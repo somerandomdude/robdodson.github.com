@@ -4,7 +4,7 @@
   <title><![CDATA[Much creepier in person]]></title>
   <link href="http://robdodson.github.com/atom.xml" rel="self"/>
   <link href="http://robdodson.github.com/"/>
-  <updated>2012-04-28T09:41:16-07:00</updated>
+  <updated>2012-04-28T09:43:40-07:00</updated>
   <id>http://robdodson.github.com/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -18,7 +18,7 @@
     <link href="http://robdodson.github.com/blog/2012/04/28/playing-with-ruby-dates/"/>
     <updated>2012-04-28T07:20:00-07:00</updated>
     <id>http://robdodson.github.com/blog/2012/04/28/playing-with-ruby-dates</id>
-    <content type="html"><![CDATA[<p>One of <a href="https://vimeo.com/40633070">my previous projects</a> involved a ton of work using Flash&#8217;s built in Date object. We ended up rolling our own Calendar library which was both tedious and time consuming to debug. Now that I&#8217;m digging into Ruby for my newest project, I wanted to see what benefits the language has to offer. So far I&#8217;m <em>really</em> impressed and that&#8217;s after only a few hours of exploration. I&#8217;ll detail some of the tricks I&#8217;ve learned along the way so hopefully other newcomers can benefit.</p>
+    <content type="html"><![CDATA[<p>One of <a href="https://vimeo.com/40633070">my previous projects</a> involved a ton of work using Flash&#8217;s built in Date object. We ended up rolling our own Calendar library which was both tedious and time consuming to debug. Now that I&#8217;m digging into Ruby for my newest project, I wanted to see what features the language has to offer. So far I&#8217;m <em>really</em> impressed and that&#8217;s after only a few hours of exploration. I&#8217;ll detail some of the tricks I&#8217;ve learned along the way so hopefully other newcomers can benefit.</p>
 
 <h3>Ruby Date Object Basics</h3>
 
