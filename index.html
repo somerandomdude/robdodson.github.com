@@ -215,7 +215,7 @@
 
 <p>Active Support is a library extracted from Rails which adds a ton of sugar to the Ruby language. As the author&#8217;s describe it:</p>
 
-<blockquote><p>Active Support is a collection of various utility classes and standard library extensions that were found useful for Rails. All these additions have hence been collected in this bundle as way to gather all that sugar that makes Ruby sweeter.</p></blockquote>
+<blockquote><p>Active Support is a collection of various utility classes and standard library extensions that were found useful for Rails. All these additions have hence been collected in this bundle as a way to gather all that sugar that makes Ruby sweeter.</p></blockquote>
 
 <p>It&#8217;s broken into several pieces so you can choose to load only the parts that you&#8217;ll actually be using. <em>I&#8217;m going to write an upcoming article on Active Support. For now we&#8217;ll just require it all.</em></p>
 
@@ -235,7 +235,7 @@
 </span><span class='line'> =&gt; Date </span></code></pre></td></tr></table></div></figure>
 
 
-<p>You&#8217;ll notice that Active Support has changed the way our date&#8217;s to_s is formatted so it&#8217;s more human readable. It also added shortcuts for creating Dates on either side of today.</p>
+<p>You&#8217;ll notice that Active Support has changed the way our date&#8217;s <code>to_s</code> is formatted so it&#8217;s more human readable. It also added shortcuts for creating Dates on either side of today.</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -249,7 +249,7 @@
 </span><span class='line'> =&gt; Sun, 29 Apr 2012</span></code></pre></td></tr></table></div></figure>
 
 
-<p>Included as well are some nice new convenience booleans: <code>past?</code>, <code>today?</code>, and <code>future?</code></p>
+<p>Included as well are some nice convenience booleans: <code>past?</code>, <code>today?</code>, and <code>future?</code></p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -257,7 +257,7 @@
 </span><span class='line'> =&gt; true</span></code></pre></td></tr></table></div></figure>
 
 
-<p>If you&#8217;ve ever had to write a Calendar class that can support weeks, especially those that straddle two different months, you&#8217;ll appreciate the simplicity of the helper methods that Active Support adds.</p>
+<p>If you&#8217;ve ever had to write a Calendar that can support weeks, especially those that straddle two different months, you&#8217;ll appreciate the simplicity of the helpers Active Support adds.</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -295,7 +295,7 @@
 </span><span class='line'> =&gt; Sun, 28 Apr 2002</span></code></pre></td></tr></table></div></figure>
 
 
-<p><code>FixNum</code> is also extended to support additional Date related methods which make certain operations much more readable.</p>
+<p>By extending <code>FixNum</code> to support additional Date methods certain operations become much more readable.</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -312,7 +312,7 @@ Which brings us back to one of our first examples of finding the date 7 days ago
 </span><span class='line'> =&gt; 2012-04-21 08:44:02 -0700</span></code></pre></td></tr></table></div></figure>
 
 
-<p>Pretty cool! Active Support adds <em>A LOT</em> more than just Date helpers and I&#8217;ll try to cover it more in some future articles. Definitely <a href="http://guides.rubyonrails.org/active_support_core_extensions.html">check out the documentation</a> (you can <a href="http://guides.rubyonrails.org/active_support_core_extensions.html#extensions-to-date">skip to the Date section</a> since it&#8217;s pretty immense)</p>
+<p>Pretty cool! Active Support adds <em>A LOT</em> more than just Date helpers and I&#8217;ll try to cover it more in some future articles. Definitely <a href="http://guides.rubyonrails.org/active_support_core_extensions.html">check out the documentation</a> (you can <a href="http://guides.rubyonrails.org/active_support_core_extensions.html#extensions-to-date">skip to the Date section</a> since it&#8217;s pretty immense).</p>
 
 <p><small>Source:<br />
 <a href="http://stackoverflow.com/questions/962544/one-line-hash-creation-in-ruby">http://stackoverflow.com/questions/962544/one-line-hash-creation-in-ruby</a>
