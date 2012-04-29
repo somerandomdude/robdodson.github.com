@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.github.com/atom.xml" rel="self"/>
   <link href="http://robdodson.github.com/"/>
-  <updated>2012-04-29T09:45:51-07:00</updated>
+  <updated>2012-04-29T09:48:50-07:00</updated>
   <id>http://robdodson.github.com/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[How to Run Tests in Sublime Text 2]]></title>
-    <link href="http://robdodson.github.com/blog/2012/04/29/how-to-run-tests-in-sublime-text-2/"/>
+    <link href="http://robdodson.github.com/blog/2012/04/29/how-to-run-tests-in-sublime-text/"/>
     <updated>2012-04-29T09:26:00-07:00</updated>
-    <id>http://robdodson.github.com/blog/2012/04/29/how-to-run-tests-in-sublime-text-2</id>
+    <id>http://robdodson.github.com/blog/2012/04/29/how-to-run-tests-in-sublime-text</id>
     <content type="html"><![CDATA[<p>If you&#8217;re lazy like me then you love to automate as much of your process as possible. Running tests from within your IDE is one of those tasks that screams for a keyboard shortcut. In full featured tools like RubyMine or Eclipse this is usually pretty straightforward. However many developers in the Ruby community seem to prefer more lightweight tools like TextMate, Vim and Sublime. Today we&#8217;ll look at how to setup RubyTest in Sublime Text 2 so we can easily run tests with just a few hotkeys. The tests will be written in <a href="http://rspec.info/">Rspec</a> which should be familiar to most Rubyists.</p>
 
 <h3>How to setup RubyTest in Sublime Text 2</h3>
