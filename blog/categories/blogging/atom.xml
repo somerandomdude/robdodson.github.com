@@ -4,7 +4,7 @@
   <title><![CDATA[Category: blogging | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/blogging/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-04-30T08:42:57-07:00</updated>
+  <updated>2012-04-30T08:47:39-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -141,6 +141,8 @@ If you visit your repo you should see the CNAME record in the root of the master
 <p>If adding <code>www</code> to the beginning of your domain seems to break things then make sure that your domain registrar has a CNAME record for www which points to your A record. I'm not a DNS expert but I <em>think</em> this is the proper way to set that up.</p>
 
 <p>Make sure you spelled your domain name correctly in the CNAME record that you pushed to Github. I spent almost an hour wondering why <code>robodson.me</code> wasn't resolving :\</p>
+
+<p>If all else fails checkout the docs from <a href="http://help.github.com/pages/">Github Pages</a> and <a href="http://octopress.org/docs/deploying/github/">Octopress</a> on setting up a custom domain.</p>
 ]]></content>
   </entry>
   
