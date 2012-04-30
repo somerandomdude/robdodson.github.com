@@ -4,7 +4,7 @@
   <title><![CDATA[Category: octopress | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/octopress/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-04-30T08:47:39-07:00</updated>
+  <updated>2012-04-30T09:02:15-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -20,7 +20,7 @@
     <id>http://robdodson.me/blog/2012/04/30/custom-domain-with-octopress-and-github-pages</id>
     <content type="html"><![CDATA[<p><em>I'm going to try to write this as a bit of a lightening post to see if I can bring down the time it takes me to produce something.</em></p>
 
-<p><a href="http://octopress.org/">Octopress</a> is a blogging framework written by <a href="http://brandonmathis.com/">Brandon Mathis</a> (<a href="https://twitter.com/#!/imathis">@imathis</a>) which sits on top of <a href="https://github.com/mojombo/jekyll">Jekyll</a>. Jekyll is a static site generator, meaning there's no database associated with your blog. Instead of writing everything in a WSYWIG linked to MySQL (like Wordpress or Blogger) you produce text files using Markdown which are then converted to static HTML. There are 3 huge benefits to this approach. First, writing in Markdown is awesome. Once you learn the syntax it's incredibly fast and you don't have to spend time playing with a tiny little editor window just to <s>add</s> <em>some</em> <strong>style</strong> to your posts. Second, writing in your favorite text editor is also awesome. I produce everything in <a href="http://www.sublimetext.com/2">Sublime Text 2</a> and every day I discover a new tricks to make the process better. If you've ever had to write a blog post using one of those horrible little TinyMCE editors you will appreciate this feature. And lastly, static HTML is <em>fast</em>.</p>
+<p><a href="http://octopress.org/">Octopress</a> is a blogging framework written by <a href="http://brandonmathis.com/">Brandon Mathis</a> (<a href="https://twitter.com/#!/imathis">@imathis</a>) which sits on top of <a href="https://github.com/mojombo/jekyll">Jekyll</a>. Jekyll is a static site generator, meaning there's no database associated with your blog. Instead of writing everything in a WSYWIG linked to MySQL (like Wordpress or Blogger) you produce text files using Markdown which are then converted to static HTML. There are 3 huge benefits to this approach. First, writing in Markdown is awesome. Once you learn the syntax it's incredibly fast and you don't have to spend time playing with a tiny little editor window just to <s>add</s> <em>some</em> <strong>style</strong> to your posts. Second, writing in your favorite text editor is also awesome. I produce everything in <a href="http://www.sublimetext.com/2">Sublime Text 2</a> and every day I discover new tricks to make the process better. If you've ever had to write a blog post using one of those horrible little TinyMCE editors you will appreciate this feature. And lastly, static HTML is <em>fast</em>.</p>
 
 <p>Octopress takes what Jekyll has started and adds some useful tasks and templates which make setting up your own blog a breeze. I'm going to quickly cover the steps needed to set everything up on Github Pages using a custom domain since that's something I struggled with when first starting out.</p>
 
@@ -31,9 +31,9 @@
 <p>You'll need at least Ruby 1.9.2 to install and run Octopress. As of right now the current version of Ruby is up to 1.9.3. I'd also recommend setting up a new RVM gemset just for your blog.</p>
 
 <p><code>
-rvm install 1.9.3 # This will take a while
+rvm install 1.9.3   # This will take a while
 rvm gemset create octopress
-rvm 1.9.3@octopress # This will tell RVM to use our new gemset.
+rvm 1.9.3@octopress   # This will tell RVM to use our new gemset.
 </code></p>
 
 <p>Next you'll need to clone and <code>bundle install</code> Octopress. When you <code>cd</code> into the directory it'll ask you to approve the .rvmrc file. An .rvmrc file basically tells RVM which ruby and gemset to use in a particular folder. Type <code>yes</code> and you'll probably get an error saying you're not using Ruby 1.9.2. This is ok, we're going to change what's in that file so ignore it for now.</p>
@@ -45,7 +45,7 @@ cd octopress    # If you use RVM, You'll be asked if you trust the .rvmrc file (
 Now let's tell RVM to use Ruby 1.9.3 with our custom Octopress gemset.
 ```</p>
 
-<blockquote><p>.rvmrc # This will empty the .rvmrc file
+<blockquote><p>.rvmrc    # This will empty the .rvmrc file
 echo "rvm use 1.9.3@octopress" > .rvmrc
 <code>
 The next time you `cd` into the octopress directory you'll have to approve the new .rvmrc file. Next let's use [Bundler](http://gembundler.com/) to install our dependencies.
@@ -66,11 +66,11 @@ then you already have a version of Rake in your global gemset. You can use</code
 
 <h3>Octopress on Github Pages</h3>
 
-<p>I prefer to host Octopress on <a href="http://github.com">Github</a> pages because it's extemely easy (and free) to setup. The first step is to go to <a href="http://github.com">Github</a> and setup a new repository. The repository should be called "your_user_name.github.com". My name on Github is <a href="https://github.com/robdodson">robdodson</a> so my repo is: <a href="https://github.com/robdodson/robdodson.github.com">robdodson.github.com</a>. Here's a quick explanation from the <a href="http://octopress.org/docs/deploying/github/">Octopress deployment guide</a>.</p>
+<p>I prefer to host Octopress on <a href="http://github.com">Github</a> pages because it's extemely easy (and free) to setup. The first step is to go to <a href="http://github.com">Github</a> and create a new repository. The repository should be called "your_user_name.github.com". My name on Github is <a href="https://github.com/robdodson">robdodson</a> so my repo is: <a href="https://github.com/robdodson/robdodson.github.com">robdodson.github.com</a>. Here's a quick explanation from the <a href="http://octopress.org/docs/deploying/github/">Octopress deployment guide</a>.</p>
 
-<blockquote><p>Github Pages for users and organizations uses the master branch like the public directory on a web server, serving up the files at your Pages url <code>http://username.github.com</code>. As a result, you’ll want to work on the source for your blog in the source branch and commit the generated content to the master branch. Octopress has a configuration task that helps you set all this up.&lt;</p></blockquote>
+<blockquote><p>Github Pages for users and organizations uses the master branch like the public directory on a web server, serving up the files at your Pages url <code>http://username.github.com</code>. As a result, you’ll want to work on the source for your blog in the source branch and commit the generated content to the master branch. Octopress has a configuration task that helps you set all this up.</p></blockquote>
 
-<p>Here's the task:</p>
+<p>Here's the task, let's run it:</p>
 
 <p><code>
 rake setup_github_pages
@@ -88,17 +88,19 @@ git commit -am 'Initial commit!'
 git push origin source
 </code></p>
 
-<h3>Octopress Deploying a Blog Post</h3>
+<h3>Octopress: Deploying a Blog Post</h3>
 
-<p>I want go into too much detail here since <a href="http://octopress.org/docs/blogging/">there's already a pretty comprehensive write up on the Octopress site for getting started</a>. But let's do a quick post just to get you familiar with everything.</p>
+<p>I won't go into too much detail here since <a href="http://octopress.org/docs/blogging/">there's already a pretty comprehensive write up on the Octopress site for getting started</a>. But let's do a quick post to get you familiar with everything.</p>
 
 <p>You'll use Rake tasks to generate your blog posts, like so:
 <code>
 rake new_post["Hello World: The First of Many New Blog Posts"]
 </code>
-This will spit out a little markdown file for us in the <code>source/_posts</code> directory. Open up the new file using your favorite text editor. You should see a little block of <a href="https://github.com/mojombo/jekyll/wiki/yaml-front-matter">YAML Front Matter</a> at the top which generates some useful metadata about our post. If you need to change a blog post's title in Octopress you'll have to update this YAML as well as the post's filename.</p>
+<em>Remember if rake cries just use <code>bundle exec</code> in front of your rake command.</em></p>
 
-<p>As I mentioned earlier your posts should be written in Markdown. <a href="http://support.mashery.com/docs/customizing_your_portal/Markdown_Cheat_Sheet">Here's a good Markdown cheat sheet to get you started</a>. <em>Tip: When you're writing in markdown you're also free to mix in HTML tags as they are ignored by the processor.</em> Let's just write a quick block text like <code>Hey, here's my first blog post!</code></p>
+<p>This will spit out a markdown file for us in the <code>source/_posts</code> directory. Open up the new file using your favorite text editor. You should see a little block of <a href="https://github.com/mojombo/jekyll/wiki/yaml-front-matter">YAML Front Matter</a> at the top which generates some useful metadata about our post. If you need to change a blog post's title in Octopress you'll have to update this YAML as well as the post's filename.</p>
+
+<p>As I mentioned earlier your posts should be written in Markdown. <a href="http://support.mashery.com/docs/customizing_your_portal/Markdown_Cheat_Sheet">Here's a good Markdown cheat sheet to get you started</a>. <em>Tip: When you're writing in markdown you're also free to mix in HTML tags as they are ignored by the processor.</em> Write a quick block of text like "Hey, here's my first blog post!" and save it.</p>
 
 <p>You can use <code>bundle exec rake preview</code> to fire up a local instance of your blog at <code>http://localhost:4000</code>. I usually leave this process running while I write so I can preview any of the markdown that I'm adding to the page. When you're done writing you'll need to generate and deploy the site to Github.</p>
 
