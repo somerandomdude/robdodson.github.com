@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: date | Rob Dodson talks internets]]></title>
+  <title><![CDATA[Category: Date | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/date/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-04-30T09:02:15-07:00</updated>
+  <updated>2012-05-01T09:00:24-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
