@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: Ruby - Rob Dodson talks internets</title>
+  <title>NoMethodError in Rails 3 - Rob Dodson talks internets</title>
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Category: Ruby">
+  <meta name="description" content="Coming from Actionscript 3 I’m pretty used to all of the different errors that the Flash compiler and runtime typically throw at me. But now that I’ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://robdodson.meblog/categories/ruby">
+  <link rel="canonical" href="http://robdodson.me/blog/2011/09/20/nomethoderror-in-rails-3">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -73,123 +73,112 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: Ruby</h1>
+    
+      <h1 class="entry-title">NoMethodError in Rails 3</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-09-20T07:33:00-07:00" pubdate data-updated="true">Sep 20<span>th</span>, 2011</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><p>Coming from Actionscript 3 I’m pretty used to all of the different errors that the Flash compiler and runtime typically throw at me. But now that I’ve started teaching myself Ruby on Rails 3 I’m having to learn a whole new lexicon of messages which generally amount to “Something blow’d up..”</p>
 
-  
-  <h2>2012</h2>
+<p>For my own benefit, and hopefully for the benefit of others, I’m going to post the errors and solutions that I come up with. Hopefully since I’m a total newbie, explaining things from my perspective will help other people who are new to the language as well.</p>
 
-<article>
-  
-<h1><a href="/blog/2012/05/01/ruby-objects-and-dot-syntax/">Ruby Objects and Dot Syntax</a></h1>
-<time datetime="2012-05-01T07:37:00-07:00" pubdate><span class='month'>May</span> <span class='day'>01</span> <span class='year'>2012</span></time>
+<p>To start of we have the <code>NoMethodError</code>.
+<img class="center" src="/images/no_method_error.jpg" title="'NoMethodError'" ></p>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/data-structures/'>Data Structures</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a></span>
-</footer>
+<p>You get a <code>NoMethodError</code> when you try to call a method which either doesn’t exist on an Object, or the Object itself doesn’t exist. Since <code>Nil</code> is actually an object in Ruby (it’s an instance of <code>NilClass</code>) this error can sometimes be a bit misleading (especially if you come from a language where Nil or Null is represented by a primitive or a data type like in Actionscript 3).</p>
 
+<p>The real reason this occurs is either because the Object itself is Nil (and you probably didn’t intend that) or you forgot to define the method on your Object. In Flash you would get an error saying you can’t call a method on a null object reference, since null is just a primitive data type. But in Ruby, it says that the method you wanted didn’t exist because you called it on an ACTUAL NilClass object and NilClass doesn&#8217;t define whatever method name you passed.</p>
 
-</article>
+<h3>Resolution</h3>
 
-
-
-<article>
-  
-<h1><a href="/blog/2012/04/29/how-to-run-tests-in-sublime-text/">How to Run Tests in Sublime Text</a></h1>
-<time datetime="2012-04-29T09:26:00-07:00" pubdate><span class='month'>Apr</span> <span class='day'>29</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/rspec/'>RSpec</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a>, <a class='category' href='/blog/categories/sublime/'>Sublime</a>, <a class='category' href='/blog/categories/tdd/'>TDD</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2012/04/28/playing-with-ruby-dates/">Playing with Ruby Dates</a></h1>
-<time datetime="2012-04-28T07:20:00-07:00" pubdate><span class='month'>Apr</span> <span class='day'>28</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/active-support/'>Active Support</a>, <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/chronic/'>Chronic</a>, <a class='category' href='/blog/categories/date/'>Date</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2012/04/27/how-to-setup-postgresql-for-rails-and-heroku/">How to setup PostgreSQL for Rails and Heroku</a></h1>
-<time datetime="2012-04-27T07:33:00-07:00" pubdate><span class='month'>Apr</span> <span class='day'>27</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/heroku/'>Heroku</a>, <a class='category' href='/blog/categories/postgresql/'>PostgreSQL</a>, <a class='category' href='/blog/categories/rails/'>Rails</a>, <a class='category' href='/blog/categories/rails-3/'>Rails 3</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a></span>
-</footer>
-
-
-</article>
-
-
-
-  
-  <h2>2011</h2>
-
-<article>
-  
-<h1><a href="/blog/2011/09/23/how-to-use-rvm-for-rails3/">A Basic RVM Tutorial for Rails 3</a></h1>
-<time datetime="2011-09-23T07:33:00-07:00" pubdate><span class='month'>Sep</span> <span class='day'>23</span> <span class='year'>2011</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/rvm/'>RVM</a>, <a class='category' href='/blog/categories/rails/'>Rails</a>, <a class='category' href='/blog/categories/rails-3/'>Rails 3</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2011/09/21/syntax-error-unexpected-tidentifier/">Syntax Error: Unexpected tIDENTIFIER in Rails 3</a></h1>
-<time datetime="2011-09-21T07:33:00-07:00" pubdate><span class='month'>Sep</span> <span class='day'>21</span> <span class='year'>2011</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/errors/'>Errors</a>, <a class='category' href='/blog/categories/rails/'>Rails</a>, <a class='category' href='/blog/categories/rails-3/'>Rails 3</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2011/09/20/nomethoderror-in-rails-3/">NoMethodError in Rails 3</a></h1>
-<time datetime="2011-09-20T07:33:00-07:00" pubdate><span class='month'>Sep</span> <span class='day'>20</span> <span class='year'>2011</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/errors/'>Errors</a>, <a class='category' href='/blog/categories/rails/'>Rails</a>, <a class='category' href='/blog/categories/rails-3/'>Rails 3</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a></span>
-</footer>
-
-
-</article>
+<ol>
+<li><p>If your error says “undefined method ‘some_method_name’ for NilClass:Class” (like it does in the picture) then you’ve accidentally tried to call a method on an Object which doesn’t really exist. You probably just didn’t pass or instantiate the Object properly.</p></li>
+<li><p>If you see the correct class type in the error then you’ve just failed to declare that method or perhaps mistyped its name. Verify that the method exists in the class and that you don’t have any spelling errors :)</p></li>
+</ol>
 
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Rob Dodson</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-09-20T07:33:00-07:00" pubdate data-updated="true">Sep 20<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/errors/'>Errors</a>, <a class='category' href='/blog/categories/rails/'>Rails</a>, <a class='category' href='/blog/categories/rails-3/'>Rails 3</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2011/09/20/nomethoderror-in-rails-3/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2011/09/20/nomethoderror-in-rails-3/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+      
+        <a class="basic-alignment right" href="/blog/2011/09/21/syntax-error-unexpected-tidentifier/" title="Next Post: Syntax Error: Unexpected tIDENTIFIER in Rails 3">Syntax Error: Unexpected tIDENTIFIER in Rails 3 &raquo;</a>
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -308,7 +297,10 @@
       var disqus_shortname = 'robdodsonblog';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://robdodson.me/blog/2011/09/20/nomethoderror-in-rails-3/';
+        var disqus_url = 'http://robdodson.me/blog/2011/09/20/nomethoderror-in-rails-3/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

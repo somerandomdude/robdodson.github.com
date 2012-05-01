@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-01T09:00:24-07:00</updated>
+  <updated>2012-05-01T09:49:12-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -979,6 +979,158 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
 <p>And recreate it however we want :D</p>
 
 <p>That wraps it up for today. If you have any questions you can post a comment or hit me up on twitter <a href="http://twitter.com/robdodson">@rob_dodson</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Syntax Error: Unexpected tIDENTIFIER in Rails 3]]></title>
+    <link href="http://robdodson.me/blog/2011/09/21/syntax-error-unexpected-tidentifier/"/>
+    <updated>2011-09-21T07:33:00-07:00</updated>
+    <id>http://robdodson.me/blog/2011/09/21/syntax-error-unexpected-tidentifier</id>
+    <content type="html"><![CDATA[<p>Today we’re going to look at this little gem, which is really nothing more than a syntax error. If you’re not used to Ruby’s syntax, this can be a particularly easy stumbling block.</p>
+
+<p>For starters here’s the image you see in Rails 3 when things go South:</p>
+
+<p><img class="center" src="http://robdodson.me/images/unexpected_tidentifier.jpg" title="'Syntax Error: Unexpected tIDENTIFIER'" ></p>
+
+<p>Just to focus your attention, I’ll post the snippet of code that was causing the issue.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='erb'><span class='line'><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s2">&quot;Goodbye&quot;</span> <span class="n">say_goodbye_path</span> <span class="cp">%&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Can you tell me what’s wrong with the code above? If you’re coming from a Ruby background it should be plainly obvious, but if you’re coming from more of an ECMAScript or Java/C/C++ background things might be a little more subtle. What if I rewrote it like this?</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">linkTo</span><span class="p">(</span><span class="s2">&quot;Goodbye&quot;</span> <span class="n">sayGoodbyePath</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Did you notice I left out a comma when passing my function arguments? The proper code would look something like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='erb'><span class='line'><span class="x"># note the comma between arguments</span>
+</span><span class='line'><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s2">&quot;Goodbye&quot;</span><span class="p">,</span> <span class="n">say_goodbye_path</span> <span class="cp">%&gt;</span><span class="x"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you want to explore this a bit more (and if you’re new to Ruby—trust me—you do) then strap in for a brief tangent.</p>
+
+<h3>Ruby Says Goodbye to Braces (sort of)</h3>
+
+<p>One of Ruby’s double edged swords, especially if you’re coming from another language, is the exclusion of various syntactical elements to improve brevity and readability. In Actionscript 3 you might iterate over a list of items like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='actionscript3'><span class='line'><span class="k">for</span> <span class="k">each</span> <span class="o">(</span><span class="kd">var</span> <span class="n">person</span><span class="p">:</span><span class="kt">Object</span> <span class="k">in</span> <span class="n">people</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nf">trace</span><span class="o">(</span><span class="n">person</span><span class="o">.</span><span class="na">name</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>However in Ruby you can write it much more succinctly:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">for</span> <span class="n">person</span> <span class="k">in</span> <span class="vi">@people</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">person</span><span class="o">.</span><span class="n">name</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># or...</span>
+</span><span class='line'>
+</span><span class='line'><span class="vi">@people</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">person</span><span class="o">|</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">person</span><span class="o">.</span><span class="n">name</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Just that example alone doesn’t look so bad but where it gets tricky for a newcomer like myself is when the parenthesis wrapping a function’s arguments are excluded. This is the case in our original example and it can be pretty jarring for someone not used to that kind of shorthand. Suddenly I’m left wondering if I’m calling another function, or using a keyword, or some other idiom of the language that I don’t fully grasp.</p>
+
+<p>It gets especially confusing when dealing with hashes as function arguments. Here’s a quote from <a href="http://pragprog.com/book/rails4/agile-web-development-with-rails">Agile Web Development with Rails, 4th Edition</a> with some emphasis added:</p>
+
+<blockquote><p>You can pass hashes as parameters on method calls. <strong>Ruby allows you to omit the braces, but only if the hash is the last parameter of the call.</strong> Rails makes extensive use of this feature…In effect, though, you can ignore that it’s a hash and pretend that Ruby has keyword arguments.</p></blockquote>
+
+<p>As you start to learn Rails you’ll see this kind of thing everywhere. At first I thought there was a special language construct that I was missing (similar to the ‘keyword’ referred to in the book) but in actuality it’s just hashes without the surrounding brackets. Common Rails practices take this to the extreme, mixing and omitting braces quite frequently. Take for example this validation:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">validates</span> <span class="ss">:email</span><span class="p">,</span> <span class="n">presence</span><span class="p">:</span>   <span class="kp">true</span><span class="p">,</span>
+</span><span class='line'>                    <span class="nb">format</span><span class="p">:</span>     <span class="p">{</span> <span class="n">with</span><span class="p">:</span> <span class="no">VALID_EMAIL_REGEX</span> <span class="p">},</span>
+</span><span class='line'>                    <span class="n">uniqueness</span><span class="p">:</span> <span class="p">{</span> <span class="n">case_sensitive</span><span class="p">:</span> <span class="kp">false</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To confuse the issue even further, the hash syntax changed from Ruby 1.8.7 to 1.9 allowing you to swap the place of the colon on your symbols. This makes newer Rails examples seem like they’re using another part of the language that you might not be familiar with. Below is an example, note the position of the colons:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'> <span class="c1"># Ruby 1.8.7 hash syntax</span>
+</span><span class='line'><span class="n">say_hello</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="ss">:age</span> <span class="o">=&gt;</span> <span class="mi">27</span>
+</span><span class='line'><span class="n">say_hello</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="ss">:age</span> <span class="o">=&gt;</span> <span class="mi">27</span><span class="p">)</span>
+</span><span class='line'><span class="n">say_hello</span><span class="p">({</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="ss">:age</span> <span class="o">=&gt;</span> <span class="mi">27</span><span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Ruby 1.9 hash syntax</span>
+</span><span class='line'><span class="n">say_hello</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="n">age</span><span class="p">:</span> <span class="mi">27</span>
+</span><span class='line'><span class="n">say_hello</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="n">age</span><span class="p">:</span> <span class="mi">27</span><span class="p">)</span>
+</span><span class='line'><span class="n">say_hello</span><span class="p">({</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="n">age</span><span class="p">:</span> <span class="mi">27</span><span class="p">})</span>
+</span><span class='line'><span class="n">say_hello</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="ss">:age</span> <span class="o">=&gt;</span> <span class="mi">27</span>
+</span><span class='line'><span class="n">say_hello</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="ss">:age</span> <span class="o">=&gt;</span> <span class="mi">27</span><span class="p">)</span>
+</span><span class='line'><span class="n">say_hello</span><span class="p">({</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="ss">:age</span> <span class="o">=&gt;</span> <span class="mi">27</span><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>All of the above code evaluates to the same thing (give it a shot in IRB). At this point we’re way off topic but I wanted to put this out there in case anyone else is struggling with these concepts. After getting used to the syntax (or lack thereof) these kinds of mistakes are easily cleared up, but for now just be mindful of what version of Ruby your examples are written in.</p>
+
+<h3>Resolution</h3>
+
+<p>Check the syntax of your method call. Odds are you forgot a comma somewhere.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[NoMethodError in Rails 3]]></title>
+    <link href="http://robdodson.me/blog/2011/09/20/nomethoderror-in-rails-3/"/>
+    <updated>2011-09-20T07:33:00-07:00</updated>
+    <id>http://robdodson.me/blog/2011/09/20/nomethoderror-in-rails-3</id>
+    <content type="html"><![CDATA[<p>Coming from Actionscript 3 I’m pretty used to all of the different errors that the Flash compiler and runtime typically throw at me. But now that I’ve started teaching myself Ruby on Rails 3 I’m having to learn a whole new lexicon of messages which generally amount to “Something blow’d up..”</p>
+
+<p>For my own benefit, and hopefully for the benefit of others, I’m going to post the errors and solutions that I come up with. Hopefully since I’m a total newbie, explaining things from my perspective will help other people who are new to the language as well.</p>
+
+<p>To start of we have the <code>NoMethodError</code>.
+<img class="center" src="http://robdodson.me/images/no_method_error.jpg" title="'NoMethodError'" ></p>
+
+<p>You get a <code>NoMethodError</code> when you try to call a method which either doesn’t exist on an Object, or the Object itself doesn’t exist. Since <code>Nil</code> is actually an object in Ruby (it’s an instance of <code>NilClass</code>) this error can sometimes be a bit misleading (especially if you come from a language where Nil or Null is represented by a primitive or a data type like in Actionscript 3).</p>
+
+<p>The real reason this occurs is either because the Object itself is Nil (and you probably didn’t intend that) or you forgot to define the method on your Object. In Flash you would get an error saying you can’t call a method on a null object reference, since null is just a primitive data type. But in Ruby, it says that the method you wanted didn’t exist because you called it on an ACTUAL NilClass object and NilClass doesn&#8217;t define whatever method name you passed.</p>
+
+<h3>Resolution</h3>
+
+<ol>
+<li><p>If your error says “undefined method ‘some_method_name’ for NilClass:Class” (like it does in the picture) then you’ve accidentally tried to call a method on an Object which doesn’t really exist. You probably just didn’t pass or instantiate the Object properly.</p></li>
+<li><p>If you see the correct class type in the error then you’ve just failed to declare that method or perhaps mistyped its name. Verify that the method exists in the class and that you don’t have any spelling errors :)</p></li>
+</ol>
+
 ]]></content>
   </entry>
   
