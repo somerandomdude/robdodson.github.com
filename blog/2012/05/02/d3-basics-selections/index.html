@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: Active Support - Rob Dodson talks internets</title>
+  <title>D3 Basics: Selections - Rob Dodson talks internets</title>
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Category: Active Support">
+  <meta name="description" content=".chart { font-family: Arial, sans-serif; font-size: 10px; margin-top: -40px; } .bar { fill: steelblue; } .axis path, .axis line { fill: none; stroke &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://robdodson.meblog/categories/active-support">
+  <link rel="canonical" href="http://robdodson.me/blog/2012/05/02/d3-basics-selections">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -73,36 +73,213 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: Active Support</h1>
+    
+      <h1 class="entry-title">D3 Basics: Selections</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-02T07:20:00-07:00" pubdate data-updated="true">May 2<span>nd</span>, 2012</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
+
+
+<div class="entry-content"><!-- Make sure to include D3 first or else the IIFEs won't work. -->
+
+
+<script src="javascripts/d3.v2.js"></script>
+
+
+<p></p>
+
+<!-- CSS Styles: -->
+
+
+<div>
+  <style type="text/css">
+
+    .chart {
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      margin-top: -40px;
+    }
+
+    .bar {
+      fill: steelblue;
+    }
+
+    .axis path, .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+  </style>
+</div>
 
 
 
-  
-  <h2>2012</h2>
 
-<article>
-  
-<h1><a href="/blog/2012/04/28/playing-with-ruby-dates/">Playing with Ruby Dates</a></h1>
-<time datetime="2012-04-28T07:20:00-07:00" pubdate><span class='month'>Apr</span> <span class='day'>28</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/active-support/'>Active Support</a>, <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/chronic/'>Chronic</a>, <a class='category' href='/blog/categories/date/'>Date</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a></span>
-</footer>
+<!-- Global Variables: -->
 
 
-</article>
+<script type="text/javascript">
+
+  var data = [1, 1, 2, 3, 5, 8];
+
+  var margin = {top: 40, right: 40, bottom: 40, left: 40},
+      width = $('.entry-content').width(),
+      height = 300;
+
+  $(window).resize(function() {
+    width = $('.entry-content').width();
+  });
+
+</script>
+
+
+<h3>D3: Example Chart</h3>
+
+<p>Lorem ipsum dolor set amet. Bacon cheeseburger ribeye flank steak,
+chicken waffle. Possum raccoon and gravy.</p>
+
+<p>Here&#8217;s an example chart:</p>
+
+<div id='chart-1'></div>
+
+
+<script type='text/javascript'>
+  (function() {
+
+    function draw() {
+      
+      $('#chart-1').empty();
+
+      var x = d3.scale.linear()
+      .domain([0, d3.max(data)])
+      .range([0, width - margin.left - margin.right]);
+
+      var y = d3.scale.ordinal()
+          .domain(d3.range(data.length))
+          .rangeRoundBands([height - margin.top - margin.bottom, 0], 0.2);
+
+      var xAxis = d3.svg.axis()
+          .scale(x)
+          .orient('bottom')
+          .tickPadding(8);
+
+      var yAxis = d3.svg.axis()
+          .scale(y)
+          .orient('left')
+          .tickPadding(8)
+          .tickSize(0);
+
+      var svg = d3.select('#chart-1').append('svg')
+          .attr('width', width)
+          .attr('height', height)
+          .attr('class', 'chart')
+        .append('g')
+          .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+
+      svg.selectAll('.chart')
+          .data(data)
+        .enter().append('rect')
+          .attr('class', 'bar')
+          .attr('y', function(d, i) { return y(i) })
+          .attr('width', x)
+          .attr('height', y.rangeBand());
+
+      svg.append('g')
+          .attr('class', 'x axis')
+          .attr('transform', 'translate(0, ' + y.rangeExtent()[1] + ')')
+          .call(xAxis);
+
+      svg.append('g')
+          .attr('class', 'y axis')
+          .call(yAxis);
+    }
+
+    draw();
+
+    $(window).resize(function() {
+      console.log('empty and redraw');
+      draw();
+    });
+
+  })();
+</script>
 
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Rob Dodson</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-02T07:20:00-07:00" pubdate data-updated="true">May 2<span>nd</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2012/05/02/d3-basics-selections/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2012/05/02/d3-basics-selections/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/05/01/ruby-objects-and-dot-syntax/" title="Previous Post: Ruby Objects and Dot Syntax">&laquo; Ruby Objects and Dot Syntax</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -221,7 +398,10 @@
       var disqus_shortname = 'robdodsontalksinternets';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://robdodson.me/blog/2012/05/02/d3-basics-selections/';
+        var disqus_url = 'http://robdodson.me/blog/2012/05/02/d3-basics-selections/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

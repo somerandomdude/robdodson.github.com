@@ -9,10 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Coming from JavaScript I&#8217;m very accustomed to doing something like this: Javascript1
-2
-3
-var person = { name: &#39;Rob&#39;, city: &#39;San &hellip;">
+  <meta name="description" content=".chart { font-family: Arial, sans-serif; font-size: 10px; margin-top: -40px; } .bar { fill: steelblue; } .axis path, .axis line { fill: none; stroke &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +74,166 @@ var person = { name: &#39;Rob&#39;, city: &#39;San &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/02/d3-basics-selections/">D3 Basics: Selections</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-02T07:20:00-07:00" pubdate data-updated="true">May 2<span>nd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><!-- Make sure to include D3 first or else the IIFEs won't work. -->
+
+
+<script src="javascripts/d3.v2.js"></script>
+
+
+<p></p>
+
+<!-- CSS Styles: -->
+
+
+<div>
+  <style type="text/css">
+
+    .chart {
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      margin-top: -40px;
+    }
+
+    .bar {
+      fill: steelblue;
+    }
+
+    .axis path, .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+  </style>
+</div>
+
+
+
+
+<!-- Global Variables: -->
+
+
+<script type="text/javascript">
+
+  var data = [1, 1, 2, 3, 5, 8];
+
+  var margin = {top: 40, right: 40, bottom: 40, left: 40},
+      width = $('.entry-content').width(),
+      height = 300;
+
+  $(window).resize(function() {
+    width = $('.entry-content').width();
+  });
+
+</script>
+
+
+<h3>D3: Example Chart</h3>
+
+<p>Lorem ipsum dolor set amet. Bacon cheeseburger ribeye flank steak,
+chicken waffle. Possum raccoon and gravy.</p>
+
+<p>Here&#8217;s an example chart:</p>
+
+<div id='chart-1'></div>
+
+
+<script type='text/javascript'>
+  (function() {
+
+    function draw() {
+      
+      $('#chart-1').empty();
+
+      var x = d3.scale.linear()
+      .domain([0, d3.max(data)])
+      .range([0, width - margin.left - margin.right]);
+
+      var y = d3.scale.ordinal()
+          .domain(d3.range(data.length))
+          .rangeRoundBands([height - margin.top - margin.bottom, 0], 0.2);
+
+      var xAxis = d3.svg.axis()
+          .scale(x)
+          .orient('bottom')
+          .tickPadding(8);
+
+      var yAxis = d3.svg.axis()
+          .scale(y)
+          .orient('left')
+          .tickPadding(8)
+          .tickSize(0);
+
+      var svg = d3.select('#chart-1').append('svg')
+          .attr('width', width)
+          .attr('height', height)
+          .attr('class', 'chart')
+        .append('g')
+          .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+
+      svg.selectAll('.chart')
+          .data(data)
+        .enter().append('rect')
+          .attr('class', 'bar')
+          .attr('y', function(d, i) { return y(i) })
+          .attr('width', x)
+          .attr('height', y.rangeBand());
+
+      svg.append('g')
+          .attr('class', 'x axis')
+          .attr('transform', 'translate(0, ' + y.rangeExtent()[1] + ')')
+          .call(xAxis);
+
+      svg.append('g')
+          .attr('class', 'y axis')
+          .call(yAxis);
+    }
+
+    draw();
+
+    $(window).resize(function() {
+      console.log('empty and redraw');
+      draw();
+    });
+
+  })();
+</script>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1428,6 +1585,10 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/05/02/d3-basics-selections/">D3 Basics: Selections</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/05/01/ruby-objects-and-dot-syntax/">Ruby Objects and Dot Syntax</a>
       </li>
     
@@ -1441,10 +1602,6 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
     
       <li class="post">
         <a href="/blog/2012/04/28/playing-with-ruby-dates/">Playing with Ruby Dates</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/04/27/how-to-setup-postgresql-for-rails-and-heroku/">How to setup PostgreSQL for Rails and Heroku</a>
       </li>
     
   </ul>
