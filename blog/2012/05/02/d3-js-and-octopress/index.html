@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>D3 Basics: Selections - Rob Dodson talks internets</title>
+  <title>D3.js and Octopress - Rob Dodson talks internets</title>
   <meta name="author" content="Rob Dodson">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://robdodson.me/blog/2012/05/02/d3-basics-selections">
+  <link rel="canonical" href="http://robdodson.me/blog/2012/05/02/d3-js-and-octopress">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -77,7 +77,7 @@
   
   <header>
     
-      <h1 class="entry-title">D3 Basics: Selections</h1>
+      <h1 class="entry-title">D3.js and Octopress</h1>
     
     
       <p class="meta">
@@ -136,7 +136,7 @@
 
 
 
-<!-- Global Variables: -->
+<!-- Global Variables and Handlers: -->
 
 
 <script type="text/javascript">
@@ -161,69 +161,74 @@ chicken waffle. Possum raccoon and gravy.</p>
 
 <p>Here&#8217;s an example chart:</p>
 
+<!-- D3.js Chart -->
+
+
 <div id='chart-1'></div>
 
 
 <script type='text/javascript'>
-  (function() {
+(function() {
 
-    function draw() {
-      
-      $('#chart-1').empty();
+  function draw() {
+    
+    $('#chart-1').empty();
 
-      var x = d3.scale.linear()
-      .domain([0, d3.max(data)])
-      .range([0, width - margin.left - margin.right]);
+    var x = d3.scale.linear()
+        .domain([0, d3.max(data)])
+        .range([0, width - margin.left - margin.right]);
 
-      var y = d3.scale.ordinal()
-          .domain(d3.range(data.length))
-          .rangeRoundBands([height - margin.top - margin.bottom, 0], 0.2);
+    var y = d3.scale.ordinal()
+        .domain(d3.range(data.length))
+        .rangeRoundBands([height - margin.top - margin.bottom, 0], 0.2);
 
-      var xAxis = d3.svg.axis()
-          .scale(x)
-          .orient('bottom')
-          .tickPadding(8);
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient('bottom')
+        .tickPadding(8);
 
-      var yAxis = d3.svg.axis()
-          .scale(y)
-          .orient('left')
-          .tickPadding(8)
-          .tickSize(0);
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient('left')
+        .tickPadding(8)
+        .tickSize(0);
 
-      var svg = d3.select('#chart-1').append('svg')
-          .attr('width', width)
-          .attr('height', height)
-          .attr('class', 'chart')
-        .append('g')
-          .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+    var svg = d3.select('#chart-1').append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .attr('class', 'chart')
+      .append('g')
+        .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
 
-      svg.selectAll('.chart')
-          .data(data)
-        .enter().append('rect')
-          .attr('class', 'bar')
-          .attr('y', function(d, i) { return y(i) })
-          .attr('width', x)
-          .attr('height', y.rangeBand());
+    svg.selectAll('.chart')
+        .data(data)
+      .enter().append('rect')
+        .attr('class', 'bar')
+        .attr('y', function(d, i) { return y(i) })
+        .attr('width', x)
+        .attr('height', y.rangeBand());
 
-      svg.append('g')
-          .attr('class', 'x axis')
-          .attr('transform', 'translate(0, ' + y.rangeExtent()[1] + ')')
-          .call(xAxis);
+    svg.append('g')
+        .attr('class', 'x axis')
+        .attr('transform', 'translate(0, ' + y.rangeExtent()[1] + ')')
+        .call(xAxis);
 
-      svg.append('g')
-          .attr('class', 'y axis')
-          .call(yAxis);
-    }
+    svg.append('g')
+        .attr('class', 'y axis')
+        .call(yAxis);
+    
+  }
 
+  draw();
+
+  $(window).resize(function() {
     draw();
+  });
 
-    $(window).resize(function() {
-      console.log('empty and redraw');
-      draw();
-    });
-
-  })();
+})();
 </script>
+
+
 
 </div>
 
@@ -255,7 +260,7 @@ chicken waffle. Possum raccoon and gravy.</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2012/05/02/d3-basics-selections/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2012/05/02/d3-basics-selections/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2012/05/02/d3-js-and-octopress/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2012/05/02/d3-js-and-octopress/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -290,7 +295,7 @@ chicken waffle. Possum raccoon and gravy.</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2012/05/02/d3-basics-selections/">D3 Basics: Selections</a>
+        <a href="/blog/2012/05/02/d3-js-and-octopress/">D3.js and Octopress</a>
       </li>
     
       <li class="post">
@@ -399,8 +404,8 @@ chicken waffle. Possum raccoon and gravy.</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://robdodson.me/blog/2012/05/02/d3-basics-selections/';
-        var disqus_url = 'http://robdodson.me/blog/2012/05/02/d3-basics-selections/';
+        var disqus_identifier = 'http://robdodson.me/blog/2012/05/02/d3-js-and-octopress/';
+        var disqus_url = 'http://robdodson.me/blog/2012/05/02/d3-js-and-octopress/';
         var disqus_script = 'embed.js';
       
     (function () {
