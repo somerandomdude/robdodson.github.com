@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Octopress | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/octopress/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-02T13:08:29-07:00</updated>
+  <updated>2012-05-02T13:17:10-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -21,7 +21,7 @@
     <content type="html"><![CDATA[<!-- Make sure to include D3 first or else the IIFEs won't work. -->
 
 
-<script src="javascripts/d3.v2.js"></script>
+<script src="http://robdodson.me/javascripts/d3.v2.js"></script>
 
 
 <p></p>
