@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-03T22:15:48-07:00</updated>
+  <updated>2012-05-03T22:17:02-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -95,7 +95,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now let&#8217;s change the scale a bit. Let&#8217;s say that <code>x</code> still has a <code>domain</code> of 0 - 100 but now it has a <code>range</code> of <code>0 - 10</code>. What do you think our <code>scale of 50</code> will return?</p>
+<p>Now let&#8217;s change the scale a bit. Let&#8217;s say that <code>x</code> still has an input <code>domain</code> of 0 - 100 but now it has an output <code>range</code> of <code>0 - 10</code>. What do you think our <code>scale of 50</code> will return?</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="c1">// returns 5</span>

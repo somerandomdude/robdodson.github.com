@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Data Viz | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/data-viz/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-03T22:15:48-07:00</updated>
+  <updated>2012-05-03T22:17:02-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -94,7 +94,7 @@
 x(50) // returns 50
 </code></p>
 
-<p>Now let's change the scale a bit. Let's say that <code>x</code> still has a <code>domain</code> of 0 - 100 but now it has a <code>range</code> of <code>0 - 10</code>. What do you think our <code>scale of 50</code> will return?
+<p>Now let's change the scale a bit. Let's say that <code>x</code> still has an input <code>domain</code> of 0 - 100 but now it has an output <code>range</code> of <code>0 - 10</code>. What do you think our <code>scale of 50</code> will return?
 <code>javascript
 x(50) // returns 5
 </code>
