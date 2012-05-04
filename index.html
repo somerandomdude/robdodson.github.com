@@ -80,6 +80,168 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2012/05/03/d3-basics-scales-pt-1/">D3 Basics: Scales Pt. 1</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-03T10:04:00-07:00" pubdate data-updated="true">May 3<span>rd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><!-- Make sure to include D3 first or else the IIFEs won't work. -->
+
+
+<script src="javascripts/d3.v2.js"></script>
+
+
+<p></p>
+
+<!-- CSS Styles: -->
+
+
+<div>
+  <style type="text/css">
+
+    .chart {
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      margin-top: -40px;
+    }
+
+    .bar {
+      fill: steelblue;
+    }
+
+    .axis path, .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+  </style>
+</div>
+
+
+
+
+<!-- Global Variables: -->
+
+
+<script type="text/javascript">
+
+  var data = [1, 1, 2, 3, 5, 8];
+
+  var margin = {top: 40, right: 40, bottom: 40, left: 40},
+      width = $('.entry-content').width(),
+      height = 300;
+
+  $(window).resize(function() {
+    width = $('.entry-content').width();
+  });
+
+</script>
+
+
+<p>I wanted to say a thing and it goes right here.</p>
+
+<h3>What Are Scales in D3?</h3>
+
+<p>A scale in D3 is a convenience function for mapping input data to an output range, typically x/y positions or width/height. Scales can also be used to link data to arbitrary values like categories or days of the week, or to quantize data into &#8220;buckets&#8221;.</p>
+
+<p>There are two essential properties for any scale: the <code>domain</code> and the <code>range</code>. The <code>domain</code> serves as the input for your graph while the <code>range</code> represents the output.</p>
+
+<h4>Domain</h4>
+
+<p>Since the <code>domain</code> corresponds to our graph&#8217;s input it can be either <em>continuous</em> or <em>discrete</em>. You might think of a continous data set as any number from 1 to infinity while a discrete set might be every <code>Date</code> from January 1, 2012 to January 10, 2012. The takeaway is that continous data is essentially unbounded while discrete data is finite and easily quantified.</p>
+
+<h4>Range</h4>
+
+<p>The <code>range</code> defines the potential output that the scale can generate. Values from the domain are mapped to values in the range. Let&#8217;s look at two examples to help clarify.</p>
+
+<p>Say you have an <em>identity scale</em>, meaning whatever value you use for input will also be returned as the output. We&#8217;ll call the scale <code>x</code>. If <code>x</code> has a <code>domain</code> of 0 - 100 and a <code>range</code> of 0 - 100, then your <code>scale of 1</code> will be 1. Your <code>scale of 50</code> will be 50. Here&#8217;s another way to write it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="c1">// returns 50</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now let&#8217;s change the scale a bit. Let&#8217;s say that <code>x</code> still has a <code>domain</code> of 0 - 100 but now it has a <code>range</code> of <code>0 - 10</code>. What do you think our <code>scale of 50</code> will return?</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="c1">// returns 5</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you guessed 5 then you are the smart! Since we limited our potential output down to any number between 0 and 10 it narrowed the mapping from our <code>domain</code> to our <code>range</code>. Being able to expand or contract this mapping is the main value in using a D3 scale.</p>
+
+<h3>Class Work Time</h3>
+
+<!-- D3.js -->
+
+
+<script type='text/javascript'>
+
+x = d3.scale.linear()
+    .domain([0, 100])
+    .range([0, 10]);
+
+</script>
+
+
+<p>I&#8217;ve included d3 on the page so you can play around with it. Go ahead, bust open your developer tools or firebug and type <code>d3</code> into the console. It should return an Object full of methods.</p>
+
+<p>Let&#8217;s do some experiments with our <code>x</code> scale from earlier. Try typing the following to see what you get.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1">// 0</span>
+</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span> <span class="c1">// 2.5</span>
+</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span> <span class="c1">// 9.9</span>
+</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="c1">// 10</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In D3 a scale is both a <code>Function</code> and an <code>Object</code>. You can invoke a scale by using parenthesis: <code>x(100)</code> or you can set a property to change its behavior: 1x.range([0, 1000])`. Let&#8217;s try that! In the console type:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">.</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Our scale&#8217;s range used to be 0 - 10. Now that we&#8217;ve changed it to 0 - 1000, what do you think <code>x(100)</code> will equal if 100 is the highest value in our domain? If you&#8217;re not sure try it out in the console. Actually try it out in the console regardless! The console is cool as shit!</p>
+
+<h3>To Be Continued&#8230;</h3>
+
+<p>Scales are a huge topic so we&#8217;ll stop here for now. In the next post we&#8217;ll start talking about <code>linear</code>, <code>time</code> and <code>ordinal</code> scales. In my experience these are the big three, once you&#8217;ve mastered them everything else becomes a lot easier. Stay tuned :)</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2012/05/02/d3-js-and-octopress/">D3.js and Octopress</a></h1>
     
     
@@ -1847,6 +2009,10 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/05/03/d3-basics-scales-pt-1/">D3 Basics: Scales Pt. 1</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/05/02/d3-js-and-octopress/">D3.js and Octopress</a>
       </li>
     
@@ -1860,10 +2026,6 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
     
       <li class="post">
         <a href="/blog/2012/04/29/how-to-run-tests-in-sublime-text/">How to Run Tests in Sublime Text</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/04/28/playing-with-ruby-dates/">Playing with Ruby Dates</a>
       </li>
     
   </ul>

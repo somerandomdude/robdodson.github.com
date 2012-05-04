@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Data Viz | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/data-viz/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-02T13:34:22-07:00</updated>
+  <updated>2012-05-03T22:04:06-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,132 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[D3 Basics: Scales Pt. 1]]></title>
+    <link href="http://robdodson.me/blog/2012/05/03/d3-basics-scales-pt-1/"/>
+    <updated>2012-05-03T10:04:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/03/d3-basics-scales-pt-1</id>
+    <content type="html"><![CDATA[<!-- Make sure to include D3 first or else the IIFEs won't work. -->
+
+
+<script src="javascripts/d3.v2.js"></script>
+
+
+<p></p>
+
+<!-- CSS Styles: -->
+
+
+<div>
+  <style type="text/css">
+
+    .chart {
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      margin-top: -40px;
+    }
+
+    .bar {
+      fill: steelblue;
+    }
+
+    .axis path, .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+  </style>
+</div>
+
+
+
+
+<!-- Global Variables: -->
+
+
+<script type="text/javascript">
+
+  var data = [1, 1, 2, 3, 5, 8];
+
+  var margin = {top: 40, right: 40, bottom: 40, left: 40},
+      width = $('.entry-content').width(),
+      height = 300;
+
+  $(window).resize(function() {
+    width = $('.entry-content').width();
+  });
+
+</script>
+
+
+<p>I wanted to say a thing and it goes right here.</p>
+
+<h3>What Are Scales in D3?</h3>
+
+<p>A scale in D3 is a convenience function for mapping input data to an output range, typically x/y positions or width/height. Scales can also be used to link data to arbitrary values like categories or days of the week, or to quantize data into "buckets".</p>
+
+<p>There are two essential properties for any scale: the <code>domain</code> and the <code>range</code>. The <code>domain</code> serves as the input for your graph while the <code>range</code> represents the output.</p>
+
+<h4>Domain</h4>
+
+<p>Since the <code>domain</code> corresponds to our graph's input it can be either <em>continuous</em> or <em>discrete</em>. You might think of a continous data set as any number from 1 to infinity while a discrete set might be every <code>Date</code> from January 1, 2012 to January 10, 2012. The takeaway is that continous data is essentially unbounded while discrete data is finite and easily quantified.</p>
+
+<h4>Range</h4>
+
+<p>The <code>range</code> defines the potential output that the scale can generate. Values from the domain are mapped to values in the range. Let's look at two examples to help clarify.</p>
+
+<p>Say you have an <em>identity scale</em>, meaning whatever value you use for input will also be returned as the output. We'll call the scale <code>x</code>. If <code>x</code> has a <code>domain</code> of 0 - 100 and a <code>range</code> of 0 - 100, then your <code>scale of 1</code> will be 1. Your <code>scale of 50</code> will be 50. Here's another way to write it:</p>
+
+<p><code>javascript
+x(50) // returns 50
+</code></p>
+
+<p>Now let's change the scale a bit. Let's say that <code>x</code> still has a <code>domain</code> of 0 - 100 but now it has a <code>range</code> of <code>0 - 10</code>. What do you think our <code>scale of 50</code> will return?
+<code>javascript
+x(50) // returns 5
+</code>
+If you guessed 5 then you are the smart! Since we limited our potential output down to any number between 0 and 10 it narrowed the mapping from our <code>domain</code> to our <code>range</code>. Being able to expand or contract this mapping is the main value in using a D3 scale.</p>
+
+<h3>Class Work Time</h3>
+
+<!-- D3.js -->
+
+
+<script type='text/javascript'>
+
+x = d3.scale.linear()
+    .domain([0, 100])
+    .range([0, 10]);
+
+</script>
+
+
+<p>I've included d3 on the page so you can play around with it. Go ahead, bust open your developer tools or firebug and type <code>d3</code> into the console. It should return an Object full of methods.</p>
+
+<p>Let's do some experiments with our <code>x</code> scale from earlier. Try typing the following to see what you get.</p>
+
+<p><code>javascript
+x(0) // 0
+x(25) // 2.5
+x(99) // 9.9
+x(100) // 10
+</code></p>
+
+<p>In D3 a scale is both a <code>Function</code> and an <code>Object</code>. You can invoke a scale by using parenthesis: <code>x(100)</code> or you can set a property to change its behavior: 1x.range([0, 1000])`. Let's try that! In the console type:</p>
+
+<p><code>javascript
+x.range([0, 1000]);
+</code></p>
+
+<p>Our scale's range used to be 0 - 10. Now that we've changed it to 0 - 1000, what do you think <code>x(100)</code> will equal if 100 is the highest value in our domain? If you're not sure try it out in the console. Actually try it out in the console regardless! The console is cool as shit!</p>
+
+<h3>To Be Continued...</h3>
+
+<p>Scales are a huge topic so we'll stop here for now. In the next post we'll start talking about <code>linear</code>, <code>time</code> and <code>ordinal</code> scales. In my experience these are the big three, once you've mastered them everything else becomes a lot easier. Stay tuned :)</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[D3.js and Octopress]]></title>
