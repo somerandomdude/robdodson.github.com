@@ -4,7 +4,7 @@
   <title><![CDATA[Category: D3 | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/d3/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-03T22:37:28-07:00</updated>
+  <updated>2012-05-04T07:18:44-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -98,7 +98,7 @@ x(50) // returns 50
 
 <p><img class="center" src="http://www.jeromecukier.net/wp-content/uploads/2011/08/d3scale1.png" title="'An example of how scales work'" ></p>
 
-<p>Jerome has <a href="http://www.jeromecukier.net/blog/2011/08/11/d3-scales-and-color/">an excelent blog post</a> covering scales in D3 which inspired me to write my own post. Definitely check it out :) I feel like a great way to learn something is to not only read about it a bunch but to write about it. Hearing different views on the same topic often helps me solidify a concept.</p>
+<p>Jerome has <a href="http://www.jeromecukier.net/blog/2011/08/11/d3-scales-and-color/">an excelent blog post</a> covering scales in D3 which inspired me to write my own post. Definitely read his as well! I feel like a great way to learn something is to not only read about it a bunch but to write about it. Hearing different views on the same topic often helps me solidify a concept.</p>
 
 <h3>Class Work Time</h3>
 
@@ -135,7 +135,7 @@ x.range([0, 1000]);
 
 <h3>To Be Continued...</h3>
 
-<p>Scales are a huge topic so we'll stop here for now. In the next post we'll talk about <code>linear</code>, <code>time</code> and <code>ordinal</code> scales. In my experience these are the big three, once you've mastered them everything else becomes a lot easier. Stay tuned :)</p>
+<p>Scales are a huge topic so we'll stop here for now. In the next post we'll talk about <code>linear</code>, <code>time</code> and <code>ordinal</code> scales; once you've mastered them everything else becomes a lot easier. Stay tuned :)</p>
 ]]></content>
   </entry>
   
