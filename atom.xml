@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-03T22:17:02-07:00</updated>
+  <updated>2012-05-03T22:37:28-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -95,14 +95,11 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now let&#8217;s change the scale a bit. Let&#8217;s say that <code>x</code> still has an input <code>domain</code> of 0 - 100 but now it has an output <code>range</code> of <code>0 - 10</code>. What do you think our <code>scale of 50</code> will return?</p>
+<p>Now let&#8217;s change the scale a bit. Let&#8217;s say that <code>x</code> still has an input <code>domain</code> of 0 - 100 but now it has an output <code>range</code> of <code>0 - 10</code>. What do you think our <code>scale of 50</code> will return? &#8230; If you guessed 5 then you are the smart! Because we limited our potential output down to any number between 0 and 10 it narrowed the mapping from our <code>domain</code> to our <code>range</code>. Being able to expand or contract this mapping is the main value in using a D3 scale. If it&#8217;s still not quite sinking in check out this great visual from <a href="http://www.jeromecukier.net/">Jerome Cukier</a> (<a href="https://twitter.com/#!/jcukier">@jcukier</a>).</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="c1">// returns 5</span>
-</span></code></pre></td></tr></table></div></figure>
+<p><img class="center" src="http://www.jeromecukier.net/wp-content/uploads/2011/08/d3scale1.png" title="'An example of how scales work'" ></p>
 
-
-<p>If you guessed 5 then you are the smart! Since we limited our potential output down to any number between 0 and 10 it narrowed the mapping from our <code>domain</code> to our <code>range</code>. Being able to expand or contract this mapping is the main value in using a D3 scale.</p>
+<p>Jerome has <a href="http://www.jeromecukier.net/blog/2011/08/11/d3-scales-and-color/">an excelent blog post</a> covering scales in D3 which inspired me to write my own post. Definitely check it out :) I feel like a great way to learn something is to not only read about it a bunch but to write about it. Hearing different views on the same topic often helps me solidify a concept.</p>
 
 <h3>Class Work Time</h3>
 
@@ -118,33 +115,33 @@ x = d3.scale.linear()
 </script>
 
 
-<p>I&#8217;ve included d3 on the page so you can play around with it. Go ahead, bust open your developer tools or firebug and type <code>d3</code> into the console. It should return an Object full of methods.</p>
+<p>I&#8217;ve included <code>d3</code> on the page so you can play around with it. Go ahead, bust open your developer tools or firebug and type <code>d3</code> into the console. It should return an Object full of methods.</p>
 
-<p>Let&#8217;s do some experiments with our <code>x</code> scale from earlier. Try typing the following to see what you get.</p>
+<p>Let&#8217;s do some experiments with our <code>x</code> scale from earlier. Type the following to see what you get.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1">// 0</span>
-</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">25</span><span class="p">)</span> <span class="c1">// 2.5</span>
-</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span> <span class="c1">// 9.9</span>
-</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="c1">// 10</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">25</span><span class="p">);</span>
+</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">99</span><span class="p">);</span>
+</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>In D3 a scale is both a <code>Function</code> and an <code>Object</code>. You can invoke a scale by using parenthesis: <code>x(100)</code> or you can set a property to change its behavior: 1x.range([0, 1000])`. Let&#8217;s try that! In the console type:</p>
+<p>In D3 a scale is both a <code>Function</code> and an <code>Object</code>. You can invoke a scale by using parenthesis: <code>x(100)</code> or you can set a property to change its behavior: <code>x.range([0, 1000])</code>. Let&#8217;s try that! In the console type:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">.</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Our scale&#8217;s range used to be 0 - 10. Now that we&#8217;ve changed it to 0 - 1000, what do you think <code>x(100)</code> will equal if 100 is the highest value in our domain? If you&#8217;re not sure try it out in the console. Actually try it out in the console regardless! The console is cool as shit!</p>
+<p>Our scale&#8217;s range used to be 0 - 10. Now that we&#8217;ve changed it to 0 - 1000, what do you think <code>x(100)</code> will equal? Keep in mind that 100 is the highest value in our domain. If you&#8217;re not sure try it in the console. Actually try it in the console regardless of how sure you are! The console is cool as shit!</p>
 
 <h3>To Be Continued&#8230;</h3>
 
-<p>Scales are a huge topic so we&#8217;ll stop here for now. In the next post we&#8217;ll start talking about <code>linear</code>, <code>time</code> and <code>ordinal</code> scales. In my experience these are the big three, once you&#8217;ve mastered them everything else becomes a lot easier. Stay tuned :)</p>
+<p>Scales are a huge topic so we&#8217;ll stop here for now. In the next post we&#8217;ll talk about <code>linear</code>, <code>time</code> and <code>ordinal</code> scales. In my experience these are the big three, once you&#8217;ve mastered them everything else becomes a lot easier. Stay tuned :)</p>
 ]]></content>
   </entry>
   

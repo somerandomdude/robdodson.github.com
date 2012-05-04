@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-03T22:17:02-07:00</updated>
+  <updated>2012-05-03T22:37:28-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -94,11 +94,11 @@
 x(50) // returns 50
 </code></p>
 
-<p>Now let's change the scale a bit. Let's say that <code>x</code> still has an input <code>domain</code> of 0 - 100 but now it has an output <code>range</code> of <code>0 - 10</code>. What do you think our <code>scale of 50</code> will return?
-<code>javascript
-x(50) // returns 5
-</code>
-If you guessed 5 then you are the smart! Since we limited our potential output down to any number between 0 and 10 it narrowed the mapping from our <code>domain</code> to our <code>range</code>. Being able to expand or contract this mapping is the main value in using a D3 scale.</p>
+<p>Now let's change the scale a bit. Let's say that <code>x</code> still has an input <code>domain</code> of 0 - 100 but now it has an output <code>range</code> of <code>0 - 10</code>. What do you think our <code>scale of 50</code> will return? ... If you guessed 5 then you are the smart! Because we limited our potential output down to any number between 0 and 10 it narrowed the mapping from our <code>domain</code> to our <code>range</code>. Being able to expand or contract this mapping is the main value in using a D3 scale. If it's still not quite sinking in check out this great visual from <a href="http://www.jeromecukier.net/">Jerome Cukier</a> (<a href="https://twitter.com/#!/jcukier">@jcukier</a>).</p>
+
+<p><img class="center" src="http://www.jeromecukier.net/wp-content/uploads/2011/08/d3scale1.png" title="'An example of how scales work'" ></p>
+
+<p>Jerome has <a href="http://www.jeromecukier.net/blog/2011/08/11/d3-scales-and-color/">an excelent blog post</a> covering scales in D3 which inspired me to write my own post. Definitely check it out :) I feel like a great way to learn something is to not only read about it a bunch but to write about it. Hearing different views on the same topic often helps me solidify a concept.</p>
 
 <h3>Class Work Time</h3>
 
@@ -114,28 +114,28 @@ x = d3.scale.linear()
 </script>
 
 
-<p>I've included d3 on the page so you can play around with it. Go ahead, bust open your developer tools or firebug and type <code>d3</code> into the console. It should return an Object full of methods.</p>
+<p>I've included <code>d3</code> on the page so you can play around with it. Go ahead, bust open your developer tools or firebug and type <code>d3</code> into the console. It should return an Object full of methods.</p>
 
-<p>Let's do some experiments with our <code>x</code> scale from earlier. Try typing the following to see what you get.</p>
+<p>Let's do some experiments with our <code>x</code> scale from earlier. Type the following to see what you get.</p>
 
 <p><code>javascript
-x(0) // 0
-x(25) // 2.5
-x(99) // 9.9
-x(100) // 10
+x(0);
+x(25);
+x(99);
+x(100);
 </code></p>
 
-<p>In D3 a scale is both a <code>Function</code> and an <code>Object</code>. You can invoke a scale by using parenthesis: <code>x(100)</code> or you can set a property to change its behavior: 1x.range([0, 1000])`. Let's try that! In the console type:</p>
+<p>In D3 a scale is both a <code>Function</code> and an <code>Object</code>. You can invoke a scale by using parenthesis: <code>x(100)</code> or you can set a property to change its behavior: <code>x.range([0, 1000])</code>. Let's try that! In the console type:</p>
 
 <p><code>javascript
 x.range([0, 1000]);
 </code></p>
 
-<p>Our scale's range used to be 0 - 10. Now that we've changed it to 0 - 1000, what do you think <code>x(100)</code> will equal if 100 is the highest value in our domain? If you're not sure try it out in the console. Actually try it out in the console regardless! The console is cool as shit!</p>
+<p>Our scale's range used to be 0 - 10. Now that we've changed it to 0 - 1000, what do you think <code>x(100)</code> will equal? Keep in mind that 100 is the highest value in our domain. If you're not sure try it in the console. Actually try it in the console regardless of how sure you are! The console is cool as shit!</p>
 
 <h3>To Be Continued...</h3>
 
-<p>Scales are a huge topic so we'll stop here for now. In the next post we'll start talking about <code>linear</code>, <code>time</code> and <code>ordinal</code> scales. In my experience these are the big three, once you've mastered them everything else becomes a lot easier. Stay tuned :)</p>
+<p>Scales are a huge topic so we'll stop here for now. In the next post we'll talk about <code>linear</code>, <code>time</code> and <code>ordinal</code> scales. In my experience these are the big three, once you've mastered them everything else becomes a lot easier. Stay tuned :)</p>
 ]]></content>
   </entry>
   
