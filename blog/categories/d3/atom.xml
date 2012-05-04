@@ -4,7 +4,7 @@
   <title><![CDATA[Category: D3 | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/d3/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-03T22:11:53-07:00</updated>
+  <updated>2012-05-03T22:13:13-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -78,7 +78,7 @@
 
 <p>Essentially a scale is a convenience function for mapping input data to an output range, typically x/y positions or width/height. Scales can also be used to link data to arbitrary values like categories or days of the week, or to quantize data into "buckets".</p>
 
-<p>There are two essential properties for any scale: the <code>domain</code> and the <code>range</code>. The <code>domain</code> serves as the input for your graph while the <code>range</code> represents the output.</p>
+<p>There are two universal properties for any scale: the <code>domain</code> and the <code>range</code>. The <code>domain</code> serves as the input for your graph while the <code>range</code> represents the output.</p>
 
 <h4>Domain</h4>
 
