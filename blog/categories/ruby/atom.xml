@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-05T22:17:30-07:00</updated>
+  <updated>2012-05-06T22:38:39-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,266 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests]]></title>
+    <link href="http://robdodson.me/blog/2012/05/06/object-oriented-scraper-backed-with-tests/"/>
+    <updated>2012-05-06T18:09:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/06/object-oriented-scraper-backed-with-tests</id>
+    <content type="html"><![CDATA[<p><em>I just drank a ton of coffee and I'm blasting music in my headphones so this post my bit a bit more scatter-shot than most since I can't really focus :]</em></p>
+
+<p>Yesterday I managed to build a pretty naive scraper using Nokogiri which would count how often each word was used in the first 10 posts of this blog. Basically scraping the home URL of the site and grabbing everything inside of the <code>div.entry-content</code> selector.</p>
+
+<p>Today I want to convert it into a more OO library so it's a bit more modular and reusable. I also want to back everything with RSpec tests to get into the practice. While it won't be true TDD I'll try to write the tests for the library before putting the classes together.</p>
+
+<h3>Design Decisions</h3>
+
+<p>I'm calling the project <code>Tentacles</code> for now since it relates to my Octopress blog. I'm still trying to figure out exactly what the end product will be. So far I know that I want it to produce a page of statistics about my blog. I figure that for now it can be just one page with stats that cover the entire blog. In the future I might want to make it more granular so that each post can get special attention. For now it's easiest for me if I just think of the whole blog as a big data set and this page as the output.</p>
+
+<p>I also know that since Octopress is heavily integrated with Rake that I'd probably like to trigger the process as part of a Rake task. IMO the logical place would be to amend Octopress' <code>rake generate</code> so that it not only builds our static pages but it also produces our statistics. Down the line I might want to change this but for now it seems OK to me.</p>
+
+<p>Finally I figure I'll want to have some kind of configuration file so the parser knows what to look for.</p>
+
+<p>For now I'm fine with the output being a plain text file with a few stats on it. We'll work on making the output more robust after we've figure out the basics of our module and integrated it with Rake.</p>
+
+<p>Here's the folder structure I'm using:</p>
+
+<ul>
+<li>tentacles
+
+<ul>
+<li>bin      <em>&lt;--- contains our executable program</em>
+
+<ul>
+<li>tentacles</li>
+</ul>
+</li>
+<li>lib      <em>&lt;--- contains our library of classes</em>
+
+<ul>
+<li>crawler.rb</li>
+<li>config.yml</li>
+<li>runner.rb</li>
+</ul>
+</li>
+<li>spec      <em>&lt;--- contains our RSpec tests</em>
+
+<ul>
+<li>crawler_spec.rb</li>
+<li>runner_spec.rb</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+<h3>Playing with IRB</h3>
+
+<p>One of the first issues I've run up against is figuring out how to play with my classes in IRB. Being new to Ruby I tend to build everything in one folder. Since this is my first time embarking on some actual modular structure I'm unsure how to require or include a module in IRB. What I've settled on for now is to <code>cd</code> into my lib folder and use the <code>-I</code> flag to set the <code>$LOAD_PATH</code>.</p>
+
+<p>Here's the <code>grep</code> from the irb man page.</p>
+
+<p><code>
+-I path        Same as `ruby -I' .  Specifies $LOAD_PATH directory
+</code></p>
+
+<p>So we end up in <code>tentacles/lib</code> and call IRB like so:</p>
+
+<p><code>
+irb -I .
+</code></p>
+
+<p>And now we can require our classes</p>
+
+<p><code>
+irb -I .
+1.9.3-p125 :001 &gt; require 'runner'
+ =&gt; true # sweeet
+</code></p>
+
+<h3>Skeletons</h3>
+
+<p>I'm going to create a basic <code>Runner</code> class so we can verify that the stuff in IRB is working properly.</p>
+
+<p>Here's what I've thrown together:</p>
+
+<p>```ruby
+module Tentacles
+  class Runner</p>
+
+<pre><code>def initialize(config)
+  # Load in our config file
+end
+
+def run
+  puts 'run run run!'
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>and here's how we test it in IRB.</p>
+
+<p>```
+irb -I .
+require 'runner'</p>
+
+<p>runner = Tentacles::Runner.new('foo')
+ => #&lt;Tentacles::Runner:0x007faeb284ec30></p>
+
+<p>runner.run
+run run run!
+ => nil
+```</p>
+
+<p>Looks good so far!</p>
+
+<h3>Tests</h3>
+
+<p>OK on to the tests then. I'm going to be using RSpec so if you don't have that setup already you should do a <code>gem install rspec</code>.</p>
+
+<p>I'm a total noob when it comes to testing so let me take my best stab at this...</p>
+
+<p>I'm going to write tests for <code>Runner</code> first since it's already stubbed out. I want to make sure of the following things:</p>
+
+<ul>
+<li>It should respond to the <code>run</code> method</li>
+<li>When I pass it an invalid config file it should throw an error</li>
+<li>When I pass it an empty string or nil in place of config it should throw an error</li>
+</ul>
+
+
+<p>For now that's the only public API this object has. Pretty simple but of course I'm immediately running into issues. Here's what my spec looks like:</p>
+
+<p>```ruby tentacles/spec/runner_spec.rb
+require_relative '../lib/tentacles/runner'</p>
+
+<p>describe Tentacles::Runner do</p>
+
+<p>  before do</p>
+
+<pre><code>@runner = Tentacles::Runner.new('config.yml')
+</code></pre>
+
+<p>  end</p>
+
+<p>  subject { @runner }</p>
+
+<p>  it { should respond_to(:run) }</p>
+
+<p>  describe "when passing the config file" do</p>
+
+<pre><code>it "should raise an error if the config file is missing" do
+  expect { runner = Tentacles::Runner.new('') }.to raise_error(Errno::ENOENT)
+  expect { runner = Tentacles::Runner.new(nil) }.to raise_error(TypeError)
+end
+</code></pre>
+
+<p>  end
+end
+```
+and here's what runner.rb looks like:</p>
+
+<p>```ruby tentacles/lib/tentacles/runner.rb
+require 'yaml'</p>
+
+<p>module Tentacles
+  class Runner</p>
+
+<pre><code>def initialize(config)
+  @config = YAML.load(File.open(config))
+end
+
+def run      
+  'Runner should be running'
+end
+</code></pre>
+
+<p>  end
+end
+```
+aaaaaand here's the error:</p>
+
+<p>```bash
+1) Tentacles::Runner</p>
+
+<pre><code> Failure/Error: @runner = Tentacles::Runner.new('config.yml')
+ Errno::ENOENT:
+   No such file or directory - config.yml
+ # ./lib/tentacles/runner.rb:10:in `initialize'
+ # ./lib/tentacles/runner.rb:10:in `open'
+ # ./lib/tentacles/runner.rb:10:in `initialize'
+ # ./spec/runner_spec.rb:8:in `new'
+ # ./spec/runner_spec.rb:8:in `block (2 levels) in &lt;top (required)&gt;'
+</code></pre>
+
+<p>```</p>
+
+<p>It looks like the test is bailing out on my <code>before</code> block when I try to create an instance of runner and pass it the config file. Folks on IRC are kind enough to point out that <code>require</code> and methods run in RSpec don't necessarily have the same scope so trying <code>../lib/tentacles/config.yml</code> won't work either. The solution is to use <code>File.dirname(__FILE__) + '/../lib/tentacles/config.yml'</code>. Since I don't want my line lengths to get any longer I define a helper module and give it a <code>relative_path</code> method which should spit out <code>File.dirname(__FILE__)</code>.</p>
+
+<p>```ruby tentacles/spec/helpers.rb
+module Helpers
+  def relative_path</p>
+
+<pre><code>File.dirname(__FILE__)
+</code></pre>
+
+<p>  end
+end
+```
+After I include it my tests look like this:</p>
+
+<p>```ruby tentacles/spec/runner_spec.rb
+require_relative '../lib/tentacles/runner'
+require 'helpers'</p>
+
+<p>describe Tentacles::Runner do
+  include Helpers</p>
+
+<p>  before do</p>
+
+<pre><code>@runner = Tentacles::Runner.new(relative_path + '/../lib/tentacles/config.yml')
+</code></pre>
+
+<p>  end</p>
+
+<p>  subject { @runner }</p>
+
+<p>  it { should respond_to(:run) }</p>
+
+<p>  describe "when passing the config file" do</p>
+
+<pre><code>it "should raise an error if the config file is missing" do
+  expect { runner = Tentacles::Runner.new('') }.to raise_error(Errno::ENOENT)
+  expect { runner = Tentacles::Runner.new(nil) }.to raise_error(TypeError)
+end
+
+it "should raise an error if the config file is invalid" do
+  expect { runner = Tentacles::Runner.new(relative_path + '/mocks/invalid_yaml.yml') }.to raise_error(Psych::SyntaxError)
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>end
+```
+You'll also notice I added a test for an invalid yml file. Basically I created a mocks folder and tossed in a yaml file that's full of gibberish. Probably not the best way to mock stuff but whatever, i'm learning!</p>
+
+<p>With that all of our tests for <code>Tentacles::Runner</code> are passing. Yay! But now it's 10:37pm and I gotta call it a night. We'll continue tomorrow by writing tests for <code>Tentacles::Crawler</code>. See ya!</p>
+
+<ul>
+<li>Time: 6:30 pm</li>
+<li>Mood: Wired, Lazy</li>
+<li>Sleep: 7.5</li>
+<li>Hunger: 0</li>
+<li>Coffee: 2</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a Simple Scraper with Nokogiri in Ruby]]></title>
@@ -499,98 +759,6 @@ Which brings us back to one of our first examples of finding the date 7 days ago
 <a href="http://stackoverflow.com/questions/962544/one-line-hash-creation-in-ruby">http://stackoverflow.com/questions/962544/one-line-hash-creation-in-ruby</a>
 <a href="http://www.developer.com/open/article.php/3729206/Telling-Time-with-Ruby.htm">http://www.developer.com/open/article.php/3729206/Telling-Time-with-Ruby.htm</a>
 <a href="http://guides.rubyonrails.org/active_support_core_extensions.html">http://guides.rubyonrails.org/active_support_core_extensions.html</a></small></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to setup PostgreSQL for Rails and Heroku]]></title>
-    <link href="http://robdodson.me/blog/2012/04/27/how-to-setup-postgresql-for-rails-and-heroku/"/>
-    <updated>2012-04-27T07:33:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/04/27/how-to-setup-postgresql-for-rails-and-heroku</id>
-    <content type="html"><![CDATA[<h3>Install PostgreSQL Locally</h3>
-
-<p>Ryan Bates has already put together a wonderful Railscast on this topic so feel free to <a href="http://railscasts.com/episodes/342-migrating-to-postgresql">jump over there</a> to view it. My main goal in writing this post was to distill down what he said, point out a small gotcha along the way and offer some additional tools.</p>
-
-<p>There are a few different options for installing PostgreSQL. The first one, which Ryan outlines, is to use <a href="http://mxcl.github.com/homebrew/">Homebrew</a> and simply do a <code>brew install postgresql</code>. Some folks might not be comfortable with that process so I wanted to also recommend the new <a href="http://postgresapp.com/">PostgreSQL.app</a> from the team at <a href="http://www.heroku.com/">Heroku</a>. If you're more used to tools like <a href="http://www.mamp.info/en/index.html">MAMP</a> then the PostgreSQL.app might be a bit more your style.</p>
-
-<p>If you go the Homebrew route make sure you type in <code>initdb /usr/local/var/postgres</code> after the install finishes to init your first database. The installer will also mention some commands you can use to have PostgreSQL auto-start whenever you turn on your computer. I wasn't a big fan of this approach so instead I created two aliases in my .bash_profile.</p>
-
-<p><code>
-alias pg-start='pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgres/server.log start'
-alias pg-stop='pg_ctl -D /usr/local/var/postgres stop -s -m fast'
-</code>
-With these I can just type <code>pg-start</code> to fire up Postgres and <code>pg-stop</code> when I want to shut it down.</p>
-
-<h3>Change Rails Database to PostgreSQL</h3>
-
-<p>The next thing you'll want to do is either convert an existing project to PostgreSQL or create a new rails project and set PostgreSQL as the database.</p>
-
-<p>Creating a new rails project for Postgres is as easy as <code>rails new blog -d postgresql</code>. After running this command you'll also need to call <code>rake db:create:all</code> to create a new database.</p>
-
-<p>To convert an existing project you'll want to update your Gemfile to include the <code>pg</code> gem. A basic Gemfile might look something like this:</p>
-
-<p>``` ruby
-source 'https://rubygems.org'</p>
-
-<p>gem 'rails', '3.2.3'
-gem 'pg', '~>0.13.2'</p>
-
-<p>group :assets do
-  gem 'sass-rails',   '~> 3.2.3'
-  gem 'coffee-rails', '~> 3.2.1'
-  gem 'uglifier', '>= 1.0.3'
-end</p>
-
-<p>gem 'jquery-rails'</p>
-
-<p>```
-You'll also need to update your config/database.yml to look for Postgres instead of SQLite or MySQL.</p>
-
-<p>``` yaml config/database.yml
-development:
-  adapter: postgresql
-  encoding: unicode
-  database: [insert your dev database name]
-  pool: 5
-  username: [insert your user name]
-  password:</p>
-
-<p>test:
-  adapter: postgresql
-  encoding: unicode
-  database: [insert your test database name]
-  pool: 5
-  username: [insert your user name]
-  password:
-<code>``
-Since we haven't created any Postgres user accounts both Homebrew and PostgreSQL.app will simply use our current username as the login. The password can remain blank. After this is done you'll also need to call</code>rake db:create:all` to create the new database.</p>
-
-<h3>Connect a Rails Project to a PostgreSQL Database on Heroku</h3>
-
-<p>If your project isn't already under version control then now would be a good time to set that up.</p>
-
-<p><code>
-git init
-git add .
-git commit -m 'Initial commit!'
-</code>
-Next we'll create a free Heroku instance
-<code>
-heroku create --stack cedar
-</code>
-After that's done we'll simply push our project up there.
-<code>
-git push heroku master
-</code>
-You might see some deprecation warnings about vendor plugins. For now you can (probably) safely ignore those.</p>
-
-<p>Here's one little gotcha that I seemed to run into. If you try to access your site on Heroku using the <code>heroku open</code> command you might get an error page. You have to make sure to also call <code>heroku run rake db:create:all</code> otherwise your production database will not be in place and your app will fail to connect to it. Speaking of production databases, you should also note that Heroku will overwrite whatever you put into your config/database.yml so you don't have to worry about figuring out all the connection details for their shared services...it'll all just work. Sweet!</p>
-
-<h3>PostgreSQL GUI</h3>
-
-<p>One last tip re: your new Postgres setup. If you're just starting out like me then your command line fu is probably not as strong as you'd like it to be. Personally I really like having a nice GUI to visualize the tables in my database. For MySQL I usually use the awesome (and free) <a href="http://www.sequelpro.com/">SequelPro</a>. For PostgreSQL you can use <a href="http://inductionapp.com/">Induction</a>. It doesn't seem like they have a downloadable binary on their website (weird?) but you can grab one out of <a href="https://github.com/Induction/Induction/downloads">the Github repo's downloads page</a>. Connecting to your Postgres instance can be a little tricky, you have to make sure to use the PostgreSQL adapter, localhost as the hostname, your computer's username as the user and the password can remain blank. You also <em>HAVE</em> to give it a database name (even though it says it's optional) or it will throw a <code>FATAL:  database [your username] does not exist</code>. Here's a screenshot of what mine looks like:</p>
-
-<p><img class="center" src="/images/induction_screen.png" title="'Induction Login Screen'" ></p>
 ]]></content>
   </entry>
   

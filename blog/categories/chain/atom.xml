@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-05T22:17:30-07:00</updated>
+  <updated>2012-05-06T22:38:39-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,266 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests]]></title>
+    <link href="http://robdodson.me/blog/2012/05/06/object-oriented-scraper-backed-with-tests/"/>
+    <updated>2012-05-06T18:09:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/06/object-oriented-scraper-backed-with-tests</id>
+    <content type="html"><![CDATA[<p><em>I just drank a ton of coffee and I'm blasting music in my headphones so this post my bit a bit more scatter-shot than most since I can't really focus :]</em></p>
+
+<p>Yesterday I managed to build a pretty naive scraper using Nokogiri which would count how often each word was used in the first 10 posts of this blog. Basically scraping the home URL of the site and grabbing everything inside of the <code>div.entry-content</code> selector.</p>
+
+<p>Today I want to convert it into a more OO library so it's a bit more modular and reusable. I also want to back everything with RSpec tests to get into the practice. While it won't be true TDD I'll try to write the tests for the library before putting the classes together.</p>
+
+<h3>Design Decisions</h3>
+
+<p>I'm calling the project <code>Tentacles</code> for now since it relates to my Octopress blog. I'm still trying to figure out exactly what the end product will be. So far I know that I want it to produce a page of statistics about my blog. I figure that for now it can be just one page with stats that cover the entire blog. In the future I might want to make it more granular so that each post can get special attention. For now it's easiest for me if I just think of the whole blog as a big data set and this page as the output.</p>
+
+<p>I also know that since Octopress is heavily integrated with Rake that I'd probably like to trigger the process as part of a Rake task. IMO the logical place would be to amend Octopress' <code>rake generate</code> so that it not only builds our static pages but it also produces our statistics. Down the line I might want to change this but for now it seems OK to me.</p>
+
+<p>Finally I figure I'll want to have some kind of configuration file so the parser knows what to look for.</p>
+
+<p>For now I'm fine with the output being a plain text file with a few stats on it. We'll work on making the output more robust after we've figure out the basics of our module and integrated it with Rake.</p>
+
+<p>Here's the folder structure I'm using:</p>
+
+<ul>
+<li>tentacles
+
+<ul>
+<li>bin      <em>&lt;--- contains our executable program</em>
+
+<ul>
+<li>tentacles</li>
+</ul>
+</li>
+<li>lib      <em>&lt;--- contains our library of classes</em>
+
+<ul>
+<li>crawler.rb</li>
+<li>config.yml</li>
+<li>runner.rb</li>
+</ul>
+</li>
+<li>spec      <em>&lt;--- contains our RSpec tests</em>
+
+<ul>
+<li>crawler_spec.rb</li>
+<li>runner_spec.rb</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+
+<h3>Playing with IRB</h3>
+
+<p>One of the first issues I've run up against is figuring out how to play with my classes in IRB. Being new to Ruby I tend to build everything in one folder. Since this is my first time embarking on some actual modular structure I'm unsure how to require or include a module in IRB. What I've settled on for now is to <code>cd</code> into my lib folder and use the <code>-I</code> flag to set the <code>$LOAD_PATH</code>.</p>
+
+<p>Here's the <code>grep</code> from the irb man page.</p>
+
+<p><code>
+-I path        Same as `ruby -I' .  Specifies $LOAD_PATH directory
+</code></p>
+
+<p>So we end up in <code>tentacles/lib</code> and call IRB like so:</p>
+
+<p><code>
+irb -I .
+</code></p>
+
+<p>And now we can require our classes</p>
+
+<p><code>
+irb -I .
+1.9.3-p125 :001 &gt; require 'runner'
+ =&gt; true # sweeet
+</code></p>
+
+<h3>Skeletons</h3>
+
+<p>I'm going to create a basic <code>Runner</code> class so we can verify that the stuff in IRB is working properly.</p>
+
+<p>Here's what I've thrown together:</p>
+
+<p>```ruby
+module Tentacles
+  class Runner</p>
+
+<pre><code>def initialize(config)
+  # Load in our config file
+end
+
+def run
+  puts 'run run run!'
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>and here's how we test it in IRB.</p>
+
+<p>```
+irb -I .
+require 'runner'</p>
+
+<p>runner = Tentacles::Runner.new('foo')
+ => #&lt;Tentacles::Runner:0x007faeb284ec30></p>
+
+<p>runner.run
+run run run!
+ => nil
+```</p>
+
+<p>Looks good so far!</p>
+
+<h3>Tests</h3>
+
+<p>OK on to the tests then. I'm going to be using RSpec so if you don't have that setup already you should do a <code>gem install rspec</code>.</p>
+
+<p>I'm a total noob when it comes to testing so let me take my best stab at this...</p>
+
+<p>I'm going to write tests for <code>Runner</code> first since it's already stubbed out. I want to make sure of the following things:</p>
+
+<ul>
+<li>It should respond to the <code>run</code> method</li>
+<li>When I pass it an invalid config file it should throw an error</li>
+<li>When I pass it an empty string or nil in place of config it should throw an error</li>
+</ul>
+
+
+<p>For now that's the only public API this object has. Pretty simple but of course I'm immediately running into issues. Here's what my spec looks like:</p>
+
+<p>```ruby tentacles/spec/runner_spec.rb
+require_relative '../lib/tentacles/runner'</p>
+
+<p>describe Tentacles::Runner do</p>
+
+<p>  before do</p>
+
+<pre><code>@runner = Tentacles::Runner.new('config.yml')
+</code></pre>
+
+<p>  end</p>
+
+<p>  subject { @runner }</p>
+
+<p>  it { should respond_to(:run) }</p>
+
+<p>  describe "when passing the config file" do</p>
+
+<pre><code>it "should raise an error if the config file is missing" do
+  expect { runner = Tentacles::Runner.new('') }.to raise_error(Errno::ENOENT)
+  expect { runner = Tentacles::Runner.new(nil) }.to raise_error(TypeError)
+end
+</code></pre>
+
+<p>  end
+end
+```
+and here's what runner.rb looks like:</p>
+
+<p>```ruby tentacles/lib/tentacles/runner.rb
+require 'yaml'</p>
+
+<p>module Tentacles
+  class Runner</p>
+
+<pre><code>def initialize(config)
+  @config = YAML.load(File.open(config))
+end
+
+def run      
+  'Runner should be running'
+end
+</code></pre>
+
+<p>  end
+end
+```
+aaaaaand here's the error:</p>
+
+<p>```bash
+1) Tentacles::Runner</p>
+
+<pre><code> Failure/Error: @runner = Tentacles::Runner.new('config.yml')
+ Errno::ENOENT:
+   No such file or directory - config.yml
+ # ./lib/tentacles/runner.rb:10:in `initialize'
+ # ./lib/tentacles/runner.rb:10:in `open'
+ # ./lib/tentacles/runner.rb:10:in `initialize'
+ # ./spec/runner_spec.rb:8:in `new'
+ # ./spec/runner_spec.rb:8:in `block (2 levels) in &lt;top (required)&gt;'
+</code></pre>
+
+<p>```</p>
+
+<p>It looks like the test is bailing out on my <code>before</code> block when I try to create an instance of runner and pass it the config file. Folks on IRC are kind enough to point out that <code>require</code> and methods run in RSpec don't necessarily have the same scope so trying <code>../lib/tentacles/config.yml</code> won't work either. The solution is to use <code>File.dirname(__FILE__) + '/../lib/tentacles/config.yml'</code>. Since I don't want my line lengths to get any longer I define a helper module and give it a <code>relative_path</code> method which should spit out <code>File.dirname(__FILE__)</code>.</p>
+
+<p>```ruby tentacles/spec/helpers.rb
+module Helpers
+  def relative_path</p>
+
+<pre><code>File.dirname(__FILE__)
+</code></pre>
+
+<p>  end
+end
+```
+After I include it my tests look like this:</p>
+
+<p>```ruby tentacles/spec/runner_spec.rb
+require_relative '../lib/tentacles/runner'
+require 'helpers'</p>
+
+<p>describe Tentacles::Runner do
+  include Helpers</p>
+
+<p>  before do</p>
+
+<pre><code>@runner = Tentacles::Runner.new(relative_path + '/../lib/tentacles/config.yml')
+</code></pre>
+
+<p>  end</p>
+
+<p>  subject { @runner }</p>
+
+<p>  it { should respond_to(:run) }</p>
+
+<p>  describe "when passing the config file" do</p>
+
+<pre><code>it "should raise an error if the config file is missing" do
+  expect { runner = Tentacles::Runner.new('') }.to raise_error(Errno::ENOENT)
+  expect { runner = Tentacles::Runner.new(nil) }.to raise_error(TypeError)
+end
+
+it "should raise an error if the config file is invalid" do
+  expect { runner = Tentacles::Runner.new(relative_path + '/mocks/invalid_yaml.yml') }.to raise_error(Psych::SyntaxError)
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>end
+```
+You'll also notice I added a test for an invalid yml file. Basically I created a mocks folder and tossed in a yaml file that's full of gibberish. Probably not the best way to mock stuff but whatever, i'm learning!</p>
+
+<p>With that all of our tests for <code>Tentacles::Runner</code> are passing. Yay! But now it's 10:37pm and I gotta call it a night. We'll continue tomorrow by writing tests for <code>Tentacles::Crawler</code>. See ya!</p>
+
+<ul>
+<li>Time: 6:30 pm</li>
+<li>Mood: Wired, Lazy</li>
+<li>Sleep: 7.5</li>
+<li>Hunger: 0</li>
+<li>Coffee: 2</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a Simple Scraper with Nokogiri in Ruby]]></title>
@@ -775,192 +1035,6 @@ x.range([0, 1000]);
 After we declare the self-executing function we include another function called</code>draw<code>. Using a separate function lets us later *redraw* the graph if the user resizes their browser. This also works on the iPhone when the user changes from portrait to landscape mode. Inside of</code>draw<code>we first make sure that the containing div is empty (otherwise we'd end up drawing graphs on top of one another). You can skip most of the D3 code—we'll cover that over the next couple of days—but take a look at the last few lines where we call</code>draw()<code>and add another handler for</code>window.resize<code>. Whenever the user changes their browser size our global</code>width` value will be updated, then our graphs will redraw themselves using this new width.</p>
 
 <p>At the moment you need to add this handler to each of your visualizations. Not terrible but not very DRY either. I think in a future iteration I'll add a queue which holds a reference to each <code>draw</code> instance and calls them in sync. For now this is the quick and dirty way to get a graph up on Octopress. <a href="https://github.com/robdodson/octopress-templates">You can download the entire post template from Github.</a> Enjoy!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Ruby Objects and Dot Syntax]]></title>
-    <link href="http://robdodson.me/blog/2012/05/01/ruby-objects-and-dot-syntax/"/>
-    <updated>2012-05-01T07:37:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/01/ruby-objects-and-dot-syntax</id>
-    <content type="html"><![CDATA[<p>Coming from JavaScript I'm very accustomed to doing something like this:</p>
-
-<p>``` javascript Javascript
-var person = { name: 'Rob', city: 'San Francisco' }</p>
-
-<p>console.log( person.city );   // 'San Francisco'</p>
-
-<p>```</p>
-
-<p>Using dot syntax to access a <code>Hash</code> is second nature to me. That's why I was surprised when I ran into the following error yesterday while writing some Ruby.</p>
-
-<p>``` ruby Ruby
-person = {name: 'Rob', city: 'San Francisco'}
- => {:name=>"Rob", :city=>"San Francisco"}</p>
-
-<p>puts person.city</p>
-
-<p>NoMethodError: undefined method `city' for {:name=>"Rob", :city=>"San Francisco"}:Hash
-```</p>
-
-<p>"Hmm, weird," I thought. I know I've seen dot syntax used in Ruby before..what gives?</p>
-
-<h3>Dot Syntax and the Ruby Hash Object</h3>
-
-<p>As it turns out Ruby does not support dot syntax for the <code>Hash</code> object. If I had wanted to access the <code>city</code> property from my previous example I should have done it using the symbol key like so:</p>
-
-<p><code>ruby
-person[:city]
- =&gt; "San Francisco"
-</code></p>
-
-<p>There are a few data structures that are very similar to <code>Hashes</code> and seeing those used in the wild perhaps threw me off. So I figured I'd write a post about the do's and dont's of dot syntax and how different object types react to it.</p>
-
-<h4>Class</h4>
-
-<p>The first and most obvious one is the <code>Class</code> object. Really I'm talking about instances of a <code>Class</code> here, for example an instance of class <code>Person</code> might have a <code>city</code> attribute. Here's what that would look like.</p>
-
-<p>```ruby Person: Long Version
-class Person
-  def initialize(name, city)</p>
-
-<pre><code>@name = name
-@city = city
-</code></pre>
-
-<p>  end</p>
-
-<p>  def name</p>
-
-<pre><code>@name
-</code></pre>
-
-<p>  end</p>
-
-<p>  def city</p>
-
-<pre><code>@city
-</code></pre>
-
-<p>  end
-end</p>
-
-<p>person = Person.new('Rob', 'San Francisco')
- => #&lt;Person:0x007ff15412a8c0 @name="Rob", @city="San Francisco"></p>
-
-<p>person.city
- => "San Francisco"
-<code>``
-Since I've defined methods for both</code>name<code>and</code>city<code>, using dot syntax to access those properties basically means we're calling those methods. The methods just return the instance variables, acting as getters. You can shorten this by using</code>attr_reader<code>or</code>attr_accessor`.</p>
-
-<p>```ruby Person: Short Version
-class Person
-  attr_accessor :name, :city
-  def initialize(name, city)</p>
-
-<pre><code>@name = name
-@city = city
-</code></pre>
-
-<p>  end
-end</p>
-
-<p>person = Person.new('Rob', 'San Francisco')
- => #&lt;Person:0x007ff15412a8c0 @name="Rob", @city="San Francisco"></p>
-
-<p>person.city
- => "San Francisco"
-```</p>
-
-<h4>Struct</h4>
-
-<p>The <code>Struct</code> object is another commonly used element which allows dot access to its attributes. Quoting from <a href="http://www.ruby-doc.org/core-1.9.3/Struct.html">the documentation</a>:</p>
-
-<blockquote><p>A Struct is a convenient way to bundle a number of attributes together, using accessor methods, without having to write an explicit class.</p></blockquote>
-
-<p>Examples speak louder than words so here's our <code>Person</code> again.</p>
-
-<p>```ruby Person Struct
-Person = Struct.new(:name, :city)
- => Person</p>
-
-<p>person = Person.new('Rob', 'San Francisco')
- => #<struct Person name="Rob", city="San Francisco"></p>
-
-<p>person.city
- => "San Francisco"
-<code>``
-As I understand it a</code>Struct<code>is basically sealed after you've given it an initial definition. This means that you can't keep tacking on properties like you can with a</code>Hash`</p>
-
-<p>```ruby</p>
-
-<h1>Continuing from above...</h1>
-
-<p>person.age = 28
-NoMethodError: undefined method `age=' for #<struct Person name="Rob", city="San Francisco"></p>
-
-<p>person[:age] = 28
-NameError: no member 'age' in struct
-```</p>
-
-<h4>OpenStruct</h4>
-
-<p>Finally we come to the <code>OpenStruct</code> which has both dynamic attributes and dot syntax. <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/ostruct/rdoc/OpenStruct.html">The documentation describes it like so</a>:</p>
-
-<blockquote><p>An OpenStruct is a data structure, similar to a Hash, that allows the definition of arbitrary attributes with their accompanying values.</p></blockquote>
-
-<p>And again here is our <code>Person</code> from before. Note that <code>OpenStruct</code> needs you to <code>require</code> it.
-```ruby Person OpenStruct
-require 'ostruct'</p>
-
-<p>person = OpenStruct.new
- => #<OpenStruct></p>
-
-<p>person.name = 'Rob'
- => "Rob"</p>
-
-<p>person.city = 'San Francisco'
- => "San Francisco"</p>
-
-<p>person.city
- => "San Francisco"
-```</p>
-
-<p>If you noticed, we didn't need to define the attributes of our <code>Person</code> before creating an instance of it. This means we could keep adding attributes indefinitely. Want your person to respond to <code>age</code>? Just tack it on.</p>
-
-<p>```ruby
-person.age = 28
- => 28</p>
-
-<p>person.age
- => 28
-```</p>
-
-<p>For the sake of brevity you can pass in a <code>Hash</code> and <code>OpenStruct</code> will covert it for you.
-```ruby
-require 'ostruct'</p>
-
-<p>person = OpenStruct.new(name: 'Rob', city: 'San Francisco')
- => #<OpenStruct name="Rob", city="San Francisco"></p>
-
-<p>person.city
- => "San Francisco"
-<code>``
-This all seems wonderful but there's one huge caveat which comes from the way</code>OpenStruct` finds all of these dynamic attributes. As <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/ostruct/rdoc/OpenStruct.html">the documentation describes it</a>:</p>
-
-<blockquote><p>An OpenStruct utilizes Ruby’s method lookup structure to and find and define the necessary methods for properties. This is accomplished through the method method_missing and define_method.</p>
-
-<p>This should be a consideration if there is a concern about the performance of the objects that are created, as there is much more overhead in the setting of these properties compared to using a Hash or a Struct.</p></blockquote>
-
-<p>Definitely keep that in mind if you're writing time sensitive code. In those situations you'll want to use a <code>Hash</code> or a <code>Struct</code> instead.</p>
-
-<p><small>Source:<br />
-<a href="http://www.ruby-doc.org/core-1.9.3/Class.html">http://www.ruby-doc.org/core-1.9.3/Class.html</a><br />
-<a href="http://www.ruby-doc.org/core-1.9.3/Struct.html">http://www.ruby-doc.org/core-1.9.3/Struct.html</a><br />
-<a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/ostruct/rdoc/OpenStruct.html">http://ruby-doc.org/stdlib-1.9.3/libdoc/ostruct/rdoc/OpenStruct.html</a><br />
-<a href="http://stackoverflow.com/questions/9356704/unable-to-use-dot-syntax-for-ruby-hash">http://stackoverflow.com/questions/9356704/unable-to-use-dot-syntax-for-ruby-hash</a><br />
-<a href="http://www.rubyist.net/~slagell/ruby/accessors.html">http://www.rubyist.net/~slagell/ruby/accessors.html</a>
-</small></p>
 ]]></content>
   </entry>
   
