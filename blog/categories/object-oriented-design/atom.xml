@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Object Oriented Design | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/object-oriented-design/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-06T22:38:39-07:00</updated>
+  <updated>2012-05-07T22:34:13-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,261 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Object Oriented Scraper Backed With Tests pt. 2]]></title>
+    <link href="http://robdodson.me/blog/2012/05/07/object-oriented-scraper-backed-with-tests-pt-2/"/>
+    <updated>2012-05-07T18:48:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/07/object-oriented-scraper-backed-with-tests-pt-2</id>
+    <content type="html"><![CDATA[<p>I'm picking up from where I left off last night. If you look back at the <a href="/blog/2012/05/06/object-oriented-scraper-backed-with-tests/">previous post</a> we ended with a spec'd out <code>Runner</code> object. Now we need to build our <code>Crawler</code> which will slurp up all the content from our posts and return them as meaningful data.</p>
+
+<p>Our Crawler will have 2 main responsibilities. First it will iterate over a post and return a Hash of words and their usage count. Second, it will iterate over a post and pull out any metadata and associate that with a Date. These are rather simple goals and if you remember from our original scraper we were actually hitting every post on the main page. I think I'd like to nail down these simple functions and then refactor the Crawler to accept a corpus page full of links—<a href="http://robdodson.me/blog/archives/">like our archives page</a>—which it will follow and parse. Right now I want to start small.</p>
+
+<p>Here's a list of what I <em>think</em> would be good tests for our <code>Crawler</code>.</p>
+
+<ul>
+<li>It should return an instance in exchange for a valid URI. Since the URI comes from the Runner and that's already being tested we'll assume that the URI we're given is valid.</li>
+<li>It should respond to a <code>get_word_counts</code> method.</li>
+<li>The get_word_counts method should accept a selector <code>String</code> and return a <code>Hash</code> of words and their counts. Since the selector will be coming from the Runner we'll assume it's valid too but first we'll need to put another test in our <code>runner_spec.rb</code>.</li>
+<li>It should respond to a <code>get_metadata</code> method.</li>
+<li>The get_metadata method should also accept a selector <code>String</code> and return a <code>Hash</code> with a valid <code>Date</code> and each piece of metadata categorized. Let's see how far we can take this by converting strings related to time into <code>Time</code> objects and any categories with multiple entries into <code>Arrays</code>.</li>
+</ul>
+
+
+<p>I'm actually going to copy and paste the above list into my specs and start buliding from there.</p>
+
+<p>....</p>
+
+<p>Hmm... actually I'm not. Something about this doesn't feel right. <code>Runner</code> has accrued too much responsibility. It's supposed to validate 3 different strings parsed from a YAML file which it loads and then it also has to deal with creating and running the <code>Crawler</code>. I think it's time for another object. Which we'll call <code>Options</code>. Options will be in charge of loading our YAML and verifying that all the values are valid. <code>Runner</code> will create both an Options and a Crawler object and pass the values from Options to Crawler. This is actaully also in line with the Pickaxe book's Anagrams example, so we have a nice guide to follow in that.</p>
+
+<p>OK so <code>Options</code>, eh? Well we'll need to spec out its responsibilities. I think we can just take the tests we wrote for Runner and move them over to Options.</p>
+
+<p>After doing this for while I've ended up with a TON of tests...only to validate 3 variables.</p>
+
+<p>```ruby tentacles/spec/options_spec.rb
+require_relative '../lib/tentacles/options'
+require 'yaml'
+require 'uri'
+require 'helpers'</p>
+
+<p>describe Tentacles::Options do
+  include Helpers</p>
+
+<p>  before do</p>
+
+<pre><code>@options = Tentacles::Options.new(relative_path + '/../lib/tentacles/config.yml')
+</code></pre>
+
+<p>  end</p>
+
+<p>  subject { @options }</p>
+
+<p>  it { should respond_to(:uri) }
+  it { should respond_to(:post_selector) }
+  it { should respond_to(:metadata_selector) }</p>
+
+<p>  describe "when parsing the config file" do</p>
+
+<pre><code>it "should raise an exception if the config file is missing" do
+  expect { options = Tentacles::Options.new('') }.to raise_error(Errno::ENOENT)
+  expect { options = Tentacles::Options.new(nil) }.to raise_error(TypeError)
+end
+
+it "should raise an exception if the config file is invalid" do
+  expect { options = Tentacles::Options.new(relative_path + '/mocks/invalid_yaml.yml') }.to raise_error(Psych::SyntaxError)
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  describe "when parsing the URI" do</p>
+
+<pre><code>it "should display the right URI" do
+  uri = URI.parse('http://robdodson.me')
+  @options.uri.should eq(uri)
+end
+
+it "should raise an exception if uri is empty" do
+  expect { options = Tentacles::Options.new(relative_path + '/mocks/blank_uri.yml') }.to raise_error(Psych::SyntaxError)
+end
+
+it "should raise an exception if uri is invalid" do
+  expect { options = Tentacles::Options.new(relative_path + '/mocks/invalid_uri.yml') }.to raise_error(Psych::SyntaxError)
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  describe "when parsing the post selector" do</p>
+
+<pre><code>it "should have a post_selector" do
+  @options.post_selector.should be('.entry-content')
+end
+
+it "should raise an exception if the post selector is empty" do
+  expect { options = Tentacles::Options.new(relative_path + '/mocks/blank_uri.yml') }.to raise_error(Psych::SyntaxError)
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  describe "when parsing the metadata selector" do</p>
+
+<pre><code>it "should have a metadata_selector" do
+  @options.metadata_selector.should be('.personal-metadata')
+end
+
+it "should raise an exception if the metadata selector is empty" do
+  expect { options = Tentacles::Options.new(relative_path + '/mocks/blank_uri.yml') }.to raise_error(Psych::SyntaxError)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Here's my implementation of <code>options.rb</code>
+```ruby tentacles/lib/tentacles/options.rb
+require 'yaml'</p>
+
+<p>module Tentacles
+  class Options</p>
+
+<pre><code>attr_reader :uri
+attr_reader :post_selector
+attr_reader :metadata_selector
+
+def initialize(config)
+  @config = YAML.load(File.open(config))
+
+  @uri = URI.parse(@config[:uri])
+  raise IOError, 'invalid uri!' if @uri.scheme.nil? || @uri.host.nil?
+
+  @post_selector = @config[:post_selector]
+  raise IOError, 'post_selector is not defined' if @post_selector.empty? 
+
+  @metadata_selector = @config[:metadata_selector]
+  raise IOError, 'metadata_selector is not defined' if @metadata_selector.empty? 
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Seems like now might be a good time to pause for a bit. When I look at those tests I see a lot of places where I'm testing Classes that have probably already been tested. I feel like you can safely assume that if you pass <code>YAML.load</code> a bunch of junk it's going to throw an error. Is there any value in testing something like that for my own implementation? I'm guessing not. However I do think it's important that I test the 3 exceptions that I wrote. I'll get all the tests to pass and then I'll go back and clean it up.</p>
+
+<h3>Making the Tests Pass</h3>
+
+<p>I like to comment out my spec file and go line by line making each test pass as I go. I'm pretty good at writing failing tests (heh) so this approach adheres well to the red, green, refactor mantra.</p>
+
+<p>Starting out I have a problem in the first block which checks my <code>attr_readers</code>:</p>
+
+<p><code>ruby
+it { should respond_to(:uri) }
+it { should respond_to(:post_selector) }
+it { should respond_to(:metadata_selector) }
+</code></p>
+
+<p>Let's see if I can get just the first test to pass... I comment out everything inside of Options and notice that YAML does not use symbols for keys. It seems like loaded YAML uses Strings for keys. After changing my symbol keys to strings my first block of tests pass.</p>
+
+<p>```ruby tentacles/lib/tentacles/options.rb
+require 'yaml'</p>
+
+<p>module Tentacles
+  class Options</p>
+
+<pre><code>attr_reader :uri
+attr_reader :post_selector
+attr_reader :metadata_selector
+
+def initialize(config)
+  @config = YAML.load(File.open(config))
+
+  @uri = URI.parse(@config["uri"])
+  raise IOError, 'invalid uri!' if @uri.scheme.nil? || @uri.host.nil?
+
+  @post_selector = @config["post_selector"]
+  raise IOError, 'post_selector is not defined' if @post_selector.empty? 
+
+  @metadata_selector = @config["metadata_selector"]
+  raise IOError, 'metadata_selector is not defined' if @metadata_selector.empty? 
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>The next block passes quite easily because it's ported over from the <code>Runner</code> class</p>
+
+<p>```ruby
+describe "when parsing the config file" do</p>
+
+<pre><code>it "should raise an exception if the config file is missing" do
+  expect { options = Tentacles::Options.new('') }.to raise_error(Errno::ENOENT)
+  expect { options = Tentacles::Options.new(nil) }.to raise_error(TypeError)
+end
+
+it "should raise an exception if the config file is invalid" do
+  expect { options = Tentacles::Options.new(relative_path + '/mocks/invalid_yaml.yml') }.to raise_error(Psych::SyntaxError)
+end
+</code></pre>
+
+<p>  end
+```</p>
+
+<p>After that we run into some issues because our next set of tested exceptions have the wrong class.</p>
+
+<p>```ruby
+  describe "when parsing the URI" do</p>
+
+<pre><code>it "should display the right URI" do
+  uri = URI.parse('http://robdodson.me')
+  @options.uri.should eq(uri)
+end
+
+it "should raise an exception if uri is empty" do
+  expect { options = Tentacles::Options.new(relative_path + '/mocks/blank_uri.yml') }.to raise_error(Psych::SyntaxError)
+end
+
+it "should raise an exception if uri is invalid" do
+  expect { options = Tentacles::Options.new(relative_path + '/mocks/invalid_uri.yml') }.to raise_error(Psych::SyntaxError)
+end
+</code></pre>
+
+<p>  end
+<code>``
+Changing the last two exceptions to expect</code>Errno::ENOENT<code>and</code>URI::InvalidURIError` in that order fixes things and we're all green again.</p>
+
+<p>In the next block we have 2 failing tests because the first one is using improper syntax. Instead of <code>be</code> we should be using <code>eq</code>. Seems like in RSpec <code>be</code> is equivalent to === and not ==. Also we have another PSYCH::SyntaxError that needs to be replaced with <code>Errno::ENOENT</code>. Here's what we end up with after making those changes:</p>
+
+<p>```ruby
+describe "when parsing the post selector" do</p>
+
+<pre><code>it "should have a post_selector" do
+  @options.post_selector.should eq('.entry-content')
+end
+
+it "should raise an exception if the post selector is empty" do
+  expect { options = Tentacles::Options.new(relative_path + '/mocks/blank_uri.yml') }.to raise_error(Errno::ENOENT)
+end
+</code></pre>
+
+<p>  end
+```
+Ugh, hate to cut it short but looks like I'm going down a rabbit hole with validation. I'll pickup tomorrow to see if we can iron a lot of this out.</p>
+
+<ul>
+<li>Time: 7:11 pm</li>
+<li>Mood: Calm, Hot, Tired</li>
+<li>Sleep: 7</li>
+<li>Hunger: 6.5</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests]]></title>
