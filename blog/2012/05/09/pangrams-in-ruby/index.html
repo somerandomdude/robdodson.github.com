@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>NoMethodError in Rails 3 - Rob Dodson talks internets</title>
+  <title>Pangrams in Ruby - Rob Dodson talks internets</title>
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Coming from Actionscript 3 I’m pretty used to all of the different errors that the Flash compiler and runtime typically throw at me. But now that I’ &hellip;">
+  <meta name="description" content="I&#8217;m a big fan of sites like RubyQuiz and CodeEval. In my opinion doing short puzzles and brain-teasers is a great way to explore a language. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://robdodson.me/blog/2011/09/20/nomethoderror-in-rails-3">
+  <link rel="canonical" href="http://robdodson.me/blog/2012/05/09/pangrams-in-ruby">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -78,7 +78,7 @@
   
   <header>
     
-      <h1 class="entry-title">NoMethodError in Rails 3</h1>
+      <h1 class="entry-title">Pangrams in Ruby</h1>
     
     
       <p class="meta">
@@ -94,31 +94,99 @@
   
 
 
-<time datetime="2011-09-20T07:33:00-07:00" pubdate data-updated="true">Sep 20<span>th</span>, 2011</time>
+<time datetime="2012-05-09T23:15:00-07:00" pubdate data-updated="true">May 9<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>Coming from Actionscript 3 I’m pretty used to all of the different errors that the Flash compiler and runtime typically throw at me. But now that I’ve started teaching myself Ruby on Rails 3 I’m having to learn a whole new lexicon of messages which generally amount to “Something blow’d up..”</p>
+<div class="entry-content"><p>I&#8217;m a big fan of sites like <a href="http://www.rubyquiz.com/">RubyQuiz</a> and <a href="http://www.codeeval.com/">CodeEval</a>. In my opinion doing short puzzles and brain-teasers is a great way to explore a language. Here&#8217;s one such puzzle taken from CodeEval which asks that you devise a program to read in a file, parse each line and decide if it is a pangram or not.</p>
 
-<p>For my own benefit, and hopefully for the benefit of others, I’m going to post the errors and solutions that I come up with. Hopefully since I’m a total newbie, explaining things from my perspective will help other people who are new to the language as well.</p>
+<blockquote><p>The sentence &#8216;A quick brown fox jumps over the lazy dog&#8217; contains every single letter in the alphabet. Such sentences are called pangrams. You are to write a program, which takes a sentence, and returns all the letters it is missing (which prevent it from being a pangram). You should ignore the case of the letters in sentence, and your return should be all lower case letters, in alphabetical order. You should also ignore all non US-ASCII characters.In case the input sentence is already a pangram, print out the string NULL</p></blockquote>
 
-<p>To start of we have the <code>NoMethodError</code>.
-<img class="center" src="/images/no_method_error.jpg" title="'NoMethodError'" ></p>
+<p>Here&#8217;s my first attempt. Hopefully I can come back to this post in a few weeks and try it again in a bit more elegant fashion :)</p>
 
-<p>You get a <code>NoMethodError</code> when you try to call a method which either doesn’t exist on an Object, or the Object itself doesn’t exist. Since <code>Nil</code> is actually an object in Ruby (it’s an instance of <code>NilClass</code>) this error can sometimes be a bit misleading (especially if you come from a language where Nil or Null is represented by a primitive or a data type like in Actionscript 3).</p>
+<figure class='code'><figcaption><span>pangrams.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="no">ARGV</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">each_line</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">missing_letters</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">unless</span> <span class="n">line</span><span class="o">.</span><span class="n">chomp</span><span class="o">.</span><span class="n">empty?</span>
+</span><span class='line'>    <span class="n">line</span><span class="o">.</span><span class="n">chomp!</span>
+</span><span class='line'>    <span class="n">line</span><span class="o">.</span><span class="n">downcase!</span>
+</span><span class='line'>    <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="o">.</span><span class="n">.</span><span class="s1">&#39;z&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">l</span><span class="o">|</span>
+</span><span class='line'>      <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">.</span><span class="n">nil?</span>
+</span><span class='line'>        <span class="n">missing_letters</span> <span class="o">&lt;&lt;</span> <span class="n">l</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span> <span class="n">missing_letters</span><span class="o">.</span><span class="n">empty?</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;NULL&quot;</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="n">missing_letters</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>The real reason this occurs is either because the Object itself is Nil (and you probably didn’t intend that) or you forgot to define the method on your Object. In Flash you would get an error saying you can’t call a method on a null object reference, since null is just a primitive data type. But in Ruby, it says that the method you wanted didn’t exist because you called it on an ACTUAL NilClass object and NilClass doesn&#8217;t define whatever method name you passed.</p>
 
-<h3>Resolution</h3>
+<p>And here&#8217;s some input:</p>
 
-<ol>
-<li><p>If your error says “undefined method ‘some_method_name’ for NilClass:Class” (like it does in the picture) then you’ve accidentally tried to call a method on an Object which doesn’t really exist. You probably just didn’t pass or instantiate the Object properly.</p></li>
-<li><p>If you see the correct class type in the error then you’ve just failed to declare that method or perhaps mistyped its name. Verify that the method exists in the class and that you don’t have any spelling errors :)</p></li>
-</ol>
+<figure class='code'><figcaption><span>sentences.txt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>A quick brown fox jumps over the lazy dog
+</span><span class='line'>
+</span><span class='line'>A slow yellow fox crawls under the proactive dog
+</span><span class='line'>
+</span><span class='line'>AbC
+</span></code></pre></td></tr></table></div></figure>
 
+
+<p>To run it from the command line you&#8217;ll need to pass in the path to the sentece file as an argument. Here&#8217;s what it would look like if <code>pangrams.rb</code> and <code>sentences.txt</code> were in the same folder:</p>
+
+<figure class='code'><figcaption><span>sentences.txt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>ruby pangrams.rb sentences.txt
+</span><span class='line'>
+</span><span class='line'># outputs...
+</span><span class='line'>NULL
+</span><span class='line'>NULL
+</span><span class='line'>bjkmqz
+</span><span class='line'>NULL
+</span><span class='line'>defghijklmnopqrstuvwxyz
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Play around with this, throw some different sentence combinations at it to see what it spits out. Then try to write your own implementation.</p>
 </div>
 
 
@@ -141,12 +209,12 @@
   
 
 
-<time datetime="2011-09-20T07:33:00-07:00" pubdate data-updated="true">Sep 20<span>th</span>, 2011</time>
+<time datetime="2012-05-09T23:15:00-07:00" pubdate data-updated="true">May 9<span>th</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/errors/'>Errors</a>, <a class='category' href='/blog/categories/rails/'>Rails</a>, <a class='category' href='/blog/categories/rails-3/'>Rails 3</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a>
+    <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/puzzles/'>Puzzles</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a>
   
 </span>
 
@@ -155,7 +223,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2011/09/20/nomethoderror-in-rails-3/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2011/09/20/nomethoderror-in-rails-3/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -168,8 +236,8 @@
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/" title="Previous Post: Object Oriented Scraper Backed With Tests Pt. 3">&laquo; Object Oriented Scraper Backed With Tests Pt. 3</a>
       
-        <a class="basic-alignment right" href="/blog/2011/09/21/syntax-error-unexpected-tidentifier/" title="Next Post: Syntax Error: Unexpected tIDENTIFIER in Rails 3">Syntax Error: Unexpected tIDENTIFIER in Rails 3 &raquo;</a>
       
     </p>
   </footer>
@@ -299,8 +367,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://robdodson.me/blog/2011/09/20/nomethoderror-in-rails-3/';
-        var disqus_url = 'http://robdodson.me/blog/2011/09/20/nomethoderror-in-rails-3/';
+        var disqus_identifier = 'http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/';
+        var disqus_url = 'http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/';
         var disqus_script = 'embed.js';
       
     (function () {

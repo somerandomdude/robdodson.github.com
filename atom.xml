@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-08T23:26:39-07:00</updated>
+  <updated>2012-05-09T23:53:45-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,100 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Pangrams in Ruby]]></title>
+    <link href="http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/"/>
+    <updated>2012-05-09T23:15:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/09/pangrams-in-ruby</id>
+    <content type="html"><![CDATA[<p>I&#8217;m a big fan of sites like <a href="http://www.rubyquiz.com/">RubyQuiz</a> and <a href="http://www.codeeval.com/">CodeEval</a>. In my opinion doing short puzzles and brain-teasers is a great way to explore a language. Here&#8217;s one such puzzle taken from CodeEval which asks that you devise a program to read in a file, parse each line and decide if it is a pangram or not.</p>
+
+<blockquote><p>The sentence &#8216;A quick brown fox jumps over the lazy dog&#8217; contains every single letter in the alphabet. Such sentences are called pangrams. You are to write a program, which takes a sentence, and returns all the letters it is missing (which prevent it from being a pangram). You should ignore the case of the letters in sentence, and your return should be all lower case letters, in alphabetical order. You should also ignore all non US-ASCII characters.In case the input sentence is already a pangram, print out the string NULL</p></blockquote>
+
+<p>Here&#8217;s my first attempt. Hopefully I can come back to this post in a few weeks and try it again in a bit more elegant fashion :)</p>
+
+<figure class='code'><figcaption><span>pangrams.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="no">ARGV</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">each_line</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">missing_letters</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">unless</span> <span class="n">line</span><span class="o">.</span><span class="n">chomp</span><span class="o">.</span><span class="n">empty?</span>
+</span><span class='line'>    <span class="n">line</span><span class="o">.</span><span class="n">chomp!</span>
+</span><span class='line'>    <span class="n">line</span><span class="o">.</span><span class="n">downcase!</span>
+</span><span class='line'>    <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="o">.</span><span class="n">.</span><span class="s1">&#39;z&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">l</span><span class="o">|</span>
+</span><span class='line'>      <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">.</span><span class="n">nil?</span>
+</span><span class='line'>        <span class="n">missing_letters</span> <span class="o">&lt;&lt;</span> <span class="n">l</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span> <span class="n">missing_letters</span><span class="o">.</span><span class="n">empty?</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;NULL&quot;</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="n">missing_letters</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And here&#8217;s some input:</p>
+
+<figure class='code'><figcaption><span>sentences.txt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>A quick brown fox jumps over the lazy dog
+</span><span class='line'>
+</span><span class='line'>A slow yellow fox crawls under the proactive dog
+</span><span class='line'>
+</span><span class='line'>AbC
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To run it from the command line you&#8217;ll need to pass in the path to the sentece file as an argument. Here&#8217;s what it would look like if <code>pangrams.rb</code> and <code>sentences.txt</code> were in the same folder:</p>
+
+<figure class='code'><figcaption><span>sentences.txt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>ruby pangrams.rb sentences.txt
+</span><span class='line'>
+</span><span class='line'># outputs...
+</span><span class='line'>NULL
+</span><span class='line'>NULL
+</span><span class='line'>bjkmqz
+</span><span class='line'>NULL
+</span><span class='line'>defghijklmnopqrstuvwxyz
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Play around with this, throw some different sentence combinations at it to see what it spits out. Then try to write your own implementation.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Object Oriented Scraper Backed With Tests Pt. 3]]></title>

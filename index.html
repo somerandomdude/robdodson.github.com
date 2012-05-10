@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="I did some cleanup this morning on the Options class and the options_spec, mainly to remove items that seemed like they shouldn&#8217;t be tested. &hellip;">
+  <meta name="description" content="I&#8217;m a big fan of sites like RubyQuiz and CodeEval. In my opinion doing short puzzles and brain-teasers is a great way to explore a language. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,127 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/09/pangrams-in-ruby/">Pangrams in Ruby</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-09T23:15:00-07:00" pubdate data-updated="true">May 9<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&#8217;m a big fan of sites like <a href="http://www.rubyquiz.com/">RubyQuiz</a> and <a href="http://www.codeeval.com/">CodeEval</a>. In my opinion doing short puzzles and brain-teasers is a great way to explore a language. Here&#8217;s one such puzzle taken from CodeEval which asks that you devise a program to read in a file, parse each line and decide if it is a pangram or not.</p>
+
+<blockquote><p>The sentence &#8216;A quick brown fox jumps over the lazy dog&#8217; contains every single letter in the alphabet. Such sentences are called pangrams. You are to write a program, which takes a sentence, and returns all the letters it is missing (which prevent it from being a pangram). You should ignore the case of the letters in sentence, and your return should be all lower case letters, in alphabetical order. You should also ignore all non US-ASCII characters.In case the input sentence is already a pangram, print out the string NULL</p></blockquote>
+
+<p>Here&#8217;s my first attempt. Hopefully I can come back to this post in a few weeks and try it again in a bit more elegant fashion :)</p>
+
+<figure class='code'><figcaption><span>pangrams.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="no">ARGV</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">each_line</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">missing_letters</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">unless</span> <span class="n">line</span><span class="o">.</span><span class="n">chomp</span><span class="o">.</span><span class="n">empty?</span>
+</span><span class='line'>    <span class="n">line</span><span class="o">.</span><span class="n">chomp!</span>
+</span><span class='line'>    <span class="n">line</span><span class="o">.</span><span class="n">downcase!</span>
+</span><span class='line'>    <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="o">.</span><span class="n">.</span><span class="s1">&#39;z&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">l</span><span class="o">|</span>
+</span><span class='line'>      <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">.</span><span class="n">nil?</span>
+</span><span class='line'>        <span class="n">missing_letters</span> <span class="o">&lt;&lt;</span> <span class="n">l</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">if</span> <span class="n">missing_letters</span><span class="o">.</span><span class="n">empty?</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;NULL&quot;</span>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="n">missing_letters</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And here&#8217;s some input:</p>
+
+<figure class='code'><figcaption><span>sentences.txt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>A quick brown fox jumps over the lazy dog
+</span><span class='line'>
+</span><span class='line'>A slow yellow fox crawls under the proactive dog
+</span><span class='line'>
+</span><span class='line'>AbC
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To run it from the command line you&#8217;ll need to pass in the path to the sentece file as an argument. Here&#8217;s what it would look like if <code>pangrams.rb</code> and <code>sentences.txt</code> were in the same folder:</p>
+
+<figure class='code'><figcaption><span>sentences.txt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>ruby pangrams.rb sentences.txt
+</span><span class='line'>
+</span><span class='line'># outputs...
+</span><span class='line'>NULL
+</span><span class='line'>NULL
+</span><span class='line'>bjkmqz
+</span><span class='line'>NULL
+</span><span class='line'>defghijklmnopqrstuvwxyz
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Play around with this, throw some different sentence combinations at it to see what it spits out. Then try to write your own implementation.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2915,66 +3036,6 @@ Now let&#8217;s tell RVM to use Ruby 1.9.3 with our custom Octopress gemset.</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/04/29/how-to-run-tests-in-sublime-text/">How to Run Tests in Sublime Text</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-04-29T09:26:00-07:00" pubdate data-updated="true">Apr 29<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>If you&#8217;re lazy like me then you love to automate as much of your process as possible. Running tests from within your IDE is one of those tasks that screams for a keyboard shortcut. In full featured tools like RubyMine or Eclipse this is usually pretty straightforward. However many developers in the Ruby community seem to prefer more lightweight tools like TextMate, Vim and Sublime. Today we&#8217;ll look at how to setup RubyTest in Sublime Text 2 so we can easily run tests with just a few hotkeys. The tests will be written in <a href="http://rspec.info/">Rspec</a> which should be familiar to most Rubyists.</p>
-
-<h3>How to setup RubyTest in Sublime Text 2</h3>
-
-<p>If you haven&#8217;t installed the <a href="http://wbond.net/sublime_packages/package_control">Sublime Package Manager</a> go ahead and do that now. The package manager is a wonderful tool that lets us install and update plugins from within Sublime. After you have that installed you can hit <code>cmd-shift-p</code> to open up the Command Palette. Type the following <code>Install Package</code> and press Enter. This will bring up a list of available packages that we can install. You can also type <code>Discover Packages</code> which will take you to a page listing each plugin with a brief description.</p>
-
-<p>Go ahead and type <code>RubyTest</code> and press Enter. You will see a progress indicator at the bottom of your editor. Once it&#8217;s finished you should be able to click on <code>Tools &gt; RubyTest</code>.</p>
-
-<h3>Running tests in Sublime Text 2</h3>
-
-<p>I&#8217;ve put together <a href="https://github.com/robdodson/testing_demo">a sample project which you can download</a>. It has a Gemfile and a pair of contrived Rspec tests. Put it someplace where you can easily get to it using the command line. In order for RubyTest to work you have to open your projects from the CLI. This has to do with how certain load paths get setup and it&#8217;s probably the cause of about 95% of RubyTest issues. Follow <a href="http://www.sublimetext.com/docs/2/osx_command_line.html">these instructions</a> if you don&#8217;t already have the <code>subl</code> command setup in your terminal.</p>
-
-<p><code>cd</code> into the project folder and do a quick <code>bundle install</code>. When that&#8217;s finished try to run</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>bundle exec rspec spec/</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you see test results then you know that rspec is good to go. Use <code>subl .</code> to open the project. You should see a list of files on your left hand sidebar. Navigate to the <code>spec/robot_spec.rb</code> file. If you&#8217;re lucky you should be able to hit <code>cmd-shift-t</code> to run all of the tests within the spec. If succesful you&#8217;ll see a console window that looks like this.</p>
-
-<p><img class="center" src="/images/ruby_test_console.png" title="Ruby Test Console" ></p>
-
-<p>Don&#8217;t worry if it doesn&#8217;t work the first time. Sublime and RubyTest are <em>very</em> finicky. Close Sublime and try to open it again from the command line.It might help to close any other Sublime projects you already have open or even quit the program entirely using <code>cmd-q</code>. You&#8217;ll have to experiment a bit to get it all working.</p>
-
-<p>Hopefully after all that you&#8217;ve got your tests showing up green. Now you can integrate RubyTest into your workflow and save all that alt-tabbing back and forth between the command line!</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -2990,6 +3051,10 @@ Now let&#8217;s tell RVM to use Ruby 1.9.3 with our custom Octopress gemset.</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/05/09/pangrams-in-ruby/">Pangrams in Ruby</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/">Object Oriented Scraper Backed With Tests Pt. 3</a>
       </li>
     
@@ -3003,10 +3068,6 @@ Now let&#8217;s tell RVM to use Ruby 1.9.3 with our custom Octopress gemset.</p>
     
       <li class="post">
         <a href="/blog/2012/05/05/building-a-simple-scraper-with-nokogiri-in-ruby/">Building a Simple Scraper with Nokogiri in Ruby</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/04/d3-basics-the-linear-scale/">D3 Basics: The Linear Scale</a>
       </li>
     
   </ul>

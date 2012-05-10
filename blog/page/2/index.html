@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="One of my previous projects involved a ton of work using Flash&#8217;s built in Date object. We ended up rolling our own Calendar library which was &hellip;">
+  <meta name="description" content="If you&#8217;re lazy like me then you love to automate as much of your process as possible. Running tests from within your IDE is one of those tasks &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,66 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/04/29/how-to-run-tests-in-sublime-text/">How to Run Tests in Sublime Text</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-29T09:26:00-07:00" pubdate data-updated="true">Apr 29<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>If you&#8217;re lazy like me then you love to automate as much of your process as possible. Running tests from within your IDE is one of those tasks that screams for a keyboard shortcut. In full featured tools like RubyMine or Eclipse this is usually pretty straightforward. However many developers in the Ruby community seem to prefer more lightweight tools like TextMate, Vim and Sublime. Today we&#8217;ll look at how to setup RubyTest in Sublime Text 2 so we can easily run tests with just a few hotkeys. The tests will be written in <a href="http://rspec.info/">Rspec</a> which should be familiar to most Rubyists.</p>
+
+<h3>How to setup RubyTest in Sublime Text 2</h3>
+
+<p>If you haven&#8217;t installed the <a href="http://wbond.net/sublime_packages/package_control">Sublime Package Manager</a> go ahead and do that now. The package manager is a wonderful tool that lets us install and update plugins from within Sublime. After you have that installed you can hit <code>cmd-shift-p</code> to open up the Command Palette. Type the following <code>Install Package</code> and press Enter. This will bring up a list of available packages that we can install. You can also type <code>Discover Packages</code> which will take you to a page listing each plugin with a brief description.</p>
+
+<p>Go ahead and type <code>RubyTest</code> and press Enter. You will see a progress indicator at the bottom of your editor. Once it&#8217;s finished you should be able to click on <code>Tools &gt; RubyTest</code>.</p>
+
+<h3>Running tests in Sublime Text 2</h3>
+
+<p>I&#8217;ve put together <a href="https://github.com/robdodson/testing_demo">a sample project which you can download</a>. It has a Gemfile and a pair of contrived Rspec tests. Put it someplace where you can easily get to it using the command line. In order for RubyTest to work you have to open your projects from the CLI. This has to do with how certain load paths get setup and it&#8217;s probably the cause of about 95% of RubyTest issues. Follow <a href="http://www.sublimetext.com/docs/2/osx_command_line.html">these instructions</a> if you don&#8217;t already have the <code>subl</code> command setup in your terminal.</p>
+
+<p><code>cd</code> into the project folder and do a quick <code>bundle install</code>. When that&#8217;s finished try to run</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>bundle exec rspec spec/</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you see test results then you know that rspec is good to go. Use <code>subl .</code> to open the project. You should see a list of files on your left hand sidebar. Navigate to the <code>spec/robot_spec.rb</code> file. If you&#8217;re lucky you should be able to hit <code>cmd-shift-t</code> to run all of the tests within the spec. If succesful you&#8217;ll see a console window that looks like this.</p>
+
+<p><img class="center" src="/images/ruby_test_console.png" title="Ruby Test Console" ></p>
+
+<p>Don&#8217;t worry if it doesn&#8217;t work the first time. Sublime and RubyTest are <em>very</em> finicky. Close Sublime and try to open it again from the command line.It might help to close any other Sublime projects you already have open or even quit the program entirely using <code>cmd-q</code>. You&#8217;ll have to experiment a bit to get it all working.</p>
+
+<p>Hopefully after all that you&#8217;ve got your tests showing up green. Now you can integrate RubyTest into your workflow and save all that alt-tabbing back and forth between the command line!</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -883,6 +943,10 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/05/09/pangrams-in-ruby/">Pangrams in Ruby</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/">Object Oriented Scraper Backed With Tests Pt. 3</a>
       </li>
     
@@ -896,10 +960,6 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
     
       <li class="post">
         <a href="/blog/2012/05/05/building-a-simple-scraper-with-nokogiri-in-ruby/">Building a Simple Scraper with Nokogiri in Ruby</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/04/d3-basics-the-linear-scale/">D3 Basics: The Linear Scale</a>
       </li>
     
   </ul>
