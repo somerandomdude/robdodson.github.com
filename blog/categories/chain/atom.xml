@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-09T23:53:45-07:00</updated>
+  <updated>2012-05-10T00:10:31-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -57,13 +57,11 @@ end
 ```</p>
 
 <p>And here's some input:
-```text sentences.txt
-A quick brown fox jumps over the lazy dog</p>
-
-<p>A slow yellow fox crawls under the proactive dog</p>
-
-<p>AbC
-```</p>
+<code>text sentences.txt
+A quick brown fox jumps over the lazy dog
+A slow yellow fox crawls under the proactive dog
+AbC
+</code></p>
 
 <p>To run it from the command line you'll need to pass in the path to the sentece file as an argument. Here's what it would look like if <code>pangrams.rb</code> and <code>sentences.txt</code> were in the same folder:
 ```
@@ -72,12 +70,10 @@ ruby pangrams.rb sentences.txt</p>
 <h1>outputs...</h1>
 
 <p>NULL
-NULL
 bjkmqz
-NULL
 defghijklmnopqrstuvwxyz
 ```
-Play around with this, throw some different sentence combinations at it to see what it spits out. Then try to write your own implementation.</p>
+Play around with this, throw some different sentence combinations at it to see what it spits out. Then try to write your own implementation. A good next step would be to modify the script so it can support empty lines in the text file.</p>
 ]]></content>
   </entry>
   
