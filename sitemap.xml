@@ -82,14 +82,20 @@
         <loc>
             http://robdodson.me/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4/
         </loc>
-        <lastmod>2012-05-11T22:00:56-07:00</lastmod>
+        <lastmod>2012-05-12T07:01:34-07:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://robdodson.me/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/
+        </loc>
+        <lastmod>2012-05-12T09:02:35-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/archives/</loc>
-        <lastmod>2012-05-11T22:00:56-07:00</lastmod>
+        <lastmod>2012-05-12T09:02:35-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/</loc>
-        <lastmod>2012-05-11T22:00:56-07:00</lastmod>
+        <lastmod>2012-05-12T09:02:35-07:00</lastmod>
     </url>
 </urlset>

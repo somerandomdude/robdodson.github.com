@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-11T22:01:05-07:00</updated>
+  <updated>2012-05-12T09:02:44-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,179 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 5]]></title>
+    <link href="http://robdodson.me/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/"/>
+    <updated>2012-05-12T07:02:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5</id>
+    <content type="html"><![CDATA[<p>Last night I got the <code>Crawler</code> passing its test for <code>#get_words_by_selector</code>. This morning I realize that when someone sends in a junk selector I want to raise an exception of some kind. Since I don't know much about Ruby Exceptions I'm doing a little digging...</p>
+
+<p>I'm glad I spent the time to do that since I managed to learn some pretty interesting stuff along the way. Ruby has both <code>throw</code>/<code>catch</code> and <code>raise</code>/<code>rescue</code> so what's the difference between throw/catch and raise/rescue in Ruby?</p>
+
+<h3>Throwing exceptions for control flow</h3>
+
+<p>There's a great guest post by Avdi Grimm on <a href="http://rubylearning.com/blog/2011/07/12/throw-catch-raise-rescue-im-so-confused/">RubyLearning</a> which covers this topic in depth. To summarize <code>throw</code>/<code>catch</code> is mainly used when doing <em>exceptions as control flow</em>. In other words, if you need to break out of a deeply nested loop or some other expensive operation you can throw an exception symbol which can be caught someone high up the call stack. Initially this rubbed me the wrong way since I know that things like <code>goto</code> and <code>labels</code> are a bad practice. Someone else raised this point in the comments to which Avid responded:</p>
+
+<blockquote><p>There is a fundamental difference between throw/catch and goto. Goto, in languages which support it, pays no attention to the stack. Any resources which were allocated before the goto are simply left dangling unless they are manually cleaned up.</p>
+
+<p>throw/catch, like exception handling, unwinds the stack, triggering ensure blocks along the way. So, for example, if you throw inside an open() {…} block, the open file will be closed on the way up to the catch() block.</p></blockquote>
+
+<h3>Raising exceptions for everything else</h3>
+
+<p>With <code>throw</code>/<code>catch</code> out of the way that leaves <code>raise</code>/<code>rescue</code> to handle everything else. I'm willing to bet that 99% of error code should probably be raising exceptions and throw/catch should only be used in situations where you need the control flow behavior. With that knowledge in hand I need to decide between one of Ruby's built-in Exceptions or defining one of my own. Let's define one of our own so we can get that experience under our belt.</p>
+
+<h3>Creating an exception subclass in Ruby</h3>
+
+<p>One tip I picked up while doing my research into <code>raise</code> and <code>throw</code> is that any exception that doesn't subclass StandardError will not be caught by default. Here's an example to illustrate:</p>
+
+<p>```ruby</p>
+
+<h2>#</h2>
+
+<h1>First we define an exception class which doesn't</h1>
+
+<h1>inherit from StandardError. As a result it won't</h1>
+
+<h1>be caught by a simple rescue. Instead we would</h1>
+
+<h1>need to rescue by its class name</h1>
+
+<h2>#</h2>
+
+<p>class MyBadException &lt; Exception
+end</p>
+
+<p>def miss_bad_exception
+  raise MyBadException.new
+  rescue
+  p "I'll never be called :("
+end</p>
+
+<p>miss_bad_exception
+MyBadException: MyBadException
+  from (irb):4:in <code>miss_bad_exception'
+  from (irb):8
+  from /Users/Rob/.rvm/rubies/ruby-1.9.3-p125/bin/irb:16:in</code><main></p>
+
+<h1>See that calling the method produces an uncaught exception...</h1>
+
+<h2>#</h2>
+
+<h1>Next we'll subclass StandardError. As a result</h1>
+
+<h1>we won't have to explicitly define our class name</h1>
+
+<h1>for a rescue to work.</h1>
+
+<h2>#</h2>
+
+<p>class MyGoodException &lt; StandardError
+end</p>
+
+<p>def save_good_exception
+  raise MyGoodException.new
+  rescue
+  p "I'm saved! My hero!"
+end</p>
+
+<p>save_good_exception
+"I'm saved! My hero!"</p>
+
+<h1>Yay! Our exception was caught!</h1>
+
+<p><code>``
+We'll call our Exception</code>SelectorError` to indicate that the provided selector did not return any results. For reference I often refer to <a href="http://rubylearning.com/satishtalim/ruby_exceptions.html">this chart on RubyLearning</a> when I want to see a list of all the available Exception classes. In our case we'll just inherit from StandardError.</p>
+
+<p><code>ruby tentacles/lib/selection_error.rb
+module Tentacles
+  class SelectionError &lt; StandardError
+  end
+end
+</code>
+I don't think we actually need to do much more than that. The ability to pass a payload message should come from the super class so I think we're good to go. Here's our updated spec:</p>
+
+<p>```ruby
+it "should raise an exception if nothing was returned" do</p>
+
+<pre><code>    expect { @crawler.get_words_by_selector('some-gibberish-selector') }.to raise_error(Tentacles::SelectionError, 'The selector did not return an results!')  
+</code></pre>
+
+<p>end
+<code>``      
+Initially the test fails so now we need to update our</code>Crawler` to check if nothing was returned and raise the custom exception.</p>
+
+<p>Here's our updated <code>Crawler</code> with additional require and updated method.</p>
+
+<p>```ruby tentacles/lib/crawler.rb
+require 'open-uri'
+require 'nokogiri'
+require_relative 'selection_error'</p>
+
+<p>module Tentacles
+  class Crawler</p>
+
+<pre><code>attr_reader :doc
+
+def self.from_uri(uri)
+  new(uri)
+end
+
+def initialize(uri)
+  @uri = uri
+  @doc = Nokogiri::HTML(open(@uri))
+  @counts = Hash.new(0)
+end
+
+def get_words_by_selector(selector)
+  entries = doc.css(selector)
+  raise Tentacles::SelectionError, 
+    'The selector did not return an results!' if entries.empty?
+  entries.each do |entry|
+    words = words_from_string(entry.content)
+    count_frequency(words)
+  end
+
+  sorted = @counts.sort_by { |word, count| count }
+  sorted.reverse!
+  sorted.map { |word, count| "#{word}: #{count}"}
+end
+
+def get_metadata_by_selector(selector)
+  # TODO
+end
+</code></pre>
+
+<p>  private</p>
+
+<pre><code>def words_from_string(string)
+  string.downcase.scan(/[\w']+/)
+end
+
+def count_frequency(word_list)
+  for word in word_list
+    @counts[word] += 1
+  end
+  @counts
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>All tests passing, we're good to go :)</p>
+
+<ul>
+<li>Time: 7:00 am</li>
+<li>Mood: Alert, Awake, Anxious</li>
+<li>Sleep: 8</li>
+<li>Hunger: 3</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 4]]></title>
@@ -722,261 +895,6 @@ it { should respond_to(:get_metadata_by_selector) }
 end
 ```
 While it's not the prettiest test ever written it does get the job done. 0.00359 seconds for 4 examples <em>down from 6 seconds!</em> That's going to wrap it up for tonight. Tomorrow we'll finish off the spec and the implementation and finally get some data coming down from the live site. Until then!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Object Oriented Scraper Backed With Tests pt. 2]]></title>
-    <link href="http://robdodson.me/blog/2012/05/07/object-oriented-scraper-backed-with-tests-pt-2/"/>
-    <updated>2012-05-07T18:48:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/07/object-oriented-scraper-backed-with-tests-pt-2</id>
-    <content type="html"><![CDATA[<p>I'm picking up from where I left off last night. If you look back at the <a href="/blog/2012/05/06/object-oriented-scraper-backed-with-tests/">previous post</a> we ended with a spec'd out <code>Runner</code> object. Now we need to build our <code>Crawler</code> which will slurp up all the content from our posts and return them as meaningful data.</p>
-
-<p>Our Crawler will have 2 main responsibilities. First it will iterate over a post and return a Hash of words and their usage count. Second, it will iterate over a post and pull out any metadata and associate that with a Date. These are rather simple goals and if you remember from our original scraper we were actually hitting every post on the main page. I think I'd like to nail down these simple functions and then refactor the Crawler to accept a corpus page full of links—<a href="http://robdodson.me/blog/archives/">like our archives page</a>—which it will follow and parse. Right now I want to start small.</p>
-
-<p>Here's a list of what I <em>think</em> would be good tests for our <code>Crawler</code>.</p>
-
-<ul>
-<li>It should return an instance in exchange for a valid URI. Since the URI comes from the Runner and that's already being tested we'll assume that the URI we're given is valid.</li>
-<li>It should respond to a <code>get_word_counts</code> method.</li>
-<li>The get_word_counts method should accept a selector <code>String</code> and return a <code>Hash</code> of words and their counts. Since the selector will be coming from the Runner we'll assume it's valid too but first we'll need to put another test in our <code>runner_spec.rb</code>.</li>
-<li>It should respond to a <code>get_metadata</code> method.</li>
-<li>The get_metadata method should also accept a selector <code>String</code> and return a <code>Hash</code> with a valid <code>Date</code> and each piece of metadata categorized. Let's see how far we can take this by converting strings related to time into <code>Time</code> objects and any categories with multiple entries into <code>Arrays</code>.</li>
-</ul>
-
-
-<p>I'm actually going to copy and paste the above list into my specs and start buliding from there.</p>
-
-<p>....</p>
-
-<p>Hmm... actually I'm not. Something about this doesn't feel right. <code>Runner</code> has accrued too much responsibility. It's supposed to validate 3 different strings parsed from a YAML file which it loads and then it also has to deal with creating and running the <code>Crawler</code>. I think it's time for another object. Which we'll call <code>Options</code>. Options will be in charge of loading our YAML and verifying that all the values are valid. <code>Runner</code> will create both an Options and a Crawler object and pass the values from Options to Crawler. This is actaully also in line with the Pickaxe book's Anagrams example, so we have a nice guide to follow in that.</p>
-
-<p>OK so <code>Options</code>, eh? Well we'll need to spec out its responsibilities. I think we can just take the tests we wrote for Runner and move them over to Options.</p>
-
-<p>After doing this for while I've ended up with a TON of tests...only to validate 3 variables.</p>
-
-<p>```ruby tentacles/spec/options_spec.rb
-require_relative '../lib/tentacles/options'
-require 'yaml'
-require 'uri'
-require 'helpers'</p>
-
-<p>describe Tentacles::Options do
-  include Helpers</p>
-
-<p>  before do</p>
-
-<pre><code>@options = Tentacles::Options.new(relative_path + '/../lib/tentacles/config.yml')
-</code></pre>
-
-<p>  end</p>
-
-<p>  subject { @options }</p>
-
-<p>  it { should respond_to(:uri) }
-  it { should respond_to(:post_selector) }
-  it { should respond_to(:metadata_selector) }</p>
-
-<p>  describe "when parsing the config file" do</p>
-
-<pre><code>it "should raise an exception if the config file is missing" do
-  expect { options = Tentacles::Options.new('') }.to raise_error(Errno::ENOENT)
-  expect { options = Tentacles::Options.new(nil) }.to raise_error(TypeError)
-end
-
-it "should raise an exception if the config file is invalid" do
-  expect { options = Tentacles::Options.new(relative_path + '/mocks/invalid_yaml.yml') }.to raise_error(Psych::SyntaxError)
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  describe "when parsing the URI" do</p>
-
-<pre><code>it "should display the right URI" do
-  uri = URI.parse('http://robdodson.me')
-  @options.uri.should eq(uri)
-end
-
-it "should raise an exception if uri is empty" do
-  expect { options = Tentacles::Options.new(relative_path + '/mocks/blank_uri.yml') }.to raise_error(Psych::SyntaxError)
-end
-
-it "should raise an exception if uri is invalid" do
-  expect { options = Tentacles::Options.new(relative_path + '/mocks/invalid_uri.yml') }.to raise_error(Psych::SyntaxError)
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  describe "when parsing the post selector" do</p>
-
-<pre><code>it "should have a post_selector" do
-  @options.post_selector.should be('.entry-content')
-end
-
-it "should raise an exception if the post selector is empty" do
-  expect { options = Tentacles::Options.new(relative_path + '/mocks/blank_uri.yml') }.to raise_error(Psych::SyntaxError)
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  describe "when parsing the metadata selector" do</p>
-
-<pre><code>it "should have a metadata_selector" do
-  @options.metadata_selector.should be('.personal-metadata')
-end
-
-it "should raise an exception if the metadata selector is empty" do
-  expect { options = Tentacles::Options.new(relative_path + '/mocks/blank_uri.yml') }.to raise_error(Psych::SyntaxError)
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Here's my implementation of <code>options.rb</code>
-```ruby tentacles/lib/tentacles/options.rb
-require 'yaml'</p>
-
-<p>module Tentacles
-  class Options</p>
-
-<pre><code>attr_reader :uri
-attr_reader :post_selector
-attr_reader :metadata_selector
-
-def initialize(config)
-  @config = YAML.load(File.open(config))
-
-  @uri = URI.parse(@config[:uri])
-  raise IOError, 'invalid uri!' if @uri.scheme.nil? || @uri.host.nil?
-
-  @post_selector = @config[:post_selector]
-  raise IOError, 'post_selector is not defined' if @post_selector.empty? 
-
-  @metadata_selector = @config[:metadata_selector]
-  raise IOError, 'metadata_selector is not defined' if @metadata_selector.empty? 
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Seems like now might be a good time to pause for a bit. When I look at those tests I see a lot of places where I'm testing Classes that have probably already been tested. I feel like you can safely assume that if you pass <code>YAML.load</code> a bunch of junk it's going to throw an error. Is there any value in testing something like that for my own implementation? I'm guessing not. However I do think it's important that I test the 3 exceptions that I wrote. I'll get all the tests to pass and then I'll go back and clean it up.</p>
-
-<h3>Making the Tests Pass</h3>
-
-<p>I like to comment out my spec file and go line by line making each test pass as I go. I'm pretty good at writing failing tests (heh) so this approach adheres well to the red, green, refactor mantra.</p>
-
-<p>Starting out I have a problem in the first block which checks my <code>attr_readers</code>:</p>
-
-<p><code>ruby
-it { should respond_to(:uri) }
-it { should respond_to(:post_selector) }
-it { should respond_to(:metadata_selector) }
-</code></p>
-
-<p>Let's see if I can get just the first test to pass... I comment out everything inside of Options and notice that YAML does not use symbols for keys. It seems like loaded YAML uses Strings for keys. After changing my symbol keys to strings my first block of tests pass.</p>
-
-<p>```ruby tentacles/lib/tentacles/options.rb
-require 'yaml'</p>
-
-<p>module Tentacles
-  class Options</p>
-
-<pre><code>attr_reader :uri
-attr_reader :post_selector
-attr_reader :metadata_selector
-
-def initialize(config)
-  @config = YAML.load(File.open(config))
-
-  @uri = URI.parse(@config["uri"])
-  raise IOError, 'invalid uri!' if @uri.scheme.nil? || @uri.host.nil?
-
-  @post_selector = @config["post_selector"]
-  raise IOError, 'post_selector is not defined' if @post_selector.empty? 
-
-  @metadata_selector = @config["metadata_selector"]
-  raise IOError, 'metadata_selector is not defined' if @metadata_selector.empty? 
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>The next block passes quite easily because it's ported over from the <code>Runner</code> class</p>
-
-<p>```ruby
-describe "when parsing the config file" do</p>
-
-<pre><code>it "should raise an exception if the config file is missing" do
-  expect { options = Tentacles::Options.new('') }.to raise_error(Errno::ENOENT)
-  expect { options = Tentacles::Options.new(nil) }.to raise_error(TypeError)
-end
-
-it "should raise an exception if the config file is invalid" do
-  expect { options = Tentacles::Options.new(relative_path + '/mocks/invalid_yaml.yml') }.to raise_error(Psych::SyntaxError)
-end
-</code></pre>
-
-<p>  end
-```</p>
-
-<p>After that we run into some issues because our next set of tested exceptions have the wrong class.</p>
-
-<p>```ruby
-  describe "when parsing the URI" do</p>
-
-<pre><code>it "should display the right URI" do
-  uri = URI.parse('http://robdodson.me')
-  @options.uri.should eq(uri)
-end
-
-it "should raise an exception if uri is empty" do
-  expect { options = Tentacles::Options.new(relative_path + '/mocks/blank_uri.yml') }.to raise_error(Psych::SyntaxError)
-end
-
-it "should raise an exception if uri is invalid" do
-  expect { options = Tentacles::Options.new(relative_path + '/mocks/invalid_uri.yml') }.to raise_error(Psych::SyntaxError)
-end
-</code></pre>
-
-<p>  end
-<code>``
-Changing the last two exceptions to expect</code>Errno::ENOENT<code>and</code>URI::InvalidURIError` in that order fixes things and we're all green again.</p>
-
-<p>In the next block we have 2 failing tests because the first one is using improper syntax. Instead of <code>be</code> we should be using <code>eq</code>. Seems like in RSpec <code>be</code> is equivalent to === and not ==. Also we have another PSYCH::SyntaxError that needs to be replaced with <code>Errno::ENOENT</code>. Here's what we end up with after making those changes:</p>
-
-<p>```ruby
-describe "when parsing the post selector" do</p>
-
-<pre><code>it "should have a post_selector" do
-  @options.post_selector.should eq('.entry-content')
-end
-
-it "should raise an exception if the post selector is empty" do
-  expect { options = Tentacles::Options.new(relative_path + '/mocks/blank_uri.yml') }.to raise_error(Errno::ENOENT)
-end
-</code></pre>
-
-<p>  end
-```
-Ugh, hate to cut it short but looks like I'm going down a rabbit hole with validation. I'll pickup tomorrow to see if we can iron a lot of this out.</p>
-
-<ul>
-<li>Time: 7:11 pm</li>
-<li>Mood: Calm, Hot, Tired</li>
-<li>Sleep: 7</li>
-<li>Hunger: 6.5</li>
-<li>Coffee: 0</li>
-</ul>
-
 ]]></content>
   </entry>
   
