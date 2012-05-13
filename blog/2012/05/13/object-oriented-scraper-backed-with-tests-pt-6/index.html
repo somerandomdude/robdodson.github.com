@@ -1,0 +1,741 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Object Oriented Scraper Backed with Tests Pt. 6 - Rob Dodson talks internets</title>
+  <meta name="author" content="Rob Dodson">
+
+  
+  <meta name="description" content="Yesterday we verified that our Crawler was able to hit a document and, given the right selector, pull down a list of words and their frequency on the &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://robdodson.me/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <script src="/javascripts/d3.v2.js"></script>
+  <link href="/atom.xml" rel="alternate" title="Rob Dodson talks internets" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-25869920-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Rob Dodson talks internets</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:robdodson.me" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Object Oriented Scraper Backed With Tests Pt. 6</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-13T07:52:00-07:00" pubdate data-updated="true">May 13<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Yesterday we verified that our <code>Crawler</code> was able to hit a document and, given the right selector, pull down a list of words and their frequency on the page. We also created a custom exception to be used whenever the selector fails to pull down the right content. I&#8217;m going to repeat this process today with the <code>get_metadata_by_selector</code>. If there&#8217;s time we&#8217;ll try to output another file with our data, otherwise that&#8217;ll be tomorrow&#8217;s homeworkd :D</p>
+
+<p>Let&#8217;s take a moment to look at today&#8217;s metadata to figure out what we&#8217;d like our output to reflect.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>- Time: 8:03 am
+</span><span class='line'>- Mood: Happy, Drowsy, Peaceful
+</span><span class='line'>- Sleep: 5.5
+</span><span class='line'>- Hunger: 3
+</span><span class='line'>- Coffee: 0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&#8217;s the actual markdown that goes into the editor but it gets converted into a <code>ul</code>. I don&#8217;t <em>think</em> you can pass a CSS class to markdown syntax otherwise I&#8217;d use one here. We could go back and wrap everything in regular HTML tags but since we know that our metadata is going to be the last ul per entry we&#8217;ll just use that knowledge to build our selector. Obviously a more robust solution would use a CSS class so that might be a good refactoring for the future.</p>
+
+<p>I figure for now we&#8217;ll just parse the metadata into a Hash that&#8217;ll look something like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>{
+</span><span class='line'>  datetime: 2012-05-13T08:03:00-07:00,
+</span><span class='line'>  mood: ['Happy', 'Drowsy', 'Peaceful'],
+</span><span class='line'>  sleep: 5.5,
+</span><span class='line'>  hunger: 3.0,
+</span><span class='line'>  coffee: 0.0
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In the final iteration we&#8217;ll toss all of our Metadata Hashes into an ordered Array so we can visualize them over time.</p>
+
+<h3>Red, Green, Refactor</h3>
+
+<p>Ok, time for a failing test. Let&#8217;s make sure that our selector pulls something down and if it doesn&#8217;t we should raise the custom <code>SelectionError</code> we defined yesterday. I&#8217;m already seeing some repetitive code in our Crawler so I&#8217;m refactoring it. Where we need to get a group of XML nodes from the document via selector I&#8217;ve created a private helper called <code>nodes_by_selector</code>. This is also where we&#8217;ll raise our exception if nothing came back. I&#8217;m also cleaning up some of the word cruff from our public API so instead of <code>get_words_by_selector</code> it&#8217;s not just <code>words_by_selector</code>. The same goes for our metadata method.</p>
+
+<figure class='code'><figcaption><span>tentacles/lib/tentacles/crawler_rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;open-uri&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;nokogiri&#39;</span>
+</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;selection_error&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Crawler</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:doc</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="kp">new</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@uri</span> <span class="o">=</span> <span class="n">uri</span>
+</span><span class='line'>      <span class="vi">@doc</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="vi">@uri</span><span class="p">))</span>
+</span><span class='line'>      <span class="vi">@counts</span> <span class="o">=</span> <span class="no">Hash</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">words_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">nodes</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">node</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">words</span> <span class="o">=</span> <span class="n">words_from_string</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">count_frequency</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">sorted</span> <span class="o">=</span> <span class="vi">@counts</span><span class="o">.</span><span class="n">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="n">count</span> <span class="p">}</span>
+</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">reverse!</span>
+</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">word</span><span class="si">}</span><span class="s2">: </span><span class="si">#{</span><span class="n">count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">metadata_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kp">private</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">nodes</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">raise</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;The selector did not return an results!&#39;</span> <span class="k">if</span> <span class="n">nodes</span><span class="o">.</span><span class="n">empty?</span>
+</span><span class='line'>      <span class="n">nodes</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">words_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">string</span><span class="o">.</span><span class="n">downcase</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="sr">/[\w&#39;]+/</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">count_frequency</span><span class="p">(</span><span class="n">word_list</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">for</span> <span class="n">word</span> <span class="k">in</span> <span class="n">word_list</span>
+</span><span class='line'>        <span class="vi">@counts</span><span class="o">[</span><span class="n">word</span><span class="o">]</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>      <span class="vi">@counts</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Going back to the tests we need to refactor a bit for any place that&#8217;s been broken. Immediately I saw that my <code>nodes_by_selector</code> method was not initially returning the nodes so I added that back in. The tests brought that to my attention before I had to do any potentially painful debugging. Beyond that we just need to fix up our method names:</p>
+
+<figure class='code'><figcaption><span>tentacles/spec/crawler_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;../lib/tentacles/crawler&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;fakeweb&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span> <span class="k">do</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">before</span> <span class="k">do</span>
+</span><span class='line'>    <span class="c1"># Create a mock options object</span>
+</span><span class='line'>    <span class="vi">@options</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">uri</span><span class="p">:</span> <span class="s1">&#39;http://robdodson.me&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">post_selector</span><span class="p">:</span> <span class="s1">&#39;.entry-content&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">metadata_selector</span><span class="p">:</span> <span class="s1">&#39;.personal-metadata&#39;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># Create a mock web request</span>
+</span><span class='line'>    <span class="no">FakeWeb</span><span class="o">.</span><span class="n">register_uri</span><span class="p">(</span><span class="ss">:get</span><span class="p">,</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>                         <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="s1">&#39;&lt;div class=&quot;&#39;</span> <span class="o">+</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">].</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">+</span>
+</span><span class='line'>                         <span class="s1">&#39;&quot;&gt;Hello Hello Hello World World Foobar!&lt;/div&gt;&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;constructors&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">describe</span> <span class="s2">&quot;#from_uri&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should respond&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:from_uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should return an instance&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">crawler</span><span class="o">.</span><span class="n">should</span> <span class="n">be_an_instance_of</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;instances&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">before</span> <span class="k">do</span>
+</span><span class='line'>      <span class="vi">@crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">subject</span> <span class="p">{</span> <span class="vi">@crawler</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:words_by_selector</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:metadata_by_selector</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;post-construct&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should have the right document&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="vi">@crawler</span><span class="o">.</span><span class="n">doc</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">should</span> <span class="o">=~</span> <span class="sr">/Hello Hello Hello World World Foobar!/</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">describe</span> <span class="s2">&quot;#words_by_selector&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should produce an Array of keywords&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">expected_array</span> <span class="o">=</span> <span class="o">[</span><span class="s1">&#39;hello: 3&#39;</span><span class="p">,</span> <span class="s1">&#39;world: 2&#39;</span><span class="p">,</span> <span class="s1">&#39;foobar: 1&#39;</span><span class="o">]</span>
+</span><span class='line'>        <span class="n">actual_array</span> <span class="o">=</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">words_by_selector</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">actual_array</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="n">expected_array</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should raise an exception if nothing was returned&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">expect</span> <span class="p">{</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">words_by_selector</span><span class="p">(</span><span class="s1">&#39;some-gibberish-selector&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span> <span class="s1">&#39;The selector did not return an results!&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">describe</span> <span class="s2">&quot;#metadata_by_selector&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should raise an exception if nothing was returned&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">expect</span> <span class="p">{</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">metadata_by_selector</span><span class="p">(</span><span class="s1">&#39;some-gibberish-selector&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span> <span class="s1">&#39;The selector did not return an results!&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&#8217;ve got a duplicate test in there where both <code>#words_by_selector</code> and <code>#metadata_by_selector</code> are checking that they both raise an exception if nothing comes down. Let&#8217;s see if we can refactor those into an RSpec shared example. I&#8217;m not sure if this is a best practice or not but here&#8217;s my implementation:</p>
+
+<figure class='code'><figcaption><span>tentacles/spec/crawler_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">shared_examples_for</span> <span class="s2">&quot;all selector methods&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;when selection has no nodes&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an exception&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">selector_method</span><span class="p">,</span> <span class="s1">&#39;some-gibberish-selector&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span> <span class="s1">&#39;The selector did not return an results!&#39;</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">### ...</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="s2">&quot;#words_by_selector&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">it_behaves_like</span> <span class="s2">&quot;all selector methods&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">let</span><span class="p">(</span><span class="ss">:selector_method</span><span class="p">)</span> <span class="p">{</span> <span class="ss">:words_by_selector</span> <span class="p">}</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># ...</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="s2">&quot;#metadata_by_selector&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">it_behaves_like</span> <span class="s2">&quot;all selector methods&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">let</span><span class="p">(</span><span class="ss">:selector_method</span><span class="p">)</span> <span class="p">{</span> <span class="ss">:metadata_by_selector</span> <span class="p">}</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Basically we&#8217;re putting our method name as a symbol into a variable using <code>let</code> and then calling that method in the shared_examples_for block. Notice how we&#8217;re using <code>@crawler.send(selector_method, ...)</code>? In this case <code>selector_method</code> refers to our method name symbol.</p>
+
+<p>If you run this in RSpec&#8217;s nested mode it looks pretty cool:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span>
+</span><span class='line'>  <span class="n">constructors</span>
+</span><span class='line'>    <span class="c1">#from_uri</span>
+</span><span class='line'>      <span class="n">should</span> <span class="n">respond</span>
+</span><span class='line'>      <span class="n">should</span> <span class="k">return</span> <span class="n">an</span> <span class="n">instance</span>
+</span><span class='line'>  <span class="n">instances</span>
+</span><span class='line'>    <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#words_by_selector</span>
+</span><span class='line'>    <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#metadata_by_selector</span>
+</span><span class='line'>    <span class="n">post</span><span class="o">-</span><span class="n">construct</span>
+</span><span class='line'>      <span class="n">should</span> <span class="n">have</span> <span class="n">the</span> <span class="n">right</span> <span class="n">document</span>
+</span><span class='line'>    <span class="c1">#words_by_selector</span>
+</span><span class='line'>      <span class="n">should</span> <span class="n">produce</span> <span class="n">an</span> <span class="nb">Array</span> <span class="n">of</span> <span class="n">keywords</span>
+</span><span class='line'>      <span class="n">behaves</span> <span class="n">like</span> <span class="n">all</span> <span class="n">selector</span> <span class="nb">methods</span>
+</span><span class='line'>        <span class="k">when</span> <span class="n">selection</span> <span class="n">has</span> <span class="n">no</span> <span class="n">nodes</span>
+</span><span class='line'>          <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="n">exception</span>
+</span><span class='line'>    <span class="c1">#metadata_by_selector</span>
+</span><span class='line'>      <span class="n">behaves</span> <span class="n">like</span> <span class="n">all</span> <span class="n">selector</span> <span class="nb">methods</span>
+</span><span class='line'>        <span class="k">when</span> <span class="n">selection</span> <span class="n">has</span> <span class="n">no</span> <span class="n">nodes</span>
+</span><span class='line'>          <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="n">exception</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ok, so we know that all of our selector methods raise the proper exception if they are called with a bunk selector. Now let&#8217;s make sure we can get our metadata downloaded and structured.</p>
+
+<p>Unfortunately I&#8217;m realizing that if the <code>ul</code> for our metadata is part of the post then those words get counted along with everything else, which is not what I want. I need to figure out how to exclude that content&#8230;</p>
+
+<p>I could either tell my crawler to explicitly ignore that content or wrap my blog entry in an even more specific class and just select that. I guess that&#8217;ll be an exercise for tomorrow :\</p>
+
+<ul>
+<li>Time: 8:03 am</li>
+<li>Mood: Happy, Drowsy, Peaceful</li>
+<li>Sleep: 5.5</li>
+<li>Hunger: 3</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rob Dodson</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-13T07:52:00-07:00" pubdate data-updated="true">May 13<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/bdd/'>BDD</a>, <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/exceptions/'>Exceptions</a>, <a class='category' href='/blog/categories/nokogiri/'>Nokogiri</a>, <a class='category' href='/blog/categories/object-oriented-design/'>Object Oriented Design</a>, <a class='category' href='/blog/categories/rspec/'>RSpec</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/" title="Previous Post: Object Oriented Scraper Backed with Tests Pt. 5">&laquo; Object Oriented Scraper Backed with Tests Pt. 5</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/">Object Oriented Scraper Backed with Tests Pt. 6</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/">Object Oriented Scraper Backed with Tests Pt. 5</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4/">Object Oriented Scraper Backed with Tests Pt. 4</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/10/design-by-configuration-sucks/">Design by Configuration Sucks</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/09/pangrams-in-ruby/">Pangrams in Ruby</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/robdodson">@robdodson</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'robdodson',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("rob_dodson", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/rob_dodson" class="twitter-follow-button" data-show-count="false">Follow @rob_dodson</a>
+  
+</section>
+
+
+<section>
+  <h1>My Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:robdodson">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "robdodson"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Rob Dodson -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'robdodsontalksinternets';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://robdodson.me/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/';
+        var disqus_url = 'http://robdodson.me/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
