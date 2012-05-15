@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-13T09:39:33-07:00</updated>
+  <updated>2012-05-14T20:45:33-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Hacking the PATH variable in Sublime Text]]></title>
+    <link href="http://robdodson.me/blog/2012/05/14/hacking-the-path-variable-in-sublime-text/"/>
+    <updated>2012-05-14T20:26:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/14/hacking-the-path-variable-in-sublime-text</id>
+    <content type="html"><![CDATA[<p>This is going to be a bit of a lightning post but I wanted to quickly show off how to edit the PATH variable that Sublime text uses. I should warn you that that I am neither an expert in Python nor am I a very seasoned Sublime user. So having said that take all of this with a grain of salt and use at your own risk.</p>
+
+<h3>Our first (crappy) plugin!</h3>
+
+<p>Sublime has a great plugin architecture that makes it extremely easy to add to the platform. If you create a <code>.py</code> file in the <code>~/Library/Application Support/Sublime Text 2/Packages/User/</code> folder it will be loaded as soon as Sublime starts. Writing plugins seems to be actually quite easy based on their <a href="http://www.sublimetext.com/docs/plugin-basics">documentation and examples.</a> We won't be following the typical plugin architecture since we're just trying to hack a system variable and that doesn't seem to necessitate the use of their built in modules.</p>
+
+<p>Here's a script I'm calling <code>Pathway</code> at the moment.</p>
+
+<p>```python
+import os</p>
+
+<p>LOCAL = '/usr/local/bin:/usr/local/sbin:'
+HOME = '/Users/Rob'  ### !!! REPLACE WITH YOUR HOME PATH !!! ###
+RVM = HOME + '/.rvm/bin:'</p>
+
+<h1>Sublime's default path is</h1>
+
+<h1>/usr/bin:/bin:/usr/sbin:/sbin</h1>
+
+<p>os.environ['PATH'] += ':'
+os.environ['PATH'] += LOCAL
+os.environ['PATH'] += RVM</p>
+
+<p>print 'PATH = ' + os.environ['PATH']
+<code>``
+If you add this file to the Sublime user's directory outlined above you should be able to hit cmd + \</code> to fire up the Sublime console which will print out our new PATH variable.</p>
+
+<p>I would also recommend adding a shell plugin to Sublime. At the moment I use <a href="https://github.com/misfo/Shell-Turtlestein">Shell Turtlestein.</a>.</p>
+
+<p>Now that I have my hacked path variable and my shell plugin I can check to see if RVM works. Using Shell Turtlestein you can hit <code>cmd-shift-c</code> to open a little console prompt. Typing <code>rvm current</code> returns our ruby version number and gemset. Nice! What's even nicer is this means I can now run Rake tasks from inside of Sublime!</p>
+
+<p>I should point out if all you want to do is run Rake or Ant then there are already plugins for that sort of thing. My main effort in doing all this is to try to integrate the command line with Sublime a bit better. If <em>anyone</em> knows how to simply tell Sublime to use the path in my .bash_profile or .bashrc then I would gladly use that approach instead. But after crawling the forums for a while it looks like this is still a common problem with no good solution.</p>
+
+<ul>
+<li>Time: 8:26 pm</li>
+<li>Mood: Happy, Peaceful, Hurried</li>
+<li>Sleep: 7</li>
+<li>Hunger: 6</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 6]]></title>
@@ -799,70 +848,6 @@ $('body').append($(widget));
 <p>```</p>
 
 <p>Unfortunately this is still a lot of code and my first solution to slim it down is to create a helper function. At that point we're basically back to design by configuration... I'm not entirely ready to give up on this approach because I feel like their <em>might</em> be something here, I'm just not sure what yet. I think the design by configuration problem falls right into that sweet spot between not needing to create a factory and obviously needing to create a factory. I'll try to explore this more in a later post. For now it's time for bed.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Pangrams in Ruby]]></title>
-    <link href="http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/"/>
-    <updated>2012-05-09T23:15:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/09/pangrams-in-ruby</id>
-    <content type="html"><![CDATA[<p>I'm a big fan of sites like <a href="http://www.rubyquiz.com/">RubyQuiz</a> and <a href="http://www.codeeval.com/">CodeEval</a>. In my opinion doing short puzzles and brain-teasers is a great way to explore a language. Here's one such puzzle taken from CodeEval which asks that you devise a program to read in a file, parse each line and decide if it is a pangram or not.</p>
-
-<blockquote><p>The sentence 'A quick brown fox jumps over the lazy dog' contains every single letter in the alphabet. Such sentences are called pangrams. You are to write a program, which takes a sentence, and returns all the letters it is missing (which prevent it from being a pangram). You should ignore the case of the letters in sentence, and your return should be all lower case letters, in alphabetical order. You should also ignore all non US-ASCII characters.In case the input sentence is already a pangram, print out the string NULL</p></blockquote>
-
-<p>Here's my first attempt. Hopefully I can come back to this post in a few weeks and try it again in a bit more elegant fashion :)</p>
-
-<p>```ruby pangrams.rb
-File.open(ARGV[0]).each_line do |line|</p>
-
-<p>  missing_letters = []</p>
-
-<p>  unless line.chomp.empty?</p>
-
-<pre><code>line.chomp!
-line.downcase!
-('a'..'z').each do |l|
-  if line.index(l).nil?
-    missing_letters &lt;&lt; l
-  end
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  if missing_letters.empty?</p>
-
-<pre><code>puts "NULL"
-</code></pre>
-
-<p>  else</p>
-
-<pre><code>puts missing_letters.join('')
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>And here's some input:
-<code>text sentences.txt
-A quick brown fox jumps over the lazy dog
-A slow yellow fox crawls under the proactive dog
-AbC
-</code></p>
-
-<p>To run it from the command line you'll need to pass in the path to the sentece file as an argument. Here's what it would look like if <code>pangrams.rb</code> and <code>sentences.txt</code> were in the same folder:
-```
-ruby pangrams.rb sentences.txt</p>
-
-<h1>outputs...</h1>
-
-<p>NULL
-bjkmqz
-defghijklmnopqrstuvwxyz
-```
-Play around with this, throw some different sentence combinations at it to see what it spits out. Then try to write your own implementation. A good next step would be to modify the script so it can support empty lines in the text file.</p>
 ]]></content>
   </entry>
   
