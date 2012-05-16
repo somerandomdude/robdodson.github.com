@@ -4,7 +4,7 @@
   <title><![CDATA[Category: BDD | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/bdd/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-14T20:45:33-07:00</updated>
+  <updated>2012-05-15T22:47:53-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,91 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 7]]></title>
+    <link href="http://robdodson.me/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7/"/>
+    <updated>2012-05-15T21:33:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7</id>
+    <content type="html"><![CDATA[<p>During my last post I realized that including my metadata in the blog post as only a ul meant that all the words were being scraped as part of the keyword frequency search. After thinking about it for a while I think I'm going to give the keyword search method an optional value which it can use to ignore or delete certain nodes.</p>
+
+<p>Thankfully I have my tests in place to validate what our final output should look like. Which means I'm basically hacking away at Nokogiri to get things to pass. Here's what I finally settle on:</p>
+
+<p>```ruby
+def words_by_selector(selector, ignored_selector = nil)
+  node = nodes_by_selector(selector).first
+  if ignored_selector</p>
+
+<pre><code>ignored = node.css(ignored_selector)
+ignored.remove()
+</code></pre>
+
+<p>  end
+  words = words_from_string(node.content)
+  count_frequency(words)</p>
+
+<p>  sorted = @counts.sort_by { |word, count| count }
+  sorted.reverse!
+  sorted.map { |word, count| "#{word}: #{count}"}
+end
+```</p>
+
+<p>I think the code is pretty self explanatory. Moving on to the metadata we expect a Hash that looks like this:</p>
+
+<p><code>
+{
+  datetime: 2012-05-13T08:03:00-07:00,
+  mood: ['Happy', 'Drowsy', 'Peaceful'],
+  sleep: 5.5,
+  hunger: 3.0,
+  coffee: 0.0
+}
+</code></p>
+
+<p>As I'm playing back and forth with the metadata selector methods I'm realizing that writing non-brittle tests is extremely difficult!</p>
+
+<p>I'm noticing that some of the metadata, when broken into Strings, don't parse very well. For instance:</p>
+
+<p><code>Time: 8:03</code> splits up into <code>["Time", " 8", "03"]</code></p>
+
+<p>We can use a splat operator to clean that up a bit for us:</p>
+
+<p>```ruby
+def metadata_by_selector(selector)
+  node = nodes_by_selector(selector).first
+  metadata = {}
+  node.children.each do |child|</p>
+
+<pre><code>key, *value = child.content.split(':')
+puts "#{key}: #{value}"
+</code></pre>
+
+<p>  end    <br/>
+end
+```</p>
+
+<p>The above should produce something like:</p>
+
+<p><code>
+Time: [" 8", "03 am"]
+Mood: [" Happy, Drowsy, Peaceful"]
+Sleep: [" 5.5"]
+Hunger: [" 3"]
+Coffee: [" 0"]
+</code></p>
+
+<p>Close... but still not perfect. I think the best thing to do would be to write some formatter objects or functions to handle the different kinds of metadata. We'll tackle that tomorrow.</p>
+
+<ul>
+<li>Time: 9:34pm</li>
+<li>Mood: Fat, Tired, Drunk</li>
+<li>Sleep: 6</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 6]]></title>

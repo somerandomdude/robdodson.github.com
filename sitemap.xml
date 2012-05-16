@@ -101,11 +101,17 @@
         <lastmod>2012-05-14T20:45:12-07:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://robdodson.me/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7/
+        </loc>
+        <lastmod>2012-05-15T22:47:44-07:00</lastmod>
+    </url>
+    <url>
         <loc>http://robdodson.me/blog/archives/</loc>
-        <lastmod>2012-05-14T20:45:12-07:00</lastmod>
+        <lastmod>2012-05-15T22:47:44-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/</loc>
-        <lastmod>2012-05-14T20:45:12-07:00</lastmod>
+        <lastmod>2012-05-15T22:47:44-07:00</lastmod>
     </url>
 </urlset>
