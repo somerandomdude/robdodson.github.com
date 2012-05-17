@@ -1,0 +1,553 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Getting Familiar with Backbone Boilerplate - Rob Dodson talks internets</title>
+  <meta name="author" content="Rob Dodson">
+
+  
+  <meta name="description" content="I have an upcoming project which uses Backbone and Node.js so I thought it would be good to blog about the topics (particularly Backbone) for a while &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <script src="/javascripts/d3.v2.js"></script>
+  <link href="/atom.xml" rel="alternate" title="Rob Dodson talks internets" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-25869920-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Rob Dodson talks internets</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:robdodson.me" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Getting Familiar With Backbone Boilerplate</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-17T07:47:00-07:00" pubdate data-updated="true">May 17<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I have an upcoming project which uses <a href="http://documentcloud.github.com/backbone/">Backbone</a> and <a href="http://nodejs.org/">Node.js</a> so I thought it would be good to blog about the topics (particularly Backbone) for a while to make sure I&#8217;m well up to speed.</p>
+
+<p>We&#8217;re using the <a href="https://github.com/tbranyen/backbone-boilerplate">Backbone Boilerplate</a> to get us started since it includes a bit of file structure and a build process. As they mention in the docs you have to install <a href="https://github.com/cowboy/grunt">Grunt</a> if you want to use the build process they&#8217;ve stubbed out. Grunt is a javascript build tool which uses Node (think Rake in JS).</p>
+
+<p>As a refresher course I&#8217;m going to dig into the open-source <a href="http://addyosmani.github.com/backbone-fundamentals/">Backbone Fundamentals book</a> by <a href="http://addyosmani.github.com/backbone-fundamentals/">Addy Osmani</a>.</p>
+
+<p>First thing&#8217;s first though, after we have nodejs and grunt installed we need to also install the bbb (backbone boilerplate build, I guess?) tool. You can <a href="https://github.com/backbone-boilerplate/grunt-bbb">grab it here.</a></p>
+
+<p>We&#8217;ll create a new folder for our project and run <code>bbb init</code>. If all goes well it should stub out some project directories and files for us.</p>
+
+<h3>The Backbone Boilerplate templates</h3>
+
+<p>I&#8217;ll start with the index.html file. It seems like your standard HTML5 doc with the noteable exception that it includes <a href="http://requirejs.org/">require.js</a> at the bottom of the page.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!doctype html&gt;</span>
+</span><span class='line'><span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">&quot;en&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'><span class="nt">&lt;head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">http-equiv=</span><span class="s">&quot;X-UA-Compatible&quot;</span> <span class="na">content=</span><span class="s">&quot;IE=edge,chrome=1&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;viewport&quot;</span> <span class="na">content=</span><span class="s">&quot;width=device-width,initial-scale=1&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nt">&lt;title&gt;</span>Backbone Boilerplate<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c">&lt;!-- Application styles --&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href=</span><span class="s">&quot;/assets/css/index.css&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'><span class="nt">&lt;/head&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;body&gt;</span>
+</span><span class='line'>  <span class="c">&lt;!-- Main container --&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">role=</span><span class="s">&quot;main&quot;</span> <span class="na">id=</span><span class="s">&quot;main&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c">&lt;!-- Application source --&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">data-main=</span><span class="s">&quot;app/config&quot;</span> <span class="na">src=</span><span class="s">&quot;/assets/js/libs/require.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Require.js is a module and file loader which will help us manage our AMD modules. AMD (which stands for Asynchronous Module Definition) is a specification which details how to break JS down into modules that are loaded in, as needed, at runtime. <a href="http://addyosmani.com/writing-modular-js/">Again we turn to Addy Osmani for a good explanation.</a></p>
+
+<p>If you notice this block:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="c">&lt;!-- Application source --&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">data-main=</span><span class="s">&quot;app/config&quot;</span> <span class="na">src=</span><span class="s">&quot;/assets/js/libs/require.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>the <code>data-main</code> attribute in the script tag is telling require.js what to load first. In this case it&#8217;s the <code>app/config.js</code> file. If you omit the <code>js</code> require will add it for you. If you add the <code>.js</code> require will respect the path exactly as it was given. This distinction seems kind of trivial here but later on when you start configuring require with baseUrls and whatnot, it becomes more important.</p>
+
+<p>Let&#8217;s look at that confg file, shall we?</p>
+
+<figure class='code'><figcaption><span>app/config.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// Set the require.js configuration for your application.</span>
+</span><span class='line'><span class="nx">require</span><span class="p">.</span><span class="nx">config</span><span class="p">({</span>
+</span><span class='line'>  <span class="c1">// Initialize the application with the main application file</span>
+</span><span class='line'>  <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;main&quot;</span><span class="p">],</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">paths</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// JavaScript folders</span>
+</span><span class='line'>    <span class="nx">libs</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">plugins</span><span class="o">:</span> <span class="s2">&quot;../assets/js/plugins&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Libraries</span>
+</span><span class='line'>    <span class="nx">jquery</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/jquery&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">underscore</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/underscore&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">backbone</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/backbone&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Shim Plugin</span>
+</span><span class='line'>    <span class="nx">use</span><span class="o">:</span> <span class="s2">&quot;../assets/js/plugins/use&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">use</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">backbone</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;use!underscore&quot;</span><span class="p">,</span> <span class="s2">&quot;jquery&quot;</span><span class="p">],</span>
+</span><span class='line'>      <span class="nx">attach</span><span class="o">:</span> <span class="s2">&quot;Backbone&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">underscore</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">attach</span><span class="o">:</span> <span class="s2">&quot;_&quot;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>One of the first things you can do with Require is to pass it a configuration object. The config object <a href="http://requirejs.org/docs/api.html#config">can be used for a ton of bootstrap options</a> like setting paths, requiring other scripts, setting timeouts, etc. The first option we see here is <code>deps: ["main"]</code>. We can infer this is telling require to load our main.js file first. But how does it get the path to main.js? From the docs we see that since we haven&#8217;t defined a <code>baseUrl</code> property require is using the path from our <code>data-main</code> attribute.</p>
+
+<blockquote><p>If no baseUrl is explicitly set in the configuration, the default value will be the location of the HTML page that loads require.js. If a data-main attribute is used, that path will become the baseUrl.</p></blockquote>
+
+<p>So we know that our baseUrl is <code>app/</code> and anything we require will be relative to that.</p>
+
+<p>Next up we have this block:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">paths</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// JavaScript folders</span>
+</span><span class='line'>    <span class="nx">libs</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">plugins</span><span class="o">:</span> <span class="s2">&quot;../assets/js/plugins&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Libraries</span>
+</span><span class='line'>    <span class="nx">jquery</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/jquery&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">underscore</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/underscore&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">backbone</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/backbone&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Shim Plugin</span>
+</span><span class='line'>    <span class="nx">use</span><span class="o">:</span> <span class="s2">&quot;../assets/js/plugins/use&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The paths property defines paths relative to <code>baseUrl</code>. If we say</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">require</span><span class="p">([</span><span class="s2">&quot;libs/module&quot;</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>require.js will look for this <code>libs</code> path and find it in our config file. Most of these make sense till we hit the last line which creates a path for the <code>use</code> plugin.</p>
+
+<p><a href="http://tbranyen.com/post/amdrequirejs-shim-plugin-for-loading-incompatible-javascript">It seems like <code>use</code> was created by Tim Branyen, the author of the Backbone Boilerplate, to help with loading libraries that are non-AMD compliant.</a> Most of the big libraries are currently not AMD compliant (underscore and backbone itself) so this makes sense. So instead of creating a shim for each of those libraries the <code>use</code> plugin <em>should</em> take care of things for us. We can see how it&#8217;s used further in the config file:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">use</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">backbone</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;use!underscore&quot;</span><span class="p">,</span> <span class="s2">&quot;jquery&quot;</span><span class="p">],</span>
+</span><span class='line'>      <span class="nx">attach</span><span class="o">:</span> <span class="s2">&quot;Backbone&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">underscore</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">attach</span><span class="o">:</span> <span class="s2">&quot;_&quot;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&#8217;s start at the bottom so we can see that underscore is defined and mapped to &#8220;_&#8221;. <code>attach</code> is going to take whatever library we&#8217;re defining and attach it to <code>window</code>. So underscore will be attached as <code>window._</code>. Next we see that backbone is defined and depends on our version of underscore and jquery. Since jquery is AMD compliant we don&#8217;t need the call to <code>use!</code> but we will need it for underscore. Finally backbone is attached to the window as <code>window.Backbone</code>.</p>
+
+<p>That covers the configuration file. I&#8217;ll move on to main.js in the next post.</p>
+
+<ul>
+<li>Time: 7:49 am</li>
+<li>Mood: Awake, Tired, Lazy</li>
+<li>Sleep: 7</li>
+<li>Hunger: 4</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rob Dodson</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-17T07:47:00-07:00" pubdate data-updated="true">May 17<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/backbone/'>Backbone</a>, <a class='category' href='/blog/categories/backbone-boilerplate/'>Backbone Boilerplate</a>, <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/grunt/'>Grunt</a>, <a class='category' href='/blog/categories/node/'>Node</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8/" title="Previous Post: Object Oriented Scraper Backed with Tests Pt. 8">&laquo; Object Oriented Scraper Backed with Tests Pt. 8</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/">Getting Familiar with Backbone Boilerplate</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8/">Object Oriented Scraper Backed with Tests Pt. 8</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7/">Object Oriented Scraper Backed with Tests Pt. 7</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/14/hacking-the-path-variable-in-sublime-text/">Hacking the PATH variable in Sublime Text</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/">Object Oriented Scraper Backed with Tests Pt. 6</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/robdodson">@robdodson</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'robdodson',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("rob_dodson", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/rob_dodson" class="twitter-follow-button" data-show-count="false">Follow @rob_dodson</a>
+  
+</section>
+
+
+<section>
+  <h1>My Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:robdodson">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "robdodson"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Rob Dodson -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'robdodsontalksinternets';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/';
+        var disqus_url = 'http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
