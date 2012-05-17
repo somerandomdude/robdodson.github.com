@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Object Oriented Design | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/object-oriented-design/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-15T22:47:53-07:00</updated>
+  <updated>2012-05-16T23:19:17-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,219 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 8]]></title>
+    <link href="http://robdodson.me/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8/"/>
+    <updated>2012-05-16T07:42:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8</id>
+    <content type="html"><![CDATA[<p>Yesterday's I refactored my specs and crawler to support ignoring selections. While I started parsing the metadata I quickly realized that certain bits were rather specific and needed to have custom parsing methods. Today I'm going to write some format objects to help with all that.</p>
+
+<p>Our metadata on the page looks like this:</p>
+
+<p><code>
+Time: 7:42 am
+Mood: Awake, Alert, Focused
+Sleep: 6
+Hunger: 0
+Coffee: 0
+</code></p>
+
+<p>Sleep, hunger and coffee are all floats, so one object could be just <code>FloatFormat</code>. Mood should produce an <code>Array</code> of objects so we could have a <code>CollectionFormat</code>. Finally time is going to combine the time listed in the metadata and the post date. We'll make a <code>DateTimeFormat</code> for that. These could all be methods of one big Format object as well but experience tells me that you need to be careful of monolithic actors that consume tons of different data types and spit out results. Those classes have a tendency to bloat very easily as project requirements change. I think it's better to produce classes which can be extended or abstracted as needs arise.</p>
+
+<p>So we know <em>who</em> is going to format but we still don't know <em>how</em>. I think I'd like to build a manifest which matches the metadata category to a format. Maybe something like this?</p>
+
+<p><code>ruby
+{
+  'Time'    =&gt; DateTimeFormat,
+  'Mood'    =&gt; CollectionFormat,
+  'Sleep'   =&gt; FloatFormat,
+  'Hunger'  =&gt; FloatFormat,
+  'Coffee'  =&gt; FloatFormat
+}
+</code></p>
+
+<p>I could probably look at each item and "detect" what kind of format it needs but I'd rather be explicit. If, for instance, I want to add another format, it's a lot easier to just change my manifest file vs. hacking on some detection scheme. I think we can just produce this manifest file in YAML and load it in at runtime. One thing I don't like about this approach is that it specifically names our format classes. You could generalize it so that it just matches a category to the desired output data, for instance <code>'Coffee' =&gt; Float</code> but then you run into problems with flexibility. What if Coffee still needed to output a float but had to go through a different Format than Hunger or Sleep? With that in mind we'll stick to the plan already laid out.</p>
+
+<p><code>yaml tentacles/lib/tentacles/formats.yml
+time:     DateTimeFormat
+mood:     CollectionFormat
+sleep:    FloatFormat
+hunger:   FloatFormat
+coffee:   FloatFormat
+</code></p>
+
+<h3>The Format object</h3>
+
+<p>I would love it if I could use the Format object as a module and just call a method on it from Crawler. It might look like this:</p>
+
+<p>```ruby
+def metadata_by_selector(selector)
+  node = nodes_by_selector(selector).first
+  metadata = {}
+  node.children.each do |child|</p>
+
+<pre><code>Tentacles::Format.insert(child, metadata)         
+</code></pre>
+
+<p>  end    <br/>
+end
+<code>``
+The only problem is</code>Format` needs to load in and parse its formats.yml file before it's any good to us. There's some interesting talk of the <a href="http://www.subelsky.com/2008/05/using-rubys-autoload-method-to.html">Module#autoload method</a> but that's not quite what I need...</p>
+
+<p>Seems like I can't find any good documentation on this so instead we'll make it an instance of the class. Also I'm lazy so I'm going to have that instance load its own formats.yml file. Normally I like to only have one entry point for configuration files but...whatever.</p>
+
+<h3>How do I convert a string into a class name in Ruby?</h3>
+
+<p>Well we know we can load our YAML file but all of our format classes are going to come in as strings. I did some digging to figure out how to convert the string into an actual class that can then be instantiated. If you just want to convert a String into a class you can use <code>Object.const_get('Foobar').new</code> but that's not going to work for us since our code is wrapped in a module. To convert a string into a module class we'll need to use the name of our module: <code>Tentacles.const_get('DateTimeFormat').new</code>.</p>
+
+<p>With that in mind I want to spec out a simple test that passes in string of metadata and receives a printed notification that the right formatter has been created. We'll then refactor it to actually use the formatter on the string.</p>
+
+<p>```ruby tentacles/spec/format_spec.rb
+require_relative '../lib/tentacles/format'
+require_relative '../lib/tentacles/date_time_format'</p>
+
+<p>describe Tentacles::Format do
+  describe "when asked to parse some metadata" do</p>
+
+<pre><code>it "should create the right formatter" do
+  @format = Tentacles::Format.new
+  @format.parse('Time: 8:03 am').should be_an_instance_of(Tentacles::DateTimeFormat)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>```ruby tentacles/lib/format.rb
+require 'yaml'
+require_relative 'date_time_format'</p>
+
+<p>module Tentacles
+  class Format</p>
+
+<pre><code>def initialize
+  @categories = YAML.load(File.open(File.dirname(__FILE__) + '/formats.yml'))
+end
+
+def parse(data)
+  category = data.split(':')[0]
+  category.downcase!
+  Tentacles.const_get(@categories[category]).new
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>```ruby tentacles/lib/date_time_format.rb
+module Tentacles
+  class DateTimeFormat</p>
+
+<pre><code>def initialize
+  puts 'DateTimeFormat created!'
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Now let's take it a step further so we can convert an actual time into a DateTime object. Here's our updated spec:</p>
+
+<p>```ruby
+require_relative '../lib/tentacles/format'
+require 'date'</p>
+
+<p>describe Tentacles::Format do
+  describe "when asked to parse some metadata" do</p>
+
+<pre><code>it "should create the right formatter" do
+  @format = Tentacles::Format.new
+  @format.parse('Time: 8:03 am').should be_an_instance_of(Date)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>To pull this off we'll need the help of at least 2 new gems: <a href="http://rubygems.org/gems/chronic">Chronic</a> and <a href="http://rubygems.org/gems/activesupport">ActiveSupport</a>. Chronic is a natural language parser which can convert strings into useable timestamps. ActiveSupport is a library of extensions originally created for Rails which have been abstracted into a general purpose toolset. We're going to combine these two gems to turn the phrase "8:03 am" into a Ruby DateTime.</p>
+
+<p>Gotta first update the Gemfile with our new dependencies and run <code>bundle install</code>.</p>
+
+<p>```ruby
+source 'https://rubygems.org'</p>
+
+<p>gem 'rspec', '2.9.0'
+gem 'nokogiri', '~>1.5.2'
+gem 'awesome_print', '~>1.0.2'
+gem 'fakeweb', '~>1.3.0'
+gem 'chronic', '~> 0.6.7'
+gem 'activesupport', '~> 3.2.3'
+```</p>
+
+<p>Next we bang out a quick parse method inside of DateTimeFormat. Our Tentacles::Format is going to delegate its parse call to whichever subordinate formatter it creates. Code speaks louder than words:</p>
+
+<p>```ruby tentacles/lib/tentacles/format.rb
+require 'yaml'
+require_relative 'date_time_format'</p>
+
+<p>module Tentacles
+  class Format</p>
+
+<pre><code>def initialize
+  @categories = YAML.load(File.open(File.dirname(__FILE__) + '/formats.yml'))
+end
+
+# Create a formatter based on the content of the passed
+# in data. Delegate the parse call to this new formatter
+def parse(data)
+  category, *content = data.split(':')
+  category.downcase!
+  formatter = Tentacles.const_get(@categories[category]).new
+  formatter.parse(content)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>```ruby tentacles/lib/tentacles/date_time_format.rb
+require 'chronic'
+require 'active_support/core_ext/string/conversions.rb'</p>
+
+<p>module Tentacles
+  class DateTimeFormat</p>
+
+<pre><code>def initialize
+  puts 'DateTimeFormat created!'
+end
+
+def parse(content)
+  Chronic.parse(content.join(':')).to_datetime
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>With all that in place our test should pass. Nice!!!!!! We're well on our way to processing the remaining metadata. Tomorrow I'll whip up our other formats and figure out how to pull the date out of a blog post so we can combine that with the time to get a proper DateTime.</p>
+
+<ul>
+<li>Time: 7:42 am</li>
+<li>Mood: Awake, Alert, Focused</li>
+<li>Sleep: 6</li>
+<li>Hunger: 0</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 7]]></title>
@@ -757,300 +970,6 @@ end
 <li>Coffee: 0</li>
 </ul>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Object Oriented Scraper Backed With Tests Pt. 3]]></title>
-    <link href="http://robdodson.me/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/"/>
-    <updated>2012-05-08T21:03:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3</id>
-    <content type="html"><![CDATA[<p>I did some cleanup this morning on the <code>Options</code> class and the <code>options_spec</code>, mainly to remove items that seemed like they shouldn't be tested. Here's where I'm currently at:</p>
-
-<p>```ruby tentacles/lib/tentacles/options.rb
-require 'yaml'</p>
-
-<p>module Tentacles
-  class Options</p>
-
-<pre><code>attr_reader :uri
-attr_reader :post_selector
-attr_reader :metadata_selector
-
-def initialize(config)
-  @config = YAML.load(File.open(config))
-
-  @config.each do |key, value|
-    raise IOError, "#{key} is undefined!" if key.nil?
-  end
-
-  @uri = URI.parse(@config["uri"])
-  raise IOError, 'Invalid uri!' if @uri.scheme.nil? || @uri.host.nil?
-
-  @post_selector = @config["post_selector"]
-  @metadata_selector = @config["metadata_selector"]
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>```ruby tentacles/spec/options_spec.rb
-require_relative '../lib/tentacles/options'
-require 'yaml'
-require 'uri'
-require 'helpers'</p>
-
-<p>describe Tentacles::Options do
-  include Helpers</p>
-
-<p>  before do</p>
-
-<pre><code>@options = Tentacles::Options.new(relative_path + '/../lib/tentacles/config.yml')
-</code></pre>
-
-<p>  end</p>
-
-<p>  subject { @options }</p>
-
-<p>  it { should respond_to(:uri) }
-  it { should respond_to(:post_selector) }
-  it { should respond_to(:metadata_selector) }</p>
-
-<p>  describe "#initialize" do</p>
-
-<pre><code>describe "when parsing the URI" do
-
-  context "when URI is valid" do
-    it "should display the right URI" do
-      uri = URI.parse('http://robdodson.me')
-      @options.uri.should eq(uri)
-    end
-  end
-
-  context "when URI is invalid" do
-    it "should raise an exception" do
-      expect { options = Tentacles::Options.new(relative_path + '/mocks/invalid_uri.yml') }.to raise_error(URI::InvalidURIError)
-    end
-  end
-
-  context "when URI does not contain a scheme" do
-    it "should raise an IO exception" do
-      expect { options = Tentacles::Options.new(relative_path + '/mocks/no_scheme_or_host_uri.yml') }.to raise_error(IOError)
-    end
-  end
-
-  context "when URI does not contain a host" do
-    it "should raise an IO exception" do
-      expect { options = Tentacles::Options.new(relative_path + '/mocks/no_scheme_or_host_uri.yml') }.to raise_error(IOError)
-    end
-  end
-end
-</code></pre>
-
-<p>  end
-end
-<code>``
-Previously I was testing against</code>@config = YAML.load(File.open(config))<code>to see if it would throw an error when passed</code>nil<code>or empty string for the argument. I've since realized that's basically testing [Ruby Core](http://www.ruby-doc.org/core-1.9.3/) to see if it's working as described in the docs...which seems silly to me. Now if I were *handling* those exceptions and doing something in response, then yeah, I would want to test it. But since I'm allowing the program to explode if you try to load an empty config file I figure it's best to just let the core or stdlib do their thing and assume that it was well tested. Having said that I think we've got decent coverage on</code>Options<code>and can move back to the</code>Runner<code>and then the</code>Crawler`.</p>
-
-<p>By the way, if you want a more visual representation of our tests you can run <code>bundle exec rspec -f html -o index.html</code> which will generate an html file showing what passed/failed and is still pending.
-<img class="left" src="/images/rspec_tests_visualization.png" title="'RSpec Static Test HTML'" ></p>
-
-<h3>Mocking Nokogiri requests with FakeWeb</h3>
-
-<p>I was curious if it would be possible to mock the Nokogiri requests from our <code>Crawler</code> so I did a bit of googling. It looks like the best options would be either <a href="https://github.com/wycats/artifice">Artifice</a> or <a href="http://fakeweb.rubyforge.org/">FakeWeb</a>. I'm not super familiar with Rack and I don't want to write a separate app just to mock a few calls so I've decided to go with FakeWeb.</p>
-
-<p>First we add it to our Gemfile
-```ruby
-source 'https://rubygems.org'</p>
-
-<p>gem 'rspec', '2.9.0'
-gem 'nokogiri', '~>1.5.2'
-gem 'awesome_print', '~>1.0.2'
-gem 'fakeweb', '~>1.3.0'
-<code>``
-and do the usual</code>bundle install<code>. Next we'll stub out our</code>crawler_spec` and verify that it's at least detecting all the methods on the class.</p>
-
-<p>```ruby tentacles/spec/crawler_spec.rb
-require_relative '../lib/tentacles/crawler'</p>
-
-<p>describe Tentacles::Crawler do</p>
-
-<p>  before do</p>
-
-<pre><code># A mock for our options object
-options = {
-  uri: 'http://robdodson.me', 
-  post_selector: '.entry-content',
-  metadata_selector: '.personal-metadata'
-}
-
-@crawler = Tentacles::Crawler.from_uri(options[:uri])
-</code></pre>
-
-<p>  end</p>
-
-<p>  subject { @crawler }</p>
-
-<p>  it { should respond_to(:get_words_by_selector) }
-  it { should respond_to(:get_metadata_by_selector) }</p>
-
-<p>end
-```</p>
-
-<p>I also want to verify that my class responds to an alternative constructor. Rather than just saying <code>Crawler.new</code> I'd prefer to use <code>Crawler.from_uri</code>. It doesn't serve much of a purpose but I think it's a good exercise. Here's the modified test to support it.</p>
-
-<p>```ruby tentacles/spec/crawler_spec.rb
-require_relative '../lib/tentacles/crawler'</p>
-
-<p>describe Tentacles::Crawler do</p>
-
-<p>  describe "constructors" do</p>
-
-<pre><code>describe "#from_uri" do
-  it "should respond" do
-    Tentacles::Crawler.should respond_to(:from_uri)
-  end
-
-  it "should return an instance" do
-    crawler = Tentacles::Crawler.from_uri('http://robdodson.me')
-    crawler.should be_an_instance_of(Tentacles::Crawler)
-  end
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  before do</p>
-
-<pre><code>options = {
-  uri: 'http://robdodson.me', 
-  post_selector: '.entry-content',
-  metadata_selector: '.personal-metadata'
-}
-
-@crawler = Tentacles::Crawler.from_uri(options[:uri])
-</code></pre>
-
-<p>  end</p>
-
-<p>  subject { @crawler }</p>
-
-<p>  it { should respond_to(:get_words_by_selector) }
-  it { should respond_to(:get_metadata_by_selector) }</p>
-
-<p>end
-```</p>
-
-<p>And here is our <code>Crawler</code> class based largely on our original Crawler <a href="http://robdodson.me/blog/2012/05/05/building-a-simple-scraper-with-nokogiri-in-ruby/">from the first post.</a></p>
-
-<p>```ruby tentacles/lib/tentacles/crawler.rb
-require 'open-uri'
-require 'nokogiri'</p>
-
-<p>module Tentacles
-  class Crawler</p>
-
-<pre><code>def self.from_uri(uri)
-  new(uri)
-end
-
-def initialize(uri)
-  @uri = uri
-  @doc = Nokogiri::HTML(open(@uri))
-  @counts = Hash.new(0)
-end
-
-def get_words_by_selector(selector)
-  entries = doc.css('div.entry-content')
-  puts "Parsing #{entries.length} entries"
-  entries.each do |entry|
-    words = words_from_string(entry.content)
-    count_frequency(words)
-  end
-
-  sorted  = @counts.sort_by { |word, count| count }
-  puts sorted.map { |word, count| "#{word}: #{count}"}
-end
-
-def get_metadata_by_selector(selector)
-  # TODO
-end
-</code></pre>
-
-<p>  private</p>
-
-<pre><code>def words_from_string(string)
-  string.downcase.scan(/[\w']+/)
-end
-
-def count_frequency(word_list)
-  for word in word_list
-    @counts[word] += 1
-  end
-  @counts
-end
-</code></pre>
-
-<p>  end
-end
-<code>``
-If we run the specs now they *should* pass but they're **EXTREMELY** slow! Just 4 examples takes 6 seconds O_O. Can you spot the source of all that lag? Take a look at what happens inside of</code>Crawler#initialize<code>. Notice how it's creating a new Nokogiri doc every time? Since we have a</code>before` block in our spec that means that each test (after the before) is going out and parsing our website. Let's see if FakeWeb can help us out some.</p>
-
-<p>```ruby tentacles/spec/crawler_spec.rb
-require_relative '../lib/tentacles/crawler'
-require 'fakeweb'</p>
-
-<p>describe Tentacles::Crawler do</p>
-
-<p>  before do</p>
-
-<pre><code># Create a mock options object
-@options = {
-  uri: 'http://robdodson.me', 
-  post_selector: '.entry-content',
-  metadata_selector: '.personal-metadata'
-}
-
-# Create a mock web request
-FakeWeb.register_uri(:get, @options[:uri], :body =&gt; "Hello World! Hello San Francisco!")
-</code></pre>
-
-<p>  end</p>
-
-<p>  describe "constructors" do</p>
-
-<pre><code>describe "#from_uri" do
-  it "should respond" do
-    Tentacles::Crawler.should respond_to(:from_uri)
-  end
-
-  it "should return an instance" do
-    crawler = Tentacles::Crawler.from_uri(@options[:uri])
-    crawler.should be_an_instance_of(Tentacles::Crawler)
-  end
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  describe "instances" do</p>
-
-<pre><code>before do
-  @crawler = Tentacles::Crawler.from_uri(@options[:uri])
-end
-
-subject { @crawler }
-
-it { should respond_to(:get_words_by_selector) }
-it { should respond_to(:get_metadata_by_selector) }
-</code></pre>
-
-<p>  end
-end
-```
-While it's not the prettiest test ever written it does get the job done. 0.00359 seconds for 4 examples <em>down from 6 seconds!</em> That's going to wrap it up for tonight. Tomorrow we'll finish off the spec and the implementation and finally get some data coming down from the live site. Until then!</p>
 ]]></content>
   </entry>
   

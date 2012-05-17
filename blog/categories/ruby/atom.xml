@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-15T22:47:53-07:00</updated>
+  <updated>2012-05-16T23:19:17-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,219 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 8]]></title>
+    <link href="http://robdodson.me/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8/"/>
+    <updated>2012-05-16T07:42:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8</id>
+    <content type="html"><![CDATA[<p>Yesterday's I refactored my specs and crawler to support ignoring selections. While I started parsing the metadata I quickly realized that certain bits were rather specific and needed to have custom parsing methods. Today I'm going to write some format objects to help with all that.</p>
+
+<p>Our metadata on the page looks like this:</p>
+
+<p><code>
+Time: 7:42 am
+Mood: Awake, Alert, Focused
+Sleep: 6
+Hunger: 0
+Coffee: 0
+</code></p>
+
+<p>Sleep, hunger and coffee are all floats, so one object could be just <code>FloatFormat</code>. Mood should produce an <code>Array</code> of objects so we could have a <code>CollectionFormat</code>. Finally time is going to combine the time listed in the metadata and the post date. We'll make a <code>DateTimeFormat</code> for that. These could all be methods of one big Format object as well but experience tells me that you need to be careful of monolithic actors that consume tons of different data types and spit out results. Those classes have a tendency to bloat very easily as project requirements change. I think it's better to produce classes which can be extended or abstracted as needs arise.</p>
+
+<p>So we know <em>who</em> is going to format but we still don't know <em>how</em>. I think I'd like to build a manifest which matches the metadata category to a format. Maybe something like this?</p>
+
+<p><code>ruby
+{
+  'Time'    =&gt; DateTimeFormat,
+  'Mood'    =&gt; CollectionFormat,
+  'Sleep'   =&gt; FloatFormat,
+  'Hunger'  =&gt; FloatFormat,
+  'Coffee'  =&gt; FloatFormat
+}
+</code></p>
+
+<p>I could probably look at each item and "detect" what kind of format it needs but I'd rather be explicit. If, for instance, I want to add another format, it's a lot easier to just change my manifest file vs. hacking on some detection scheme. I think we can just produce this manifest file in YAML and load it in at runtime. One thing I don't like about this approach is that it specifically names our format classes. You could generalize it so that it just matches a category to the desired output data, for instance <code>'Coffee' =&gt; Float</code> but then you run into problems with flexibility. What if Coffee still needed to output a float but had to go through a different Format than Hunger or Sleep? With that in mind we'll stick to the plan already laid out.</p>
+
+<p><code>yaml tentacles/lib/tentacles/formats.yml
+time:     DateTimeFormat
+mood:     CollectionFormat
+sleep:    FloatFormat
+hunger:   FloatFormat
+coffee:   FloatFormat
+</code></p>
+
+<h3>The Format object</h3>
+
+<p>I would love it if I could use the Format object as a module and just call a method on it from Crawler. It might look like this:</p>
+
+<p>```ruby
+def metadata_by_selector(selector)
+  node = nodes_by_selector(selector).first
+  metadata = {}
+  node.children.each do |child|</p>
+
+<pre><code>Tentacles::Format.insert(child, metadata)         
+</code></pre>
+
+<p>  end    <br/>
+end
+<code>``
+The only problem is</code>Format` needs to load in and parse its formats.yml file before it's any good to us. There's some interesting talk of the <a href="http://www.subelsky.com/2008/05/using-rubys-autoload-method-to.html">Module#autoload method</a> but that's not quite what I need...</p>
+
+<p>Seems like I can't find any good documentation on this so instead we'll make it an instance of the class. Also I'm lazy so I'm going to have that instance load its own formats.yml file. Normally I like to only have one entry point for configuration files but...whatever.</p>
+
+<h3>How do I convert a string into a class name in Ruby?</h3>
+
+<p>Well we know we can load our YAML file but all of our format classes are going to come in as strings. I did some digging to figure out how to convert the string into an actual class that can then be instantiated. If you just want to convert a String into a class you can use <code>Object.const_get('Foobar').new</code> but that's not going to work for us since our code is wrapped in a module. To convert a string into a module class we'll need to use the name of our module: <code>Tentacles.const_get('DateTimeFormat').new</code>.</p>
+
+<p>With that in mind I want to spec out a simple test that passes in string of metadata and receives a printed notification that the right formatter has been created. We'll then refactor it to actually use the formatter on the string.</p>
+
+<p>```ruby tentacles/spec/format_spec.rb
+require_relative '../lib/tentacles/format'
+require_relative '../lib/tentacles/date_time_format'</p>
+
+<p>describe Tentacles::Format do
+  describe "when asked to parse some metadata" do</p>
+
+<pre><code>it "should create the right formatter" do
+  @format = Tentacles::Format.new
+  @format.parse('Time: 8:03 am').should be_an_instance_of(Tentacles::DateTimeFormat)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>```ruby tentacles/lib/format.rb
+require 'yaml'
+require_relative 'date_time_format'</p>
+
+<p>module Tentacles
+  class Format</p>
+
+<pre><code>def initialize
+  @categories = YAML.load(File.open(File.dirname(__FILE__) + '/formats.yml'))
+end
+
+def parse(data)
+  category = data.split(':')[0]
+  category.downcase!
+  Tentacles.const_get(@categories[category]).new
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>```ruby tentacles/lib/date_time_format.rb
+module Tentacles
+  class DateTimeFormat</p>
+
+<pre><code>def initialize
+  puts 'DateTimeFormat created!'
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Now let's take it a step further so we can convert an actual time into a DateTime object. Here's our updated spec:</p>
+
+<p>```ruby
+require_relative '../lib/tentacles/format'
+require 'date'</p>
+
+<p>describe Tentacles::Format do
+  describe "when asked to parse some metadata" do</p>
+
+<pre><code>it "should create the right formatter" do
+  @format = Tentacles::Format.new
+  @format.parse('Time: 8:03 am').should be_an_instance_of(Date)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>To pull this off we'll need the help of at least 2 new gems: <a href="http://rubygems.org/gems/chronic">Chronic</a> and <a href="http://rubygems.org/gems/activesupport">ActiveSupport</a>. Chronic is a natural language parser which can convert strings into useable timestamps. ActiveSupport is a library of extensions originally created for Rails which have been abstracted into a general purpose toolset. We're going to combine these two gems to turn the phrase "8:03 am" into a Ruby DateTime.</p>
+
+<p>Gotta first update the Gemfile with our new dependencies and run <code>bundle install</code>.</p>
+
+<p>```ruby
+source 'https://rubygems.org'</p>
+
+<p>gem 'rspec', '2.9.0'
+gem 'nokogiri', '~>1.5.2'
+gem 'awesome_print', '~>1.0.2'
+gem 'fakeweb', '~>1.3.0'
+gem 'chronic', '~> 0.6.7'
+gem 'activesupport', '~> 3.2.3'
+```</p>
+
+<p>Next we bang out a quick parse method inside of DateTimeFormat. Our Tentacles::Format is going to delegate its parse call to whichever subordinate formatter it creates. Code speaks louder than words:</p>
+
+<p>```ruby tentacles/lib/tentacles/format.rb
+require 'yaml'
+require_relative 'date_time_format'</p>
+
+<p>module Tentacles
+  class Format</p>
+
+<pre><code>def initialize
+  @categories = YAML.load(File.open(File.dirname(__FILE__) + '/formats.yml'))
+end
+
+# Create a formatter based on the content of the passed
+# in data. Delegate the parse call to this new formatter
+def parse(data)
+  category, *content = data.split(':')
+  category.downcase!
+  formatter = Tentacles.const_get(@categories[category]).new
+  formatter.parse(content)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>```ruby tentacles/lib/tentacles/date_time_format.rb
+require 'chronic'
+require 'active_support/core_ext/string/conversions.rb'</p>
+
+<p>module Tentacles
+  class DateTimeFormat</p>
+
+<pre><code>def initialize
+  puts 'DateTimeFormat created!'
+end
+
+def parse(content)
+  Chronic.parse(content.join(':')).to_datetime
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>With all that in place our test should pass. Nice!!!!!! We're well on our way to processing the remaining metadata. Tomorrow I'll whip up our other formats and figure out how to pull the date out of a blog post so we can combine that with the time to get a proper DateTime.</p>
+
+<ul>
+<li>Time: 7:42 am</li>
+<li>Mood: Awake, Alert, Focused</li>
+<li>Sleep: 6</li>
+<li>Hunger: 0</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 7]]></title>
@@ -757,70 +970,6 @@ end
 <li>Coffee: 0</li>
 </ul>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Pangrams in Ruby]]></title>
-    <link href="http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/"/>
-    <updated>2012-05-09T23:15:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/09/pangrams-in-ruby</id>
-    <content type="html"><![CDATA[<p>I'm a big fan of sites like <a href="http://www.rubyquiz.com/">RubyQuiz</a> and <a href="http://www.codeeval.com/">CodeEval</a>. In my opinion doing short puzzles and brain-teasers is a great way to explore a language. Here's one such puzzle taken from CodeEval which asks that you devise a program to read in a file, parse each line and decide if it is a pangram or not.</p>
-
-<blockquote><p>The sentence 'A quick brown fox jumps over the lazy dog' contains every single letter in the alphabet. Such sentences are called pangrams. You are to write a program, which takes a sentence, and returns all the letters it is missing (which prevent it from being a pangram). You should ignore the case of the letters in sentence, and your return should be all lower case letters, in alphabetical order. You should also ignore all non US-ASCII characters.In case the input sentence is already a pangram, print out the string NULL</p></blockquote>
-
-<p>Here's my first attempt. Hopefully I can come back to this post in a few weeks and try it again in a bit more elegant fashion :)</p>
-
-<p>```ruby pangrams.rb
-File.open(ARGV[0]).each_line do |line|</p>
-
-<p>  missing_letters = []</p>
-
-<p>  unless line.chomp.empty?</p>
-
-<pre><code>line.chomp!
-line.downcase!
-('a'..'z').each do |l|
-  if line.index(l).nil?
-    missing_letters &lt;&lt; l
-  end
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  if missing_letters.empty?</p>
-
-<pre><code>puts "NULL"
-</code></pre>
-
-<p>  else</p>
-
-<pre><code>puts missing_letters.join('')
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>And here's some input:
-<code>text sentences.txt
-A quick brown fox jumps over the lazy dog
-A slow yellow fox crawls under the proactive dog
-AbC
-</code></p>
-
-<p>To run it from the command line you'll need to pass in the path to the sentece file as an argument. Here's what it would look like if <code>pangrams.rb</code> and <code>sentences.txt</code> were in the same folder:
-```
-ruby pangrams.rb sentences.txt</p>
-
-<h1>outputs...</h1>
-
-<p>NULL
-bjkmqz
-defghijklmnopqrstuvwxyz
-```
-Play around with this, throw some different sentence combinations at it to see what it spits out. Then try to write your own implementation. A good next step would be to modify the script so it can support empty lines in the text file.</p>
 ]]></content>
   </entry>
   
