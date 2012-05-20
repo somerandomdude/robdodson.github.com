@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-18T19:26:36-07:00</updated>
+  <updated>2012-05-19T23:58:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,45 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[My First Chain]]></title>
+    <link href="http://robdodson.me/blog/2012/05/19/my-first-chain/"/>
+    <updated>2012-05-19T22:53:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/19/my-first-chain</id>
+    <content type="html"><![CDATA[<p>Back in April I was reading hacker news when I came across a blog posted titled <a href="http://japhr.blogspot.com/2012/04/366-or-how-i-tricked-myself-into-being.html">&#8216;366 or How I Tricked Myself into Being Awesome&#8217;</a>. It was written by a fellow named Chris Strom. It was written on blogspot. It was mostly unstyled.</p>
+
+<p>Chris wrote every single day for 366 days and in so doing self-published three books on programming languages that he knew nothing about. His post was to champion that milestone. At the time I read it and thought, &#8220;I can totally do this,&#8221; meaning if I follow the steps that Chris has outlined I can potentially trick myself into becoming a blogger.</p>
+
+<p>That probably seems rather silly to say but it&#8217;s true. Every developer I know Googles for answers when they&#8217;re stuck or trying to learn something new. <a href="http://css-tricks.com/">And it seems like</a>, <a href="http://www.alistapart.com/">over and</a> <a href="http://www.leebrimelow.com/">over again</a>, <a href="http://devblog.avdi.org/">we end up</a> <a href="http://yehudakatz.com/">in the same places.</a> And if you&#8217;re a developer, or maybe if you&#8217;re just me, you totally revere these people. They are guides in what is a truly unfamiliar world and they do it without asking anything in return.</p>
+
+<p>So I set out to try to do my own chain. I have to write until I go to Europe on June 27th. At this moment I have 22 blog posts that I&#8217;ve written as a result of the chain. Prior to that I&#8217;d written 3 in an entire year. At first I found the whole process exhilarating, until it started to get in the way of my personal activities. Now I have to figure out how to write something of substance while still balancing my job and my home life. This is not easy. It requires setting boundaries and self-discipline. I try to write in the mornings, usually between the hours of 7 to 9. Frequently I don&#8217;t finish and my posts have to be resumed in the evening. But working like this interferes with the time I can spend with my girlfriend and that breaks one of the unspoken rules I have which is that writing should not disturb my normal social life. Getting to the first 10 posts this was not a problem but now that I&#8217;m passing 20 it is. I&#8217;ve changed my writing style from full blown tutorials to more of a play-by-play as I code. I&#8217;m always striving to be more succinct in what I write but usually the challenge is disappearing down a rabbit hole while I research something new only to realize that I&#8217;ve blown half an hour of my writing time googling minutia. I&#8217;m going to try to associate googling minutia with some guy getting in between me and my girlfriend. As a result I will want to stab googling minutia.</p>
+
+<p>Anyway, if you find this post and you are thinking about writing let me tell you that I <strong>highly</strong> recommend it. Here is some quick advice:</p>
+
+<h3>Don&#8217;t worry about what your blog looks like.</h3>
+
+<p>I&#8217;m 100% serious on this point. If you spend any time designing your blog before you write your first 5 articles then you&#8217;re doing it wrong. I have fallen into this trap innumerable times. Just accept this challenge: Make it to 10 blog posts, then you can redesign the thing.</p>
+
+<p>I think we fall in love with the idea of having a beautiful blog and get lost in design and programming how everything will look. This is a mistake. Blogging is supposed to just be a journal of what you&#8217;re currently working on and thinking. Assume no one will read it (this is probably true). After you have a few readers then work on the look and feel if you choose. Personally I&#8217;ve found that not worrying about the design at all has been incredibly freeing. Again, look at <a href="http://japhr.blogspot.com/2012/04/366-or-how-i-tricked-myself-into-being.html">Chris Strom&#8217;s blog</a>. He has a ton of readers, is a published author, and is running the default blogspot theme.</p>
+
+<h3>Try to write at the same time every day</h3>
+
+<p>I find it easiest to focus in the morning especially when everyone else is asleep. I think Chris works late at night. Figure out what times suits you and do your best to stick to it. When I finish a post in the morning I feel free for the whole rest of the day. It&#8217;s kind of cool to have that sense of accomplishment before arriving at work :D</p>
+
+<h3>Use the best tools you can</h3>
+
+<p>I tried writing in Wordpress on several different occasions. I&#8217;ve also tried Tumblr and Posterous. I find writing in shitty WYSIWYG editors drives me totally crazy. There are apps out there that let you write in more of a desktop setting but I&#8217;m not sure if they are still subject to Wordpress or Tumblr&#8217;s weird formatting. Basically if you&#8217;re writing a code blog it fucking sucks to use a WYSIWYG because they&#8217;ll try to wrap all of your funky syntax in weird markup. I found <a href="http://octopress.org/">Octopress</a> and it&#8217;s been the best tool I&#8217;ve ever used for writing. I also <a href="http://robdodson.me/blog/2012/04/30/custom-domain-with-octopress-and-github-pages/">wrote a little article</a> on it if you&#8217;re trying to get it setup for your personal domain. Octopress is great because it uses <a href="http://daringfireball.net/projects/markdown/">Markdown</a>, the same language that&#8217;s used to generate most of the pages on Github, there&#8217;s no database and you can write in any text editor. I do all of my blogging in <a href="http://www.sublimetext.com/2">Sublime Text 2</a>, often times with my blog in one cell with my code in the other. Here&#8217;s a screenshot of what this can look like.</p>
+
+<p><img class="center" src="http://robdodson.me/images/side_by_side_blogging.png" title="'Awesome splits!'" ></p>
+
+<h3>Don&#8217;t worry when no one reads it</h3>
+
+<p>Finally, don&#8217;t get too hung up on who is (or isn&#8217;t) reading your blog. I know that pretty much all of the visits I see in my google analytics are actually just me checking the site on my phone or laptop. Definitely <em>do</em> add analytics so you can see which parts are successful and which are not but don&#8217;t expect to be <a href="http://daringfireball.net/">Daring Fireball</a> overnight. In fact, don&#8217;t ever expect to be Daring Fireball. Keep in mind that what you&#8217;re doing is a personal journal. It may not seem like blogs are framed in that context but that&#8217;s what they&#8217;re best at. I often times find this really interesting flow where I write down what I think I should build before I build it, then I write a test, then I write the implementation. Often times I work out what I&#8217;m doing in the blog post well before I&#8217;ve even written the test. This is like a whole other kind of BDD, Blog Driven Development :) Use it for what it&#8217;s best at and you&#8217;ll find it rewarding.</p>
+
+<p>Ok that&#8217;s it for now. Goodnight!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Backbone Boilerplate: Playing with Require.js]]></title>
@@ -4874,39 +4913,6 @@ Now let&#8217;s tell RVM to use Ruby 1.9.3 with our custom Octopress gemset.</p>
 <p>Make sure you spelled your domain name correctly in the CNAME record that you pushed to Github. I spent almost an hour wondering why <code>robodson.me</code> wasn&#8217;t resolving :\</p>
 
 <p>If all else fails checkout the docs from <a href="http://help.github.com/pages/">Github Pages</a> and <a href="http://octopress.org/docs/deploying/github/">Octopress</a> on setting up a custom domain.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to Run Tests in Sublime Text]]></title>
-    <link href="http://robdodson.me/blog/2012/04/29/how-to-run-tests-in-sublime-text/"/>
-    <updated>2012-04-29T09:26:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/04/29/how-to-run-tests-in-sublime-text</id>
-    <content type="html"><![CDATA[<p>If you&#8217;re lazy like me then you love to automate as much of your process as possible. Running tests from within your IDE is one of those tasks that screams for a keyboard shortcut. In full featured tools like RubyMine or Eclipse this is usually pretty straightforward. However many developers in the Ruby community seem to prefer more lightweight tools like TextMate, Vim and Sublime. Today we&#8217;ll look at how to setup RubyTest in Sublime Text 2 so we can easily run tests with just a few hotkeys. The tests will be written in <a href="http://rspec.info/">Rspec</a> which should be familiar to most Rubyists.</p>
-
-<h3>How to setup RubyTest in Sublime Text 2</h3>
-
-<p>If you haven&#8217;t installed the <a href="http://wbond.net/sublime_packages/package_control">Sublime Package Manager</a> go ahead and do that now. The package manager is a wonderful tool that lets us install and update plugins from within Sublime. After you have that installed you can hit <code>cmd-shift-p</code> to open up the Command Palette. Type the following <code>Install Package</code> and press Enter. This will bring up a list of available packages that we can install. You can also type <code>Discover Packages</code> which will take you to a page listing each plugin with a brief description.</p>
-
-<p>Go ahead and type <code>RubyTest</code> and press Enter. You will see a progress indicator at the bottom of your editor. Once it&#8217;s finished you should be able to click on <code>Tools &gt; RubyTest</code>.</p>
-
-<h3>Running tests in Sublime Text 2</h3>
-
-<p>I&#8217;ve put together <a href="https://github.com/robdodson/testing_demo">a sample project which you can download</a>. It has a Gemfile and a pair of contrived Rspec tests. Put it someplace where you can easily get to it using the command line. In order for RubyTest to work you have to open your projects from the CLI. This has to do with how certain load paths get setup and it&#8217;s probably the cause of about 95% of RubyTest issues. Follow <a href="http://www.sublimetext.com/docs/2/osx_command_line.html">these instructions</a> if you don&#8217;t already have the <code>subl</code> command setup in your terminal.</p>
-
-<p><code>cd</code> into the project folder and do a quick <code>bundle install</code>. When that&#8217;s finished try to run</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>bundle exec rspec spec/</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you see test results then you know that rspec is good to go. Use <code>subl .</code> to open the project. You should see a list of files on your left hand sidebar. Navigate to the <code>spec/robot_spec.rb</code> file. If you&#8217;re lucky you should be able to hit <code>cmd-shift-t</code> to run all of the tests within the spec. If succesful you&#8217;ll see a console window that looks like this.</p>
-
-<p><img class="center" src="http://robdodson.me/images/ruby_test_console.png" title="Ruby Test Console" ></p>
-
-<p>Don&#8217;t worry if it doesn&#8217;t work the first time. Sublime and RubyTest are <em>very</em> finicky. Close Sublime and try to open it again from the command line.It might help to close any other Sublime projects you already have open or even quit the program entirely using <code>cmd-q</code>. You&#8217;ll have to experiment a bit to get it all working.</p>
-
-<p>Hopefully after all that you&#8217;ve got your tests showing up green. Now you can integrate RubyTest into your workflow and save all that alt-tabbing back and forth between the command line!</p>
 ]]></content>
   </entry>
   
