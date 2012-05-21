@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Backbone Boilerplate | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/backbone-boilerplate/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-19T23:58:26-07:00</updated>
+  <updated>2012-05-20T20:00:43-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -21,7 +21,7 @@
     <content type="html"><![CDATA[<p>I want to keep playing with require.js and AMD modules today so I can really internalize the concepts around them. I'm going to go through the examples in <a href="http://requirejs.org/docs/api.html#jsfiles">the require documentation</a> starting with loading regular scripts and then defining modules and loading those. Here's our boilerplate HTML:</p>
 
 <p>Here is our boilerplate HTML. It's a standard HTML5 file which just includes require.js at the bottom of the page.
-```html
+``` html
 &lt;!doctype html>
 <html lang="en">
 <head>
@@ -46,12 +46,14 @@
 ```
 I'm also going to define a file called foo.js which will just console log "Hello World!". To update our HTML we'll add the following script tag after the call to include require.js</p>
 
-<p>```html</p>
+<p>``` html</p>
 
 <script>
     require(["foo"]);
 </script>
 
+
+<p>```</p>
 
 <p>And as expected the console outputs 'Hello World!'. Let's step it up a notch and define a module. Our first module will just return an object literal <a href="http://requirejs.org/docs/api.html#defsimple">like in this example.</a> It will be a <code>Person</code> module with our name and city. We'll place it in an <code>app</code> folder in the root of our project. So our stucture looks like this:</p>
 
@@ -75,7 +77,7 @@ index.html
 <p>```</p>
 
 <p>The <code>Person</code> module just needs to implement a define function which takes an object as an argument. It looks like this:
-```js app/person.js
+``` js app/person.js
 define({</p>
 
 <pre><code>name: "Rob Dodson",
@@ -86,7 +88,7 @@ city: "San Francisco"
 ```
 And in our updated index.html we're going to require that module.</p>
 
-<p>```html
+<p>``` html
 &lt;!doctype html>
 <html lang="en">
 <head>
@@ -129,7 +131,7 @@ And in our updated index.html we're going to require that module.</p>
 
 <p>Ok let's write a module that's a bit more realistic. We'll use a function to return our object so it's kind of like a constructor.</p>
 
-<p>```js app/monster.js
+<p>``` js app/monster.js
 "use strict";</p>
 
 <p>define(function () {</p>
@@ -153,7 +155,7 @@ This is a simple monster object. Notice that we build a variable called</code>es
 
 <p>Next up is a module with dependencies. We'll make the monster depend on his coffin.</p>
 
-<p>```js app/coffin.js
+<p>``` js app/coffin.js
 "use strict";</p>
 
 <p>define(function () {
@@ -171,7 +173,7 @@ open: function() {
 });
 ```</p>
 
-<p>```js app/monster.js
+<p>``` js app/monster.js
 "use strict";</p>
 
 <p>define(['./coffin'], function (coffin) {
@@ -196,7 +198,7 @@ goToSleep: function() {
 });
 ```</p>
 
-<p>```html index.html</p>
+<p>``` html index.html</p>
 
 <script data-main="" src="http://robdodson.me/assets/js/libs/require.js"></script>
 
@@ -213,7 +215,7 @@ goToSleep: function() {
 You can see that we've created a dependency for our monster, it has to load the coffin module before it's ready to be loaded itself. Otherwise it won't be able to run</code>goToSleep()<code>properly. Require.js will sort all of this out so long as we declare our dependencies as the first argument to the</code>define` function.</p>
 
 <p>We aren't limited to objects though, we can also return functions (which are objects in their own right). For instance if we wanted to define a helper module that greets people we could do something like this:
-```js app/greet.js
+``` js app/greet.js
 "use strict";</p>
 
 <p>define(function () {
