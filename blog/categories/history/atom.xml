@@ -4,7 +4,7 @@
   <title><![CDATA[Category: History | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/history/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-21T21:51:29-07:00</updated>
+  <updated>2012-05-21T21:52:31-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -95,7 +95,8 @@ The last few bits prevent the link from completely refreshing the page—<code>e
 Example.Views.Tutorial = Backbone.View.extend({
   template: "app/templates/example.html",</p>
 
-<p>  events: {</p>
+<p>  // Listen for when the user clicks our anchor tag
+  events: {</p>
 
 <pre><code>'click .search': 'search'
 </code></pre>

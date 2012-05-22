@@ -230,6 +230,7 @@ The last few bits prevent the link from completely refreshing the page—<code>e
 </span><span class='line'><span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Tutorial</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
 </span><span class='line'>  <span class="nx">template</span><span class="o">:</span> <span class="s2">&quot;app/templates/example.html&quot;</span><span class="p">,</span>
 </span><span class='line'>
+</span><span class='line'>  <span class="c1">// Listen for when the user clicks our anchor tag</span>
 </span><span class='line'>  <span class="nx">events</span><span class="o">:</span> <span class="p">{</span>
 </span><span class='line'>    <span class="s1">&#39;click .search&#39;</span><span class="o">:</span> <span class="s1">&#39;search&#39;</span>
 </span><span class='line'>  <span class="p">},</span>
@@ -242,7 +243,6 @@ The last few bits prevent the link from completely refreshing the page—<code>e
 </span><span class='line'>  <span class="p">},</span>
 </span><span class='line'>
 </span><span class='line'>  <span class="p">...</span>
-</span><span class='line'>
 </span></code></pre></td></tr></table></div></figure>
 
 
