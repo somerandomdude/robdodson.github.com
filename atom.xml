@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-21T21:38:37-07:00</updated>
+  <updated>2012-05-21T21:47:32-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -50,7 +50,7 @@
 </span><span class='line'>    <span class="s2">&quot;search&quot;</span><span class="o">:</span> <span class="s2">&quot;search&quot;</span>
 </span><span class='line'>  <span class="p">},</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="nx">index</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">hash</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">index</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
 </span><span class='line'>    <span class="kd">var</span> <span class="nx">tutorial</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Tutorial</span><span class="p">();</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="c1">// Attach the tutorial page to the DOM</span>
