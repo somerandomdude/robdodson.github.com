@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Backbone | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/backbone/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-21T21:52:31-07:00</updated>
+  <updated>2012-05-21T21:54:46-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -153,7 +153,7 @@ namespace.app.router.navigate('whatever');
 Backbone.history.start({ pushState: true });
 </code></p>
 
-<p>This lets you create routes that look like this: <code>mysite.com/search/foobar</code> instead of using a hash <code>mysite.com/#search/foobar</code>. The only problem is that for HTML5 History pushState to work your server has to keep resolving to index.html. The boilerplate tutorial says to use <code>node build/server</code> to run your project server, even though elsewhere it says to use <code>bbb server</code>. Neither works so I've <a href="https://github.com/backbone-boilerplate/grunt-bbb/issues/21">logged an issue on Github.</a> Very possible I'm doing it wrong but we'll see. For now I'll use the hash approach.</p>
+<p>This lets you create routes that look like this: <code>mysite.com/search/foobar</code> instead of using a hash <code>mysite.com/#search/foobar</code>. The only problem is that for HTML5 History pushState to work your server has to keep resolving to index.html. The boilerplate tutorial says to use <code>node build/server</code> to run your project server, even though elsewhere it says to use <code>bbb server</code>. Neither works so I've <a href="https://github.com/backbone-boilerplate/grunt-bbb/issues/21">logged an issue on Github.</a> Very possible I'm doing it wrong but we'll see. For now I'm not use pushState so I changed the line in main.js to read <code>Backbone.history.start()</code> and instead I'm using the hash approach.</p>
 
 <ul>
 <li>Time: 7:59 am</li>
