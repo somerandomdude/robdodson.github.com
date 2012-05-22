@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-21T21:47:32-07:00</updated>
+  <updated>2012-05-21T21:51:29-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -119,7 +119,7 @@
 
 
 <p>In short this is an application wide handler for any relative anchor that doesn&#8217;t have a <code>data-bypass</code> attribute. So something like <code>&lt;a href="search"&gt;Search&lt;/a&gt;</code> would get passed through here.
-The last few bits prevent the link from completely refreshing the page—<code>evt.preventDefault()</code>—and pipe the href through the router. Actually the href gets piped through <code>Backbone.history.navigate</code> which <code>Router.navigate proxies</code>. When you call Router.navigate(&#8216;foobar&#8217;) you&#8217;re supposed to pash a hash of <code>{trigger: true}</code> if you&#8217;d like the router to run the corresponding <code>foobar</code> method. If you dig into the source you can see that just passing true will also have the same effect and that&#8217;s what&#8217;s done here by the Boilerplate.</p>
+The last few bits prevent the link from completely refreshing the page—<code>evt.preventDefault()</code>—and pipe the href through the router. Actually the href gets piped through <code>Backbone.history.navigate</code> which <code>Router.navigate</code> proxies. When you call <code>Router.navigate('foobar')</code> you&#8217;re supposed to pash a hash of <code>{trigger: true}</code> if you&#8217;d like the router to run the corresponding <code>foobar</code> method. If you dig into the source you can see that just passing true will also have the same effect and that&#8217;s what&#8217;s done here by the Boilerplate.</p>
 
 <p>Originally I had written my View like this because I thought I had to use the Router explicitly.</p>
 
@@ -140,16 +140,6 @@ The last few bits prevent the link from completely refreshing the page—<code>e
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
 </pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// This will fetch the tutorial template and render it.</span>
 </span><span class='line'><span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Tutorial</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
 </span><span class='line'>  <span class="nx">template</span><span class="o">:</span> <span class="s2">&quot;app/templates/example.html&quot;</span><span class="p">,</span>
@@ -158,25 +148,15 @@ The last few bits prevent the link from completely refreshing the page—<code>e
 </span><span class='line'>    <span class="s1">&#39;click .search&#39;</span><span class="o">:</span> <span class="s1">&#39;search&#39;</span>
 </span><span class='line'>  <span class="p">},</span>
 </span><span class='line'>
+</span><span class='line'>  <span class="c1">// Note: I&#39;m stopping the event and explicitly telling the Router to</span>
+</span><span class='line'>  <span class="c1">// update the history and trigger the corresponding search method.</span>
 </span><span class='line'>  <span class="nx">search</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
 </span><span class='line'>    <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
 </span><span class='line'>    <span class="nx">namespace</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span><span class="p">(</span><span class="s1">&#39;search&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">trigger</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
 </span><span class='line'>  <span class="p">},</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">view</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">...</span>
 </span><span class='line'>
-</span><span class='line'>    <span class="c1">// Fetch the template, render it to the View element and call done.</span>
-</span><span class='line'>    <span class="nx">namespace</span><span class="p">.</span><span class="nx">fetchTemplate</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">template</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">tmpl</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">view</span><span class="p">.</span><span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">tmpl</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="c1">// If a done function is passed, call it with the element</span>
-</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">done</span><span class="p">))</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">done</span><span class="p">(</span><span class="nx">view</span><span class="p">.</span><span class="nx">el</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
