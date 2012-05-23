@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: GFX | Rob Dodson talks internets]]></title>
+  <link href="http://robdodson.me/blog/categories/gfx/atom.xml" rel="self"/>
+  <link href="http://robdodson.me/"/>
+  <updated>2012-05-23T01:17:43-07:00</updated>
+  <id>http://robdodson.me/</id>
+  <author>
+    <name><![CDATA[Rob Dodson]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[CSS3 Transitions with GFX]]></title>
+    <link href="http://robdodson.me/blog/2012/05/22/css3-transitions-and-animations-with-sass/"/>
+    <updated>2012-05-22T08:06:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/22/css3-transitions-and-animations-with-sass</id>
+    <content type="html"><![CDATA[<p>CSS3 is a rather verbose tool especially when it comes to transitions and animations. I want to see if there's a way to clean a lot of that up with either a SASS mixin or a jQuery library like <a href="http://maccman.github.com/gfx/">gfx.</a></p>
+
+<p>We'll try to do something simple at first to recreate an animation like the one we have below.</p>
+
+<p><small>Rollover the grey area to activate it.</small></p>
+
+<!-- CSS Styles: -->
+
+
+<div>
+  <style type="text/css">
+    .container {
+      width: 300px;
+      height: 300px;
+      position: relative;
+      background-color: #CCC;
+    }
+
+    #example1 .container:hover .widget {
+      background-color: red;
+      left: 200px;
+      top: 200px;
+    }
+
+    #example1 .widget {
+      background-color: black;
+      left: 10px;
+      position: absolute;
+      top: 10px;
+      width: 20px;
+      height: 20px;
+      -webkit-transition: background-color 1s linear, left 1s, top 2s
+    }
+  </style>
+</div>
+
+
+
+
+<div id="example1">
+  <div class="container">
+      <div class="widget"></div>
+  </div>​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
+</div>
+
+
+<p>The code to produce the above animation looks something like this:</p>
+
+<p>``` css
+.container {
+  width: 300px;
+  height: 300px;
+  position: relative;
+  background-color: #CCC;
+}</p>
+
+<p>.container:hover .widget {
+  background-color: red;
+  left: 200px;
+  top: 200px;
+}</p>
+
+<p>.widget {
+  background-color: black;
+  left: 10px;
+  position: absolute;
+  top: 10px;
+  width: 20px;
+  height: 20px;
+  -webkit-transition: background-color 1s linear, left 1s, top 2s
+}
+```
+We definitely don't want all that logic in our CSS. Ideally we could trigger these kinds of things from JavaScript, which is where Gfx comes in.</p>
+
+<p>Using Gfx we can get similar but not exactly the same result with the following snippet:</p>
+
+<p>``` js
+$("#widget")</p>
+
+<pre><code>.gfx({ translateX: '200px' }, { duration: '1000', queue: false })
+.gfx({ translateX: '200px', translateY: '200px' }, { duration: '2000' });
+</code></pre>
+
+<p>```</p>
+
+<p>After tinking with Gfx for what seems like hours at this point I haven't figured out a way to pass two different times to simultaneous animations. From one animation to the next you have to specify the end points from the previous animations or else the styles will revert. That's why I'm passing <code>translateX: '200px'</code> in both places...although I'm not 100% if that's what I should be doing. I emailed the author of Gfx so we'll see what he says.</p>
+
+<ul>
+<li>Time: 8:07 am</li>
+<li>Mood: Sedated, Upset-Stomach, Laggy</li>
+<li>Sleep: 5.5</li>
+<li>Hunger: 0</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-21T21:54:46-07:00</updated>
+  <updated>2012-05-23T01:17:43-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,109 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[CSS3 Transitions with GFX]]></title>
+    <link href="http://robdodson.me/blog/2012/05/22/css3-transitions-and-animations-with-sass/"/>
+    <updated>2012-05-22T08:06:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/22/css3-transitions-and-animations-with-sass</id>
+    <content type="html"><![CDATA[<p>CSS3 is a rather verbose tool especially when it comes to transitions and animations. I want to see if there's a way to clean a lot of that up with either a SASS mixin or a jQuery library like <a href="http://maccman.github.com/gfx/">gfx.</a></p>
+
+<p>We'll try to do something simple at first to recreate an animation like the one we have below.</p>
+
+<p><small>Rollover the grey area to activate it.</small></p>
+
+<!-- CSS Styles: -->
+
+
+<div>
+  <style type="text/css">
+    .container {
+      width: 300px;
+      height: 300px;
+      position: relative;
+      background-color: #CCC;
+    }
+
+    #example1 .container:hover .widget {
+      background-color: red;
+      left: 200px;
+      top: 200px;
+    }
+
+    #example1 .widget {
+      background-color: black;
+      left: 10px;
+      position: absolute;
+      top: 10px;
+      width: 20px;
+      height: 20px;
+      -webkit-transition: background-color 1s linear, left 1s, top 2s
+    }
+  </style>
+</div>
+
+
+
+
+<div id="example1">
+  <div class="container">
+      <div class="widget"></div>
+  </div>​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
+</div>
+
+
+<p>The code to produce the above animation looks something like this:</p>
+
+<p>``` css
+.container {
+  width: 300px;
+  height: 300px;
+  position: relative;
+  background-color: #CCC;
+}</p>
+
+<p>.container:hover .widget {
+  background-color: red;
+  left: 200px;
+  top: 200px;
+}</p>
+
+<p>.widget {
+  background-color: black;
+  left: 10px;
+  position: absolute;
+  top: 10px;
+  width: 20px;
+  height: 20px;
+  -webkit-transition: background-color 1s linear, left 1s, top 2s
+}
+```
+We definitely don't want all that logic in our CSS. Ideally we could trigger these kinds of things from JavaScript, which is where Gfx comes in.</p>
+
+<p>Using Gfx we can get similar but not exactly the same result with the following snippet:</p>
+
+<p>``` js
+$("#widget")</p>
+
+<pre><code>.gfx({ translateX: '200px' }, { duration: '1000', queue: false })
+.gfx({ translateX: '200px', translateY: '200px' }, { duration: '2000' });
+</code></pre>
+
+<p>```</p>
+
+<p>After tinking with Gfx for what seems like hours at this point I haven't figured out a way to pass two different times to simultaneous animations. From one animation to the next you have to specify the end points from the previous animations or else the styles will revert. That's why I'm passing <code>translateX: '200px'</code> in both places...although I'm not 100% if that's what I should be doing. I emailed the author of Gfx so we'll see what he says.</p>
+
+<ul>
+<li>Time: 8:07 am</li>
+<li>Mood: Sedated, Upset-Stomach, Laggy</li>
+<li>Sleep: 5.5</li>
+<li>Hunger: 0</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Exploring the Backbone Router and History API]]></title>
@@ -723,167 +826,6 @@ bear in mind that each module requires an http request to load it so you don't w
 <img class="center" src="/images/module_costs.png" title="'Note the separate http request for greet.js'" ></p>
 
 <p>Ok that's it for today. I'll try to continue on Saturday!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Getting Familiar with Backbone Boilerplate]]></title>
-    <link href="http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/"/>
-    <updated>2012-05-17T07:47:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate</id>
-    <content type="html"><![CDATA[<p>I have an upcoming project which uses <a href="http://documentcloud.github.com/backbone/">Backbone</a> and <a href="http://nodejs.org/">Node.js</a> so I thought it would be good to blog about the topics (particularly Backbone) for a while to make sure I'm well up to speed.</p>
-
-<p>We're using the <a href="https://github.com/tbranyen/backbone-boilerplate">Backbone Boilerplate</a> to get us started since it includes a bit of file structure and a build process. As they mention in the docs you have to install <a href="https://github.com/cowboy/grunt">Grunt</a> if you want to use the build process they've stubbed out. Grunt is a javascript build tool which uses Node (think Rake in JS).</p>
-
-<p>As a refresher course I'm going to dig into the open-source <a href="http://addyosmani.github.com/backbone-fundamentals/">Backbone Fundamentals book</a> by <a href="http://addyosmani.github.com/backbone-fundamentals/">Addy Osmani</a>.</p>
-
-<p>First thing's first though, after we have nodejs and grunt installed we need to also install the bbb (backbone boilerplate build, I guess?) tool. You can <a href="https://github.com/backbone-boilerplate/grunt-bbb">grab it here.</a></p>
-
-<p>We'll create a new folder for our project and run <code>bbb init</code>. If all goes well it should stub out some project directories and files for us.</p>
-
-<h3>The Backbone Boilerplate templates</h3>
-
-<p>I'll start with the index.html file. It seems like your standard HTML5 doc with the noteable exception that it includes <a href="http://requirejs.org/">require.js</a> at the bottom of the page.</p>
-
-<p>```html
-&lt;!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width,initial-scale=1"></p>
-
-<p>  <title>Backbone Boilerplate</title></p>
-
-<p>  <!-- Application styles -->
-  <link rel="stylesheet" href="http://robdodson.me/assets/css/index.css">
-</head></p>
-
-<p><body>
-  <!-- Main container -->
-  <div role="main" id="main"></div></p>
-
-<p>  <!-- Application source -->
-  <script data-main="app/config" src="http://robdodson.me/assets/js/libs/require.js"></script>
-</body>
-</html>
-```
-Require.js is a module and file loader which will help us manage our AMD modules. AMD (which stands for Asynchronous Module Definition) is a specification which details how to break JS down into modules that are loaded in, as needed, at runtime. <a href="http://addyosmani.com/writing-modular-js/">Again we turn to Addy Osmani for a good explanation.</a></p>
-
-<p>If you notice this block:
-```html</p>
-
-<!-- Application source -->
-
-
-<p>  <script data-main="app/config" src="http://robdodson.me/assets/js/libs/require.js"></script>
-<code>``
-the</code>data-main<code>attribute in the script tag is telling require.js what to load first. In this case it's the</code>app/config.js<code>file. If you omit the</code>js<code>require will add it for you. If you add the</code>.js` require will respect the path exactly as it was given. This distinction seems kind of trivial here but later on when you start configuring require with baseUrls and whatnot, it becomes more important.</p>
-
-<p>Let's look at that confg file, shall we?</p>
-
-<p>```javascript app/config.js
-// Set the require.js configuration for your application.
-require.config({
-  // Initialize the application with the main application file
-  deps: ["main"],</p>
-
-<p>  paths: {</p>
-
-<pre><code>// JavaScript folders
-libs: "../assets/js/libs",
-plugins: "../assets/js/plugins",
-
-// Libraries
-jquery: "../assets/js/libs/jquery",
-underscore: "../assets/js/libs/underscore",
-backbone: "../assets/js/libs/backbone",
-
-// Shim Plugin
-use: "../assets/js/plugins/use"
-</code></pre>
-
-<p>  },</p>
-
-<p>  use: {</p>
-
-<pre><code>backbone: {
-  deps: ["use!underscore", "jquery"],
-  attach: "Backbone"
-},
-
-underscore: {
-  attach: "_"
-}
-</code></pre>
-
-<p>  }
-});
-```</p>
-
-<p>One of the first things you can do with Require is to pass it a configuration object. The config object <a href="http://requirejs.org/docs/api.html#config">can be used for a ton of bootstrap options</a> like setting paths, requiring other scripts, setting timeouts, etc. The first option we see here is <code>deps: ["main"]</code>. We can infer this is telling require to load our main.js file first. But how does it get the path to main.js? From the docs we see that since we haven't defined a <code>baseUrl</code> property require is using the path from our <code>data-main</code> attribute.</p>
-
-<blockquote><p>If no baseUrl is explicitly set in the configuration, the default value will be the location of the HTML page that loads require.js. If a data-main attribute is used, that path will become the baseUrl.</p></blockquote>
-
-<p>So we know that our baseUrl is <code>app/</code> and anything we require will be relative to that.</p>
-
-<p>Next up we have this block:</p>
-
-<p>```js
-paths: {</p>
-
-<pre><code>// JavaScript folders
-libs: "../assets/js/libs",
-plugins: "../assets/js/plugins",
-
-// Libraries
-jquery: "../assets/js/libs/jquery",
-underscore: "../assets/js/libs/underscore",
-backbone: "../assets/js/libs/backbone",
-
-// Shim Plugin
-use: "../assets/js/plugins/use"
-</code></pre>
-
-<p>  },
-```</p>
-
-<p>The paths property defines paths relative to <code>baseUrl</code>. If we say
-<code>js
-require(["libs/module"])
-</code>
-require.js will look for this <code>libs</code> path and find it in our config file. Most of these make sense till we hit the last line which creates a path for the <code>use</code> plugin.</p>
-
-<p><a href="http://tbranyen.com/post/amdrequirejs-shim-plugin-for-loading-incompatible-javascript">It seems like <code>use</code> was created by Tim Branyen, the author of the Backbone Boilerplate, to help with loading libraries that are non-AMD compliant.</a> Most of the big libraries are currently not AMD compliant (underscore and backbone itself) so this makes sense. So instead of creating a shim for each of those libraries the <code>use</code> plugin <em>should</em> take care of things for us. We can see how it's used further in the config file:</p>
-
-<p>```js
-use: {</p>
-
-<pre><code>backbone: {
-  deps: ["use!underscore", "jquery"],
-  attach: "Backbone"
-},
-
-underscore: {
-  attach: "_"
-}
-</code></pre>
-
-<p>  }
-```</p>
-
-<p>Let's start at the bottom so we can see that underscore is defined and mapped to "_". <code>attach</code> is going to take whatever library we're defining and attach it to <code>window</code>. So underscore will be attached as <code>window._</code>. Next we see that backbone is defined and depends on our version of underscore and jquery. Since jquery is AMD compliant we don't need the call to <code>use!</code> but we will need it for underscore. Finally backbone is attached to the window as <code>window.Backbone</code>.</p>
-
-<p>That covers the configuration file. I'll move on to main.js in the next post.</p>
-
-<ul>
-<li>Time: 7:49 am</li>
-<li>Mood: Awake, Tired, Lazy</li>
-<li>Sleep: 7</li>
-<li>Hunger: 4</li>
-<li>Coffee: 0</li>
-</ul>
-
 ]]></content>
   </entry>
   
