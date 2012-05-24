@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-23T01:17:43-07:00</updated>
+  <updated>2012-05-23T23:27:52-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,393 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How do you switch between views in Backbone]]></title>
+    <link href="http://robdodson.me/blog/2012/05/23/how-do-you-switch-between-views-in-backbone/"/>
+    <updated>2012-05-23T07:56:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/23/how-do-you-switch-between-views-in-backbone</id>
+    <content type="html"><![CDATA[<p>I&#8217;m going to try to approach some of my future articles as more of a question/answer setup so they don&#8217;t turn into these sprawling tutorials. Today I want to focus on moving between views in Backbone.js. I&#8217;m starting with some very simple templates and three views: LeftView, MiddleView, RightView. To do this quickly we&#8217;ll make it so each view is essentially a big button which, when clicked on, should animate to the middle of the screen.</p>
+
+<p>Here&#8217;s what one of my templates looks like:</p>
+
+<figure class='code'><figcaption><span>right.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;right-container&quot;</span> <span class="na">class=</span><span class="s">&quot;container&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  Everyone knows I&#39;m right.
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>One of the first thing I&#8217;m noticing is that all of my templates seem to be wrapped in an extra div. Since this extra div is block displayed I can&#8217;t get my items to line up next to each other&#8230; Oh! T<a href="http://stackoverflow.com/questions/7894253/backbone-js-turning-off-wrap-by-div-in-render">he problem is because I haven&#8217;t specified a tagName for my views.</a> I think I can actually do everything in the View declaration without needing a template.</p>
+
+<figure class='code'><figcaption><span>example.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Right</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;right-container&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;container&#39;</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That should create our view for us with the proper tag, class and id attributes. My containers are just colored squares so I don&#8217;t need to populate them with any content. If I did want to use this approach I could add more content like this:</p>
+
+<figure class='code'><figcaption><span>example.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Right</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;right-container&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;container&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s2">&quot;Hello World!&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here is our most basic <code>Router</code> showing how to add the views to stage. Since we aren&#8217;t using a template we can just call the regular render function and append the returned element to the DOM.</p>
+
+<figure class='code'><figcaption><span>main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">Router</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">routes</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;&quot;</span><span class="o">:</span> <span class="s2">&quot;index&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">index</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">leftView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Left</span><span class="p">();</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">middleView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Middle</span><span class="p">();</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">rightView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Right</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Attach the views to the DOM</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#main&quot;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">leftView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#main&quot;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">middleView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#main&quot;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">rightView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here are my very simple styles:</p>
+
+<figure class='code'><figcaption><span>style.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">margin-right</span><span class="o">:</span> <span class="m">50px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">#left-container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background</span><span class="o">:</span> <span class="m">#F00</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">#middle-container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background</span><span class="o">:</span> <span class="m">#0F0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">#right-container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background</span><span class="o">:</span> <span class="m">#00F</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We should now have a very simple horizontal layout.</p>
+
+<p><img class="center" src="http://f.cl.ly/items/173L112z0g2t3S1h3k1E/Screen%20Shot%202012-05-23%20at%209.02.56%20AM.png" title="'Our Basic Backbone Layout'" ></p>
+
+<h3>Composite Views</h3>
+
+<p>Well I&#8217;d like to center my views in the middle of the screen but moving each item individually is going to be pretty challenging. I think the better idea would be to wrap my views in a containing view which can then be easily centered on screen.</p>
+
+<p>Here&#8217;s what that looks like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Sections</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;sections&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">leftView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">middleView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">rightView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">leftView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Left</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">middleView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Middle</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">rightView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Right</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">leftView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">middleView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">rightView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// We should do this work with events instead of methods</span>
+</span><span class='line'>  <span class="nx">setInitialPosition</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">css</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Our Sections view is going to contain our 3 subordinate views. When it gets added to the DOM, <code>initialize</code> will run and create our subviews. I&#8217;ve also defined a method <code>setInitialPosition</code> which centers our view on screen. Tomorrow I&#8217;ll replace this with an event handler that fires whenever our element is added to the DOM. For now I&#8217;m too lazy to look up the supported events :D</p>
+
+<p>The sections view is absolutely positioned and it&#8217;s width and height are explicitly defined in the css. In the short term here&#8217;s how we&#8217;ve updated things:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nf">#sections</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">1000px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">50px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">left</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">#left-container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background</span><span class="o">:</span> <span class="m">#F00</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">left</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">#middle-container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background</span><span class="o">:</span> <span class="m">#0F0</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">left</span><span class="o">:</span> <span class="m">350px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">#right-container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background</span><span class="o">:</span> <span class="m">#00F</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">left</span><span class="o">:</span> <span class="m">700px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I wanted to give each view a 50px margin on each side so in the short term all these values are hard coded. I&#8217;ll think about how to make things more dynamic.</p>
+
+<p>Let&#8217;s listen to when the user clicks on a view. When we hear that we&#8217;ll animate the whole sections container over so that view is centered on screen.</p>
+
+<p>We&#8217;ll need to add an events hash to our Sections view. Since all of our children implement the same <code>.container</code> class we may as well listen for a click on that.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">events</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;click .container&quot;</span><span class="o">:</span>    <span class="s2">&quot;onChildClicked&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In our handler, <code>onChildClicked</code>, we&#8217;ll figure out which child was actually clicked and then animate ourselves accordingly. Don&#8217;t recoil in horror when you see this handler, it&#8217;s 11:25pm and I&#8217;m too lazy to make it properly dynamic. For now there&#8217;s magic numbers. Tomorrow we will clean that up :)</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Sections</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;sections&#39;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">leftView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">middleView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">rightView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">events</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;click .container&quot;</span><span class="o">:</span>    <span class="s2">&quot;onChildClicked&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">leftView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Left</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">middleView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Middle</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">rightView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Right</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">leftView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">middleView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">rightView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// We should do this work with events instead of methods</span>
+</span><span class='line'>  <span class="nx">setInitialPosition</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">css</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">});</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">onChildClicked</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">$target</span> <span class="o">=</span> <span class="nx">$e</span><span class="p">.</span><span class="nx">target</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">switch</span><span class="p">(</span><span class="nx">$e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// TODO: Clean out magic numbers</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;left-container&#39;</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">300</span> <span class="o">/</span> <span class="mi">2</span><span class="p">});</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;middle-container&#39;</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">});</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;right-container&#39;</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">+</span> <span class="mi">300</span> <span class="o">/</span> <span class="mi">2</span><span class="p">});</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Time: 7:57 am</li>
+<li>Mood: Laggy, Pensive</li>
+<li>Sleep: 5</li>
+<li>Hunger: 0</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[CSS3 Transitions with GFX]]></title>
@@ -4757,129 +5144,6 @@ Initially the test fails so now we need to update our <code>Crawler</code> to ch
 <h3>Conclusion</h3>
 
 <p>Now that we&#8217;ve got one scale under our belt the others should be pretty easy to digest. Over the next couple of posts we&#8217;ll focus on ordinal scales followed by time scales. Stay tuned and ping me if you have any questions. Thanks!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[D3 Basics: An Introduction To Scales]]></title>
-    <link href="http://robdodson.me/blog/2012/05/03/d3-basics-an-introduction-to-scales/"/>
-    <updated>2012-05-03T10:04:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/03/d3-basics-an-introduction-to-scales</id>
-    <content type="html"><![CDATA[<!-- CSS Styles: -->
-
-
-<div>
-  <style type="text/css">
-
-    .chart {
-      font-family: Arial, sans-serif;
-      font-size: 10px;
-    }
-
-    .bar {
-      fill: steelblue;
-    }
-
-    .axis path, .axis line {
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
-    }
-
-  </style>
-</div>
-
-
-
-
-<!-- Global Variables: -->
-
-
-<script type="text/javascript">
-
-  var data = [1, 1, 2, 3, 5, 8];
-
-  var margin = {top: 40, right: 40, bottom: 40, left: 40},
-      width = $('.entry-content').width(),
-      height = 300;
-
-  $(window).resize(function() {
-    width = $('.entry-content').width();
-  });
-
-</script>
-
-
-<p>After selections, scales are probably the most frequently used element in D3 because they faciliate such great control over data and screen space. I want to spend several posts documenting how scales work to help out anyone who is struggling with the concept. We&#8217;ll start with a high level overview of what a scale is in D3 and then explore the individual objects to learn their nuances.</p>
-
-<h3>What Are D3 Scales?</h3>
-
-<p>Essentially a scale is a convenience function for mapping input data to an output range, typically x/y positions or width/height. Scales can also be used to link data to arbitrary values like categories or days of the week, or to quantize data into &#8220;buckets&#8221;.</p>
-
-<p>There are two universal properties for any scale: the <code>domain</code> and the <code>range</code>. The <code>domain</code> serves as the input for your graph while the <code>range</code> represents the output.</p>
-
-<h4>Domain</h4>
-
-<p>Since the <code>domain</code> corresponds to our graph&#8217;s input it can be either <em>continuous</em> or <em>discrete</em>. You might think of a continous data set as any number from 1 to infinity while a discrete set would be every <code>Date</code> from January 1, 2012 to January 10, 2012. The takeaway is that continous data is essentially unbounded and discrete data is finite and easily quantified.</p>
-
-<h4>Range</h4>
-
-<p>The <code>range</code> defines the potential output that the scale can generate. Values from the domain are mapped to values in the range. Let&#8217;s look at two examples to help clarify.</p>
-
-<p>Say you have an <em>identity scale</em>, meaning whatever value you use for input will also be returned as the output. We&#8217;ll call the scale <code>x</code>. If <code>x</code> has an input <code>domain</code> of 0 - 100 and an output <code>range</code> of 0 - 100, then your <code>scale of 1</code> will be 1. Your <code>scale of 50</code> will be 50. Here&#8217;s another way to write it:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="c1">// returns 50</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now let&#8217;s change the scale a bit. Let&#8217;s say that <code>x</code> still has an input <code>domain</code> of 0 - 100 but now it has an output <code>range</code> of <code>0 - 10</code>. What do you think our <code>scale of 50</code> will return? &#8230; If you guessed 5 then you are the smart! Because we limited our potential output down to any number between 0 and 10 it narrowed the mapping from our <code>domain</code> to our <code>range</code>. Being able to expand or contract this mapping is the main value in using a D3 scale. If it&#8217;s still not quite sinking in check out this great visual from <a href="http://www.jeromecukier.net/">Jerome Cukier</a> (<a href="https://twitter.com/#!/jcukier">@jcukier</a>).</p>
-
-<p><img class="center" src="http://www.jeromecukier.net/wp-content/uploads/2011/08/d3scale1.png" title="'An example of how scales work'" ></p>
-
-<p>Jerome has <a href="http://www.jeromecukier.net/blog/2011/08/11/d3-scales-and-color/">an excelent blog post</a> covering scales in D3 which inspired me to write my own post. Definitely read his as well! I feel like a great way to learn something is to not only read about it a bunch but to write about it. Hearing different views on the same topic often helps me solidify a concept.</p>
-
-<h3>Class Work Time</h3>
-
-<!-- D3.js -->
-
-
-<script type='text/javascript'>
-
-var x = d3.scale.linear()
-    .domain([0, 100])
-    .range([0, 10]);
-
-</script>
-
-
-<p>I&#8217;ve included <code>d3</code> on the page so you can play around with it. Go ahead, bust open your developer tools or firebug and type <code>d3</code> into the console. It should return an Object full of methods.</p>
-
-<p>Let&#8217;s do some experiments with our <code>x</code> scale from earlier. Type the following to see what you get.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">25</span><span class="p">);</span>
-</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">99</span><span class="p">);</span>
-</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In D3 a scale is both a <code>Function</code> and an <code>Object</code>. You can invoke a scale by using parenthesis: <code>x(100)</code> or you can set a property to change its behavior: <code>x.range([0, 1000])</code>. Let&#8217;s try that! In the console type:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">.</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Our scale&#8217;s range used to be 0 - 10. Now that we&#8217;ve changed it to 0 - 1000, what do you think <code>x(100)</code> will equal? Keep in mind that 100 is the highest value in our domain. If you&#8217;re not sure try it in the console. Actually try it in the console regardless of how sure you are! The console is cool as shit!</p>
-
-<h3>To Be Continued&#8230;</h3>
-
-<p>Scales are a huge topic so we&#8217;ll stop here for now. In the next post we&#8217;ll talk about <code>linear</code>, <code>time</code> and <code>ordinal</code> scales; once you&#8217;ve mastered them everything else becomes a lot easier. Stay tuned :)</p>
 ]]></content>
   </entry>
   

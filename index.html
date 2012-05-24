@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="CSS3 is a rather verbose tool especially when it comes to transitions and animations. I want to see if there&#8217;s a way to clean a lot of that up &hellip;">
+  <meta name="description" content="I&#8217;m going to try to approach some of my future articles as more of a question/answer setup so they don&#8217;t turn into these sprawling &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,420 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/23/how-do-you-switch-between-views-in-backbone/">How Do You Switch Between Views in Backbone</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-23T07:56:00-07:00" pubdate data-updated="true">May 23<span>rd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&#8217;m going to try to approach some of my future articles as more of a question/answer setup so they don&#8217;t turn into these sprawling tutorials. Today I want to focus on moving between views in Backbone.js. I&#8217;m starting with some very simple templates and three views: LeftView, MiddleView, RightView. To do this quickly we&#8217;ll make it so each view is essentially a big button which, when clicked on, should animate to the middle of the screen.</p>
+
+<p>Here&#8217;s what one of my templates looks like:</p>
+
+<figure class='code'><figcaption><span>right.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;right-container&quot;</span> <span class="na">class=</span><span class="s">&quot;container&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  Everyone knows I&#39;m right.
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>One of the first thing I&#8217;m noticing is that all of my templates seem to be wrapped in an extra div. Since this extra div is block displayed I can&#8217;t get my items to line up next to each other&#8230; Oh! T<a href="http://stackoverflow.com/questions/7894253/backbone-js-turning-off-wrap-by-div-in-render">he problem is because I haven&#8217;t specified a tagName for my views.</a> I think I can actually do everything in the View declaration without needing a template.</p>
+
+<figure class='code'><figcaption><span>example.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Right</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;right-container&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;container&#39;</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That should create our view for us with the proper tag, class and id attributes. My containers are just colored squares so I don&#8217;t need to populate them with any content. If I did want to use this approach I could add more content like this:</p>
+
+<figure class='code'><figcaption><span>example.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Right</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;right-container&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;container&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s2">&quot;Hello World!&quot;</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here is our most basic <code>Router</code> showing how to add the views to stage. Since we aren&#8217;t using a template we can just call the regular render function and append the returned element to the DOM.</p>
+
+<figure class='code'><figcaption><span>main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">Router</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">routes</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;&quot;</span><span class="o">:</span> <span class="s2">&quot;index&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">index</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">leftView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Left</span><span class="p">();</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">middleView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Middle</span><span class="p">();</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">rightView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Right</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Attach the views to the DOM</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#main&quot;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">leftView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#main&quot;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">middleView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#main&quot;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">rightView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here are my very simple styles:</p>
+
+<figure class='code'><figcaption><span>style.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">margin-right</span><span class="o">:</span> <span class="m">50px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">#left-container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background</span><span class="o">:</span> <span class="m">#F00</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">#middle-container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background</span><span class="o">:</span> <span class="m">#0F0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">#right-container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background</span><span class="o">:</span> <span class="m">#00F</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We should now have a very simple horizontal layout.</p>
+
+<p><img class="center" src="http://f.cl.ly/items/173L112z0g2t3S1h3k1E/Screen%20Shot%202012-05-23%20at%209.02.56%20AM.png" title="'Our Basic Backbone Layout'" ></p>
+
+<h3>Composite Views</h3>
+
+<p>Well I&#8217;d like to center my views in the middle of the screen but moving each item individually is going to be pretty challenging. I think the better idea would be to wrap my views in a containing view which can then be easily centered on screen.</p>
+
+<p>Here&#8217;s what that looks like:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Sections</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;sections&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">leftView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">middleView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">rightView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">leftView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Left</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">middleView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Middle</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">rightView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Right</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">leftView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">middleView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">rightView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// We should do this work with events instead of methods</span>
+</span><span class='line'>  <span class="nx">setInitialPosition</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">css</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Our Sections view is going to contain our 3 subordinate views. When it gets added to the DOM, <code>initialize</code> will run and create our subviews. I&#8217;ve also defined a method <code>setInitialPosition</code> which centers our view on screen. Tomorrow I&#8217;ll replace this with an event handler that fires whenever our element is added to the DOM. For now I&#8217;m too lazy to look up the supported events :D</p>
+
+<p>The sections view is absolutely positioned and it&#8217;s width and height are explicitly defined in the css. In the short term here&#8217;s how we&#8217;ve updated things:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nf">#sections</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">1000px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">50px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">left</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">#left-container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background</span><span class="o">:</span> <span class="m">#F00</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">left</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">#middle-container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background</span><span class="o">:</span> <span class="m">#0F0</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">left</span><span class="o">:</span> <span class="m">350px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nf">#right-container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background</span><span class="o">:</span> <span class="m">#00F</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">left</span><span class="o">:</span> <span class="m">700px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I wanted to give each view a 50px margin on each side so in the short term all these values are hard coded. I&#8217;ll think about how to make things more dynamic.</p>
+
+<p>Let&#8217;s listen to when the user clicks on a view. When we hear that we&#8217;ll animate the whole sections container over so that view is centered on screen.</p>
+
+<p>We&#8217;ll need to add an events hash to our Sections view. Since all of our children implement the same <code>.container</code> class we may as well listen for a click on that.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">events</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;click .container&quot;</span><span class="o">:</span>    <span class="s2">&quot;onChildClicked&quot;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In our handler, <code>onChildClicked</code>, we&#8217;ll figure out which child was actually clicked and then animate ourselves accordingly. Don&#8217;t recoil in horror when you see this handler, it&#8217;s 11:25pm and I&#8217;m too lazy to make it properly dynamic. For now there&#8217;s magic numbers. Tomorrow we will clean that up :)</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Sections</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;sections&#39;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">leftView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">middleView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">rightView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">events</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;click .container&quot;</span><span class="o">:</span>    <span class="s2">&quot;onChildClicked&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">leftView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Left</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">middleView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Middle</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">rightView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Right</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">leftView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">middleView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">rightView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// We should do this work with events instead of methods</span>
+</span><span class='line'>  <span class="nx">setInitialPosition</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">css</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">});</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">onChildClicked</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">$target</span> <span class="o">=</span> <span class="nx">$e</span><span class="p">.</span><span class="nx">target</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">switch</span><span class="p">(</span><span class="nx">$e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// TODO: Clean out magic numbers</span>
+</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;left-container&#39;</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">300</span> <span class="o">/</span> <span class="mi">2</span><span class="p">});</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;middle-container&#39;</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">});</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;right-container&#39;</span><span class="o">:</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">+</span> <span class="mi">300</span> <span class="o">/</span> <span class="mi">2</span><span class="p">});</span>
+</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Time: 7:57 am</li>
+<li>Mood: Laggy, Pensive</li>
+<li>Sleep: 5</li>
+<li>Hunger: 0</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2156,449 +2570,6 @@ bear in mind that each module requires an http request to load it so you don&#82
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/">Object Oriented Scraper Backed With Tests Pt. 6</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-13T07:52:00-07:00" pubdate data-updated="true">May 13<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Yesterday we verified that our <code>Crawler</code> was able to hit a document and, given the right selector, pull down a list of words and their frequency on the page. We also created a custom exception to be used whenever the selector fails to pull down the right content. I&#8217;m going to repeat this process today with the <code>get_metadata_by_selector</code>. If there&#8217;s time we&#8217;ll try to output another file with our data, otherwise that&#8217;ll be tomorrow&#8217;s homeworkd :D</p>
-
-<p>Let&#8217;s take a moment to look at today&#8217;s metadata to figure out what we&#8217;d like our output to reflect.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>- Time: 8:03 am
-</span><span class='line'>- Mood: Happy, Drowsy, Peaceful
-</span><span class='line'>- Sleep: 5.5
-</span><span class='line'>- Hunger: 3
-</span><span class='line'>- Coffee: 0</span></code></pre></td></tr></table></div></figure>
-
-
-<p>That&#8217;s the actual markdown that goes into the editor but it gets converted into a <code>ul</code>. I don&#8217;t <em>think</em> you can pass a CSS class to markdown syntax otherwise I&#8217;d use one here. We could go back and wrap everything in regular HTML tags but since we know that our metadata is going to be the last ul per entry we&#8217;ll just use that knowledge to build our selector. Obviously a more robust solution would use a CSS class so that might be a good refactoring for the future.</p>
-
-<p>I figure for now we&#8217;ll just parse the metadata into a Hash that&#8217;ll look something like this:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>{
-</span><span class='line'>  datetime: 2012-05-13T08:03:00-07:00,
-</span><span class='line'>  mood: ['Happy', 'Drowsy', 'Peaceful'],
-</span><span class='line'>  sleep: 5.5,
-</span><span class='line'>  hunger: 3.0,
-</span><span class='line'>  coffee: 0.0
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In the final iteration we&#8217;ll toss all of our Metadata Hashes into an ordered Array so we can visualize them over time.</p>
-
-<h3>Red, Green, Refactor</h3>
-
-<p>Ok, time for a failing test. Let&#8217;s make sure that our selector pulls something down and if it doesn&#8217;t we should raise the custom <code>SelectionError</code> we defined yesterday. I&#8217;m already seeing some repetitive code in our Crawler so I&#8217;m refactoring it. Where we need to get a group of XML nodes from the document via selector I&#8217;ve created a private helper called <code>nodes_by_selector</code>. This is also where we&#8217;ll raise our exception if nothing came back. I&#8217;m also cleaning up some of the word cruff from our public API so instead of <code>get_words_by_selector</code> it&#8217;s not just <code>words_by_selector</code>. The same goes for our metadata method.</p>
-
-<figure class='code'><figcaption><span>tentacles/lib/tentacles/crawler_rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;open-uri&#39;</span>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;nokogiri&#39;</span>
-</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;selection_error&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Crawler</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:doc</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
-</span><span class='line'>      <span class="kp">new</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
-</span><span class='line'>      <span class="vi">@uri</span> <span class="o">=</span> <span class="n">uri</span>
-</span><span class='line'>      <span class="vi">@doc</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="vi">@uri</span><span class="p">))</span>
-</span><span class='line'>      <span class="vi">@counts</span> <span class="o">=</span> <span class="no">Hash</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">words_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">nodes</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">node</span><span class="o">|</span>
-</span><span class='line'>        <span class="n">words</span> <span class="o">=</span> <span class="n">words_from_string</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">count_frequency</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="n">sorted</span> <span class="o">=</span> <span class="vi">@counts</span><span class="o">.</span><span class="n">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="n">count</span> <span class="p">}</span>
-</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">reverse!</span>
-</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">word</span><span class="si">}</span><span class="s2">: </span><span class="si">#{</span><span class="n">count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">metadata_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kp">private</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">nodes</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">raise</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span>
-</span><span class='line'>        <span class="s1">&#39;The selector did not return an results!&#39;</span> <span class="k">if</span> <span class="n">nodes</span><span class="o">.</span><span class="n">empty?</span>
-</span><span class='line'>      <span class="n">nodes</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">words_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">string</span><span class="o">.</span><span class="n">downcase</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="sr">/[\w&#39;]+/</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">count_frequency</span><span class="p">(</span><span class="n">word_list</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">for</span> <span class="n">word</span> <span class="k">in</span> <span class="n">word_list</span>
-</span><span class='line'>        <span class="vi">@counts</span><span class="o">[</span><span class="n">word</span><span class="o">]</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>      <span class="vi">@counts</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Going back to the tests we need to refactor a bit for any place that&#8217;s been broken. Immediately I saw that my <code>nodes_by_selector</code> method was not initially returning the nodes so I added that back in. The tests brought that to my attention before I had to do any potentially painful debugging. Beyond that we just need to fix up our method names:</p>
-
-<figure class='code'><figcaption><span>tentacles/spec/crawler_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;../lib/tentacles/crawler&#39;</span>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;fakeweb&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">describe</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span> <span class="k">do</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">before</span> <span class="k">do</span>
-</span><span class='line'>    <span class="c1"># Create a mock options object</span>
-</span><span class='line'>    <span class="vi">@options</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>      <span class="n">uri</span><span class="p">:</span> <span class="s1">&#39;http://robdodson.me&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="n">post_selector</span><span class="p">:</span> <span class="s1">&#39;.entry-content&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="n">metadata_selector</span><span class="p">:</span> <span class="s1">&#39;.personal-metadata&#39;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># Create a mock web request</span>
-</span><span class='line'>    <span class="no">FakeWeb</span><span class="o">.</span><span class="n">register_uri</span><span class="p">(</span><span class="ss">:get</span><span class="p">,</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">,</span>
-</span><span class='line'>                         <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="s1">&#39;&lt;div class=&quot;&#39;</span> <span class="o">+</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">].</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">+</span>
-</span><span class='line'>                         <span class="s1">&#39;&quot;&gt;Hello Hello Hello World World Foobar!&lt;/div&gt;&#39;</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;constructors&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">describe</span> <span class="s2">&quot;#from_uri&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should respond&quot;</span> <span class="k">do</span>
-</span><span class='line'>        <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:from_uri</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should return an instance&quot;</span> <span class="k">do</span>
-</span><span class='line'>        <span class="n">crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">crawler</span><span class="o">.</span><span class="n">should</span> <span class="n">be_an_instance_of</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;instances&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">before</span> <span class="k">do</span>
-</span><span class='line'>      <span class="vi">@crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">subject</span> <span class="p">{</span> <span class="vi">@crawler</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:words_by_selector</span><span class="p">)</span> <span class="p">}</span>
-</span><span class='line'>    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:metadata_by_selector</span><span class="p">)</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;post-construct&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should have the right document&quot;</span> <span class="k">do</span>
-</span><span class='line'>        <span class="vi">@crawler</span><span class="o">.</span><span class="n">doc</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">should</span> <span class="o">=~</span> <span class="sr">/Hello Hello Hello World World Foobar!/</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">describe</span> <span class="s2">&quot;#words_by_selector&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should produce an Array of keywords&quot;</span> <span class="k">do</span>
-</span><span class='line'>        <span class="n">expected_array</span> <span class="o">=</span> <span class="o">[</span><span class="s1">&#39;hello: 3&#39;</span><span class="p">,</span> <span class="s1">&#39;world: 2&#39;</span><span class="p">,</span> <span class="s1">&#39;foobar: 1&#39;</span><span class="o">]</span>
-</span><span class='line'>        <span class="n">actual_array</span> <span class="o">=</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">words_by_selector</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">]</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">actual_array</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="n">expected_array</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should raise an exception if nothing was returned&quot;</span> <span class="k">do</span>
-</span><span class='line'>        <span class="n">expect</span> <span class="p">{</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">words_by_selector</span><span class="p">(</span><span class="s1">&#39;some-gibberish-selector&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span> <span class="s1">&#39;The selector did not return an results!&#39;</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">describe</span> <span class="s2">&quot;#metadata_by_selector&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should raise an exception if nothing was returned&quot;</span> <span class="k">do</span>
-</span><span class='line'>        <span class="n">expect</span> <span class="p">{</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">metadata_by_selector</span><span class="p">(</span><span class="s1">&#39;some-gibberish-selector&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span> <span class="s1">&#39;The selector did not return an results!&#39;</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We&#8217;ve got a duplicate test in there where both <code>#words_by_selector</code> and <code>#metadata_by_selector</code> are checking that they both raise an exception if nothing comes down. Let&#8217;s see if we can refactor those into an RSpec shared example. I&#8217;m not sure if this is a best practice or not but here&#8217;s my implementation:</p>
-
-<figure class='code'><figcaption><span>tentacles/spec/crawler_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">shared_examples_for</span> <span class="s2">&quot;all selector methods&quot;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;when selection has no nodes&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an exception&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">selector_method</span><span class="p">,</span> <span class="s1">&#39;some-gibberish-selector&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span> <span class="s1">&#39;The selector did not return an results!&#39;</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">### ...</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">describe</span> <span class="s2">&quot;#words_by_selector&quot;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">it_behaves_like</span> <span class="s2">&quot;all selector methods&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">let</span><span class="p">(</span><span class="ss">:selector_method</span><span class="p">)</span> <span class="p">{</span> <span class="ss">:words_by_selector</span> <span class="p">}</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># ...</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">describe</span> <span class="s2">&quot;#metadata_by_selector&quot;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">it_behaves_like</span> <span class="s2">&quot;all selector methods&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">let</span><span class="p">(</span><span class="ss">:selector_method</span><span class="p">)</span> <span class="p">{</span> <span class="ss">:metadata_by_selector</span> <span class="p">}</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Basically we&#8217;re putting our method name as a symbol into a variable using <code>let</code> and then calling that method in the shared_examples_for block. Notice how we&#8217;re using <code>@crawler.send(selector_method, ...)</code>? In this case <code>selector_method</code> refers to our method name symbol.</p>
-
-<p>If you run this in RSpec&#8217;s nested mode it looks pretty cool:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span>
-</span><span class='line'>  <span class="n">constructors</span>
-</span><span class='line'>    <span class="c1">#from_uri</span>
-</span><span class='line'>      <span class="n">should</span> <span class="n">respond</span>
-</span><span class='line'>      <span class="n">should</span> <span class="k">return</span> <span class="n">an</span> <span class="n">instance</span>
-</span><span class='line'>  <span class="n">instances</span>
-</span><span class='line'>    <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#words_by_selector</span>
-</span><span class='line'>    <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#metadata_by_selector</span>
-</span><span class='line'>    <span class="n">post</span><span class="o">-</span><span class="n">construct</span>
-</span><span class='line'>      <span class="n">should</span> <span class="n">have</span> <span class="n">the</span> <span class="n">right</span> <span class="n">document</span>
-</span><span class='line'>    <span class="c1">#words_by_selector</span>
-</span><span class='line'>      <span class="n">should</span> <span class="n">produce</span> <span class="n">an</span> <span class="nb">Array</span> <span class="n">of</span> <span class="n">keywords</span>
-</span><span class='line'>      <span class="n">behaves</span> <span class="n">like</span> <span class="n">all</span> <span class="n">selector</span> <span class="nb">methods</span>
-</span><span class='line'>        <span class="k">when</span> <span class="n">selection</span> <span class="n">has</span> <span class="n">no</span> <span class="n">nodes</span>
-</span><span class='line'>          <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="n">exception</span>
-</span><span class='line'>    <span class="c1">#metadata_by_selector</span>
-</span><span class='line'>      <span class="n">behaves</span> <span class="n">like</span> <span class="n">all</span> <span class="n">selector</span> <span class="nb">methods</span>
-</span><span class='line'>        <span class="k">when</span> <span class="n">selection</span> <span class="n">has</span> <span class="n">no</span> <span class="n">nodes</span>
-</span><span class='line'>          <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="n">exception</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Ok, so we know that all of our selector methods raise the proper exception if they are called with a bunk selector. Now let&#8217;s make sure we can get our metadata downloaded and structured.</p>
-
-<p>Unfortunately I&#8217;m realizing that if the <code>ul</code> for our metadata is part of the post then those words get counted along with everything else, which is not what I want. I need to figure out how to exclude that content&#8230;</p>
-
-<p>I could either tell my crawler to explicitly ignore that content or wrap my blog entry in an even more specific class and just select that. I guess that&#8217;ll be an exercise for tomorrow :\</p>
-
-<ul>
-<li>Time: 8:03 am</li>
-<li>Mood: Happy, Drowsy, Peaceful</li>
-<li>Sleep: 5.5</li>
-<li>Hunger: 3</li>
-<li>Coffee: 0</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -2614,6 +2585,10 @@ bear in mind that each module requires an http request to load it so you don&#82
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/05/23/how-do-you-switch-between-views-in-backbone/">How do you switch between views in Backbone</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/05/22/css3-transitions-and-animations-with-sass/">CSS3 Transitions with GFX</a>
       </li>
     
@@ -2627,10 +2602,6 @@ bear in mind that each module requires an http request to load it so you don&#82
     
       <li class="post">
         <a href="/blog/2012/05/19/my-first-chain/">My First Chain</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/18/backbone-boilerplate-playing-with-require-dot-js/">Backbone Boilerplate: Playing with Require.js</a>
       </li>
     
   </ul>
