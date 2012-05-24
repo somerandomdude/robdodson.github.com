@@ -379,7 +379,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>In our handler, <code>onChildClicked</code>, we&#8217;ll figure out which child was actually clicked and then animate ourselves accordingly. Don&#8217;t recoil in horror when you see this handler, it&#8217;s 11:25pm and I&#8217;m too lazy to make it properly dynamic. For now there&#8217;s magic numbers. Tomorrow we will clean that up :)</p>
+<p>In our handler, <code>onChildClicked</code>, we&#8217;ll figure out which child was actually clicked and then animate ourselves accordingly. Here&#8217;s the entire object for your reference with the handler at the bottom.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -426,6 +426,14 @@
 <span class='line-number'>43</span>
 <span class='line-number'>44</span>
 <span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
 </pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Sections</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
 </span><span class='line'>  <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
 </span><span class='line'>  <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;sections&#39;</span><span class="p">,</span>
@@ -453,23 +461,31 @@
 </span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">css</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">});</span>
 </span><span class='line'>  <span class="p">},</span>
 </span><span class='line'>
+</span><span class='line'>  <span class="c1">// Whenever a child is clicked let&#39;s animate so it is</span>
+</span><span class='line'>  <span class="c1">// centered on screen</span>
 </span><span class='line'>  <span class="nx">onChildClicked</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">$target</span> <span class="o">=</span> <span class="nx">$e</span><span class="p">.</span><span class="nx">target</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">switch</span><span class="p">(</span><span class="nx">$e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="c1">// TODO: Clean out magic numbers</span>
-</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;left-container&#39;</span><span class="o">:</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">300</span> <span class="o">/</span> <span class="mi">2</span><span class="p">});</span>
-</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">$target</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">$e</span><span class="p">.</span><span class="nx">target</span><span class="p">);</span>
 </span><span class='line'>
-</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;middle-container&#39;</span><span class="o">:</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">});</span>
-</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">switch</span><span class="p">(</span><span class="nx">$e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">case</span> <span class="s1">&#39;left-container&#39;</span><span class="o">:</span>
+</span><span class='line'>          <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span>
+</span><span class='line'>            <span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="nx">$target</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span class='line'>          <span class="p">});</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
 </span><span class='line'>
-</span><span class='line'>      <span class="k">case</span> <span class="s1">&#39;right-container&#39;</span><span class="o">:</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">+</span> <span class="mi">300</span> <span class="o">/</span> <span class="mi">2</span><span class="p">});</span>
-</span><span class='line'>        <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">case</span> <span class="s1">&#39;middle-container&#39;</span><span class="o">:</span>
+</span><span class='line'>          <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span>
+</span><span class='line'>            <span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span class='line'>          <span class="p">});</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">case</span> <span class="s1">&#39;right-container&#39;</span><span class="o">:</span>
+</span><span class='line'>          <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span>
+</span><span class='line'>            <span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">+</span> <span class="nx">$target</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span class='line'>          <span class="p">});</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
 </span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
 </span><span class='line'><span class="p">});</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -534,8 +550,6 @@
         <a class="basic-alignment left" href="/blog/2012/05/22/css3-transitions-and-animations-with-sass/" title="Previous Post: CSS3 Transitions with GFX">&laquo; CSS3 Transitions with GFX</a>
       
       
-        <a class="basic-alignment right" href="/blog/2012/05/24/backbone-events-between-views/" title="Next Post: Backbone Events Between Views">Backbone Events Between Views &raquo;</a>
-      
     </p>
   </footer>
 </article>
@@ -555,10 +569,6 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2012/05/24/backbone-events-between-views/">Backbone Events Between Views</a>
-      </li>
-    
-      <li class="post">
         <a href="/blog/2012/05/23/how-do-you-switch-between-views-in-backbone/">How do you switch between views in Backbone</a>
       </li>
     
@@ -572,6 +582,10 @@
     
       <li class="post">
         <a href="/blog/2012/05/20/some-more-backbone-dot-js-basics/">Some More Backbone.js Basics</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/19/my-first-chain/">My First Chain</a>
       </li>
     
   </ul>
