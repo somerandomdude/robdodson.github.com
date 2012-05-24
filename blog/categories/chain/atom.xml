@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-23T23:27:52-07:00</updated>
+  <updated>2012-05-24T07:35:09-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -55,7 +55,8 @@ Example.Views.Right = Backbone.View.extend({
 
 <p>  }
 });
-```</p>
+```
+Or I could render a template. Again for our purposes we just want to move some colored blocks around so the first approach is sufficient.</p>
 
 <p>Here is our most basic <code>Router</code> showing how to add the views to stage. Since we aren't using a template we can just call the regular render function and append the returned element to the DOM.</p>
 
@@ -524,7 +525,9 @@ namespace.app.router.navigate('whatever');
 Backbone.history.start({ pushState: true });
 </code></p>
 
-<p>This lets you create routes that look like this: <code>mysite.com/search/foobar</code> instead of using a hash <code>mysite.com/#search/foobar</code>. The only problem is that for HTML5 History pushState to work your server has to keep resolving to index.html. The boilerplate tutorial says to use <code>node build/server</code> to run your project server, even though elsewhere it says to use <code>bbb server</code>. Neither works so I've <a href="https://github.com/backbone-boilerplate/grunt-bbb/issues/21">logged an issue on Github.</a> Very possible I'm doing it wrong but we'll see. For now I'm not use pushState so I changed the line in main.js to read <code>Backbone.history.start()</code> and instead I'm using the hash approach.</p>
+<p><s>This lets you create routes that look like this: <code>mysite.com/search/foobar</code> instead of using a hash <code>mysite.com/#search/foobar</code>. The only problem is that for HTML5 History pushState to work your server has to keep resolving to index.html. The boilerplate tutorial says to use <code>node build/server</code> to run your project server, even though elsewhere it says to use <code>bbb server</code>. Neither works so I've <a href="https://github.com/backbone-boilerplate/grunt-bbb/issues/21">logged an issue on Github.</a> Very possible I'm doing it wrong but we'll see. For now I'm not using pushState so I changed the line in main.js to read <code>Backbone.history.start()</code> and instead I'm using the hash approach.</s></p>
+
+<p><em>UPDATE: Turns out there was a bug in the Backbone Boilerplate, make sure in your index.html file that the data-main attribute starts from the root of the site, like so: <code>data-main="/app/config"</code>. Also make sure to use bbb server as node build/server is deprecated.</em></p>
 
 <ul>
 <li>Time: 7:59 am</li>
