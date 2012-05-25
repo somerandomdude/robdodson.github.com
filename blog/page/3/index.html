@@ -81,6 +81,315 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2012/05/04/d3-basics-the-linear-scale/">D3 Basics: The Linear Scale</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-04T07:21:00-07:00" pubdate data-updated="true">May 4<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><!-- CSS Styles: -->
+
+
+<div>
+  <style type="text/css">
+
+    .chart {
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+    }
+
+    .bar {
+      fill: steelblue;
+    }
+
+    .axis path, .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+    .label {
+      font-size: 12 px;
+      fill: #FFF;
+    }
+
+    .point {
+      stroke: #666;
+      fill: red;
+    }
+
+  </style>
+</div>
+
+
+<p>In <a href="http://localhost:4000/blog/2012/05/03/d3-basics-an-introduction-to-scales/">the last post</a> we did a basic introduction to the concept of scales in <a href="http://d3js.org/">D3.js</a>. Today we&#8217;ll look at our first scale and write some code to visualize it.</p>
+
+<h3>Linear Scales</h3>
+
+<p>The most basic scale in D3 is the <code>linear scale</code> which maps a continous <code>domain</code> to an output range. To define a linear domain we&#8217;ll need to first come up with a data set. Fibonacci numbers work well, so let&#8217;s declare a variable <code>data</code> like so:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">];</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The data set will represent our scale&#8217;s input domain. The next step is defining an output range. Since we&#8217;re going to be graphing these numbers we want our range to represent screen coordinates. Let&#8217;s go ahead and declare a <code>width</code> and a <code>height</code> variable and set them to 320 by 150.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="mi">320</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">height</span> <span class="o">=</span> <span class="mi">150</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We now have everything we need to create our first scale.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scale</span><span class="p">.</span><span class="nx">linear</span><span class="p">()</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">data</span><span class="p">)])</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">width</span><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>D3 methods often return a value of <code>self</code> meaning you can chain method calls onto one another. If you&#8217;re used to jQuery this should be a common idiom for you. You&#8217;ll notice that both the domain and the range functions accept arrays as parameters. Typically the domain only receives two values, the minimum and maximum of our data set. Likewise the range will be given the minimum and maximum of our output space. You could pass in multiple values to create a polylinear scale but that&#8217;s outside the scope of our dicussion today.</p>
+
+<p>In the domain function we&#8217;re using a helper called <code>d3.max</code>. Similar to <code>Math.max</code>, it looks at our data set and figures out what is the largest value. While <code>Math.max</code> only works on two numbers, <code>d3.max</code> will iterate over an entire <code>Array</code> for us.</p>
+
+<p>If you&#8217;ve been following along in your own file you should be able to open your console and type <code>x(8)</code> to get 300.</p>
+
+<p>With just this information alone we have enough to build our first graph.</p>
+
+<!-- D3.js Chart -->
+
+
+<p><small>Fibonacci Sequence Chart 1.0</small></p>
+
+<div id="linear-scale-chart-1"></div>
+
+
+<script type='text/javascript'>
+(function() {
+
+  var data = [1, 1, 2, 3, 5, 8];
+  var width = 320
+      height = 150;
+
+  var x = d3.scale.linear()
+          .domain([0, d3.max(data)])
+          .range([0, width]);
+
+  var svg = d3.select('#linear-scale-chart-1').append('svg')
+          .attr('width', width)
+          .attr('height', height)
+          .attr('class', 'chart');
+
+  svg.selectAll('.chart')
+          .data(data)
+        .enter().append('rect')
+          .attr('class', 'bar')
+          //.attr('y', function(d, i) { return i * 20 })
+          .attr('y', function(d, i) { return i * 20; })
+          .attr('width', function(d) { return x(d); })
+          .attr('height', 15);
+
+})();
+</script>
+
+
+
+
+<figure class='code'><figcaption><span>JavaScript</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">];</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="mi">320</span>
+</span><span class='line'>    <span class="nx">height</span> <span class="o">=</span> <span class="mi">150</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scale</span><span class="p">.</span><span class="nx">linear</span><span class="p">()</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">data</span><span class="p">)])</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">width</span><span class="p">]);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">svg</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;svg&#39;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="nx">width</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;chart&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">svg</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="s1">&#39;.chart&#39;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">.</span><span class="nx">enter</span><span class="p">().</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;rect&#39;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">20</span> <span class="p">})</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">x</span><span class="p">(</span><span class="nx">d</span><span class="p">);</span> <span class="p">})</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="mi">15</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>CSS</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.chart</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">font-family</span><span class="o">:</span> <span class="n">Arial</span><span class="o">,</span> <span class="k">sans-serif</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">font-size</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.bar</span> <span class="p">{</span>
+</span><span class='line'>  <span class="n">fill</span><span class="o">:</span> <span class="nb">steelblue</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Break It Down</h3>
+
+<p>Let&#8217;s go through the JavaScript piece by piece to outline what happened.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">];</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="mi">320</span>
+</span><span class='line'>    <span class="nx">height</span> <span class="o">=</span> <span class="mi">150</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scale</span><span class="p">.</span><span class="nx">linear</span><span class="p">()</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">data</span><span class="p">)])</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">width</span><span class="p">]);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The first block should be pretty familar at this point. We&#8217;ve declared our Fibonacci data, our explicit width and height and defined our scale. Nothing new here.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">svg</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;svg&#39;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="nx">width</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;chart&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In the next section we&#8217;re declaring our <code>SVG</code> element. We use a D3 selection to grab the <code>body</code> tag and we append an <code>svg</code> tag onto it. Since D3 uses method-chaining we can keep assigning attributes to our SVG element. We declare the width and the height to match the explicit values set earlier and finally we give it a class name of <code>chart</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">svg</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="s1">&#39;.chart&#39;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">.</span><span class="nx">enter</span><span class="p">().</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;rect&#39;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">20</span> <span class="p">})</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">x</span><span class="p">(</span><span class="nx">d</span><span class="p">);</span> <span class="p">})</span>
+</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="mi">15</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This last section is where it all ties together. Since we stored our SVG element in a variable called <code>svg</code> we&#8217;re able to easily reference it again. We instruct D3 to create a <code>join</code> by calling the <code>data</code> method and passing in our <code>Array</code> of values. When D3 performs a join it steps through each element in the array and attempts to match it to a figure that already exists on the page. If nothing exists it will call the <code>enter</code> function. At this point it steps through the array again, passing the values to us so we can define new shapes. <a href="http://bost.ocks.org/mike/join/">For a much more in-depth explanation of joins refer back to this article.</a></p>
+
+<p>In our case we&#8217;re appending SVG <code>Rects</code> but it could just as easily be circles or other shapes. We give each rect a class of <code>bar</code> so we can style it with CSS. When we declare the <code>y</code> attribute instead of using an explicit value we create an <code>accessor</code>, a little helper function which takes a piece of data and an optional index as its arguments. In this case <code>d</code> will equal subsequent elements in our data array and <code>i</code> will equal their indices. For a much clearer picture of what&#8217;s happening you can change it to read:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;d = data[&#39;</span> <span class="o">+</span> <span class="nx">i</span> <span class="o">+</span> <span class="s1">&#39;] = &#39;</span><span class="p">,</span> <span class="nx">d</span><span class="p">);</span> <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">20</span> <span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>which will give you the following output.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">d</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="nx">d</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="nx">d</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+</span><span class='line'><span class="nx">d</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
+</span><span class='line'><span class="nx">d</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
+</span><span class='line'><span class="nx">d</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since we&#8217;re just trying to space out our bars along the y-axis we don&#8217;t really care about the value of <code>d</code>. Instead we&#8217;ll use the index, <code>i</code>, to offset each bar by a value of i * 20.</p>
+
+<p>In the last two lines we&#8217;re going to finally use our linear scale to define our bar&#8217;s width. Here they are again as a refresher.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">x</span><span class="p">(</span><span class="nx">d</span><span class="p">);</span> <span class="p">})</span>
+</span><span class='line'><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="mi">15</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As each element of the array is passed to our width accessor it&#8217;s run through the scale and the output returned. Since 8 is our maximum value it should extend all the way to the end of our range.</p>
+
+<p>The final call is just an explicit height for each bar. Depending on the scale this bit can be automated but for simplicity sake we&#8217;ll just use a hard coded value so we can get something on screen.</p>
+
+<h3>Conclusion</h3>
+
+<p>Now that we&#8217;ve got one scale under our belt the others should be pretty easy to digest. Over the next couple of posts we&#8217;ll focus on ordinal scales followed by time scales. Stay tuned and ping me if you have any questions. Thanks!</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2012/05/03/d3-basics-an-introduction-to-scales/">D3 Basics: An Introduction to Scales</a></h1>
     
     
@@ -1923,60 +2232,9 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/09/20/nomethoderror-in-rails-3/">NoMethodError in Rails 3</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-09-20T07:33:00-07:00" pubdate data-updated="true">Sep 20<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Coming from Actionscript 3 I’m pretty used to all of the different errors that the Flash compiler and runtime typically throw at me. But now that I’ve started teaching myself Ruby on Rails 3 I’m having to learn a whole new lexicon of messages which generally amount to “Something blow’d up..”</p>
-
-<p>For my own benefit, and hopefully for the benefit of others, I’m going to post the errors and solutions that I come up with. Hopefully since I’m a total newbie, explaining things from my perspective will help other people who are new to the language as well.</p>
-
-<p>To start of we have the <code>NoMethodError</code>.
-<img class="center" src="/images/no_method_error.jpg" title="'NoMethodError'" ></p>
-
-<p>You get a <code>NoMethodError</code> when you try to call a method which either doesn’t exist on an Object, or the Object itself doesn’t exist. Since <code>Nil</code> is actually an object in Ruby (it’s an instance of <code>NilClass</code>) this error can sometimes be a bit misleading (especially if you come from a language where Nil or Null is represented by a primitive or a data type like in Actionscript 3).</p>
-
-<p>The real reason this occurs is either because the Object itself is Nil (and you probably didn’t intend that) or you forgot to define the method on your Object. In Flash you would get an error saying you can’t call a method on a null object reference, since null is just a primitive data type. But in Ruby, it says that the method you wanted didn’t exist because you called it on an ACTUAL NilClass object and NilClass doesn&#8217;t define whatever method name you passed.</p>
-
-<h3>Resolution</h3>
-
-<ol>
-<li><p>If your error says “undefined method ‘some_method_name’ for NilClass:Class” (like it does in the picture) then you’ve accidentally tried to call a method on an Object which doesn’t really exist. You probably just didn’t pass or instantiate the Object properly.</p></li>
-<li><p>If you see the correct class type in the error then you’ve just failed to declare that method or perhaps mistyped its name. Verify that the method exists in the class and that you don’t have any spelling errors :)</p></li>
-</ol>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/blog/page/4/">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -1999,15 +2257,15 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
       </li>
     
       <li class="post">
+        <a href="/blog/2012/05/22/css3-transitions-with-gfx/">CSS3 Transitions with GFX</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/05/21/exploring-the-backbone-router-and-history-api/">Exploring the Backbone Router and History API</a>
       </li>
     
       <li class="post">
         <a href="/blog/2012/05/20/some-more-backbone-dot-js-basics/">Some More Backbone.js Basics</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/19/my-first-chain/">My First Chain</a>
       </li>
     
   </ul>
