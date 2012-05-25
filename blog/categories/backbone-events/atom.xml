@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Backbone Events | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/backbone-events/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-24T23:45:02-07:00</updated>
+  <updated>2012-05-25T09:15:51-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,146 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Backbone Events: Framework Communication]]></title>
+    <link href="http://robdodson.me/blog/2012/05/25/backbone-events-framework-communication/"/>
+    <updated>2012-05-25T08:01:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/25/backbone-events-framework-communication</id>
+    <content type="html"><![CDATA[<p>I want to figure out how to communicate on a framework level within Backbone. Coming from Flash and <a href="http://www.robotlegs.org/">RobotLegs</a> I'm used to a few MVC conventions that work very well as far as event dispatching goes. In RobotLegs you typically have a framework wide eventDispatcher that anyone can tune into. In a nutshell your View will trigger an event, for instance a user clicking a button, and that will get dispatched to interested framework actors. These can be other Views or, more likely, they can be Commands. The Commands are like single use actions tied directly to events. Think of it like binding every public method of your controller to an event. The Commands will typically effect models, changing them in some way, and the Models will dispatch an event that the Views listen for to update themselves.</p>
+
+<p>Backbone works differently in that Views are often tied directly to their models like so:</p>
+
+<p>``` js
+var doc = Documents.first(); // &lt;-- Model object</p>
+
+<p>new DocumentRow({ // &lt;-- View object with model reference
+  model: doc,
+  id: "document-row-" + doc.id
+});
+```</p>
+
+<p>When you use this approach it's trivial to tell the view to listen to the model's change event and then call <code>view.render()</code>. Essentially you are munging some of a Controller's responsibilities into the View. That's all well and good but let's say we want to dispatch an event from one view which will affect other views and actors. This event has nothing to do with a model, maybe it's just an animation of some kind that others need to know about. So how do we go about this?</p>
+
+<h3>Communicating between Views in Backbone</h3>
+
+<p>To facilitate this communication we're going to use the <code>app</code> object that Backbone Boilerplate creates for us. If you look in the <code>namespace.js</code> file that comes with the boilerplate you should see a line like this way down at the bottom:</p>
+
+<p><code>js namespace.js
+app: _.extend({}, Backbone.Events)
+</code>
+If you're not familiar with <a href="http://underscorejs.org/#extend">Underscore.js's extend method</a> it basically takes all of the properties and functions of one object and copies them onto another. If you're coming from a language that supports classical inheritence this should feel familiar. In the above example it's creating a new empty object (app), and extending/inheriting from the Backbone.Events object. This means that the <code>app</code> property of the <code>namespace</code> module is basically one big event dispatcher.</p>
+
+<p>So let's create two very simple views in a module called <code>Chatty</code>. One will be <code>Subject</code> and the other <code>Observer</code>. When we click the Subject we want it to dispatch an event that any framework actor can tune into. We'll call this event <code>clicked:subject</code>. When the Observer hears the <code>clicked:subject</code> event we want it to replace its html content with whatever message is sent along.</p>
+
+<p>``` js chatty.js
+define([
+  "namespace", // &lt;-- see I'm bringing in the namespace module</p>
+
+<p>  // Libs
+  "use!backbone"</p>
+
+<p>  // Modules</p>
+
+<p>  // Plugins</p>
+
+<p>],</p>
+
+<p>function(namespace, Backbone) { // &lt;-- make sure to pass namespace as an argument</p>
+
+<p>  // Create a new module
+  var Chatty = namespace.module();</p>
+
+<p>  Chatty.Views.Subject = Backbone.View.extend({</p>
+
+<pre><code>tagName: 'div',
+className: 'subject',
+events: {
+  'click': 'onClick'
+},
+initialize: function() {
+  this.render();
+  this.$el.html("I'm the Subject. Everyone listen up!");
+},
+onClick: function(e) {
+  namespace.app.trigger('clicked:subject', 'watch it, buster!'); // &lt;-- trigger a framework event
+}
+</code></pre>
+
+<p>  });</p>
+
+<p>  Chatty.Views.Observer = Backbone.View.extend({</p>
+
+<pre><code>tagName: 'div',
+className: 'observer',
+initialize: function() {
+  this.render();
+  this.$el.html("I'm the Observer. Quietly waiting...");
+
+  namespace.app.on('clicked:subject', this.onSubjectClicked, this); &lt;-- listen for framework events
+},
+onSubjectClicked: function(message) {
+  this.$el.html("I heard the Subject say... " + message);
+}
+</code></pre>
+
+<p>  });</p>
+
+<p>  // Required, return the module for AMD compliance
+  return Chatty;</p>
+
+<p>});
+```</p>
+
+<p>In our main.js file we're just going to append those two views to the DOM whenever someone hits our route:</p>
+
+<p>``` js main.js
+require([
+  "namespace",</p>
+
+<p>  // Libs
+  "jquery",
+  "use!backbone",</p>
+
+<p>  // Modules
+  "modules/chatty"
+],</p>
+
+<p>function(namespace, $, Backbone, Chatty) {</p>
+
+<p>  // Defining the application router, you can attach sub routers here.
+  var Router = Backbone.Router.extend({</p>
+
+<pre><code>routes: {
+  "chatty": "chatty"
+},
+
+chatty: function() {
+  var subject = new Chatty.Views.Subject();
+  var observer = new Chatty.Views.Observer();
+  $("#main").append(subject.el);
+  $("#main").append(observer.el);
+}
+</code></pre>
+
+<p>  });</p>
+
+<p>  ...
+```</p>
+
+<p>And there you have it. When we click on <code>Subject</code> it should replace the content in <code>Observer</code> like so:
+<img class="center" src="/images/subject_observer.png" title="'The Observer hears the Subject'" ></p>
+
+<ul>
+<li>Time: 8:02 am</li>
+<li>Mood: Excited, Rested</li>
+<li>Sleep: 6</li>
+<li>Hunger: 4</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Backbone Events: Adding Views to the DOM]]></title>

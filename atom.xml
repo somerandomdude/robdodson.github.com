@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-24T23:45:02-07:00</updated>
+  <updated>2012-05-25T09:15:51-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,223 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Backbone Events: Framework Communication]]></title>
+    <link href="http://robdodson.me/blog/2012/05/25/backbone-events-framework-communication/"/>
+    <updated>2012-05-25T08:01:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/25/backbone-events-framework-communication</id>
+    <content type="html"><![CDATA[<p>I want to figure out how to communicate on a framework level within Backbone. Coming from Flash and <a href="http://www.robotlegs.org/">RobotLegs</a> I&#8217;m used to a few MVC conventions that work very well as far as event dispatching goes. In RobotLegs you typically have a framework wide eventDispatcher that anyone can tune into. In a nutshell your View will trigger an event, for instance a user clicking a button, and that will get dispatched to interested framework actors. These can be other Views or, more likely, they can be Commands. The Commands are like single use actions tied directly to events. Think of it like binding every public method of your controller to an event. The Commands will typically effect models, changing them in some way, and the Models will dispatch an event that the Views listen for to update themselves.</p>
+
+<p>Backbone works differently in that Views are often tied directly to their models like so:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">Documents</span><span class="p">.</span><span class="nx">first</span><span class="p">();</span> <span class="c1">// &lt;-- Model object</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">new</span> <span class="nx">DocumentRow</span><span class="p">({</span> <span class="c1">// &lt;-- View object with model reference</span>
+</span><span class='line'>  <span class="nx">model</span><span class="o">:</span> <span class="nx">doc</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">id</span><span class="o">:</span> <span class="s2">&quot;document-row-&quot;</span> <span class="o">+</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">id</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When you use this approach it&#8217;s trivial to tell the view to listen to the model&#8217;s change event and then call <code>view.render()</code>. Essentially you are munging some of a Controller&#8217;s responsibilities into the View. That&#8217;s all well and good but let&#8217;s say we want to dispatch an event from one view which will affect other views and actors. This event has nothing to do with a model, maybe it&#8217;s just an animation of some kind that others need to know about. So how do we go about this?</p>
+
+<h3>Communicating between Views in Backbone</h3>
+
+<p>To facilitate this communication we&#8217;re going to use the <code>app</code> object that Backbone Boilerplate creates for us. If you look in the <code>namespace.js</code> file that comes with the boilerplate you should see a line like this way down at the bottom:</p>
+
+<figure class='code'><figcaption><span>namespace.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">app</span><span class="o">:</span> <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Events</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you&#8217;re not familiar with <a href="http://underscorejs.org/#extend">Underscore.js&#8217;s extend method</a> it basically takes all of the properties and functions of one object and copies them onto another. If you&#8217;re coming from a language that supports classical inheritence this should feel familiar. In the above example it&#8217;s creating a new empty object (app), and extending/inheriting from the Backbone.Events object. This means that the <code>app</code> property of the <code>namespace</code> module is basically one big event dispatcher.</p>
+
+<p>So let&#8217;s create two very simple views in a module called <code>Chatty</code>. One will be <code>Subject</code> and the other <code>Observer</code>. When we click the Subject we want it to dispatch an event that any framework actor can tune into. We&#8217;ll call this event <code>clicked:subject</code>. When the Observer hears the <code>clicked:subject</code> event we want it to replace its html content with whatever message is sent along.</p>
+
+<figure class='code'><figcaption><span>chatty.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">define</span><span class="p">([</span>
+</span><span class='line'>  <span class="s2">&quot;namespace&quot;</span><span class="p">,</span> <span class="c1">// &lt;-- see I&#39;m bringing in the namespace module</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Libs</span>
+</span><span class='line'>  <span class="s2">&quot;use!backbone&quot;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Modules</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Plugins</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">],</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span><span class="p">(</span><span class="nx">namespace</span><span class="p">,</span> <span class="nx">Backbone</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// &lt;-- make sure to pass namespace as an argument</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Create a new module</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">Chatty</span> <span class="o">=</span> <span class="nx">namespace</span><span class="p">.</span><span class="nx">module</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">Chatty</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Subject</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;subject&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">events</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="s1">&#39;click&#39;</span><span class="o">:</span> <span class="s1">&#39;onClick&#39;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;I&#39;m the Subject. Everyone listen up!&quot;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">onClick</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">namespace</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;clicked:subject&#39;</span><span class="p">,</span> <span class="s1">&#39;watch it, buster!&#39;</span><span class="p">);</span> <span class="c1">// &lt;-- trigger a framework event</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">Chatty</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Observer</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;observer&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;I&#39;m the Observer. Quietly waiting...&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">namespace</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;clicked:subject&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onSubjectClicked</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span> <span class="o">&lt;--</span> <span class="nx">listen</span> <span class="k">for</span> <span class="nx">framework</span> <span class="nx">events</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">onSubjectClicked</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="s2">&quot;I heard the Subject say... &quot;</span> <span class="o">+</span> <span class="nx">message</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Required, return the module for AMD compliance</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">Chatty</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In our main.js file we&#8217;re just going to append those two views to the DOM whenever someone hits our route:</p>
+
+<figure class='code'><figcaption><span>main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">require</span><span class="p">([</span>
+</span><span class='line'>  <span class="s2">&quot;namespace&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Libs</span>
+</span><span class='line'>  <span class="s2">&quot;jquery&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s2">&quot;use!backbone&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Modules</span>
+</span><span class='line'>  <span class="s2">&quot;modules/chatty&quot;</span>
+</span><span class='line'><span class="p">],</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span><span class="p">(</span><span class="nx">namespace</span><span class="p">,</span> <span class="nx">$</span><span class="p">,</span> <span class="nx">Backbone</span><span class="p">,</span> <span class="nx">Chatty</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Defining the application router, you can attach sub routers here.</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">Router</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">routes</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="s2">&quot;chatty&quot;</span><span class="o">:</span> <span class="s2">&quot;chatty&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">chatty</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">subject</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Chatty</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Subject</span><span class="p">();</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">observer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Chatty</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Observer</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#main&quot;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">subject</span><span class="p">.</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>      <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#main&quot;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">observer</span><span class="p">.</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And there you have it. When we click on <code>Subject</code> it should replace the content in <code>Observer</code> like so:
+<img class="center" src="http://robdodson.me/images/subject_observer.png" title="'The Observer hears the Subject'" ></p>
+
+<ul>
+<li>Time: 8:02 am</li>
+<li>Mood: Excited, Rested</li>
+<li>Sleep: 6</li>
+<li>Hunger: 4</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Backbone Events: Adding Views to the DOM]]></title>
@@ -5142,173 +5359,6 @@ Initially the test fails so now we need to update our <code>Crawler</code> to ch
 <li>Sleep: 7.5</li>
 <li>Hunger: 0</li>
 <li>Coffee: 2</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Building a Simple Scraper with Nokogiri in Ruby]]></title>
-    <link href="http://robdodson.me/blog/2012/05/05/building-a-simple-scraper-with-nokogiri-in-ruby/"/>
-    <updated>2012-05-05T21:08:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/05/building-a-simple-scraper-with-nokogiri-in-ruby</id>
-    <content type="html"><![CDATA[<p>Since I&#8217;ve been talking so much about <a href="http://d3js.org/">D3.js</a> lately I thought it might be fun to start a little project which combines D3 and Ruby. The idea is to build a very simple page scraper that counts how often certain words are used in each post. I&#8217;ve also decided to start adding a little block of metadata at the end of each post so I can graph that over time as well.</p>
-
-<p>So how do we get started? Well first we&#8217;ll need to build a page scraper of some kind. This program will have to consume the contents of an HTML page, find the node that contains our blog post and count up how often each word reoccurs. For right now that should be more than enough to get us started. We&#8217;ll look at grabbing the metadata and drawing graphs in future posts. I should point out that this idea was inspired by the wonderful site <a href="http://smarterware.org/5359/taking-on-the-750-words-march-challenge">750words.com</a> which creates <a href="http://smarterware.org/5359/taking-on-the-750-words-march-challenge">a beautiful exploration section</a> any time you write a new journal entry. Definitely check out that site, it&#8217;s amazing.</p>
-
-<h3>Hello Noko</h3>
-
-<p>I decided early on that I wanted the scraper to use <a href="http://nokogiri.org/">Nokogiri</a> because I&#8217;ve heard so much about it. As the authors describe it:</p>
-
-<blockquote><p>Nokogiri (鋸) is an HTML, XML, SAX, and Reader parser. Among Nokogiri’s many features is the ability to search documents via XPath or CSS3 selectors.</p></blockquote>
-
-<p>Using CSS selectors means that working with Nokogiri is a lot like working with jQuery. Here&#8217;s a quick demonstration:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;open-uri&#39;</span>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;nokogiri&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">doc</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s1">&#39;https://www.google.com/search?q=unicorns&#39;</span><span class="p">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="s1">&#39;h3.r a&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">link</span><span class="o">|</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="n">link</span><span class="o">.</span><span class="n">content</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Easy enough, right? Taking it a step further let&#8217;s iterate over each element on the page and place them into a <code>Hash</code>.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;open-uri&#39;</span>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;nokogiri&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="vi">@counts</span> <span class="o">=</span> <span class="no">Hash</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">words_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">string</span><span class="o">.</span><span class="n">downcase</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="sr">/[\w&#39;]+/</span><span class="p">)</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">count_frequency</span><span class="p">(</span><span class="n">word_list</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">for</span> <span class="n">word</span> <span class="k">in</span> <span class="n">word_list</span>
-</span><span class='line'>    <span class="vi">@counts</span><span class="o">[</span><span class="n">word</span><span class="o">]</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>  <span class="vi">@counts</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">doc</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s1">&#39;http://robdodson.me&#39;</span><span class="p">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">####</span>
-</span><span class='line'><span class="c1"># Search for nodes by css</span>
-</span><span class='line'><span class="n">entries</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="s1">&#39;div.entry-content&#39;</span><span class="p">)</span>
-</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;Parsing </span><span class="si">#{</span><span class="n">entries</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2"> entries&quot;</span>
-</span><span class='line'><span class="n">entries</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">entry</span><span class="o">|</span>
-</span><span class='line'>  <span class="n">words</span> <span class="o">=</span> <span class="n">words_from_string</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">count_frequency</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">sorted</span>  <span class="o">=</span> <span class="vi">@counts</span><span class="o">.</span><span class="n">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="n">count</span> <span class="p">}</span>
-</span><span class='line'><span class="nb">puts</span> <span class="n">sorted</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">word</span><span class="si">}</span><span class="s2">: </span><span class="si">#{</span><span class="n">count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The output from this script should look (kind of) like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='text'><span class='line'>...
-</span><span class='line'>ruby: 66
-</span><span class='line'>rvm: 66
-</span><span class='line'>our: 68
-</span><span class='line'>can: 71
-</span><span class='line'>3: 75
-</span><span class='line'>if: 77
-</span><span class='line'>for: 82
-</span><span class='line'>your: 88
-</span><span class='line'>2: 88
-</span><span class='line'>is: 91
-</span><span class='line'>this: 91
-</span><span class='line'>s: 94
-</span><span class='line'>we: 95
-</span><span class='line'>that: 106
-</span><span class='line'>i: 118
-</span><span class='line'>in: 119
-</span><span class='line'>it: 125
-</span><span class='line'>1: 128
-</span><span class='line'>and: 149
-</span><span class='line'>of: 170
-</span><span class='line'>a: 231
-</span><span class='line'>you: 233
-</span><span class='line'>to: 342
-</span><span class='line'>the: 382
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>It looks like our regex could use a bit of work so it doesn&#8217;t grab singular letters like &#8216;s&#8217; or numbers, but it&#8217;s definitely a good start. Tomorrow we&#8217;ll put everything into a <code>Module</code> and back it with tests.</p>
-
-<ul>
-<li>Time: 9:16 pm</li>
-<li>Mood: Relaxed, Tired</li>
-<li>Sleep: 6.5</li>
-<li>Hunger: 5</li>
-<li>Coffee: 1</li>
 </ul>
 
 ]]></content>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Backbone | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/backbone/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-24T23:45:02-07:00</updated>
+  <updated>2012-05-25T09:15:51-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,146 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Backbone Events: Framework Communication]]></title>
+    <link href="http://robdodson.me/blog/2012/05/25/backbone-events-framework-communication/"/>
+    <updated>2012-05-25T08:01:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/25/backbone-events-framework-communication</id>
+    <content type="html"><![CDATA[<p>I want to figure out how to communicate on a framework level within Backbone. Coming from Flash and <a href="http://www.robotlegs.org/">RobotLegs</a> I'm used to a few MVC conventions that work very well as far as event dispatching goes. In RobotLegs you typically have a framework wide eventDispatcher that anyone can tune into. In a nutshell your View will trigger an event, for instance a user clicking a button, and that will get dispatched to interested framework actors. These can be other Views or, more likely, they can be Commands. The Commands are like single use actions tied directly to events. Think of it like binding every public method of your controller to an event. The Commands will typically effect models, changing them in some way, and the Models will dispatch an event that the Views listen for to update themselves.</p>
+
+<p>Backbone works differently in that Views are often tied directly to their models like so:</p>
+
+<p>``` js
+var doc = Documents.first(); // &lt;-- Model object</p>
+
+<p>new DocumentRow({ // &lt;-- View object with model reference
+  model: doc,
+  id: "document-row-" + doc.id
+});
+```</p>
+
+<p>When you use this approach it's trivial to tell the view to listen to the model's change event and then call <code>view.render()</code>. Essentially you are munging some of a Controller's responsibilities into the View. That's all well and good but let's say we want to dispatch an event from one view which will affect other views and actors. This event has nothing to do with a model, maybe it's just an animation of some kind that others need to know about. So how do we go about this?</p>
+
+<h3>Communicating between Views in Backbone</h3>
+
+<p>To facilitate this communication we're going to use the <code>app</code> object that Backbone Boilerplate creates for us. If you look in the <code>namespace.js</code> file that comes with the boilerplate you should see a line like this way down at the bottom:</p>
+
+<p><code>js namespace.js
+app: _.extend({}, Backbone.Events)
+</code>
+If you're not familiar with <a href="http://underscorejs.org/#extend">Underscore.js's extend method</a> it basically takes all of the properties and functions of one object and copies them onto another. If you're coming from a language that supports classical inheritence this should feel familiar. In the above example it's creating a new empty object (app), and extending/inheriting from the Backbone.Events object. This means that the <code>app</code> property of the <code>namespace</code> module is basically one big event dispatcher.</p>
+
+<p>So let's create two very simple views in a module called <code>Chatty</code>. One will be <code>Subject</code> and the other <code>Observer</code>. When we click the Subject we want it to dispatch an event that any framework actor can tune into. We'll call this event <code>clicked:subject</code>. When the Observer hears the <code>clicked:subject</code> event we want it to replace its html content with whatever message is sent along.</p>
+
+<p>``` js chatty.js
+define([
+  "namespace", // &lt;-- see I'm bringing in the namespace module</p>
+
+<p>  // Libs
+  "use!backbone"</p>
+
+<p>  // Modules</p>
+
+<p>  // Plugins</p>
+
+<p>],</p>
+
+<p>function(namespace, Backbone) { // &lt;-- make sure to pass namespace as an argument</p>
+
+<p>  // Create a new module
+  var Chatty = namespace.module();</p>
+
+<p>  Chatty.Views.Subject = Backbone.View.extend({</p>
+
+<pre><code>tagName: 'div',
+className: 'subject',
+events: {
+  'click': 'onClick'
+},
+initialize: function() {
+  this.render();
+  this.$el.html("I'm the Subject. Everyone listen up!");
+},
+onClick: function(e) {
+  namespace.app.trigger('clicked:subject', 'watch it, buster!'); // &lt;-- trigger a framework event
+}
+</code></pre>
+
+<p>  });</p>
+
+<p>  Chatty.Views.Observer = Backbone.View.extend({</p>
+
+<pre><code>tagName: 'div',
+className: 'observer',
+initialize: function() {
+  this.render();
+  this.$el.html("I'm the Observer. Quietly waiting...");
+
+  namespace.app.on('clicked:subject', this.onSubjectClicked, this); &lt;-- listen for framework events
+},
+onSubjectClicked: function(message) {
+  this.$el.html("I heard the Subject say... " + message);
+}
+</code></pre>
+
+<p>  });</p>
+
+<p>  // Required, return the module for AMD compliance
+  return Chatty;</p>
+
+<p>});
+```</p>
+
+<p>In our main.js file we're just going to append those two views to the DOM whenever someone hits our route:</p>
+
+<p>``` js main.js
+require([
+  "namespace",</p>
+
+<p>  // Libs
+  "jquery",
+  "use!backbone",</p>
+
+<p>  // Modules
+  "modules/chatty"
+],</p>
+
+<p>function(namespace, $, Backbone, Chatty) {</p>
+
+<p>  // Defining the application router, you can attach sub routers here.
+  var Router = Backbone.Router.extend({</p>
+
+<pre><code>routes: {
+  "chatty": "chatty"
+},
+
+chatty: function() {
+  var subject = new Chatty.Views.Subject();
+  var observer = new Chatty.Views.Observer();
+  $("#main").append(subject.el);
+  $("#main").append(observer.el);
+}
+</code></pre>
+
+<p>  });</p>
+
+<p>  ...
+```</p>
+
+<p>And there you have it. When we click on <code>Subject</code> it should replace the content in <code>Observer</code> like so:
+<img class="center" src="/images/subject_observer.png" title="'The Observer hears the Subject'" ></p>
+
+<ul>
+<li>Time: 8:02 am</li>
+<li>Mood: Excited, Rested</li>
+<li>Sleep: 6</li>
+<li>Hunger: 4</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Backbone Events: Adding Views to the DOM]]></title>
@@ -1006,234 +1146,6 @@ title: 'Outliers'
 <p>outliers.set('author', 'Mickey Mouse');
 ```
 Instead of throwing your HTML into the render method as a String it's advised that you use some kind of templating library. Underscore templates seem like a good place to start but Backbone is designed to be template agnostic so you could easily switch to Mustache/Handelbars or HAML if you want. Tomorrow I'll look into displaying some content using an Underscore template linked up to a model. Till then.. :D</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Backbone Boilerplate: Playing with Require.js]]></title>
-    <link href="http://robdodson.me/blog/2012/05/18/backbone-boilerplate-playing-with-require-dot-js/"/>
-    <updated>2012-05-18T08:07:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/18/backbone-boilerplate-playing-with-require-dot-js</id>
-    <content type="html"><![CDATA[<p>I want to keep playing with require.js and AMD modules today so I can really internalize the concepts around them. I'm going to go through the examples in <a href="http://requirejs.org/docs/api.html#jsfiles">the require documentation</a> starting with loading regular scripts and then defining modules and loading those. Here's our boilerplate HTML:</p>
-
-<p>Here is our boilerplate HTML. It's a standard HTML5 file which just includes require.js at the bottom of the page.
-``` html
-&lt;!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width,initial-scale=1"></p>
-
-<p>  <title>Require.js Sandbox</title></p>
-
-<p>  <!-- Application styles -->
-  <link rel="stylesheet" href="http://robdodson.me/assets/css/index.css">
-</head></p>
-
-<p><body>
-  <!-- Main container -->
-  <div role="main" id="main"></div></p>
-
-<p>  <!-- Application source -->
-  <script src="http://robdodson.me/assets/js/libs/require.js"></script>
-</body>
-</html>
-```
-I'm also going to define a file called foo.js which will just console log "Hello World!". To update our HTML we'll add the following script tag after the call to include require.js</p>
-
-<p>``` html</p>
-
-<script>
-    require(["foo"]);
-</script>
-
-
-<p>```</p>
-
-<p>And as expected the console outputs 'Hello World!'. Let's step it up a notch and define a module. Our first module will just return an object literal <a href="http://requirejs.org/docs/api.html#defsimple">like in this example.</a> It will be a <code>Person</code> module with our name and city. We'll place it in an <code>app</code> folder in the root of our project. So our stucture looks like this:</p>
-
-<p>```
-index.html
-|
-|<em> app/
-  |
-  |</em> person.js
-|
-|<em> assets/
-  |
-  |</em> js/</p>
-
-<pre><code>|
-|_ libs/
-  |
-  |_ require.js
-</code></pre>
-
-<p>```</p>
-
-<p>The <code>Person</code> module just needs to implement a define function which takes an object as an argument. It looks like this:
-``` js app/person.js
-define({</p>
-
-<pre><code>name: "Rob Dodson",
-city: "San Francisco"
-</code></pre>
-
-<p>});
-```
-And in our updated index.html we're going to require that module.</p>
-
-<p>``` html
-&lt;!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width,initial-scale=1"></p>
-
-<p>  <title>Require.js Sandbox</title></p>
-
-<p>  <!-- Application styles -->
-  <link rel="stylesheet" href="http://robdodson.me/assets/css/index.css">
-</head></p>
-
-<p><body>
-  <!-- Main container -->
-  <div role="main" id="main"></div></p>
-
-<p>  <!-- Application source -->
-  <script src="http://robdodson.me/assets/js/libs/require.js"></script>
-  <script></p>
-
-<pre><code>require(["app/person"], function(person) {
-  console.log(person.name);
-  console.log(person.city);
-});
-</code></pre>
-
-<p>  </script>
-</body>
-</html>
-```</p>
-
-<p>Opening up that page in the browser should give us the proper output in the console.</p>
-
-<h3>AMD modules for dummies</h3>
-
-<p>Let's stop here for a moment to understand what's going on. In one file we implemented a <code>define</code> function and in another place we implemented a <code>require</code> function. In the most basic sense this is all we really need to do to start using AMD. I think the concept of javascript modules is really weird for most folks but if you're coming from a language like Java or Flash just think of define and require as two different interfaces that have to be implemented in order to recreate the <code>import</code> functionality that you're used to. Require.js is going to make sure everything loads properly so long as we stick to this convention.</p>
-
-<p>If you're coming from more of a design background and you're used to having one big javascript file think of these modules as a way to break off pieces of code which you might otherwise put into separate script files. And I'm not talking one or two script files, I'm talking like 20 or 30. You could try to manage loading all of those dependencies yourself but that will be challenging. If you are building a blog then this probably isn't a big deal for you. In that case a few included js files is fine. But if you're trying to build a responsive web app for mobile then you're going to want to only load the bits of code you absolutely need. If a page doesn't require 90% of your JS then don't waste the time downloading it over a shitty AT&amp;T connection.</p>
-
-<p>Ok let's write a module that's a bit more realistic. We'll use a function to return our object so it's kind of like a constructor.</p>
-
-<p>``` js app/monster.js
-"use strict";</p>
-
-<p>define(function () {</p>
-
-<pre><code>var estimated_age = 99 + 1;
-var spookySaying = 'I vant to suck your blooood!';
-
-return {
-    name: 'Dracula',
-    home: 'Florida',
-    age: estimated_age,
-    saySomethingSpooky: function() {
-      console.log(spookySaying);
-    }
-};
-</code></pre>
-
-<p>});
-<code>``
-This is a simple monster object. Notice that we build a variable called</code>estimated_age<code>right before defining our object literal. We then return this variable. If we ask for the monster's age it will return this value. It's worth noting that this makes the</code>estimated_age<code>variable private since it only lives in the scope of the anonymous function returning our object literal. We've also got a method,</code>saySomethingSpooky<code>which will print out another private variable</code>spookySaying`. Wow it's <em>almost</em> the JavaScript classes I've always dreamed of! Before you go thinking that remember that modules are not instanceable, meaning, when you load in a module it works like a <a href="http://en.wikipedia.org/wiki/Singleton_pattern">Singleton</a> almost. You can't go monster.new() all over the place.. it just doesn't work that way. Don't get disouraged though, this is still pretty cool so let's continue...</p>
-
-<p>Next up is a module with dependencies. We'll make the monster depend on his coffin.</p>
-
-<p>``` js app/coffin.js
-"use strict";</p>
-
-<p>define(function () {
-  var color = 'Blackest black';</p>
-
-<p>  return {</p>
-
-<pre><code>color: color,
-open: function() {
-  console.log('*creeeeeek*');
-}
-</code></pre>
-
-<p>  };
-});
-```</p>
-
-<p>``` js app/monster.js
-"use strict";</p>
-
-<p>define(['./coffin'], function (coffin) {
-  var estimated_age = 99 + 1;
-  var spookySaying = 'I vant to suck your blooood!';</p>
-
-<p>  return {</p>
-
-<pre><code>name: 'Dracula',
-home: 'Florida',
-age: estimated_age,
-saySomethingSpooky: function() {
-  console.log(spookySaying);
-},
-goToSleep: function() {
-  console.log('Time for bed!');
-  coffin.open();
-}
-</code></pre>
-
-<p>  };
-});
-```</p>
-
-<p>``` html index.html</p>
-
-<script data-main="" src="http://robdodson.me/assets/js/libs/require.js"></script>
-
-
-<script>
-  require(['app/monster'], function(monster) {
-    monster.saySomethingSpooky();
-    monster.goToSleep();
-  });
-</script>
-
-
-<p><code>``
-You can see that we've created a dependency for our monster, it has to load the coffin module before it's ready to be loaded itself. Otherwise it won't be able to run</code>goToSleep()<code>properly. Require.js will sort all of this out so long as we declare our dependencies as the first argument to the</code>define` function.</p>
-
-<p>We aren't limited to objects though, we can also return functions (which are objects in their own right). For instance if we wanted to define a helper module that greets people we could do something like this:
-``` js app/greet.js
-"use strict";</p>
-
-<p>define(function () {
-  return function(name) {</p>
-
-<pre><code>return 'Why hello, ' + name;
-</code></pre>
-
-<p>  }
-});
-<code>``
-then in our index we'll just use the</code>greet` function as if it were globally available.</p>
-
-<p><code>js index.html
-require(['app/greet'], function(greet) {
-  console.log(greet('Rob'));
-});
-</code>  <br/>
-bear in mind that each module requires an http request to load it so you don't want to go overboard defining helper function modules. Note the extra http request in the profiler which loads greet.js.
-<img class="center" src="/images/module_costs.png" title="'Note the separate http request for greet.js'" ></p>
-
-<p>Ok that's it for today. I'll try to continue on Saturday!</p>
 ]]></content>
   </entry>
   
