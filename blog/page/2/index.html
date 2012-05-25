@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Yesterday we verified that our Crawler was able to hit a document and, given the right selector, pull down a list of words and their frequency on the &hellip;">
+  <meta name="description" content="This is going to be a bit of a lightning post but I wanted to quickly show off how to edit the PATH variable that Sublime text uses. I should warn &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,94 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/14/hacking-the-path-variable-in-sublime-text/">Hacking the PATH Variable in Sublime Text</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-14T20:26:00-07:00" pubdate data-updated="true">May 14<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This is going to be a bit of a lightning post but I wanted to quickly show off how to edit the PATH variable that Sublime text uses. I should warn you that that I am neither an expert in Python nor am I a very seasoned Sublime user. So having said that take all of this with a grain of salt and use at your own risk.</p>
+
+<h3>Our first (crappy) plugin!</h3>
+
+<p>Sublime has a great plugin architecture that makes it extremely easy to add to the platform. If you create a <code>.py</code> file in the <code>~/Library/Application Support/Sublime Text 2/Packages/User/</code> folder it will be loaded as soon as Sublime starts. Writing plugins seems to be actually quite easy based on their <a href="http://www.sublimetext.com/docs/plugin-basics">documentation and examples.</a> We won&#8217;t be following the typical plugin architecture since we&#8217;re just trying to hack a system variable and that doesn&#8217;t seem to necessitate the use of their built in modules.</p>
+
+<p>Here&#8217;s a script I&#8217;m calling <code>Pathway</code> at the moment.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">os</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">LOCAL</span> <span class="o">=</span> <span class="s">&#39;/usr/local/bin:/usr/local/sbin:&#39;</span>
+</span><span class='line'><span class="n">HOME</span> <span class="o">=</span> <span class="s">&#39;/Users/Rob&#39;</span>  <span class="c">### !!! REPLACE WITH YOUR HOME PATH !!! ###</span>
+</span><span class='line'><span class="n">RVM</span> <span class="o">=</span> <span class="n">HOME</span> <span class="o">+</span> <span class="s">&#39;/.rvm/bin:&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Sublime&#39;s default path is</span>
+</span><span class='line'><span class="c"># /usr/bin:/bin:/usr/sbin:/sbin</span>
+</span><span class='line'><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;PATH&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s">&#39;:&#39;</span>
+</span><span class='line'><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;PATH&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">LOCAL</span>
+</span><span class='line'><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;PATH&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">RVM</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;PATH = &#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;PATH&#39;</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you add this file to the Sublime user&#8217;s directory outlined above you should be able to hit cmd + ` to fire up the Sublime console which will print out our new PATH variable.</p>
+
+<p>I would also recommend adding a shell plugin to Sublime. At the moment I use <a href="https://github.com/misfo/Shell-Turtlestein">Shell Turtlestein.</a>.</p>
+
+<p>Now that I have my hacked path variable and my shell plugin I can check to see if RVM works. Using Shell Turtlestein you can hit <code>cmd-shift-c</code> to open a little console prompt. Typing <code>rvm current</code> returns our ruby version number and gemset. Nice! What&#8217;s even nicer is this means I can now run Rake tasks from inside of Sublime!</p>
+
+<p>I should point out if all you want to do is run Rake or Ant then there are already plugins for that sort of thing. My main effort in doing all this is to try to integrate the command line with Sublime a bit better. If <em>anyone</em> knows how to simply tell Sublime to use the path in my .bash_profile or .bashrc then I would gladly use that approach instead. But after crawling the forums for a while it looks like this is still a common problem with no good solution.</p>
+
+<ul>
+<li>Time: 8:26 pm</li>
+<li>Mood: Happy, Peaceful, Hurried</li>
+<li>Sleep: 7</li>
+<li>Hunger: 6</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2947,315 +3035,6 @@ Initially the test fails so now we need to update our <code>Crawler</code> to ch
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/04/d3-basics-the-linear-scale/">D3 Basics: The Linear Scale</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-04T07:21:00-07:00" pubdate data-updated="true">May 4<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><!-- CSS Styles: -->
-
-
-<div>
-  <style type="text/css">
-
-    .chart {
-      font-family: Arial, sans-serif;
-      font-size: 10px;
-    }
-
-    .bar {
-      fill: steelblue;
-    }
-
-    .axis path, .axis line {
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
-    }
-
-    .label {
-      font-size: 12 px;
-      fill: #FFF;
-    }
-
-    .point {
-      stroke: #666;
-      fill: red;
-    }
-
-  </style>
-</div>
-
-
-<p>In <a href="http://localhost:4000/blog/2012/05/03/d3-basics-an-introduction-to-scales/">the last post</a> we did a basic introduction to the concept of scales in <a href="http://d3js.org/">D3.js</a>. Today we&#8217;ll look at our first scale and write some code to visualize it.</p>
-
-<h3>Linear Scales</h3>
-
-<p>The most basic scale in D3 is the <code>linear scale</code> which maps a continous <code>domain</code> to an output range. To define a linear domain we&#8217;ll need to first come up with a data set. Fibonacci numbers work well, so let&#8217;s declare a variable <code>data</code> like so:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">];</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The data set will represent our scale&#8217;s input domain. The next step is defining an output range. Since we&#8217;re going to be graphing these numbers we want our range to represent screen coordinates. Let&#8217;s go ahead and declare a <code>width</code> and a <code>height</code> variable and set them to 320 by 150.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="mi">320</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">height</span> <span class="o">=</span> <span class="mi">150</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We now have everything we need to create our first scale.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scale</span><span class="p">.</span><span class="nx">linear</span><span class="p">()</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">data</span><span class="p">)])</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">width</span><span class="p">]);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>D3 methods often return a value of <code>self</code> meaning you can chain method calls onto one another. If you&#8217;re used to jQuery this should be a common idiom for you. You&#8217;ll notice that both the domain and the range functions accept arrays as parameters. Typically the domain only receives two values, the minimum and maximum of our data set. Likewise the range will be given the minimum and maximum of our output space. You could pass in multiple values to create a polylinear scale but that&#8217;s outside the scope of our dicussion today.</p>
-
-<p>In the domain function we&#8217;re using a helper called <code>d3.max</code>. Similar to <code>Math.max</code>, it looks at our data set and figures out what is the largest value. While <code>Math.max</code> only works on two numbers, <code>d3.max</code> will iterate over an entire <code>Array</code> for us.</p>
-
-<p>If you&#8217;ve been following along in your own file you should be able to open your console and type <code>x(8)</code> to get 300.</p>
-
-<p>With just this information alone we have enough to build our first graph.</p>
-
-<!-- D3.js Chart -->
-
-
-<p><small>Fibonacci Sequence Chart 1.0</small></p>
-
-<div id="linear-scale-chart-1"></div>
-
-
-<script type='text/javascript'>
-(function() {
-
-  var data = [1, 1, 2, 3, 5, 8];
-  var width = 320
-      height = 150;
-
-  var x = d3.scale.linear()
-          .domain([0, d3.max(data)])
-          .range([0, width]);
-
-  var svg = d3.select('#linear-scale-chart-1').append('svg')
-          .attr('width', width)
-          .attr('height', height)
-          .attr('class', 'chart');
-
-  svg.selectAll('.chart')
-          .data(data)
-        .enter().append('rect')
-          .attr('class', 'bar')
-          //.attr('y', function(d, i) { return i * 20 })
-          .attr('y', function(d, i) { return i * 20; })
-          .attr('width', function(d) { return x(d); })
-          .attr('height', 15);
-
-})();
-</script>
-
-
-
-
-<figure class='code'><figcaption><span>JavaScript</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">];</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="mi">320</span>
-</span><span class='line'>    <span class="nx">height</span> <span class="o">=</span> <span class="mi">150</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scale</span><span class="p">.</span><span class="nx">linear</span><span class="p">()</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">data</span><span class="p">)])</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">width</span><span class="p">]);</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">svg</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;svg&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="nx">width</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;chart&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">svg</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="s1">&#39;.chart&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
-</span><span class='line'>      <span class="p">.</span><span class="nx">enter</span><span class="p">().</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;rect&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">20</span> <span class="p">})</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">x</span><span class="p">(</span><span class="nx">d</span><span class="p">);</span> <span class="p">})</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="mi">15</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>CSS</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.chart</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">font-family</span><span class="o">:</span> <span class="n">Arial</span><span class="o">,</span> <span class="k">sans-serif</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">font-size</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.bar</span> <span class="p">{</span>
-</span><span class='line'>  <span class="n">fill</span><span class="o">:</span> <span class="nb">steelblue</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Break It Down</h3>
-
-<p>Let&#8217;s go through the JavaScript piece by piece to outline what happened.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">];</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">width</span> <span class="o">=</span> <span class="mi">320</span>
-</span><span class='line'>    <span class="nx">height</span> <span class="o">=</span> <span class="mi">150</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">x</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">scale</span><span class="p">.</span><span class="nx">linear</span><span class="p">()</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">domain</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">data</span><span class="p">)])</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">width</span><span class="p">]);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The first block should be pretty familar at this point. We&#8217;ve declared our Fibonacci data, our explicit width and height and defined our scale. Nothing new here.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">svg</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;svg&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="nx">width</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="nx">height</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;chart&#39;</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In the next section we&#8217;re declaring our <code>SVG</code> element. We use a D3 selection to grab the <code>body</code> tag and we append an <code>svg</code> tag onto it. Since D3 uses method-chaining we can keep assigning attributes to our SVG element. We declare the width and the height to match the explicit values set earlier and finally we give it a class name of <code>chart</code>.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">svg</span><span class="p">.</span><span class="nx">selectAll</span><span class="p">(</span><span class="s1">&#39;.chart&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">data</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>
-</span><span class='line'>      <span class="p">.</span><span class="nx">enter</span><span class="p">().</span><span class="nx">append</span><span class="p">(</span><span class="s1">&#39;rect&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">20</span> <span class="p">})</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">x</span><span class="p">(</span><span class="nx">d</span><span class="p">);</span> <span class="p">})</span>
-</span><span class='line'>        <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="mi">15</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This last section is where it all ties together. Since we stored our SVG element in a variable called <code>svg</code> we&#8217;re able to easily reference it again. We instruct D3 to create a <code>join</code> by calling the <code>data</code> method and passing in our <code>Array</code> of values. When D3 performs a join it steps through each element in the array and attempts to match it to a figure that already exists on the page. If nothing exists it will call the <code>enter</code> function. At this point it steps through the array again, passing the values to us so we can define new shapes. <a href="http://bost.ocks.org/mike/join/">For a much more in-depth explanation of joins refer back to this article.</a></p>
-
-<p>In our case we&#8217;re appending SVG <code>Rects</code> but it could just as easily be circles or other shapes. We give each rect a class of <code>bar</code> so we can style it with CSS. When we declare the <code>y</code> attribute instead of using an explicit value we create an <code>accessor</code>, a little helper function which takes a piece of data and an optional index as its arguments. In this case <code>d</code> will equal subsequent elements in our data array and <code>i</code> will equal their indices. For a much clearer picture of what&#8217;s happening you can change it to read:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;d = data[&#39;</span> <span class="o">+</span> <span class="nx">i</span> <span class="o">+</span> <span class="s1">&#39;] = &#39;</span><span class="p">,</span> <span class="nx">d</span><span class="p">);</span> <span class="k">return</span> <span class="nx">i</span> <span class="o">*</span> <span class="mi">20</span> <span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>which will give you the following output.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">d</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span class='line'><span class="nx">d</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span class='line'><span class="nx">d</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-</span><span class='line'><span class="nx">d</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span>
-</span><span class='line'><span class="nx">d</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
-</span><span class='line'><span class="nx">d</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Since we&#8217;re just trying to space out our bars along the y-axis we don&#8217;t really care about the value of <code>d</code>. Instead we&#8217;ll use the index, <code>i</code>, to offset each bar by a value of i * 20.</p>
-
-<p>In the last two lines we&#8217;re going to finally use our linear scale to define our bar&#8217;s width. Here they are again as a refresher.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">x</span><span class="p">(</span><span class="nx">d</span><span class="p">);</span> <span class="p">})</span>
-</span><span class='line'><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="mi">15</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>As each element of the array is passed to our width accessor it&#8217;s run through the scale and the output returned. Since 8 is our maximum value it should extend all the way to the end of our range.</p>
-
-<p>The final call is just an explicit height for each bar. Depending on the scale this bit can be automated but for simplicity sake we&#8217;ll just use a hard coded value so we can get something on screen.</p>
-
-<h3>Conclusion</h3>
-
-<p>Now that we&#8217;ve got one scale under our belt the others should be pretty easy to digest. Over the next couple of posts we&#8217;ll focus on ordinal scales followed by time scales. Stay tuned and ping me if you have any questions. Thanks!</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -3273,6 +3052,10 @@ Initially the test fails so now we need to update our <code>Crawler</code> to ch
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/05/24/backbone-events-between-views/">Backbone Events: Adding Views to the DOM</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/05/23/how-do-you-switch-between-views-in-backbone/">How do you switch between views in Backbone</a>
       </li>
     
@@ -3286,10 +3069,6 @@ Initially the test fails so now we need to update our <code>Crawler</code> to ch
     
       <li class="post">
         <a href="/blog/2012/05/20/some-more-backbone-dot-js-basics/">Some More Backbone.js Basics</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/19/my-first-chain/">My First Chain</a>
       </li>
     
   </ul>
