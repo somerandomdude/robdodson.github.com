@@ -969,159 +969,6 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/05/22/css3-transitions-with-gfx/">CSS3 Transitions With GFX</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-22T08:06:00-07:00" pubdate data-updated="true">May 22<span>nd</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>CSS3 is a rather verbose tool especially when it comes to transitions and animations. I want to see if there&#8217;s a way to clean a lot of that up with either a SASS mixin or a jQuery library like <a href="http://maccman.github.com/gfx/">gfx.</a></p>
-
-<p>We&#8217;ll try to do something simple at first to recreate an animation like the one we have below.</p>
-
-<p><small>Rollover the grey area to activate it.</small></p>
-
-<!-- CSS Styles: -->
-
-
-<div>
-  <style type="text/css">
-    .container {
-      width: 300px;
-      height: 300px;
-      position: relative;
-      background-color: #CCC;
-    }
-
-    #example1 .container:hover .widget {
-      background-color: red;
-      left: 200px;
-      top: 200px;
-    }
-
-    #example1 .widget {
-      background-color: black;
-      left: 10px;
-      position: absolute;
-      top: 10px;
-      width: 20px;
-      height: 20px;
-      -webkit-transition: background-color 1s linear, left 1s, top 2s
-    }
-  </style>
-</div>
-
-
-
-
-<div id="example1">
-  <div class="container">
-      <div class="widget"></div>
-  </div>​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
-</div>
-
-
-<p>The code to produce the above animation looks something like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.container</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">position</span><span class="o">:</span> <span class="k">relative</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="m">#CCC</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.container</span><span class="nd">:hover</span> <span class="nc">.widget</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="nb">red</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">left</span><span class="o">:</span> <span class="m">200px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">200px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.widget</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="nb">black</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">left</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">20px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">20px</span><span class="p">;</span>
-</span><span class='line'>  <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We definitely don&#8217;t want all that logic in our CSS. Ideally we could trigger these kinds of things from JavaScript, which is where Gfx comes in.</p>
-
-<p>Using Gfx we can get similar but not exactly the same result with the following snippet:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#widget&quot;</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">gfx</span><span class="p">({</span> <span class="nx">translateX</span><span class="o">:</span> <span class="s1">&#39;200px&#39;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">duration</span><span class="o">:</span> <span class="s1">&#39;1000&#39;</span><span class="p">,</span> <span class="nx">queue</span><span class="o">:</span> <span class="kc">false</span> <span class="p">})</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">gfx</span><span class="p">({</span> <span class="nx">translateX</span><span class="o">:</span> <span class="s1">&#39;200px&#39;</span><span class="p">,</span> <span class="nx">translateY</span><span class="o">:</span> <span class="s1">&#39;200px&#39;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">duration</span><span class="o">:</span> <span class="s1">&#39;2000&#39;</span> <span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>After tinkering with Gfx for what seems like hours at this point I haven&#8217;t figured out a way to pass two different times to simultaneous animations. From one animation to the next you have to specify the end points from the previous animations or else the styles will revert. That&#8217;s why I&#8217;m passing <code>translateX: '200px'</code> in both places&#8230;although I&#8217;m not 100% if that&#8217;s what I should be doing. I emailed the author of Gfx so we&#8217;ll see what he says :)</p>
-
-<ul>
-<li>Time: 8:07 am</li>
-<li>Mood: Sedated, Upset-Stomach, Laggy</li>
-<li>Sleep: 5.5</li>
-<li>Hunger: 0</li>
-<li>Coffee: 0</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
       <h1 class="entry-title"><a href="/blog/2012/05/21/exploring-the-backbone-router-and-history-api/">Exploring the Backbone Router and History API</a></h1>
     
     
@@ -2958,6 +2805,94 @@ bear in mind that each module requires an http request to load it so you don&#82
 
     </article>
   
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/14/hacking-the-path-variable-in-sublime-text/">Hacking the PATH Variable in Sublime Text</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-14T20:26:00-07:00" pubdate data-updated="true">May 14<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This is going to be a bit of a lightning post but I wanted to quickly show off how to edit the PATH variable that Sublime text uses. I should warn you that that I am neither an expert in Python nor am I a very seasoned Sublime user. So having said that take all of this with a grain of salt and use at your own risk.</p>
+
+<h3>Our first (crappy) plugin!</h3>
+
+<p>Sublime has a great plugin architecture that makes it extremely easy to add to the platform. If you create a <code>.py</code> file in the <code>~/Library/Application Support/Sublime Text 2/Packages/User/</code> folder it will be loaded as soon as Sublime starts. Writing plugins seems to be actually quite easy based on their <a href="http://www.sublimetext.com/docs/plugin-basics">documentation and examples.</a> We won&#8217;t be following the typical plugin architecture since we&#8217;re just trying to hack a system variable and that doesn&#8217;t seem to necessitate the use of their built in modules.</p>
+
+<p>Here&#8217;s a script I&#8217;m calling <code>Pathway</code> at the moment.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">os</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">LOCAL</span> <span class="o">=</span> <span class="s">&#39;/usr/local/bin:/usr/local/sbin:&#39;</span>
+</span><span class='line'><span class="n">HOME</span> <span class="o">=</span> <span class="s">&#39;/Users/Rob&#39;</span>  <span class="c">### !!! REPLACE WITH YOUR HOME PATH !!! ###</span>
+</span><span class='line'><span class="n">RVM</span> <span class="o">=</span> <span class="n">HOME</span> <span class="o">+</span> <span class="s">&#39;/.rvm/bin:&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Sublime&#39;s default path is</span>
+</span><span class='line'><span class="c"># /usr/bin:/bin:/usr/sbin:/sbin</span>
+</span><span class='line'><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;PATH&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s">&#39;:&#39;</span>
+</span><span class='line'><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;PATH&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">LOCAL</span>
+</span><span class='line'><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;PATH&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">RVM</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span> <span class="s">&#39;PATH = &#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;PATH&#39;</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you add this file to the Sublime user&#8217;s directory outlined above you should be able to hit cmd + ` to fire up the Sublime console which will print out our new PATH variable.</p>
+
+<p>I would also recommend adding a shell plugin to Sublime. At the moment I use <a href="https://github.com/misfo/Shell-Turtlestein">Shell Turtlestein.</a>.</p>
+
+<p>Now that I have my hacked path variable and my shell plugin I can check to see if RVM works. Using Shell Turtlestein you can hit <code>cmd-shift-c</code> to open a little console prompt. Typing <code>rvm current</code> returns our ruby version number and gemset. Nice! What&#8217;s even nicer is this means I can now run Rake tasks from inside of Sublime!</p>
+
+<p>I should point out if all you want to do is run Rake or Ant then there are already plugins for that sort of thing. My main effort in doing all this is to try to integrate the command line with Sublime a bit better. If <em>anyone</em> knows how to simply tell Sublime to use the path in my .bash_profile or .bashrc then I would gladly use that approach instead. But after crawling the forums for a while it looks like this is still a common problem with no good solution.</p>
+
+<ul>
+<li>Time: 8:26 pm</li>
+<li>Mood: Happy, Peaceful, Hurried</li>
+<li>Sleep: 7</li>
+<li>Hunger: 6</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
+  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -2981,15 +2916,15 @@ bear in mind that each module requires an http request to load it so you don&#82
       </li>
     
       <li class="post">
-        <a href="/blog/2012/05/22/css3-transitions-with-gfx/">CSS3 Transitions with GFX</a>
-      </li>
-    
-      <li class="post">
         <a href="/blog/2012/05/21/exploring-the-backbone-router-and-history-api/">Exploring the Backbone Router and History API</a>
       </li>
     
       <li class="post">
         <a href="/blog/2012/05/20/some-more-backbone-dot-js-basics/">Some More Backbone.js Basics</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/19/my-first-chain/">My First Chain</a>
       </li>
     
   </ul>
