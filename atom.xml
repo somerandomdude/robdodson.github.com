@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-25T09:15:51-07:00</updated>
+  <updated>2012-05-25T09:57:50-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -1100,7 +1100,11 @@
       top: 10px;
       width: 20px;
       height: 20px;
-      -webkit-transition: background-color 1s linear, left 1s, top 2s
+        -webkit-transition: background-color 1s linear, left 1s, top 2s
+     -moz-transition: background-color 1s linear, left 1s, top 2s
+      -ms-transition: background-color 1s linear, left 1s, top 2s
+       -o-transition: background-color 1s linear, left 1s, top 2s
+          transition: background-color 1s linear, left 1s, top 2s
     }
   </style>
 </div>
