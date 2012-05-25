@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-24T20:37:06-07:00</updated>
+  <updated>2012-05-24T23:36:33-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -849,9 +849,9 @@
   
   <entry>
     <title type="html"><![CDATA[CSS3 Transitions with GFX]]></title>
-    <link href="http://robdodson.me/blog/2012/05/22/css3-transitions-and-animations-with-sass/"/>
+    <link href="http://robdodson.me/blog/2012/05/22/css3-transitions-with-gfx/"/>
     <updated>2012-05-22T08:06:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/22/css3-transitions-and-animations-with-sass</id>
+    <id>http://robdodson.me/blog/2012/05/22/css3-transitions-with-gfx</id>
     <content type="html"><![CDATA[<p>CSS3 is a rather verbose tool especially when it comes to transitions and animations. I want to see if there&#8217;s a way to clean a lot of that up with either a SASS mixin or a jQuery library like <a href="http://maccman.github.com/gfx/">gfx.</a></p>
 
 <p>We&#8217;ll try to do something simple at first to recreate an animation like the one we have below.</p>
@@ -960,7 +960,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>After tinking with Gfx for what seems like hours at this point I haven&#8217;t figured out a way to pass two different times to simultaneous animations. From one animation to the next you have to specify the end points from the previous animations or else the styles will revert. That&#8217;s why I&#8217;m passing <code>translateX: '200px'</code> in both places&#8230;although I&#8217;m not 100% if that&#8217;s what I should be doing. I emailed the author of Gfx so we&#8217;ll see what he says.</p>
+<p>After tinkering with Gfx for what seems like hours at this point I haven&#8217;t figured out a way to pass two different times to simultaneous animations. From one animation to the next you have to specify the end points from the previous animations or else the styles will revert. That&#8217;s why I&#8217;m passing <code>translateX: '200px'</code> in both places&#8230;although I&#8217;m not 100% if that&#8217;s what I should be doing. I emailed the author of Gfx so we&#8217;ll see what he says :)</p>
 
 <ul>
 <li>Time: 8:07 am</li>
