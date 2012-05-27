@@ -4,7 +4,7 @@
   <title><![CDATA[Category: BDD | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/bdd/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-27T00:34:46-07:00</updated>
+  <updated>2012-05-27T16:58:59-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,224 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Getting started with Mocha and Chai]]></title>
+    <link href="http://robdodson.me/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai/"/>
+    <updated>2012-05-27T14:08:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai</id>
+    <content type="html"><![CDATA[<p>Since I was previously doing so much RSpec I want to try to bring some of that over to my JavaScript work. Lately I've been working with the Backbone Boilerplate which is a wonderful jump-start for folks who want to get up and running with AMD and Backbone. Today I'm going to see if I can get a working BDD setup going which will run some very basic tests. In a future post I'll use this new setup to do some BDD with Backbone Boilerplate.</p>
+
+<h3>Setting up Mocha and Chai</h3>
+
+<p>I chose Mocha over Jasmine because I've already worked with Jasmine so there wasn't much mystery there and also because I've heard really good things about Mocha. I think it's cool that if I choose to do a Node.js project Mocha will be able to test both my server and client code.</p>
+
+<p>Unfortunately the documentation for both Mocha and Chai is rather terse when it comes to actually explaining how to get either library working for client side testing. I guess that's understandable since their primary focus is Node but after over an hour of poking around both sites I still don't have anything that functions...</p>
+
+<p>Copying over both the mocha and chai directories into my project I've noticed that each one has a test/browser folder which is refered to in the documentation. Seems like this is how I run my specs. Mocha has a failing set of specs on its opts.html file but otherwise everything seems to pass. Chai has failures in its spec regarding its deep equals operations... Let's see if we can forge ahead and write a test in just mocha.</p>
+
+<p>Here's my html runner setup:</p>
+
+<p>``` html
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests</title>
+  <link rel="stylesheet" href="mocha/mocha.css" />
+  <script src="../assets/js/libs/jquery.js"></script>
+  <script src="mocha/mocha.js"></script>
+  <script>mocha.setup('bdd')</script>
+  <script src="test.foobar.js"></script>
+  <script></p>
+
+<pre><code>$(function() {
+  mocha.run();
+})
+</code></pre>
+
+<p>  </script>
+</head>
+<body>
+  <div id="mocha"></div>
+</body>
+</html>
+```</p>
+
+<p>And here's my first failing test:</p>
+
+<p>``` js
+describe('Foobar', function() {
+  describe('#sayHello()', function() {</p>
+
+<pre><code>it('should return some text', function() {
+  var foobar = {
+    sayHello: function() {
+      return 'Hello World!';
+    }
+  };
+
+  assert(foobar.sayHello() === 'funky chicken');
+})
+</code></pre>
+
+<p>  })
+})
+```</p>
+
+<p>Using just the above I see the mocha runner fire up but then it immediately breaks saying that <code>assert</code> is not defined. Well...great. <a href="http://visionmedia.github.com/mocha/#browser-support">I'm basing my work on this example</a> but I realize now that I removed the line which included <code>expect.js</code>. Without expect.js we don't have anything to do exceptions for us because Mocha doesn't include any by default.</p>
+
+<p><img class="center" src="/images/no_assert.png" title="'Assert is not defined" ></p>
+
+<p>Looking at some other Mocha examples in the github repo I noticed that they explicitly define the <code>assert</code> method inside the runner. We'll do the same to get things working. Here's my updated runner which now functions as expected. Note the addition of <code>assert</code> after we call <code>mocha.setup('bdd')</code>.</p>
+
+<p>``` js
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests</title>
+  <link rel="stylesheet" href="mocha/mocha.css" />
+  <script src="../assets/js/libs/jquery.js"></script>
+  <script src="mocha/mocha.js"></script>
+  <script>mocha.setup('bdd')</script>
+  <script></p>
+
+<pre><code>function assert(expr, msg) {
+  if (!expr) throw new Error(msg || 'failed');
+}
+</code></pre>
+
+<p>  </script>
+  <script src="test.foobar.js"></script>
+  <script></p>
+
+<pre><code>$(function() {
+  mocha.run();
+})
+</code></pre>
+
+<p>  </script>
+</head>
+<body>
+  <div id="mocha"></div>
+</body>
+</html>
+```</p>
+
+<p>Since our <code>assert</code> method takes a <code>msg</code> param we can add that to our test so we get some useful feedback when it fails. Here's the updated spec.</p>
+
+<p>``` js
+describe('Foobar', function() {
+  describe('#sayHello()', function() {</p>
+
+<pre><code>it('should return some text', function() {
+  var foobar = {
+    sayHello: function() {
+      return 'Hello World!';
+    }
+  };
+
+  assert(foobar.sayHello() === 'funky chicken', 'Was expecting "Hello World!"');
+})
+</code></pre>
+
+<p>  })
+})
+```</p>
+
+<p>That should fail and give us the appropriate message. Changing 'funky chicken' to 'Hello World!' will make the test pass. Yay that only took a few hours...</p>
+
+<p>OK, let's forge ahead and see if we can get chai working so we can use some nicer expectations than our weak <code>assert</code>. I'm including chai.js in place of our <code>assert</code> function.</p>
+
+<p>```
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests</title>
+  <link rel="stylesheet" href="mocha/mocha.css" />
+  <script src="../assets/js/libs/jquery.js"></script>
+  <script src="chai/chai.js"></script> <!-- added chai.js instead of assert -->
+  <script src="mocha/mocha.js"></script>
+  <script>mocha.setup('bdd')</script>
+  <script src="test.foobar.js"></script>
+  <script></p>
+
+<pre><code>$(function() {
+  mocha.run();
+})
+</code></pre>
+
+<p>  </script>
+</head>
+<body>
+  <div id="mocha"></div>
+</body>
+</html>
+```</p>
+
+<p>Next we need to update our spec. Chai has 3 different styles of assertions: <code>assert</code>, <code>expect</code> and <code>should</code>. I'll show you how to use each in our foobar spec:</p>
+
+<p>``` js
+var assert = chai.assert,</p>
+
+<pre><code>expect = chai.expect,
+should = chai.should(); // Note that should has to be executed
+</code></pre>
+
+<p>var foobar = {
+  sayHello: function() {</p>
+
+<pre><code>return 'Hello World!';
+</code></pre>
+
+<p>  }
+};</p>
+
+<p>describe('Foobar', function() {
+  describe('#sayHello()', function() {</p>
+
+<pre><code>it('should work with assert', function() {
+  assert.equal(foobar.sayHello(), 'funky chicken!');
+})
+
+it('should work with expect', function() {
+  expect(foobar.sayHello()).to.equal('funky chicken!');
+})
+
+it('should work with should', function() {
+  foobar.sayHello().should.equal('funky chicken!');
+})
+</code></pre>
+
+<p>  })
+})
+```</p>
+
+<p><img class="center" src="/images/failing_chai_tests.png" title="'Our failing Chai tests'" ></p>
+
+<p>Changing all those funky chickens to 'Hello World!' should get the tests passing again and now we can use any syntax we like.</p>
+
+<p><img class="center" src="/images/passing_chai_tests.png" title="'Finally some passing Chai tests!'" ></p>
+
+<p>Now all is well and good except the tests that come with Chai are failing in a few places. It looks like some of Chai's methods are borked on my system.</p>
+
+<p><img class="center" src="/images/broken_chai_tests.png" title="'Chai failing its own tests'" ></p>
+
+<p>That does <em>not</em> fill me with confidence. I think there's a very high probability that being a newbie I'm doing something wrong so <a href="https://twitter.com/rob_dodson/status/206893206435151872/photo/1">I've tweeted to Jake Luer, the author of Chai, to figure out if perhaps I'm missing something or if the tools are actually broken.</a> In the meantime I'm not comfortable using a testing framework that's broken.</p>
+
+<p>Sigh... well tomorrow I'll try to import some modules and if Jake hasn't gotten back to me by then I'll use Jasmine to do those tests. Till then!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 2:09 pm</li>
+<li>Mood: Awake, Caffeinated, Curious</li>
+<li>Sleep: 7</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 8]]></title>
@@ -740,233 +958,6 @@ end
 <li>Mood: Alert, Awake, Anxious</li>
 <li>Sleep: 8</li>
 <li>Hunger: 3</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 4]]></title>
-    <link href="http://robdodson.me/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4/"/>
-    <updated>2012-05-11T07:20:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4</id>
-    <content type="html"><![CDATA[<p>Continuing from our <a href="http://robdodson.me/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/">previous post</a> we're going to keep working on our <code>Crawler</code> and our specs to see if we can start pulling real data from our site.</p>
-
-<p>The first thing I did this morning was to run my tests:
-```
-bundle exec rspec spec/</p>
-
-<p>..............</p>
-
-<p>Finished in 0.01271 seconds
-14 examples, 0 failures
-```
-As someone totally new to TDD/BDD this is kind of an awesome feeling. I left my code for a few days and now I can come back and verify that everything still works. We can take it even further and run rspec with a documentation formatter to get some pretty printed output:</p>
-
-<p>```ruby
-bundle exec rspec spec/ -cf d</p>
-
-<p>Tentacles::Crawler
-  constructors</p>
-
-<pre><code>#from_uri
-  should respond
-  should return an instance
-</code></pre>
-
-<p>  instances</p>
-
-<pre><code>should respond to #get_words_by_selector
-should respond to #get_metadata_by_selector
-</code></pre>
-
-<p>Tentacles::Options
-  should respond to #uri
-  should respond to #post_selector
-  should respond to #metadata_selector
-  #initialize</p>
-
-<pre><code>when parsing the URI
-  when URI is valid
-    should display the right URI
-  when URI is invalid
-    should raise an exception
-  when URI does not contain a scheme
-    should raise an IO exception
-  when URI does not contain a host
-    should raise an IO exception
-</code></pre>
-
-<p>Tentacles::Runner
-  should respond to #run
-  when parsing the config file</p>
-
-<pre><code>should raise an error if the config file is missing
-should raise an error if the config file is invalid
-</code></pre>
-
-<p>Finished in 0.01359 seconds
-14 examples, 0 failures
-```</p>
-
-<p>In rspec the <code>-c</code> flag enables color in the output. The <code>-f</code> flag sets a formatter and <code>d</code> specifies the documentation format.</p>
-
-<p>```bash
--f, --format FORMATTER           Choose a formatter.</p>
-
-<pre><code>                                   [p]rogress (default - dots)
-                                   [d]ocumentation (group and example names)
-                                   [h]tml
-                                   [t]extmate
-                                   custom formatter class name
-</code></pre>
-
-<p>```</p>
-
-<p>Neat.</p>
-
-<p>In <code>crawler_spec.rb</code> I'm going to add a test that checks to see if our instance has actually stored the content from our mocked web request.</p>
-
-<p>```ruby
-require_relative '../lib/tentacles/crawler'
-require 'fakeweb'</p>
-
-<p>describe Tentacles::Crawler do</p>
-
-<p>  before do</p>
-
-<pre><code># Create a mock options object
-@options = {
-  uri: 'http://robdodson.me', 
-  post_selector: '.entry-content',
-  metadata_selector: '.personal-metadata'
-}
-
-# Create a mock web request
-FakeWeb.register_uri(:get, @options[:uri], :body =&gt; "Hello World! Hello San Francisco!")
-</code></pre>
-
-<p>  end</p>
-
-<p>  describe "constructors" do</p>
-
-<pre><code>describe "#from_uri" do
-  it "should respond" do
-    Tentacles::Crawler.should respond_to(:from_uri)
-  end
-
-  it "should return an instance" do
-    crawler = Tentacles::Crawler.from_uri(@options[:uri])
-    crawler.should be_an_instance_of(Tentacles::Crawler)
-  end
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  describe "instances" do</p>
-
-<pre><code>before do
-  @crawler = Tentacles::Crawler.from_uri(@options[:uri])
-end
-
-subject { @crawler }
-
-it { should respond_to(:get_words_by_selector) }
-it { should respond_to(:get_metadata_by_selector) }
-
-context "post-construct" do
-  it "should have the right document" do
-    @crawler.doc.content.should =~ /Hello World! Hello San Francisco!/
-  end
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>I want to write a test to parse the content for keywords but I realize now that our FakeWeb request returns a string without any classes or id's. Gotta go back and wrap it in some HTML to match our selectors. So I'm changing the mock web request to look like this:</p>
-
-<p>```ruby</p>
-
-<h1>Create a mock web request</h1>
-
-<pre><code>FakeWeb.register_uri(:get, @options[:uri],
-                     :body =&gt; '&lt;div class="' + @options[:post_selector] + '"&gt;Hello World! Hello San Francisco!&lt;/div&gt;')
-</code></pre>
-
-<p>```</p>
-
-<h3>Hello Hello Hello World!</h3>
-
-<p>After a lot of back and forth I finally get my test to pass. I realize along the way that there are a bunch of things I need to change. For starters having most of my words be the same count doesn't really help me to validate that my keyword counting is working all that well. So I'm changing our FakeWeb request and the subsequent specs which test against it.</p>
-
-<p>```ruby</p>
-
-<h1>Create a mock web request</h1>
-
-<pre><code>FakeWeb.register_uri(:get, @options[:uri],
-                     :body =&gt; '&lt;div class="' + @options[:post_selector].delete(".") + '"&gt;Hello Hello Hello World World Foobar!&lt;/div&gt;')
-</code></pre>
-
-<p>```</p>
-
-<p>```ruby</p>
-
-<pre><code>context "post-construct" do
-  it "should have the right document" do
-    @crawler.doc.content.should =~ /Hello Hello Hello World World Foobar!/
-  end
-end
-</code></pre>
-
-<p>```</p>
-
-<p>Next I need to make sure that my <code>get_words_by_selector</code> method is accepting a selector.</p>
-
-<p>```ruby
-def get_words_by_selector(selector)</p>
-
-<pre><code>  entries = doc.css('div.entry-content')
-  entries.each do |entry|
-    words = words_from_string(entry.content)
-    count_frequency(words)
-  end
-
-  sorted = @counts.sort_by { |word, count| count }
-  sorted.reverse!
-  sorted.map { |word, count| "#{word}: #{count}"}
-end
-</code></pre>
-
-<p>```</p>
-
-<p>I also realize that I'd like my Array of keywords to be in desceding order so I <code>reverse</code> it after the initial sort.</p>
-
-<p>Next I'm going to write the test to verify that we've received a group of words, counted them up and tossed them into an Array in descending order:</p>
-
-<p>```ruby</p>
-
-<pre><code>describe "#get_words_by_selector" do
-  it "should produce an Array of keywords" do
-    expected_array = ['hello: 3', 'world: 2', 'foobar: 1']
-    actual_array = @crawler.get_words_by_selector(@options[:post_selector])
-    actual_array.should eq(expected_array)
-  end
-end
-</code></pre>
-
-<p>```</p>
-
-<p>I actually wrote the test first and did everything else to make it pass. But at this point it should all be passing and we can verify that given a request with the appropriate selector we should be able to build a basic word frequency list. Yay!</p>
-
-<ul>
-<li>Time: 7:35 am</li>
-<li>Mood: Calm, Awake, Curious</li>
-<li>Sleep: 7</li>
-<li>Hunger: 4</li>
 <li>Coffee: 0</li>
 </ul>
 
