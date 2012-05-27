@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-27T00:28:21-07:00</updated>
+  <updated>2012-05-27T00:30:16-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -18,7 +18,9 @@
     <link href="http://robdodson.me/blog/2012/05/27/penner-easing-equations-with-gfx-and-css3/"/>
     <updated>2012-05-27T00:07:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/27/penner-easing-equations-with-gfx-and-css3</id>
-    <content type="html"><![CDATA[<p>This is going to be a bit of lightening post because it&#8217;s rather late and I need to get to bed. I spent most of the day either eating dim sum or hanging out at the <a href="http://www.meetup.com/San-Francisco-Creative-Coders/">SF Creative Coders BBQ</a> so I&#8217;ve neglected my blogging duties a bit. But I have something which will hopefully be useful for some folks who are getting into CSS3 animations with the Gfx plugin for jQuery. <a href="http://robdodson.me/blog/2012/05/22/css3-transitions-with-gfx/">I&#8217;ve blogged a bit about Gfx before</a> and one of the first things I noticed was the lack of really high powered easing support. Coming from the Flash world where <a href="http://www.greensock.com/tweenlite/">TweenLite is king</a> I&#8217;ve grown very accustomed to using Robert Penner&#8217;s easing equations for great effect. Thankfully <a href="http://matthewlein.com/ceaser/">Matthew Lein was kind enough to convert those over to cubic-beziers</a> for those of us doing CSS3 animations. Since Gfx accepts cubic-beziers I moved the equations from Matthew&#8217;s tool into an AMD compliant module and <a href="https://github.com/robdodson/amd-css3-ease">put it up on Github.</a> It&#8217;s very simple so if AMD isn&#8217;t your thing you can just rip those parts out :D</p>
+    <content type="html"><![CDATA[<p>This is going to be a bit of lightening post because it&#8217;s rather late and I need to get to bed. I spent most of the day either eating dim sum or hanging out at the <a href="http://www.meetup.com/San-Francisco-Creative-Coders/">SF Creative Coders BBQ</a> so I&#8217;ve neglected my blogging duties a bit.</p>
+
+<p>I have something which will hopefully be useful for some folks who are getting into CSS3 animations with the Gfx plugin for jQuery. <a href="http://robdodson.me/blog/2012/05/22/css3-transitions-with-gfx/">I&#8217;ve blogged a bit about Gfx before</a> and one of the first things I noticed was the lack of really high powered easing support. Coming from the Flash world where <a href="http://www.greensock.com/tweenlite/">TweenLite is king</a> I&#8217;ve grown very accustomed to using Robert Penner&#8217;s easing equations for great effect. Thankfully <a href="http://matthewlein.com/ceaser/">Matthew Lein was kind enough to convert those over to cubic-beziers</a> for those of us doing CSS3 animations. Since Gfx accepts cubic-beziers I moved the equations from Matthew&#8217;s tool into an AMD compliant module and <a href="https://github.com/robdodson/amd-css3-ease">put it up on Github.</a> It&#8217;s very simple so if AMD isn&#8217;t your thing you can just rip those parts out :D</p>
 
 <p>Example usage looks something like this:</p>
 
