@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: Chronic - Rob Dodson talks internets</title>
+  <title>Penner easing equations with GFX and CSS3 - Rob Dodson talks internets</title>
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Category: Chronic">
+  <meta name="description" content="This is going to be a bit of lightening post because it&#8217;s rather late and I need to get to bed. I spent most of the day either eating dim sum &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://robdodson.meblog/categories/chronic">
+  <link rel="canonical" href="http://robdodson.me/blog/2012/05/27/penner-easing-equations-with-gfx-and-css3">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -74,36 +74,131 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: Chronic</h1>
+    
+      <h1 class="entry-title">Penner Easing Equations With GFX and CSS3</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-27T00:07:00-07:00" pubdate data-updated="true">May 27<span>th</span>, 2012</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><p>This is going to be a bit of lightening post because it&#8217;s rather late and I need to get to bed. I spent most of the day either eating dim sum or hanging out at the <a href="http://www.meetup.com/San-Francisco-Creative-Coders/">SF Creative Coders BBQ</a> so I&#8217;ve neglected my blogging duties a bit. But I have something which will hopefully be useful for some folks who are getting into CSS3 animations with the Gfx plugin for jQuery. <a href="http://robdodson.me/blog/2012/05/22/css3-transitions-with-gfx/">I&#8217;ve blogged a bit about Gfx before</a> and one of the first things I noticed was the lack of really high powered easing support. Coming from the Flash world where <a href="http://www.greensock.com/tweenlite/">TweenLite is king</a> I&#8217;ve grown very accustomed to using Robert Penner&#8217;s easing equations for great effect. Thankfully <a href="http://matthewlein.com/ceaser/">Matthew Lein was kind enough to convert those over to cubic-beziers</a> for those of us doing CSS3 animations. Since Gfx accepts cubic-beziers I moved the equations from Matthew&#8217;s tool into an AMD compliant module and <a href="https://github.com/robdodson/amd-css3-ease">put it up on Github.</a> It&#8217;s very simple so if AMD isn&#8217;t your thing you can just rip those parts out :D</p>
 
-  
-  <h2>2012</h2>
+<p>Example usage looks something like this:</p>
 
-<article>
-  
-<h1><a href="/blog/2012/04/28/playing-with-ruby-dates/">Playing with Ruby Dates</a></h1>
-<time datetime="2012-04-28T07:20:00-07:00" pubdate><span class='month'>Apr</span> <span class='day'>28</span> <span class='year'>2012</span></time>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// After requiring the ease module and</span>
+</span><span class='line'><span class="c1">// passing it into your View with the</span>
+</span><span class='line'><span class="c1">// name &#39;Ease&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">gfx</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">translateY</span><span class="o">:</span> <span class="s1">&#39;300px&#39;</span>
+</span><span class='line'><span class="p">},</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">duration</span><span class="o">:</span> <span class="mi">500</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">easing</span><span class="o">:</span> <span class="nx">Ease</span><span class="p">.</span><span class="nx">easeInExpo</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/active-support/'>Active Support</a>, <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/chronic/'>Chronic</a>, <a class='category' href='/blog/categories/date/'>Date</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a></span>
-</footer>
 
+<p>Give it a shot and consider donating to Matthew&#8217;s project or buying Robert Penner like a million beers!</p>
 
-</article>
+<ul>
+<li>Time: 12:09 am</li>
+<li>Mood: Tired, Tipsy</li>
+<li>Sleep: 7</li>
+<li>Hunger: 0</li>
+<li>Coffee: 0</li>
+</ul>
 
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Rob Dodson</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-27T00:07:00-07:00" pubdate data-updated="true">May 27<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/animation/'>Animation</a>, <a class='category' href='/blog/categories/css3/'>CSS3</a>, <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/gfx/'>GFX</a>, <a class='category' href='/blog/categories/jquery/'>jQuery</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2012/05/27/penner-easing-equations-with-gfx-and-css3/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2012/05/27/penner-easing-equations-with-gfx-and-css3/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/05/25/backbone-events-framework-communication/" title="Previous Post: Backbone Events: Framework Communication">&laquo; Backbone Events: Framework Communication</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -222,7 +317,10 @@
       var disqus_shortname = 'robdodsontalksinternets';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://robdodson.me/blog/2012/05/27/penner-easing-equations-with-gfx-and-css3/';
+        var disqus_url = 'http://robdodson.me/blog/2012/05/27/penner-easing-equations-with-gfx-and-css3/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
