@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="One of my previous projects involved a ton of work using Flash&#8217;s built in Date object. We ended up rolling our own Calendar library which was &hellip;">
+  <meta name="description" content="Install PostgreSQL Locally Ryan Bates has already put together a wonderful Railscast on this topic so feel free to jump over there to view it. My &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,254 +75,6 @@
     <div id="content">
       <div class="blog-index">
   
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/04/28/playing-with-ruby-dates/">Playing With Ruby Dates</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-04-28T07:20:00-07:00" pubdate data-updated="true">Apr 28<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>One of <a href="https://vimeo.com/40633070">my previous projects</a> involved a ton of work using Flash&#8217;s built in Date object. We ended up rolling our own Calendar library which was both tedious and time consuming to debug. Now that I&#8217;m digging into Ruby for my newest project, I wanted to see what features the language has to offer. So far I&#8217;m <em>really</em> impressed and that&#8217;s after only a few hours of exploration. I&#8217;ll detail some of the tricks I&#8217;ve learned along the way so hopefully other newcomers can benefit.</p>
-
-<h3>Ruby Date Object Basics</h3>
-
-<p>We can start off by firing up IRB and requiring the <code>date</code> class. Let&#8217;s do a really simple example first and just generate today.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>require 'date'
-</span><span class='line'>
-</span><span class='line'>today = Date.today
-</span><span class='line'> =&gt; #&lt;Date: 2012-04-28 ((2456046j,0s,0n),+0s,2299161j)&gt;</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now lets try a bit of Ruby&#8217;s sugar to generate tomorrow&#8217;s date.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>tomorrow = today + 1
-</span><span class='line'> =&gt; #&lt;Date: 2012-04-29 ((2456047j,0s,0n),+0s,2299161j)&gt; </span></code></pre></td></tr></table></div></figure>
-
-
-<p>Pretty straightforward, right? Since there is usually more than one way to do something in Ruby we could have achieved the same results using any of the following.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>today.succ
-</span><span class='line'> =&gt; #&lt;Date: 2012-04-29 ((2456047j,0s,0n),+0s,2299161j)&gt;
-</span><span class='line'>
-</span><span class='line'>today.next
-</span><span class='line'> =&gt; #&lt;Date: 2012-04-29 ((2456047j,0s,0n),+0s,2299161j)&gt; 
-</span><span class='line'>
-</span><span class='line'>today.next_day
-</span><span class='line'> =&gt; #&lt;Date: 2012-04-29 ((2456047j,0s,0n),+0s,2299161j)&gt; </span></code></pre></td></tr></table></div></figure>
-
-
-<p>As <a href="http://stackoverflow.com/questions/962544/one-line-hash-creation-in-ruby">someone on StackOverflow pointed out</a>: <code>Date</code> objects are also <code>Comparable</code>, so you can construct a <code>Range</code>. If you wanted to collect every day from the previous week into an array you could do the following:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>last_week = today - 7
-</span><span class='line'>every_day_last_week = (last_week..today).to_a</span></code></pre></td></tr></table></div></figure>
-
-
-<p>or&#8230;</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>today.downto(today - 7).to_a</span></code></pre></td></tr></table></div></figure>
-
-
-<p>There are also some cute booleans tossed into the mix for figuring out the day of the week.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>today.friday?
-</span><span class='line'> =&gt; false
-</span><span class='line'>
-</span><span class='line'>today.saturday?
-</span><span class='line'> =&gt; true</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>How to Use Chronic</h3>
-
-<p><a href="https://github.com/mojombo/chronic/">Chronic</a> is a Ruby natural language date/time parser written by <a href="http://tom.preston-werner.com/">Tom Preston-Werner</a> (<a href="https://twitter.com/#!/mojombo">@mojombo</a>) which takes surprisingly human readable text and converts it to dates.</p>
-
-<p>Covering everything that Chronic supports could take a while so definitely go check out the docs. Below is just a quick example to demonstrate how cool it is.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>require 'chronic'
-</span><span class='line'>
-</span><span class='line'>Chronic.parse('yesterday')
-</span><span class='line'> =&gt; 2012-04-27 12:00:00 -0700
-</span><span class='line'>
-</span><span class='line'>Chronic.parse('yesterday').to_date
-</span><span class='line'> =&gt; #&lt;Date: 2012-04-27 ((2456045j,0s,0n),+0s,2299161j)&gt; 
-</span><span class='line'>
-</span><span class='line'>Chronic.parse('last monday')
-</span><span class='line'> =&gt; 2012-04-23 12:00:00 -0700 
-</span><span class='line'>
-</span><span class='line'>Chronic.parse('3 months ago this friday at 3:45pm')
-</span><span class='line'> =&gt; 2012-02-04 15:45:00 -0800</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>How to Use Active Support for Dates</h3>
-
-<p>Active Support is a library extracted from Rails which adds a ton of sugar to the Ruby language. As the author&#8217;s describe it:</p>
-
-<blockquote><p>Active Support is a collection of various utility classes and standard library extensions that were found useful for Rails. All these additions have hence been collected in this bundle as a way to gather all that sugar that makes Ruby sweeter.</p></blockquote>
-
-<p>It&#8217;s broken into several pieces so you can choose to load only the parts that you&#8217;ll actually be using. <em>I&#8217;m going to write an upcoming article on Active Support. For now we&#8217;ll just require it all.</em></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>require 'active_support/all'
-</span><span class='line'>
-</span><span class='line'>t = Date.today
-</span><span class='line'> =&gt; Sat, 28 Apr 2012
-</span><span class='line'>
-</span><span class='line'>t.class
-</span><span class='line'> =&gt; Date </span></code></pre></td></tr></table></div></figure>
-
-
-<p>You&#8217;ll notice that Active Support has changed the way our date&#8217;s <code>to_s</code> is formatted so it&#8217;s more human readable. It also added shortcuts for creating Dates on either side of today.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>yesterday = Date.yesterday
-</span><span class='line'> =&gt; Fri, 27 Apr 2012 
-</span><span class='line'> 
-</span><span class='line'>tomorrow = Date.tomorrow
-</span><span class='line'> =&gt; Sun, 29 Apr 2012</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Included as well are some nice convenience booleans: <code>past?</code>, <code>today?</code>, and <code>future?</code></p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>tomorrow.future?
-</span><span class='line'> =&gt; true</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you&#8217;ve ever had to write a Calendar that can support weeks, especially those that straddle two different months, you&#8217;ll appreciate the simplicity of the helpers Active Support adds.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>today = Date.today
-</span><span class='line'> =&gt; Sat, 28 Apr 2012
-</span><span class='line'>
-</span><span class='line'>today.beginning_of_week
-</span><span class='line'> =&gt; Mon, 23 Apr 2012
-</span><span class='line'>
-</span><span class='line'>today.next_week
-</span><span class='line'> =&gt; Mon, 30 Apr 2012
-</span><span class='line'>
-</span><span class='line'># You can also choose to make the week start on an arbitrary day, like Sunday
-</span><span class='line'>today.beginning_of_week(:sunday)
-</span><span class='line'> =&gt; Sun, 22 Apr 2012</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-
-<p>We aren&#8217;t limited to weeks though. Active Support adds methods for days, months and years. For example:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>today.years_ago(10)
-</span><span class='line'> =&gt; Sun, 28 Apr 2002</span></code></pre></td></tr></table></div></figure>
-
-
-<p>By extending <code>FixNum</code> to support additional Date methods certain operations become much more readable.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>today + 1.year
-</span><span class='line'> =&gt; Sun, 28 Apr 2013</span></code></pre></td></tr></table></div></figure>
-
-
-<p>These extensions are referred to as <code>durations</code> <a href="http://guides.rubyonrails.org/active_support_core_extensions.html">in the documentation</a>.
-Which brings us back to one of our first examples of finding the date 7 days ago. With Active Support it&#8217;s as easy as&#8230;</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>7.days.ago
-</span><span class='line'> =&gt; 2012-04-21 08:44:02 -0700</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Pretty cool! Active Support adds <em>A LOT</em> more than just Date helpers and I&#8217;ll try to cover it more in some future articles. Definitely <a href="http://guides.rubyonrails.org/active_support_core_extensions.html">check out the documentation</a> (you can <a href="http://guides.rubyonrails.org/active_support_core_extensions.html#extensions-to-date">skip to the Date section</a> since it&#8217;s pretty immense).</p>
-
-<p><small>Source:<br />
-<a href="http://stackoverflow.com/questions/962544/one-line-hash-creation-in-ruby">http://stackoverflow.com/questions/962544/one-line-hash-creation-in-ruby</a>
-<a href="http://www.developer.com/open/article.php/3729206/Telling-Time-with-Ruby.htm">http://www.developer.com/open/article.php/3729206/Telling-Time-with-Ruby.htm</a>
-<a href="http://guides.rubyonrails.org/active_support_core_extensions.html">http://guides.rubyonrails.org/active_support_core_extensions.html</a></small></p>
-</div>
-  
-  
-
-
-    </article>
   
   
     <article>
@@ -883,10 +635,6 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2012/05/28/getting-familiar-with-mocha-and-chai/">Getting Familiar with Mocha and Chai</a>
-      </li>
-    
-      <li class="post">
         <a href="/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai/">Getting started with Mocha and Chai</a>
       </li>
     
@@ -900,6 +648,10 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
     
       <li class="post">
         <a href="/blog/2012/05/24/backbone-events-between-views/">Backbone Events: Adding Views to the DOM</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/23/how-do-you-switch-between-views-in-backbone/">How do you switch between views in Backbone</a>
       </li>
     
   </ul>
