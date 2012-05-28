@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-27T16:58:59-07:00</updated>
+  <updated>2012-05-28T14:53:30-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,413 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Familiar with Mocha and Chai]]></title>
+    <link href="http://robdodson.me/blog/2012/05/28/getting-familiar-with-mocha-and-chai/"/>
+    <updated>2012-05-28T11:20:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/28/getting-familiar-with-mocha-and-chai</id>
+    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai/">After a bit of a rocky start yesterday</a> I've finally got Mocha and Chai running in the browser which is great. Today I'd like to test out some of the async functionality of Mocha. This seems to be the big selling point for most people so we'll kick the tires a bit.</p>
+
+<h3>Basic Async Tests with Mocha and Chai</h3>
+
+<p>I wrote a little Node service that we'll consume for testing purposes. This is my first <a href="http://nodejs.org/">Node</a> and <a href="http://expressjs.com/">Express</a> app so apologies if it's lamesauce. I used the <code>express</code> command to boilerplate a project called <code>pickles</code> with some very basic routes:</p>
+
+<p>``` js
+// Routes</p>
+
+<p>var count = 100;</p>
+
+<p>app.get('/', function(req, res) {
+  res.send('Welcome to the Pickle Store!');
+});</p>
+
+<p>app.get('/pickles', function(req, res) {
+  res.json({</p>
+
+<pre><code>count: count,
+message: 'oh boy, ' + count + ' pickles!'
+</code></pre>
+
+<p>  });
+});</p>
+
+<p>app.get('/pickles/add/:num', function(req, res) {
+  count += parseInt(req.params.num);
+  res.json({</p>
+
+<pre><code>add: req.params.num,
+message: 'you added ' + req.params.num + ' pickles to the pickle barrel!'
+</code></pre>
+
+<p>  });
+});</p>
+
+<p>app.listen(3000, function(){
+  console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+});
+```
+We'll need to make sure our node service is running for our tests to work and all of our URLs will point at localhost:3000. Obviously you wouldn't want this for a production setting but it'll be fine for demonstration purposes.</p>
+
+<p>Here is our really simple Mocha spec. We're actually creating a <code>pickelStore</code> object in the spec file itself so we can test against it.</p>
+
+<p>``` js test.pickles.js
+var expect = chai.expect;</p>
+
+<p>var pickleStore = {
+  pickles: function() {</p>
+
+<pre><code>$.ajax({
+  url: 'http://localhost:3000/pickles',
+  dataType: 'json',
+  success: function(data) {
+    console.log(data);
+  }
+});
+</code></pre>
+
+<p>  },
+  add: function(num) {</p>
+
+<pre><code>$.ajax({
+  url: 'http://localhost:3000/pickles/add/' + num,
+  dataType: 'json',
+  success: function(data) {
+    console.log(data);
+  }
+});
+</code></pre>
+
+<p>  }
+};</p>
+
+<p>describe('Pickle Store', function() {
+  describe('#pickles', function() {</p>
+
+<pre><code>pickleStore.pickles();
+</code></pre>
+
+<p>  });
+});
+```</p>
+
+<p>I just want to see if the ajax methods will run and hit our Node service but I'm running into the following issue in Chrome:</p>
+
+<p><code>
+XMLHttpRequest cannot load http://localhost:3000/pickles. Origin null is not allowed by Access-Control-Allow-Origin.
+</code>
+Bummer... :(</p>
+
+<p>OK, what's going on here... To StackOverflow! <a href="http://stackoverflow.com/questions/8456538/origin-null-is-not-allowed-by-access-control-allow-origin/8456586#8456586">Aaaand we have our response.</a> After a bit of googling I came across <a href="http://www.stoimen.com/blog/2010/11/19/diving-into-node-js-very-first-app/">this post</a> which mentions adding <code>res.header('Access-Control-Allow-Origin', '*');</code> to my Node responses. That does the trick. I also found <a href="http://www.stoimen.com/blog/2010/11/19/diving-into-node-js-very-first-app/">this post</a> which describes setting up <a href="https://developer.mozilla.org/en/http_access_control">CORS</a> with Express.</p>
+
+<p>OK hopefully we're done with Node for now. I don't want this to turn into a node tutorial... Let's see if we can get the tests to perform using Mocha. We'll need some way to mock and spy on the ajax because I don't want to test the data coming from the actual service. I've realized I want to <em>simulate</em> the service for client-side Mocha tests. In a future tutorial I'll test the service itself using the Node aspect of Mocha. Kind of silly to lead off this way but whatever, moving on!</p>
+
+<h3>Enter Sinon.js</h3>
+
+<p>I'm going to use <a href="http://sinonjs.org/">Sinon.js</a> to help me mock, stub, fake, spy and do whatever the heck else I need to make sure my client code is solid. After downloading the js file for Sinon you can just add it to our test/index.html under the line where we added mocha.</p>
+
+<p>``` html
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests</title>
+  <link rel="stylesheet" href="mocha/mocha.css" />
+  <script src="../assets/js/libs/jquery.js"></script>
+  <script src="chai/chai.js"></script>
+  <script src="mocha/mocha.js"></script>
+  <script src="sinon/sinon.js"></script>
+  <script>mocha.setup('bdd');</script>
+  <script src="test.pickles.js"></script>
+  <script></p>
+
+<pre><code>$(function() {
+  mocha.run();
+})
+</code></pre>
+
+<p>  </script>
+</head>
+<body>
+  <div id="mocha"></div>
+</body>
+</html>
+```</p>
+
+<p>Now we can use Sinon in our <code>test.pickles.js</code> file to get a handled on our ajax. Let's first test that an ajax call is made when we run the <code>pickles()</code> method of the <code>pickleStore</code> object. We'll make sure this first test fails, then we'll change the spec to make it pass.</p>
+
+<p>``` js test.pickles.js
+var expect = chai.expect;</p>
+
+<p>var pickleStore = {
+  pickles: function() {</p>
+
+<pre><code>$.ajax({
+  url: 'http://localhost:3000/pickles',
+  dataType: 'json',
+  success: function(data) {
+    console.log(data);
+  }
+});
+</code></pre>
+
+<p>  },
+  add: function(num) {</p>
+
+<pre><code>$.ajax({
+  url: 'http://localhost:3000/pickles/add/' + num,
+  dataType: 'json',
+  success: function(data) {
+    console.log(data);
+  }
+});
+</code></pre>
+
+<p>  }
+};</p>
+
+<p>describe('Pickle Store', function() {
+  describe('#pickles', function() {</p>
+
+<pre><code>// Use Sinon to replace jQuery's ajax method
+// with a spy.
+beforeEach(function() {
+  sinon.spy($, 'ajax');
+});
+
+// Restor jQuery's ajax method to its
+// original state
+afterEach(function() { 
+  $.ajax.restore();
+})
+
+it('should make an ajax call', function(done) {
+  pickleStore.pickles();
+  expect($.ajax.calledOnce).to.be.false; // see if the spy WASN'T called
+  done(); // let Mocha know we're done async testing
+});
+</code></pre>
+
+<p>  });
+});
+```
+<img class="center" src="https://s3.amazonaws.com/robdodson/images/first_failing_ajax_test.png" title="'Our first failing test with Mocha, Chai and Sinon. Yay!'" ></p>
+
+<p>Changing this line <code>expect($.ajax.calledOnce).to.be.false;</code> from <code>false</code> to <code>true</code> should make our test pass. Yay, first async test in the bag! Next let's try to fake a response from the server. But I'm realizing that the succesful server response should <em>do</em> something to my pickleStore object, otherwise why do I care about the data? So I'm going to update pickelStore with the following success callback on its pickles method:</p>
+
+<p>``` js test.pickles.js
+var pickleStore = {
+  count: 0,
+  status: '',
+  pickles: function() {</p>
+
+<pre><code>var self = this;
+$.ajax({
+  url: 'http://localhost:3000/pickles',
+  dataType: 'json',
+  success: function(data) {
+    self.count = parseInt(data.count);
+    self.status = data.status;
+  }
+});
+</code></pre>
+
+<p>  },
+  add: function(num) {</p>
+
+<pre><code>$.ajax({
+  url: 'http://localhost:3000/pickles/add/' + num,
+  dataType: 'json',
+  success: function(data) {
+    console.log(data);
+  }
+});
+</code></pre>
+
+<p>  }
+};</p>
+
+<p>... .
+```</p>
+
+<p>Now we can test what happens after the server sends a succesful response. But how do we get that response and how do we force the success callback? For that we'll need to use Sinon's <code>stub.yieldsTo</code> method. It's mentioned in <a href="http://sinonjs.org/docs/#stubs">the docs on this page</a> if you scroll down. <code>yieldsTo</code> lets us direct the path of our spy so it will not only pretend to be jQuery's <code>ajax</code> method, but it will also force itself into the <code>success</code> callback with an optional hash of parameters which simulate our service response. Sweet! We'll have to revise the <code>beforeEach</code> in our spec though otherwise Sinon will complain that we're wrapping <code>ajax</code> twice. The updated spec should look like this. Again, take note that we're going to make it fail first by expecting a count of 99 pickles instead of 100.</p>
+
+<p>``` js test.pickles.js
+... .</p>
+
+<p>describe('Pickle Store', function() {
+  describe('#pickles', function() {</p>
+
+<pre><code>// Use Sinon to replace jQuery's ajax method
+// with a spy. This spy will also come with
+// some success data.
+beforeEach(function() {
+  sinon.stub($, 'ajax').yieldsTo('success', {
+    count: '100',
+    message: 'oh boy, 100 pickles!'
+  });
+});
+
+// Restor jQuery's ajax method to its
+// original state
+afterEach(function() { 
+  $.ajax.restore();
+})
+
+it('should make an ajax call', function(done) {
+  pickleStore.pickles();
+  expect($.ajax.calledOnce).to.be.true;
+  done();
+});
+
+it('should update the count', function(done) {      
+  pickleStore.pickles();
+  expect(pickleStore.count).to.equal(99);
+  done();
+});
+</code></pre>
+
+<p>  });
+});
+```</p>
+
+<p>Failing as expected. Aaaaand we change the expected count to 100, voila! Passing tests again!</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/passing_yield_test.png" title="'Passing test with Sinon's yieldTo'" ></p>
+
+<p>I'm adding the test for the status update as well so our final <code>#pickles</code> spec should look like this:</p>
+
+<p>``` js test.pickles.js
+describe('Pickle Store', function() {
+  describe('#pickles', function() {</p>
+
+<pre><code>// Use Sinon to replace jQuery's ajax method
+// with a spy. This spy will also come with
+// some success data.
+beforeEach(function() {
+  sinon.stub($, 'ajax').yieldsTo('success', {
+    count: '100',
+    message: 'oh boy, 100 pickles!'
+  });
+});
+
+// Restor jQuery's ajax method to its
+// original state
+afterEach(function() { 
+  $.ajax.restore();
+})
+
+it('should make an ajax call', function(done) {
+  pickleStore.pickles();
+  expect($.ajax.calledOnce).to.be.true;
+  done();
+});
+
+it('should update the count', function(done) {      
+  pickleStore.pickles();
+  expect(pickleStore.count).to.equal(100);
+  done();
+});
+
+it('should update the status', function(done) {      
+  pickleStore.pickles();
+  expect(pickleStore.status).to.equal('oh boy, 100 pickles!');
+  done();
+});
+</code></pre>
+
+<p>  });
+});
+```</p>
+
+<p>Now let's test the <code>#add</code> method before calling it a day. This method is interesting because all it can really do is update our status message. However, once it's called the value returned by <code>pickles()</code> should have incremented by whatever amount was passed to <code>add()</code>. Let's start by updating our <code>pickleStore</code> so it properly updates the status message after we've called add.</p>
+
+<p>``` js test.pickles.js
+var pickleStore = {
+  count: 0,
+  status: '',
+  pickles: function() {</p>
+
+<pre><code>var self = this;
+$.ajax({
+  url: 'http://localhost:3000/pickles',
+  dataType: 'json',
+  success: function(data) {
+    self.count = parseInt(data.count);
+    self.status = data.message;
+  }
+});
+</code></pre>
+
+<p>  },
+  add: function(num) {</p>
+
+<pre><code>var self = this;
+$.ajax({
+  url: 'http://localhost:3000/pickles/add/' + num,
+  dataType: 'json',
+  success: function(data) {
+    self.status = data.message; // &lt;-- update the status message!
+  }
+});
+</code></pre>
+
+<p>  }
+};
+```</p>
+
+<p>Now that that's in there we'll write a failing spec.</p>
+
+<p>``` js test.pickles.js
+describe('#add', function() {</p>
+
+<p>  var amount = 11;</p>
+
+<p>  beforeEach(function() {</p>
+
+<pre><code>sinon.stub($, 'ajax').yieldsTo('success', {
+  add: amount,
+  message: 'you added ' + amount + ' pickles to the pickle barrel!'
+});
+</code></pre>
+
+<p>  });</p>
+
+<p>  afterEach(function() {</p>
+
+<pre><code>$.ajax.restore();
+</code></pre>
+
+<p>  });</p>
+
+<p>  it('should update the status with the correct amount', function(done) {</p>
+
+<pre><code>pickleStore.add(amount);
+expect(pickleStore.status).to.equal('you added ' + 99 + ' pickles to the pickle barrel!');
+done();
+</code></pre>
+
+<p>  });
+});
+```</p>
+
+<p>This is not unlike our previous spec, in fact it does even less since we're not checking count.</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/failing_add_test.png" title="'Another failing test.'" ></p>
+
+<p>To make the test pass we change the 99 to <code>amount</code>. I originally wrote the add method thinking I would go back and check the total number of pickles but I've realized now that really that's more of a test for the service and not the front end. The front end shouldn't care if that arithmetic is happening properly, it should just consume data and update its UI. For tomorrow's post I'll try to get an AMD module in here so we can start playing with Backbone again. Thanks!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 11:21 am</li>
+<li>Mood: Irritated, Antsy</li>
+<li>Sleep: 8</li>
+<li>Hunger: 5</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Getting started with Mocha and Chai]]></title>
@@ -217,6 +624,11 @@ it('should work with should', function() {
 <p>That does <em>not</em> fill me with confidence. I think there's a very high probability that being a newbie I'm doing something wrong so <a href="https://twitter.com/rob_dodson/status/206893206435151872/photo/1">I've tweeted to Jake Luer, the author of Chai, to figure out if perhaps I'm missing something or if the tools are actually broken.</a> In the meantime I'm not comfortable using a testing framework that's broken.</p>
 
 <p>Sigh... well tomorrow I'll try to import some modules and if Jake hasn't gotten back to me by then I'll use Jasmine to do those tests. Till then!</p>
+
+<ul>
+<li>Update: Looks like I managed to clone Chai right as they were updating the repo. Pulling the latest fixed everything. See the comment thread below*</li>
+</ul>
+
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
@@ -679,283 +1091,6 @@ initialize: function() {
 <li>Mood: Awake, Hot</li>
 <li>Sleep: 5</li>
 <li>Hunger: 5</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How do you switch between views in Backbone]]></title>
-    <link href="http://robdodson.me/blog/2012/05/23/how-do-you-switch-between-views-in-backbone/"/>
-    <updated>2012-05-23T07:56:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/23/how-do-you-switch-between-views-in-backbone</id>
-    <content type="html"><![CDATA[<p>I'm going to try to approach some of my future articles as more of a question/answer setup so they don't turn into these sprawling tutorials. Today I want to focus on moving between views in Backbone.js. I'm starting with some very simple templates and three views: LeftView, MiddleView, RightView. To do this quickly we'll make it so each view is essentially a big button which, when clicked on, should animate to the middle of the screen.</p>
-
-<p>Here's what one of my templates looks like:</p>
-
-<p>``` html right.html</p>
-
-<div id="right-container" class="container">
-  Everyone knows I'm right.
-</div>
-
-
-<p>
-```</p>
-
-<p>One of the first thing I'm noticing is that all of my templates seem to be wrapped in an extra div. Since this extra div is block displayed I can't get my items to line up next to each other... Oh! T<a href="http://stackoverflow.com/questions/7894253/backbone-js-turning-off-wrap-by-div-in-render">he problem is because I haven't specified a tagName for my views.</a> I think I can actually do everything in the View declaration without needing a template.</p>
-
-<p><code>js example.js
-Example.Views.Right = Backbone.View.extend({
-  tagName: 'div',
-  id: 'right-container',
-  className: 'container'
-});
-</code>
-That should create our view for us with the proper tag, class and id attributes. My containers are just colored squares so I don't need to populate them with any content. If I did want to use this approach I could add more content like this:</p>
-
-<p>```js example.js
-Example.Views.Right = Backbone.View.extend({
-  tagName: 'div',
-  id: 'right-container',
-  className: 'container',
-  initialize: function() {</p>
-
-<pre><code>this.el.innerHTML = "Hello World!";
-</code></pre>
-
-<p>  }
-});
-```
-Or I could render a template. Again for our purposes we just want to move some colored blocks around so the first approach is sufficient.</p>
-
-<p>Here is our most basic <code>Router</code> showing how to add the views to stage. Since we aren't using a template we can just call the regular render function and append the returned element to the DOM.</p>
-
-<p>``` js main.js
-var Router = Backbone.Router.extend({
-  routes: {</p>
-
-<pre><code>"": "index"
-</code></pre>
-
-<p>  },</p>
-
-<p>  index: function() {</p>
-
-<pre><code>var leftView = new Example.Views.Left();
-var middleView = new Example.Views.Middle();
-var rightView = new Example.Views.Right();
-
-// Attach the views to the DOM
-$("#main").append(leftView.render().el);
-$("#main").append(middleView.render().el);
-$("#main").append(rightView.render().el);
-</code></pre>
-
-<p>  }
-});
-```</p>
-
-<p>Here are my very simple styles:</p>
-
-<p>``` css style.css
-.container {
-  width: 300px;
-  height: 300px;
-  display: inline-block;
-  margin-right: 50px;
-}</p>
-
-<h1>left-container {</h1>
-
-<p>  background: #F00;
-}</p>
-
-<h1>middle-container {</h1>
-
-<p>  background: #0F0;
-}</p>
-
-<h1>right-container {</h1>
-
-<p>  background: #00F;
-}
-```</p>
-
-<p>We should now have a very simple horizontal layout.</p>
-
-<p><img class="center" src="http://f.cl.ly/items/173L112z0g2t3S1h3k1E/Screen%20Shot%202012-05-23%20at%209.02.56%20AM.png" title="'Our Basic Backbone Layout'" ></p>
-
-<h3>Composite Views</h3>
-
-<p>Well I'd like to center my views in the middle of the screen but moving each item individually is going to be pretty challenging. I think the better idea would be to wrap my views in a containing view which can then be easily centered on screen.</p>
-
-<p>Here's what that looks like:</p>
-
-<p>``` js
-Example.Views.Sections = Backbone.View.extend({
-  tagName: 'div',
-  id: 'sections',
-  leftView: undefined,
-  middleView: undefined,
-  rightView: undefined,</p>
-
-<p>  initialize: function() {</p>
-
-<pre><code>this.leftView = new Example.Views.Left();
-this.middleView = new Example.Views.Middle();
-this.rightView = new Example.Views.Right();
-
-this.$el.append(this.leftView.render().el);
-this.$el.append(this.middleView.render().el);
-this.$el.append(this.rightView.render().el);
-</code></pre>
-
-<p>  },</p>
-
-<p>  // We should do this work with events instead of methods
-  setInitialPosition: function() {</p>
-
-<pre><code>this.$el.css({left: $(window).width() / 2 - this.$el.width() / 2 });
-</code></pre>
-
-<p>  }
-});
-```</p>
-
-<p>Our Sections view is going to contain our 3 subordinate views. When it gets added to the DOM, <code>initialize</code> will run and create our subviews. I've also defined a method <code>setInitialPosition</code> which centers our view on screen. Tomorrow I'll replace this with an event handler that fires whenever our element is added to the DOM. For now I'm too lazy to look up the supported events :D</p>
-
-<p>The sections view is absolutely positioned and it's width and height are explicitly defined in the css. In the short term here's how we've updated things:</p>
-
-<p>``` css</p>
-
-<h1>sections {</h1>
-
-<p>  display: inline-block;
-  position: absolute;
-  width: 1000px;
-  height: 300px;
-  top: 50px;
-  left: 0;
-}</p>
-
-<p>.container {
-  width: 300px;
-  height: 300px;
-}</p>
-
-<h1>left-container {</h1>
-
-<p>  background: #F00;
-  position: absolute;
-  top: 0;
-  left: 0;
-}</p>
-
-<h1>middle-container {</h1>
-
-<p>  background: #0F0;
-  position: absolute;
-  top: 0;
-  left: 350px;
-}</p>
-
-<h1>right-container {</h1>
-
-<p>  background: #00F;
-  position: absolute;
-  top: 0;
-  left: 700px;
-}
-```
-I wanted to give each view a 50px margin on each side so in the short term all these values are hard coded. I'll think about how to make things more dynamic.</p>
-
-<p>Let's listen to when the user clicks on a view. When we hear that we'll animate the whole sections container over so that view is centered on screen.</p>
-
-<p>We'll need to add an events hash to our Sections view. Since all of our children implement the same <code>.container</code> class we may as well listen for a click on that.</p>
-
-<p><code>js
-events: {
-  "click .container":    "onChildClicked"
-}
-</code></p>
-
-<p>In our handler, <code>onChildClicked</code>, we'll figure out which child was actually clicked and then animate ourselves accordingly. Here's the entire object for your reference with the handler at the bottom.</p>
-
-<p>``` js
-Example.Views.Sections = Backbone.View.extend({
-  tagName: 'div',
-  id: 'sections',</p>
-
-<p>  leftView: undefined,
-  middleView: undefined,
-  rightView: undefined,</p>
-
-<p>  events: {</p>
-
-<pre><code>"click .container":    "onChildClicked"
-</code></pre>
-
-<p>  },</p>
-
-<p>  initialize: function() {</p>
-
-<pre><code>this.leftView = new Example.Views.Left();
-this.middleView = new Example.Views.Middle();
-this.rightView = new Example.Views.Right();
-
-this.$el.append(this.leftView.render().el);
-this.$el.append(this.middleView.render().el);
-this.$el.append(this.rightView.render().el);
-</code></pre>
-
-<p>  },</p>
-
-<p>  // We should do this work with events instead of methods
-  setInitialPosition: function() {</p>
-
-<pre><code>this.$el.css({left: $(window).width() / 2 - this.$el.width() / 2 });
-</code></pre>
-
-<p>  },</p>
-
-<p>  // Whenever a child is clicked let's animate so it is
-  // centered on screen
-  onChildClicked: function($e) {</p>
-
-<pre><code>  var $target = $($e.target);
-
-  switch($e.target.id) {
-    case 'left-container':
-      this.$el.animate({
-        left: $(window).width() / 2 - $target.width() / 2
-      });
-      break;
-
-    case 'middle-container':
-      this.$el.animate({
-        left: $(window).width() / 2 - this.$el.width() / 2
-      });
-      break;
-
-    case 'right-container':
-      this.$el.animate({
-        left: $(window).width() / 2 - this.$el.width() + $target.width() / 2
-      });
-      break;
-  }
-}
-</code></pre>
-
-<p>});
-```</p>
-
-<ul>
-<li>Time: 7:57 am</li>
-<li>Mood: Laggy, Pensive</li>
-<li>Sleep: 5</li>
-<li>Hunger: 0</li>
 <li>Coffee: 0</li>
 </ul>
 

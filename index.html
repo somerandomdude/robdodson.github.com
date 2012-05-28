@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Since I was previously doing so much RSpec I want to try to bring some of that over to my JavaScript work. Lately I&#8217;ve been working with the &hellip;">
+  <meta name="description" content="After a bit of a rocky start yesterday I&#8217;ve finally got Mocha and Chai running in the browser which is great. Today I&#8217;d like to test out &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,657 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/28/getting-familiar-with-mocha-and-chai/">Getting Familiar With Mocha and Chai</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-28T11:20:00-07:00" pubdate data-updated="true">May 28<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://robdodson.me/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai/">After a bit of a rocky start yesterday</a> I&#8217;ve finally got Mocha and Chai running in the browser which is great. Today I&#8217;d like to test out some of the async functionality of Mocha. This seems to be the big selling point for most people so we&#8217;ll kick the tires a bit.</p>
+
+<h3>Basic Async Tests with Mocha and Chai</h3>
+
+<p>I wrote a little Node service that we&#8217;ll consume for testing purposes. This is my first <a href="http://nodejs.org/">Node</a> and <a href="http://expressjs.com/">Express</a> app so apologies if it&#8217;s lamesauce. I used the <code>express</code> command to boilerplate a project called <code>pickles</code> with some very basic routes:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Routes</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">count</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;Welcome to the Pickle Store!&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/pickles&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">count</span><span class="o">:</span> <span class="nx">count</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;oh boy, &#39;</span> <span class="o">+</span> <span class="nx">count</span> <span class="o">+</span> <span class="s1">&#39; pickles!&#39;</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/pickles/add/:num&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">count</span> <span class="o">+=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">num</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">add</span><span class="o">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">num</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;you added &#39;</span> <span class="o">+</span> <span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">num</span> <span class="o">+</span> <span class="s1">&#39; pickles to the pickle barrel!&#39;</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">3000</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Express server listening on port %d in %s mode&quot;</span><span class="p">,</span> <span class="nx">app</span><span class="p">.</span><span class="nx">address</span><span class="p">().</span><span class="nx">port</span><span class="p">,</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">env</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&#8217;ll need to make sure our node service is running for our tests to work and all of our URLs will point at localhost:3000. Obviously you wouldn&#8217;t want this for a production setting but it&#8217;ll be fine for demonstration purposes.</p>
+
+<p>Here is our really simple Mocha spec. We&#8217;re actually creating a <code>pickelStore</code> object in the spec file itself so we can test against it.</p>
+
+<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">expect</span> <span class="o">=</span> <span class="nx">chai</span><span class="p">.</span><span class="nx">expect</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">pickleStore</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">pickles</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">add</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">num</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles/add/&#39;</span> <span class="o">+</span> <span class="nx">num</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Pickle Store&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#pickles&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">pickles</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I just want to see if the ajax methods will run and hit our Node service but I&#8217;m running into the following issue in Chrome:</p>
+
+<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">XMLHttpRequest</span> <span class="nx">cannot</span> <span class="nx">load</span> <span class="nx">http</span><span class="o">:</span><span class="c1">//localhost:3000/pickles. Origin null is not allowed by Access-Control-Allow-Origin.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Bummer&#8230; :(</p>
+
+<p>OK, what&#8217;s going on here&#8230; To StackOverflow! <a href="http://stackoverflow.com/questions/8456538/origin-null-is-not-allowed-by-access-control-allow-origin/8456586#8456586">Aaaand we have our response.</a> After a bit of googling I came across <a href="http://www.stoimen.com/blog/2010/11/19/diving-into-node-js-very-first-app/">this post</a> which mentions adding <code>res.header('Access-Control-Allow-Origin', '*');</code> to my Node responses. That does the trick. I also found <a href="http://www.stoimen.com/blog/2010/11/19/diving-into-node-js-very-first-app/">this post</a> which describes setting up <a href="https://developer.mozilla.org/en/http_access_control">CORS</a> with Express.</p>
+
+<p>OK hopefully we&#8217;re done with Node for now. I don&#8217;t want this to turn into a node tutorial&#8230; Let&#8217;s see if we can get the tests to perform using Mocha. We&#8217;ll need some way to mock and spy on the ajax because I don&#8217;t want to test the data coming from the actual service. I&#8217;ve realized I want to <em>simulate</em> the service for client-side Mocha tests. In a future tutorial I&#8217;ll test the service itself using the Node aspect of Mocha. Kind of silly to lead off this way but whatever, moving on!</p>
+
+<h3>Enter Sinon.js</h3>
+
+<p>I&#8217;m going to use <a href="http://sinonjs.org/">Sinon.js</a> to help me mock, stub, fake, spy and do whatever the heck else I need to make sure my client code is solid. After downloading the js file for Sinon you can just add it to our test/index.html under the line where we added mocha.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'><span class="nt">&lt;head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;title&gt;</span>Mocha Tests<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href=</span><span class="s">&quot;mocha/mocha.css&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;../assets/js/libs/jquery.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;chai/chai.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;mocha/mocha.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;sinon/sinon.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script&gt;</span><span class="nx">mocha</span><span class="p">.</span><span class="nx">setup</span><span class="p">(</span><span class="s1">&#39;bdd&#39;</span><span class="p">);</span><span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;test.pickles.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script&gt;</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">mocha</span><span class="p">.</span><span class="nx">run</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
+</span><span class='line'><span class="nt">&lt;/head&gt;</span>
+</span><span class='line'><span class="nt">&lt;body&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;mocha&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we can use Sinon in our <code>test.pickles.js</code> file to get a handled on our ajax. Let&#8217;s first test that an ajax call is made when we run the <code>pickles()</code> method of the <code>pickleStore</code> object. We&#8217;ll make sure this first test fails, then we&#8217;ll change the spec to make it pass.</p>
+
+<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">expect</span> <span class="o">=</span> <span class="nx">chai</span><span class="p">.</span><span class="nx">expect</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">pickleStore</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">pickles</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">add</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">num</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles/add/&#39;</span> <span class="o">+</span> <span class="nx">num</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Pickle Store&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#pickles&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Use Sinon to replace jQuery&#39;s ajax method</span>
+</span><span class='line'>    <span class="c1">// with a spy.</span>
+</span><span class='line'>    <span class="nx">beforeEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">sinon</span><span class="p">.</span><span class="nx">spy</span><span class="p">(</span><span class="nx">$</span><span class="p">,</span> <span class="s1">&#39;ajax&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Restor jQuery&#39;s ajax method to its</span>
+</span><span class='line'>    <span class="c1">// original state</span>
+</span><span class='line'>    <span class="nx">afterEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">.</span><span class="nx">restore</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should make an ajax call&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">pickles</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">expect</span><span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">.</span><span class="nx">calledOnce</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">be</span><span class="p">.</span><span class="kc">false</span><span class="p">;</span> <span class="c1">// see if the spy WASN&#39;T called</span>
+</span><span class='line'>      <span class="nx">done</span><span class="p">();</span> <span class="c1">// let Mocha know we&#39;re done async testing</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/first_failing_ajax_test.png" title="'Our first failing test with Mocha, Chai and Sinon. Yay!'" ></p>
+
+<p>Changing this line <code>expect($.ajax.calledOnce).to.be.false;</code> from <code>false</code> to <code>true</code> should make our test pass. Yay, first async test in the bag! Next let&#8217;s try to fake a response from the server. But I&#8217;m realizing that the succesful server response should <em>do</em> something to my pickleStore object, otherwise why do I care about the data? So I&#8217;m going to update pickelStore with the following success callback on its pickles method:</p>
+
+<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">pickleStore</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">count</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">pickles</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">self</span><span class="p">.</span><span class="nx">count</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">count</span><span class="p">);</span>
+</span><span class='line'>        <span class="nx">self</span><span class="p">.</span><span class="nx">status</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">status</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">add</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">num</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles/add/&#39;</span> <span class="o">+</span> <span class="nx">num</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">...</span> <span class="p">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we can test what happens after the server sends a succesful response. But how do we get that response and how do we force the success callback? For that we&#8217;ll need to use Sinon&#8217;s <code>stub.yieldsTo</code> method. It&#8217;s mentioned in <a href="http://sinonjs.org/docs/#stubs">the docs on this page</a> if you scroll down. <code>yieldsTo</code> lets us direct the path of our spy so it will not only pretend to be jQuery&#8217;s <code>ajax</code> method, but it will also force itself into the <code>success</code> callback with an optional hash of parameters which simulate our service response. Sweet! We&#8217;ll have to revise the <code>beforeEach</code> in our spec though otherwise Sinon will complain that we&#8217;re wrapping <code>ajax</code> twice. The updated spec should look like this. Again, take note that we&#8217;re going to make it fail first by expecting a count of 99 pickles instead of 100.</p>
+
+<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">...</span> <span class="p">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Pickle Store&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#pickles&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Use Sinon to replace jQuery&#39;s ajax method</span>
+</span><span class='line'>    <span class="c1">// with a spy. This spy will also come with</span>
+</span><span class='line'>    <span class="c1">// some success data.</span>
+</span><span class='line'>    <span class="nx">beforeEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">sinon</span><span class="p">.</span><span class="nx">stub</span><span class="p">(</span><span class="nx">$</span><span class="p">,</span> <span class="s1">&#39;ajax&#39;</span><span class="p">).</span><span class="nx">yieldsTo</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">count</span><span class="o">:</span> <span class="s1">&#39;100&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;oh boy, 100 pickles!&#39;</span>
+</span><span class='line'>      <span class="p">});</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Restor jQuery&#39;s ajax method to its</span>
+</span><span class='line'>    <span class="c1">// original state</span>
+</span><span class='line'>    <span class="nx">afterEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">.</span><span class="nx">restore</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should make an ajax call&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">pickles</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">expect</span><span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">.</span><span class="nx">calledOnce</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">be</span><span class="p">.</span><span class="kc">true</span><span class="p">;</span>
+</span><span class='line'>      <span class="nx">done</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should update the count&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">pickles</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">expect</span><span class="p">(</span><span class="nx">pickleStore</span><span class="p">.</span><span class="nx">count</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="mi">99</span><span class="p">);</span>
+</span><span class='line'>      <span class="nx">done</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Failing as expected. Aaaaand we change the expected count to 100, voila! Passing tests again!</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/passing_yield_test.png" title="'Passing test with Sinon's yieldTo'" ></p>
+
+<p>I&#8217;m adding the test for the status update as well so our final <code>#pickles</code> spec should look like this:</p>
+
+<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Pickle Store&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#pickles&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Use Sinon to replace jQuery&#39;s ajax method</span>
+</span><span class='line'>    <span class="c1">// with a spy. This spy will also come with</span>
+</span><span class='line'>    <span class="c1">// some success data.</span>
+</span><span class='line'>    <span class="nx">beforeEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">sinon</span><span class="p">.</span><span class="nx">stub</span><span class="p">(</span><span class="nx">$</span><span class="p">,</span> <span class="s1">&#39;ajax&#39;</span><span class="p">).</span><span class="nx">yieldsTo</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">count</span><span class="o">:</span> <span class="s1">&#39;100&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;oh boy, 100 pickles!&#39;</span>
+</span><span class='line'>      <span class="p">});</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Restor jQuery&#39;s ajax method to its</span>
+</span><span class='line'>    <span class="c1">// original state</span>
+</span><span class='line'>    <span class="nx">afterEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">.</span><span class="nx">restore</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should make an ajax call&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">pickles</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">expect</span><span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">.</span><span class="nx">calledOnce</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">be</span><span class="p">.</span><span class="kc">true</span><span class="p">;</span>
+</span><span class='line'>      <span class="nx">done</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should update the count&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">pickles</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">expect</span><span class="p">(</span><span class="nx">pickleStore</span><span class="p">.</span><span class="nx">count</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
+</span><span class='line'>      <span class="nx">done</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should update the status&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">pickles</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">expect</span><span class="p">(</span><span class="nx">pickleStore</span><span class="p">.</span><span class="nx">status</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">&#39;oh boy, 100 pickles!&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="nx">done</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now let&#8217;s test the <code>#add</code> method before calling it a day. This method is interesting because all it can really do is update our status message. However, once it&#8217;s called the value returned by <code>pickles()</code> should have incremented by whatever amount was passed to <code>add()</code>. Let&#8217;s start by updating our <code>pickleStore</code> so it properly updates the status message after we&#8217;ve called add.</p>
+
+<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">pickleStore</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">count</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">pickles</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">self</span><span class="p">.</span><span class="nx">count</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">count</span><span class="p">);</span>
+</span><span class='line'>        <span class="nx">self</span><span class="p">.</span><span class="nx">status</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">message</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">add</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">num</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles/add/&#39;</span> <span class="o">+</span> <span class="nx">num</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">self</span><span class="p">.</span><span class="nx">status</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">message</span><span class="p">;</span> <span class="c1">// &lt;-- update the status message!</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that that&#8217;s in there we&#8217;ll write a failing spec.</p>
+
+<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#add&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">amount</span> <span class="o">=</span> <span class="mi">11</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">beforeEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">sinon</span><span class="p">.</span><span class="nx">stub</span><span class="p">(</span><span class="nx">$</span><span class="p">,</span> <span class="s1">&#39;ajax&#39;</span><span class="p">).</span><span class="nx">yieldsTo</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">add</span><span class="o">:</span> <span class="nx">amount</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;you added &#39;</span> <span class="o">+</span> <span class="nx">amount</span> <span class="o">+</span> <span class="s1">&#39; pickles to the pickle barrel!&#39;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">afterEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">.</span><span class="nx">restore</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should update the status with the correct amount&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">amount</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">expect</span><span class="p">(</span><span class="nx">pickleStore</span><span class="p">.</span><span class="nx">status</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">&#39;you added &#39;</span> <span class="o">+</span> <span class="mi">99</span> <span class="o">+</span> <span class="s1">&#39; pickles to the pickle barrel!&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">done</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is not unlike our previous spec, in fact it does even less since we&#8217;re not checking count.</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/failing_add_test.png" title="'Another failing test.'" ></p>
+
+<p>To make the test pass we change the 99 to <code>amount</code>. I originally wrote the add method thinking I would go back and check the total number of pickles but I&#8217;ve realized now that really that&#8217;s more of a test for the service and not the front end. The front end shouldn&#8217;t care if that arithmetic is happening properly, it should just consume data and update its UI. For tomorrow&#8217;s post I&#8217;ll try to get an AMD module in here so we can start playing with Backbone again. Thanks!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 11:21 am</li>
+<li>Mood: Irritated, Antsy</li>
+<li>Sleep: 8</li>
+<li>Hunger: 5</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -391,6 +1042,11 @@
 <p>That does <em>not</em> fill me with confidence. I think there&#8217;s a very high probability that being a newbie I&#8217;m doing something wrong so <a href="https://twitter.com/rob_dodson/status/206893206435151872/photo/1">I&#8217;ve tweeted to Jake Luer, the author of Chai, to figure out if perhaps I&#8217;m missing something or if the tools are actually broken.</a> In the meantime I&#8217;m not comfortable using a testing framework that&#8217;s broken.</p>
 
 <p>Sigh&#8230; well tomorrow I&#8217;ll try to import some modules and if Jake hasn&#8217;t gotten back to me by then I&#8217;ll use Jasmine to do those tests. Till then!</p>
+
+<ul>
+<li>Update: Looks like I managed to clone Chai right as they were updating the repo. Pulling the latest fixed everything. See the comment thread below*</li>
+</ul>
+
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
@@ -2520,378 +3176,6 @@ The last few bits prevent the link from completely refreshing the page—<code>e
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/18/backbone-boilerplate-playing-with-require-dot-js/">Backbone Boilerplate: Playing With Require.js</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-18T08:07:00-07:00" pubdate data-updated="true">May 18<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I want to keep playing with require.js and AMD modules today so I can really internalize the concepts around them. I&#8217;m going to go through the examples in <a href="http://requirejs.org/docs/api.html#jsfiles">the require documentation</a> starting with loading regular scripts and then defining modules and loading those. Here&#8217;s our boilerplate HTML:</p>
-
-<p>Here is our boilerplate HTML. It&#8217;s a standard HTML5 file which just includes require.js at the bottom of the page.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!doctype html&gt;</span>
-</span><span class='line'><span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">&quot;en&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">http-equiv=</span><span class="s">&quot;X-UA-Compatible&quot;</span> <span class="na">content=</span><span class="s">&quot;IE=edge,chrome=1&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;viewport&quot;</span> <span class="na">content=</span><span class="s">&quot;width=device-width,initial-scale=1&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nt">&lt;title&gt;</span>Require.js Sandbox<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c">&lt;!-- Application styles --&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href=</span><span class="s">&quot;/assets/css/index.css&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'>  <span class="c">&lt;!-- Main container --&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">role=</span><span class="s">&quot;main&quot;</span> <span class="na">id=</span><span class="s">&quot;main&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c">&lt;!-- Application source --&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;/assets/js/libs/require.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I&#8217;m also going to define a file called foo.js which will just console log &#8220;Hello World!&#8221;. To update our HTML we&#8217;ll add the following script tag after the call to include require.js</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script&gt;</span>
-</span><span class='line'>    <span class="nx">require</span><span class="p">([</span><span class="s2">&quot;foo&quot;</span><span class="p">]);</span>
-</span><span class='line'><span class="nt">&lt;/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And as expected the console outputs &#8216;Hello World!&#8217;. Let&#8217;s step it up a notch and define a module. Our first module will just return an object literal <a href="http://requirejs.org/docs/api.html#defsimple">like in this example.</a> It will be a <code>Person</code> module with our name and city. We&#8217;ll place it in an <code>app</code> folder in the root of our project. So our stucture looks like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>index.html
-</span><span class='line'>|
-</span><span class='line'>|_ app/
-</span><span class='line'>  |
-</span><span class='line'>  |_ person.js
-</span><span class='line'>|
-</span><span class='line'>|_ assets/
-</span><span class='line'>  |
-</span><span class='line'>  |_ js/
-</span><span class='line'>    |
-</span><span class='line'>    |_ libs/
-</span><span class='line'>      |
-</span><span class='line'>      |_ require.js
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The <code>Person</code> module just needs to implement a define function which takes an object as an argument. It looks like this:</p>
-
-<figure class='code'><figcaption><span>app/person.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">define</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;Rob Dodson&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">city</span><span class="o">:</span> <span class="s2">&quot;San Francisco&quot;</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And in our updated index.html we&#8217;re going to require that module.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!doctype html&gt;</span>
-</span><span class='line'><span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">&quot;en&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">http-equiv=</span><span class="s">&quot;X-UA-Compatible&quot;</span> <span class="na">content=</span><span class="s">&quot;IE=edge,chrome=1&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;viewport&quot;</span> <span class="na">content=</span><span class="s">&quot;width=device-width,initial-scale=1&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nt">&lt;title&gt;</span>Require.js Sandbox<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c">&lt;!-- Application styles --&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href=</span><span class="s">&quot;/assets/css/index.css&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'>  <span class="c">&lt;!-- Main container --&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">role=</span><span class="s">&quot;main&quot;</span> <span class="na">id=</span><span class="s">&quot;main&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c">&lt;!-- Application source --&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;/assets/js/libs/require.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script&gt;</span>
-</span><span class='line'>    <span class="nx">require</span><span class="p">([</span><span class="s2">&quot;app/person&quot;</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">person</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">name</span><span class="p">);</span>
-</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">person</span><span class="p">.</span><span class="nx">city</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Opening up that page in the browser should give us the proper output in the console.</p>
-
-<h3>AMD modules for dummies</h3>
-
-<p>Let&#8217;s stop here for a moment to understand what&#8217;s going on. In one file we implemented a <code>define</code> function and in another place we implemented a <code>require</code> function. In the most basic sense this is all we really need to do to start using AMD. I think the concept of javascript modules is really weird for most folks but if you&#8217;re coming from a language like Java or Flash just think of define and require as two different interfaces that have to be implemented in order to recreate the <code>import</code> functionality that you&#8217;re used to. Require.js is going to make sure everything loads properly so long as we stick to this convention.</p>
-
-<p>If you&#8217;re coming from more of a design background and you&#8217;re used to having one big javascript file think of these modules as a way to break off pieces of code which you might otherwise put into separate script files. And I&#8217;m not talking one or two script files, I&#8217;m talking like 20 or 30. You could try to manage loading all of those dependencies yourself but that will be challenging. If you are building a blog then this probably isn&#8217;t a big deal for you. In that case a few included js files is fine. But if you&#8217;re trying to build a responsive web app for mobile then you&#8217;re going to want to only load the bits of code you absolutely need. If a page doesn&#8217;t require 90% of your JS then don&#8217;t waste the time downloading it over a shitty AT&amp;T connection.</p>
-
-<p>Ok let&#8217;s write a module that&#8217;s a bit more realistic. We&#8217;ll use a function to return our object so it&#8217;s kind of like a constructor.</p>
-
-<figure class='code'><figcaption><span>app/monster.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="s2">&quot;use strict&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">define</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">estimated_age</span> <span class="o">=</span> <span class="mi">99</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">spookySaying</span> <span class="o">=</span> <span class="s1">&#39;I vant to suck your blooood!&#39;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Dracula&#39;</span><span class="p">,</span>
-</span><span class='line'>        <span class="nx">home</span><span class="o">:</span> <span class="s1">&#39;Florida&#39;</span><span class="p">,</span>
-</span><span class='line'>        <span class="nx">age</span><span class="o">:</span> <span class="nx">estimated_age</span><span class="p">,</span>
-</span><span class='line'>        <span class="nx">saySomethingSpooky</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>          <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">spookySaying</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>
-This is a simple monster object. Notice that we build a variable called <code>estimated_age</code> right before defining our object literal. We then return this variable. If we ask for the monster&#8217;s age it will return this value. It&#8217;s worth noting that this makes the <code>estimated_age</code> variable private since it only lives in the scope of the anonymous function returning our object literal. We&#8217;ve also got a method, <code>saySomethingSpooky</code> which will print out another private variable <code>spookySaying</code>. Wow it&#8217;s <em>almost</em> the JavaScript classes I&#8217;ve always dreamed of! Before you go thinking that remember that modules are not instanceable, meaning, when you load in a module it works like a <a href="http://en.wikipedia.org/wiki/Singleton_pattern">Singleton</a> almost. You can&#8217;t go monster.new() all over the place.. it just doesn&#8217;t work that way. Don&#8217;t get disouraged though, this is still pretty cool so let&#8217;s continue&#8230;</p>
-
-<p>Next up is a module with dependencies. We&#8217;ll make the monster depend on his coffin.</p>
-
-<figure class='code'><figcaption><span>app/coffin.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="s2">&quot;use strict&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">define</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">color</span> <span class="o">=</span> <span class="s1">&#39;Blackest black&#39;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">color</span><span class="o">:</span> <span class="nx">color</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">open</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;*creeeeeek*&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">};</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>app/monster.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="s2">&quot;use strict&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">define</span><span class="p">([</span><span class="s1">&#39;./coffin&#39;</span><span class="p">],</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">coffin</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">estimated_age</span> <span class="o">=</span> <span class="mi">99</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">spookySaying</span> <span class="o">=</span> <span class="s1">&#39;I vant to suck your blooood!&#39;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Dracula&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">home</span><span class="o">:</span> <span class="s1">&#39;Florida&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">age</span><span class="o">:</span> <span class="nx">estimated_age</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">saySomethingSpooky</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">spookySaying</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">goToSleep</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Time for bed!&#39;</span><span class="p">);</span>
-</span><span class='line'>      <span class="nx">coffin</span><span class="p">.</span><span class="nx">open</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">};</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>index.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script </span><span class="na">data-main=</span><span class="s">&quot;&quot;</span> <span class="na">src=</span><span class="s">&quot;/assets/js/libs/require.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'><span class="nt">&lt;script&gt;</span>
-</span><span class='line'>  <span class="nx">require</span><span class="p">([</span><span class="s1">&#39;app/monster&#39;</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">monster</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">monster</span><span class="p">.</span><span class="nx">saySomethingSpooky</span><span class="p">();</span>
-</span><span class='line'>    <span class="nx">monster</span><span class="p">.</span><span class="nx">goToSleep</span><span class="p">();</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="nt">&lt;/script&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You can see that we&#8217;ve created a dependency for our monster, it has to load the coffin module before it&#8217;s ready to be loaded itself. Otherwise it won&#8217;t be able to run <code>goToSleep()</code> properly. Require.js will sort all of this out so long as we declare our dependencies as the first argument to the <code>define</code> function.</p>
-
-<p>We aren&#8217;t limited to objects though, we can also return functions (which are objects in their own right). For instance if we wanted to define a helper module that greets people we could do something like this:</p>
-
-<figure class='code'><figcaption><span>app/greet.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="s2">&quot;use strict&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">define</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="s1">&#39;Why hello, &#39;</span> <span class="o">+</span> <span class="nx">name</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>then in our index we&#8217;ll just use the <code>greet</code> function as if it were globally available.</p>
-
-<figure class='code'><figcaption><span>index.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">require</span><span class="p">([</span><span class="s1">&#39;app/greet&#39;</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">greet</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">greet</span><span class="p">(</span><span class="s1">&#39;Rob&#39;</span><span class="p">));</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>  <br/>
-bear in mind that each module requires an http request to load it so you don&#8217;t want to go overboard defining helper function modules. Note the extra http request in the profiler which loads greet.js.
-<img class="center" src="/images/module_costs.png" title="'Note the separate http request for greet.js'" ></p>
-
-<p>Ok that&#8217;s it for today. I&#8217;ll try to continue on Saturday!</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -2907,6 +3191,10 @@ bear in mind that each module requires an http request to load it so you don&#82
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/05/28/getting-familiar-with-mocha-and-chai/">Getting Familiar with Mocha and Chai</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai/">Getting started with Mocha and Chai</a>
       </li>
     
@@ -2920,10 +3208,6 @@ bear in mind that each module requires an http request to load it so you don&#82
     
       <li class="post">
         <a href="/blog/2012/05/24/backbone-events-between-views/">Backbone Events: Adding Views to the DOM</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/23/how-do-you-switch-between-views-in-backbone/">How do you switch between views in Backbone</a>
       </li>
     
   </ul>

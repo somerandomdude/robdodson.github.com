@@ -4,7 +4,7 @@
   <title><![CDATA[Category: BDD | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/bdd/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-27T16:58:59-07:00</updated>
+  <updated>2012-05-28T14:53:30-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,413 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Getting Familiar with Mocha and Chai]]></title>
+    <link href="http://robdodson.me/blog/2012/05/28/getting-familiar-with-mocha-and-chai/"/>
+    <updated>2012-05-28T11:20:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/28/getting-familiar-with-mocha-and-chai</id>
+    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai/">After a bit of a rocky start yesterday</a> I've finally got Mocha and Chai running in the browser which is great. Today I'd like to test out some of the async functionality of Mocha. This seems to be the big selling point for most people so we'll kick the tires a bit.</p>
+
+<h3>Basic Async Tests with Mocha and Chai</h3>
+
+<p>I wrote a little Node service that we'll consume for testing purposes. This is my first <a href="http://nodejs.org/">Node</a> and <a href="http://expressjs.com/">Express</a> app so apologies if it's lamesauce. I used the <code>express</code> command to boilerplate a project called <code>pickles</code> with some very basic routes:</p>
+
+<p>``` js
+// Routes</p>
+
+<p>var count = 100;</p>
+
+<p>app.get('/', function(req, res) {
+  res.send('Welcome to the Pickle Store!');
+});</p>
+
+<p>app.get('/pickles', function(req, res) {
+  res.json({</p>
+
+<pre><code>count: count,
+message: 'oh boy, ' + count + ' pickles!'
+</code></pre>
+
+<p>  });
+});</p>
+
+<p>app.get('/pickles/add/:num', function(req, res) {
+  count += parseInt(req.params.num);
+  res.json({</p>
+
+<pre><code>add: req.params.num,
+message: 'you added ' + req.params.num + ' pickles to the pickle barrel!'
+</code></pre>
+
+<p>  });
+});</p>
+
+<p>app.listen(3000, function(){
+  console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+});
+```
+We'll need to make sure our node service is running for our tests to work and all of our URLs will point at localhost:3000. Obviously you wouldn't want this for a production setting but it'll be fine for demonstration purposes.</p>
+
+<p>Here is our really simple Mocha spec. We're actually creating a <code>pickelStore</code> object in the spec file itself so we can test against it.</p>
+
+<p>``` js test.pickles.js
+var expect = chai.expect;</p>
+
+<p>var pickleStore = {
+  pickles: function() {</p>
+
+<pre><code>$.ajax({
+  url: 'http://localhost:3000/pickles',
+  dataType: 'json',
+  success: function(data) {
+    console.log(data);
+  }
+});
+</code></pre>
+
+<p>  },
+  add: function(num) {</p>
+
+<pre><code>$.ajax({
+  url: 'http://localhost:3000/pickles/add/' + num,
+  dataType: 'json',
+  success: function(data) {
+    console.log(data);
+  }
+});
+</code></pre>
+
+<p>  }
+};</p>
+
+<p>describe('Pickle Store', function() {
+  describe('#pickles', function() {</p>
+
+<pre><code>pickleStore.pickles();
+</code></pre>
+
+<p>  });
+});
+```</p>
+
+<p>I just want to see if the ajax methods will run and hit our Node service but I'm running into the following issue in Chrome:</p>
+
+<p><code>
+XMLHttpRequest cannot load http://localhost:3000/pickles. Origin null is not allowed by Access-Control-Allow-Origin.
+</code>
+Bummer... :(</p>
+
+<p>OK, what's going on here... To StackOverflow! <a href="http://stackoverflow.com/questions/8456538/origin-null-is-not-allowed-by-access-control-allow-origin/8456586#8456586">Aaaand we have our response.</a> After a bit of googling I came across <a href="http://www.stoimen.com/blog/2010/11/19/diving-into-node-js-very-first-app/">this post</a> which mentions adding <code>res.header('Access-Control-Allow-Origin', '*');</code> to my Node responses. That does the trick. I also found <a href="http://www.stoimen.com/blog/2010/11/19/diving-into-node-js-very-first-app/">this post</a> which describes setting up <a href="https://developer.mozilla.org/en/http_access_control">CORS</a> with Express.</p>
+
+<p>OK hopefully we're done with Node for now. I don't want this to turn into a node tutorial... Let's see if we can get the tests to perform using Mocha. We'll need some way to mock and spy on the ajax because I don't want to test the data coming from the actual service. I've realized I want to <em>simulate</em> the service for client-side Mocha tests. In a future tutorial I'll test the service itself using the Node aspect of Mocha. Kind of silly to lead off this way but whatever, moving on!</p>
+
+<h3>Enter Sinon.js</h3>
+
+<p>I'm going to use <a href="http://sinonjs.org/">Sinon.js</a> to help me mock, stub, fake, spy and do whatever the heck else I need to make sure my client code is solid. After downloading the js file for Sinon you can just add it to our test/index.html under the line where we added mocha.</p>
+
+<p>``` html
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests</title>
+  <link rel="stylesheet" href="mocha/mocha.css" />
+  <script src="../assets/js/libs/jquery.js"></script>
+  <script src="chai/chai.js"></script>
+  <script src="mocha/mocha.js"></script>
+  <script src="sinon/sinon.js"></script>
+  <script>mocha.setup('bdd');</script>
+  <script src="test.pickles.js"></script>
+  <script></p>
+
+<pre><code>$(function() {
+  mocha.run();
+})
+</code></pre>
+
+<p>  </script>
+</head>
+<body>
+  <div id="mocha"></div>
+</body>
+</html>
+```</p>
+
+<p>Now we can use Sinon in our <code>test.pickles.js</code> file to get a handled on our ajax. Let's first test that an ajax call is made when we run the <code>pickles()</code> method of the <code>pickleStore</code> object. We'll make sure this first test fails, then we'll change the spec to make it pass.</p>
+
+<p>``` js test.pickles.js
+var expect = chai.expect;</p>
+
+<p>var pickleStore = {
+  pickles: function() {</p>
+
+<pre><code>$.ajax({
+  url: 'http://localhost:3000/pickles',
+  dataType: 'json',
+  success: function(data) {
+    console.log(data);
+  }
+});
+</code></pre>
+
+<p>  },
+  add: function(num) {</p>
+
+<pre><code>$.ajax({
+  url: 'http://localhost:3000/pickles/add/' + num,
+  dataType: 'json',
+  success: function(data) {
+    console.log(data);
+  }
+});
+</code></pre>
+
+<p>  }
+};</p>
+
+<p>describe('Pickle Store', function() {
+  describe('#pickles', function() {</p>
+
+<pre><code>// Use Sinon to replace jQuery's ajax method
+// with a spy.
+beforeEach(function() {
+  sinon.spy($, 'ajax');
+});
+
+// Restor jQuery's ajax method to its
+// original state
+afterEach(function() { 
+  $.ajax.restore();
+})
+
+it('should make an ajax call', function(done) {
+  pickleStore.pickles();
+  expect($.ajax.calledOnce).to.be.false; // see if the spy WASN'T called
+  done(); // let Mocha know we're done async testing
+});
+</code></pre>
+
+<p>  });
+});
+```
+<img class="center" src="https://s3.amazonaws.com/robdodson/images/first_failing_ajax_test.png" title="'Our first failing test with Mocha, Chai and Sinon. Yay!'" ></p>
+
+<p>Changing this line <code>expect($.ajax.calledOnce).to.be.false;</code> from <code>false</code> to <code>true</code> should make our test pass. Yay, first async test in the bag! Next let's try to fake a response from the server. But I'm realizing that the succesful server response should <em>do</em> something to my pickleStore object, otherwise why do I care about the data? So I'm going to update pickelStore with the following success callback on its pickles method:</p>
+
+<p>``` js test.pickles.js
+var pickleStore = {
+  count: 0,
+  status: '',
+  pickles: function() {</p>
+
+<pre><code>var self = this;
+$.ajax({
+  url: 'http://localhost:3000/pickles',
+  dataType: 'json',
+  success: function(data) {
+    self.count = parseInt(data.count);
+    self.status = data.status;
+  }
+});
+</code></pre>
+
+<p>  },
+  add: function(num) {</p>
+
+<pre><code>$.ajax({
+  url: 'http://localhost:3000/pickles/add/' + num,
+  dataType: 'json',
+  success: function(data) {
+    console.log(data);
+  }
+});
+</code></pre>
+
+<p>  }
+};</p>
+
+<p>... .
+```</p>
+
+<p>Now we can test what happens after the server sends a succesful response. But how do we get that response and how do we force the success callback? For that we'll need to use Sinon's <code>stub.yieldsTo</code> method. It's mentioned in <a href="http://sinonjs.org/docs/#stubs">the docs on this page</a> if you scroll down. <code>yieldsTo</code> lets us direct the path of our spy so it will not only pretend to be jQuery's <code>ajax</code> method, but it will also force itself into the <code>success</code> callback with an optional hash of parameters which simulate our service response. Sweet! We'll have to revise the <code>beforeEach</code> in our spec though otherwise Sinon will complain that we're wrapping <code>ajax</code> twice. The updated spec should look like this. Again, take note that we're going to make it fail first by expecting a count of 99 pickles instead of 100.</p>
+
+<p>``` js test.pickles.js
+... .</p>
+
+<p>describe('Pickle Store', function() {
+  describe('#pickles', function() {</p>
+
+<pre><code>// Use Sinon to replace jQuery's ajax method
+// with a spy. This spy will also come with
+// some success data.
+beforeEach(function() {
+  sinon.stub($, 'ajax').yieldsTo('success', {
+    count: '100',
+    message: 'oh boy, 100 pickles!'
+  });
+});
+
+// Restor jQuery's ajax method to its
+// original state
+afterEach(function() { 
+  $.ajax.restore();
+})
+
+it('should make an ajax call', function(done) {
+  pickleStore.pickles();
+  expect($.ajax.calledOnce).to.be.true;
+  done();
+});
+
+it('should update the count', function(done) {      
+  pickleStore.pickles();
+  expect(pickleStore.count).to.equal(99);
+  done();
+});
+</code></pre>
+
+<p>  });
+});
+```</p>
+
+<p>Failing as expected. Aaaaand we change the expected count to 100, voila! Passing tests again!</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/passing_yield_test.png" title="'Passing test with Sinon's yieldTo'" ></p>
+
+<p>I'm adding the test for the status update as well so our final <code>#pickles</code> spec should look like this:</p>
+
+<p>``` js test.pickles.js
+describe('Pickle Store', function() {
+  describe('#pickles', function() {</p>
+
+<pre><code>// Use Sinon to replace jQuery's ajax method
+// with a spy. This spy will also come with
+// some success data.
+beforeEach(function() {
+  sinon.stub($, 'ajax').yieldsTo('success', {
+    count: '100',
+    message: 'oh boy, 100 pickles!'
+  });
+});
+
+// Restor jQuery's ajax method to its
+// original state
+afterEach(function() { 
+  $.ajax.restore();
+})
+
+it('should make an ajax call', function(done) {
+  pickleStore.pickles();
+  expect($.ajax.calledOnce).to.be.true;
+  done();
+});
+
+it('should update the count', function(done) {      
+  pickleStore.pickles();
+  expect(pickleStore.count).to.equal(100);
+  done();
+});
+
+it('should update the status', function(done) {      
+  pickleStore.pickles();
+  expect(pickleStore.status).to.equal('oh boy, 100 pickles!');
+  done();
+});
+</code></pre>
+
+<p>  });
+});
+```</p>
+
+<p>Now let's test the <code>#add</code> method before calling it a day. This method is interesting because all it can really do is update our status message. However, once it's called the value returned by <code>pickles()</code> should have incremented by whatever amount was passed to <code>add()</code>. Let's start by updating our <code>pickleStore</code> so it properly updates the status message after we've called add.</p>
+
+<p>``` js test.pickles.js
+var pickleStore = {
+  count: 0,
+  status: '',
+  pickles: function() {</p>
+
+<pre><code>var self = this;
+$.ajax({
+  url: 'http://localhost:3000/pickles',
+  dataType: 'json',
+  success: function(data) {
+    self.count = parseInt(data.count);
+    self.status = data.message;
+  }
+});
+</code></pre>
+
+<p>  },
+  add: function(num) {</p>
+
+<pre><code>var self = this;
+$.ajax({
+  url: 'http://localhost:3000/pickles/add/' + num,
+  dataType: 'json',
+  success: function(data) {
+    self.status = data.message; // &lt;-- update the status message!
+  }
+});
+</code></pre>
+
+<p>  }
+};
+```</p>
+
+<p>Now that that's in there we'll write a failing spec.</p>
+
+<p>``` js test.pickles.js
+describe('#add', function() {</p>
+
+<p>  var amount = 11;</p>
+
+<p>  beforeEach(function() {</p>
+
+<pre><code>sinon.stub($, 'ajax').yieldsTo('success', {
+  add: amount,
+  message: 'you added ' + amount + ' pickles to the pickle barrel!'
+});
+</code></pre>
+
+<p>  });</p>
+
+<p>  afterEach(function() {</p>
+
+<pre><code>$.ajax.restore();
+</code></pre>
+
+<p>  });</p>
+
+<p>  it('should update the status with the correct amount', function(done) {</p>
+
+<pre><code>pickleStore.add(amount);
+expect(pickleStore.status).to.equal('you added ' + 99 + ' pickles to the pickle barrel!');
+done();
+</code></pre>
+
+<p>  });
+});
+```</p>
+
+<p>This is not unlike our previous spec, in fact it does even less since we're not checking count.</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/failing_add_test.png" title="'Another failing test.'" ></p>
+
+<p>To make the test pass we change the 99 to <code>amount</code>. I originally wrote the add method thinking I would go back and check the total number of pickles but I've realized now that really that's more of a test for the service and not the front end. The front end shouldn't care if that arithmetic is happening properly, it should just consume data and update its UI. For tomorrow's post I'll try to get an AMD module in here so we can start playing with Backbone again. Thanks!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 11:21 am</li>
+<li>Mood: Irritated, Antsy</li>
+<li>Sleep: 8</li>
+<li>Hunger: 5</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Getting started with Mocha and Chai]]></title>
@@ -217,6 +624,11 @@ it('should work with should', function() {
 <p>That does <em>not</em> fill me with confidence. I think there's a very high probability that being a newbie I'm doing something wrong so <a href="https://twitter.com/rob_dodson/status/206893206435151872/photo/1">I've tweeted to Jake Luer, the author of Chai, to figure out if perhaps I'm missing something or if the tools are actually broken.</a> In the meantime I'm not comfortable using a testing framework that's broken.</p>
 
 <p>Sigh... well tomorrow I'll try to import some modules and if Jake hasn't gotten back to me by then I'll use Jasmine to do those tests. Till then!</p>
+
+<ul>
+<li>Update: Looks like I managed to clone Chai right as they were updating the repo. Pulling the latest fixed everything. See the comment thread below*</li>
+</ul>
+
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
@@ -786,177 +1198,6 @@ post-construct
 <li>Time: 8:03 am</li>
 <li>Mood: Happy, Drowsy, Peaceful</li>
 <li>Sleep: 5.5</li>
-<li>Hunger: 3</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 5]]></title>
-    <link href="http://robdodson.me/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/"/>
-    <updated>2012-05-12T07:02:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5</id>
-    <content type="html"><![CDATA[<p>Last night I got the <code>Crawler</code> passing its test for <code>#get_words_by_selector</code>. This morning I realize that when someone sends in a junk selector I want to raise an exception of some kind. Since I don't know much about Ruby Exceptions I'm doing a little digging...Ruby has both <code>throw</code>/<code>catch</code> and <code>raise</code>/<code>rescue</code> so what's the difference between throw/catch and raise/rescue in Ruby?</p>
-
-<h3>Throwing exceptions for control flow</h3>
-
-<p>There's a great guest post by Avdi Grimm on <a href="http://rubylearning.com/blog/2011/07/12/throw-catch-raise-rescue-im-so-confused/">RubyLearning</a> which covers this topic in depth. To summarize <code>throw</code>/<code>catch</code> is mainly used when doing <em>exceptions as control flow</em>. In other words, if you need to break out of a deeply nested loop or some other expensive operation you can throw an exception symbol which can be caught someone high up the call stack. Initially this rubbed me the wrong way since I know that things like <code>goto</code> and <code>labels</code> are a bad practice. Someone else raised this point in the comments to which Avid responded:</p>
-
-<blockquote><p>There is a fundamental difference between throw/catch and goto. Goto, in languages which support it, pays no attention to the stack. Any resources which were allocated before the goto are simply left dangling unless they are manually cleaned up.</p>
-
-<p>throw/catch, like exception handling, unwinds the stack, triggering ensure blocks along the way. So, for example, if you throw inside an open() {…} block, the open file will be closed on the way up to the catch() block.</p></blockquote>
-
-<h3>Raising exceptions for everything else</h3>
-
-<p>With <code>throw</code>/<code>catch</code> out of the way that leaves <code>raise</code>/<code>rescue</code> to handle everything else. I'm willing to bet that 99% of error code should probably be raising exceptions and throw/catch should only be used in situations where you need the control flow behavior. With that knowledge in hand I need to decide between one of Ruby's built-in Exceptions or defining one of my own. Let's define one of our own so we can get that experience under our belt.</p>
-
-<h3>Creating an exception subclass in Ruby</h3>
-
-<p>One tip I picked up while doing my research into <code>raise</code> and <code>throw</code> is that any exception that doesn't subclass StandardError will not be caught by default. Here's an example to illustrate:</p>
-
-<p>```ruby</p>
-
-<h2>#</h2>
-
-<h1>First we define an exception class which doesn't</h1>
-
-<h1>inherit from StandardError. As a result it won't</h1>
-
-<h1>be caught by a simple rescue. Instead we would</h1>
-
-<h1>need to rescue by its class name</h1>
-
-<h2>#</h2>
-
-<p>class MyBadException &lt; Exception
-end</p>
-
-<p>def miss_bad_exception
-  raise MyBadException.new
-  rescue
-  p "I'll never be called :("
-end</p>
-
-<p>miss_bad_exception
-MyBadException: MyBadException
-  from (irb):4:in <code>miss_bad_exception'
-  from (irb):8
-  from /Users/Rob/.rvm/rubies/ruby-1.9.3-p125/bin/irb:16:in</code><main></p>
-
-<h1>See that calling the method produces an uncaught exception...</h1>
-
-<h2>#</h2>
-
-<h1>Next we'll subclass StandardError. As a result</h1>
-
-<h1>we won't have to explicitly define our class name</h1>
-
-<h1>for a rescue to work.</h1>
-
-<h2>#</h2>
-
-<p>class MyGoodException &lt; StandardError
-end</p>
-
-<p>def save_good_exception
-  raise MyGoodException.new
-  rescue
-  p "I'm saved! My hero!"
-end</p>
-
-<p>save_good_exception
-"I'm saved! My hero!"</p>
-
-<h1>Yay! Our exception was caught!</h1>
-
-<p><code>``
-We'll call our Exception</code>SelectorError` to indicate that the provided selector did not return any results. For reference I often refer to <a href="http://rubylearning.com/satishtalim/ruby_exceptions.html">this chart on RubyLearning</a> when I want to see a list of all the available Exception classes. In our case we'll just inherit from StandardError.</p>
-
-<p><code>ruby tentacles/lib/selection_error.rb
-module Tentacles
-  class SelectionError &lt; StandardError
-  end
-end
-</code>
-I don't think we actually need to do much more than that. The ability to pass a payload message should come from the super class so I think we're good to go. Here's our updated spec:</p>
-
-<p>```ruby
-it "should raise an exception if nothing was returned" do</p>
-
-<pre><code>    expect { @crawler.get_words_by_selector('some-gibberish-selector') }.to raise_error(Tentacles::SelectionError, 'The selector did not return an results!')  
-</code></pre>
-
-<p>end
-<code>``      
-Initially the test fails so now we need to update our</code>Crawler` to check if nothing was returned and raise the custom exception.</p>
-
-<p>Here's our updated <code>Crawler</code> with additional require and updated method.</p>
-
-<p>```ruby tentacles/lib/crawler.rb
-require 'open-uri'
-require 'nokogiri'
-require_relative 'selection_error'</p>
-
-<p>module Tentacles
-  class Crawler</p>
-
-<pre><code>attr_reader :doc
-
-def self.from_uri(uri)
-  new(uri)
-end
-
-def initialize(uri)
-  @uri = uri
-  @doc = Nokogiri::HTML(open(@uri))
-  @counts = Hash.new(0)
-end
-
-def get_words_by_selector(selector)
-  entries = doc.css(selector)
-  raise Tentacles::SelectionError, 
-    'The selector did not return an results!' if entries.empty?
-  entries.each do |entry|
-    words = words_from_string(entry.content)
-    count_frequency(words)
-  end
-
-  sorted = @counts.sort_by { |word, count| count }
-  sorted.reverse!
-  sorted.map { |word, count| "#{word}: #{count}"}
-end
-
-def get_metadata_by_selector(selector)
-  # TODO
-end
-</code></pre>
-
-<p>  private</p>
-
-<pre><code>def words_from_string(string)
-  string.downcase.scan(/[\w']+/)
-end
-
-def count_frequency(word_list)
-  for word in word_list
-    @counts[word] += 1
-  end
-  @counts
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>All tests passing, we're good to go :)</p>
-
-<ul>
-<li>Time: 7:00 am</li>
-<li>Mood: Alert, Awake, Anxious</li>
-<li>Sleep: 8</li>
 <li>Hunger: 3</li>
 <li>Coffee: 0</li>
 </ul>
