@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Templates | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/templates/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-30T11:52:21-07:00</updated>
+  <updated>2012-05-30T11:55:33-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -71,7 +71,7 @@ success: function(contents) {
 
 <p>Not having previous experience working with <a href="http://api.jquery.com/category/deferred-object/">jQuery.Deferred</a> I was initially put-off by the idea of just copy/pasting this function over to him, especially since I couldn't explain what was going on. I knew that I probably wanted to use Deferreds and Promises but I wasn't sure how best to explain the concepts nor did this method seem to do much in the way of loading JSON, it was just for loading templates. Since my friend only wanted to load 1 template and 1 JSON file I thought it best for us to start small, and to write something that we could easily debug. Knowing I wanted to use Deferreds I found <a href="http://msdn.microsoft.com/en-us/magazine/gg723713.aspx">this wonderful article by Addy Osmani and Julian Aubourg</a> detailing how Deferreds work. It is VERY comprehensive and for our purposes I only needed to read the first few paragraphs before I had enough to start.</p>
 
-<p>In a nutshell deferreds are objects which contain promises (also objects). Promises can be in various states, <code>pending</code>, <code>resolved</code> or <code>rejected</code>. Once you have a promise you can hook functions on to it so when it changes from a <code>pending</code> to <code>resolved</code> state all those functions fire. This can be nice for several reasons. For starters, you can avoid the jQuery <em>pyramid of doom</em></p>
+<p>In a nutshell deferreds are objects which contain promises (also objects). Promises can be in various states, <code>pending</code>, <code>resolved</code> or <code>rejected</code>. Once you have a deferred (or it's promise) you can hook functions on to it so when it changes from a <code>pending</code> to <code>resolved</code> state all those functions fire. It's actually the promise that changes state but you can use the deferred like a promise because in most cases it will just proxy the calls to its promise object. Using deferreds can be nice for several reasons. For starters, you can avoid the jQuery <em>pyramid of doom</em></p>
 
 <p>``` js</p>
 
@@ -106,8 +106,8 @@ function doSomethingWithHugeData(data) {
   console.log('man, look at all these 1's and 0's!);
 }</p>
 
-<p>var promise = myService.getSomeHugeData();
-promise.done(doSomethingWithHugeData);
+<p>var dfd = myService.getSomeHugeData();
+dfd.done(doSomethingWithHugeData);
 ```</p>
 
 <p>This is a much nicer approach than passing in a callback that your service will need to execute whenever it finishes getting its data. Your service shouldn't care about your callbacks. It should care about getting data and letting people know when that data's been got! :D</p>
