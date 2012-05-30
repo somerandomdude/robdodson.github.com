@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Underscore | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/underscore/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-30T11:57:46-07:00</updated>
+  <updated>2012-05-30T12:01:28-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -135,21 +135,21 @@ dfd.done(doSomethingWithHugeData);
 &lt;script&gt;
   $(function() {
 
-    function success(jsonRes, templateRes) {
+    function successFunc(jsonRes, templateRes) {
       var json = _.first(jsonRes);
       var template = _.first(templateRes);
       var compiled = _.template(template, json);
       $('#main').html(compiled);
     }
 
-    function failure() {
+    function failureFunc() {
       console.log('fail whale!');
     }
 
     $.when(
       $.ajax("person.json"),
       $.ajax("person.template.html")
-    ).then(success, failure);
+    ).then(successFunc, failureFunc);
 
   });
 &lt;/script&gt;
@@ -161,20 +161,20 @@ dfd.done(doSomethingWithHugeData);
 
 <p>In our case everything is in the same folder as index.html so there's no need for any paths. Keep in mind that in most (all?) browsers you'll need to be running a local server for the above code to actually work. In Chrome, at least, you can't run an html file from file:// and have it load external resources, it'll complain that the access-origin is not allowed.</p>
 
-<p>Let me take a moment to explain <code>$.then</code> a little bit. We know that <code>$.ajax</code> returns a deferred, and that the deferred can be in three states: <code>pending</code>, <code>resolved</code>, <code>rejected</code>. So if we did something like this:</p>
+<p>Let me take a moment to explain <code>$.then</code> a little bit. We know that <code>$.ajax</code> returns a deferred, and that the deferred's promise can be in three states: <code>pending</code>, <code>resolved</code>, <code>rejected</code>. So if we did something like this:</p>
 
 <p><code>js
 var dfd = $.ajax('foobar.php');
 </code></p>
 
-<p><code>dfd</code> would be a deferred object in a <code>pending</code> state. Deferred's let us link methods up to them for when their state changes. These methods are: <code>done()</code>, <code>fail()</code>, <code>always()</code>, <code>progress()</code>, and <code>then()</code>. There are more but <a href="http://api.jquery.com/category/deferred-object/">I'll let the documentation explain them.</a> <code>done()</code> and <code>fail()</code> each accept either a single callback or an array of callbacks to be fired when the deferred changes to either the <code>resolved</code> or <code>rejected</code> state.</p>
+<p><code>dfd</code> would be a deferred object with a <code>pending</code> promise. Deferred's let us link methods up to them for when their state changes. These methods are: <code>done()</code>, <code>fail()</code>, <code>always()</code>, <code>progress()</code>, and <code>then()</code>. There are more but <a href="http://api.jquery.com/category/deferred-object/">I'll let the documentation explain them.</a> <code>done()</code> and <code>fail()</code> each accept either a single callback or an array of callbacks to be fired when the deferred changes to either the <code>resolved</code> or <code>rejected</code> state.</p>
 
 <p>``` js
-function success() {
+function successFunc() {
   console.log('success! do stuff with data!');
 }</p>
 
-<p>function failure() {
+<p>function failureFunc() {
   console.log('failure! um...give up!');
 }</p>
 
@@ -188,8 +188,8 @@ function success() {
 };</p>
 
 <p>service.getJSON()
-.done(success)
-.fail(failure);</p>
+.done(successFunc)
+.fail(failureFunc);</p>
 
 <p>```</p>
 

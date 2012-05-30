@@ -303,21 +303,21 @@
 </span><span class='line'>    <span class="nt">&lt;script&gt;</span>
 </span><span class='line'>      <span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
 </span><span class='line'>
-</span><span class='line'>        <span class="kd">function</span> <span class="nx">success</span><span class="p">(</span><span class="nx">jsonRes</span><span class="p">,</span> <span class="nx">templateRes</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kd">function</span> <span class="nx">successFunc</span><span class="p">(</span><span class="nx">jsonRes</span><span class="p">,</span> <span class="nx">templateRes</span><span class="p">)</span> <span class="p">{</span>
 </span><span class='line'>          <span class="kd">var</span> <span class="nx">json</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">first</span><span class="p">(</span><span class="nx">jsonRes</span><span class="p">);</span>
 </span><span class='line'>          <span class="kd">var</span> <span class="nx">template</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">first</span><span class="p">(</span><span class="nx">templateRes</span><span class="p">);</span>
 </span><span class='line'>          <span class="kd">var</span> <span class="nx">compiled</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span><span class="nx">template</span><span class="p">,</span> <span class="nx">json</span><span class="p">);</span>
 </span><span class='line'>          <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#main&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">compiled</span><span class="p">);</span>
 </span><span class='line'>        <span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'>        <span class="kd">function</span> <span class="nx">failure</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kd">function</span> <span class="nx">failureFunc</span><span class="p">()</span> <span class="p">{</span>
 </span><span class='line'>          <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;fail whale!&#39;</span><span class="p">);</span>
 </span><span class='line'>        <span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'>        <span class="nx">$</span><span class="p">.</span><span class="nx">when</span><span class="p">(</span>
 </span><span class='line'>          <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="s2">&quot;person.json&quot;</span><span class="p">),</span>
 </span><span class='line'>          <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="s2">&quot;person.template.html&quot;</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">success</span><span class="p">,</span> <span class="nx">failure</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">successFunc</span><span class="p">,</span> <span class="nx">failureFunc</span><span class="p">);</span>
 </span><span class='line'>
 </span><span class='line'>      <span class="p">});</span>
 </span><span class='line'>    <span class="nt">&lt;/script&gt;</span>
@@ -329,14 +329,14 @@
 
 <p>In our case everything is in the same folder as index.html so there&#8217;s no need for any paths. Keep in mind that in most (all?) browsers you&#8217;ll need to be running a local server for the above code to actually work. In Chrome, at least, you can&#8217;t run an html file from file:// and have it load external resources, it&#8217;ll complain that the access-origin is not allowed.</p>
 
-<p>Let me take a moment to explain <code>$.then</code> a little bit. We know that <code>$.ajax</code> returns a deferred, and that the deferred can be in three states: <code>pending</code>, <code>resolved</code>, <code>rejected</code>. So if we did something like this:</p>
+<p>Let me take a moment to explain <code>$.then</code> a little bit. We know that <code>$.ajax</code> returns a deferred, and that the deferred&#8217;s promise can be in three states: <code>pending</code>, <code>resolved</code>, <code>rejected</code>. So if we did something like this:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">dfd</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="s1">&#39;foobar.php&#39;</span><span class="p">);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><code>dfd</code> would be a deferred object in a <code>pending</code> state. Deferred&#8217;s let us link methods up to them for when their state changes. These methods are: <code>done()</code>, <code>fail()</code>, <code>always()</code>, <code>progress()</code>, and <code>then()</code>. There are more but <a href="http://api.jquery.com/category/deferred-object/">I&#8217;ll let the documentation explain them.</a> <code>done()</code> and <code>fail()</code> each accept either a single callback or an array of callbacks to be fired when the deferred changes to either the <code>resolved</code> or <code>rejected</code> state.</p>
+<p><code>dfd</code> would be a deferred object with a <code>pending</code> promise. Deferred&#8217;s let us link methods up to them for when their state changes. These methods are: <code>done()</code>, <code>fail()</code>, <code>always()</code>, <code>progress()</code>, and <code>then()</code>. There are more but <a href="http://api.jquery.com/category/deferred-object/">I&#8217;ll let the documentation explain them.</a> <code>done()</code> and <code>fail()</code> each accept either a single callback or an array of callbacks to be fired when the deferred changes to either the <code>resolved</code> or <code>rejected</code> state.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -355,11 +355,11 @@
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">success</span><span class="p">()</span> <span class="p">{</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">successFunc</span><span class="p">()</span> <span class="p">{</span>
 </span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;success! do stuff with data!&#39;</span><span class="p">);</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'><span class="kd">function</span> <span class="nx">failure</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">failureFunc</span><span class="p">()</span> <span class="p">{</span>
 </span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;failure! um...give up!&#39;</span><span class="p">);</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
@@ -370,8 +370,8 @@
 </span><span class='line'><span class="p">};</span>
 </span><span class='line'>
 </span><span class='line'><span class="nx">service</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">()</span>
-</span><span class='line'><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="nx">success</span><span class="p">)</span>
-</span><span class='line'><span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">failure</span><span class="p">);</span>
+</span><span class='line'><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="nx">successFunc</span><span class="p">)</span>
+</span><span class='line'><span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">failureFunc</span><span class="p">);</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
