@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Templates | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/templates/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-30T11:55:33-07:00</updated>
+  <updated>2012-05-30T11:57:46-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -103,7 +103,7 @@ success: function(contents) {
 
 <p>``` js
 function doSomethingWithHugeData(data) {
-  console.log('man, look at all these 1's and 0's!);
+  console.log("man, look at all these 1's and 0's!");
 }</p>
 
 <p>var dfd = myService.getSomeHugeData();

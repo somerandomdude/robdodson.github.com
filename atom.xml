@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-30T11:55:33-07:00</updated>
+  <updated>2012-05-30T11:57:46-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -155,7 +155,7 @@
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 </pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">doSomethingWithHugeData</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;man, look at all these 1&#39;</span><span class="nx">s</span> <span class="nx">and</span> <span class="mi">0</span><span class="err">&#39;</span><span class="nx">s</span><span class="o">!</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;man, look at all these 1&#39;s and 0&#39;s!&quot;</span><span class="p">);</span>
 </span><span class='line'><span class="p">}</span>
 </span><span class='line'>
 </span><span class='line'><span class="kd">var</span> <span class="nx">dfd</span> <span class="o">=</span> <span class="nx">myService</span><span class="p">.</span><span class="nx">getSomeHugeData</span><span class="p">();</span>
