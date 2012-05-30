@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Backbone | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/backbone/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-28T15:09:05-07:00</updated>
+  <updated>2012-05-29T22:34:25-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,235 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Testing AMD Backbone Modules]]></title>
+    <link href="http://robdodson.me/blog/2012/05/29/testing-backbone-modules/"/>
+    <updated>2012-05-29T08:03:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/29/testing-backbone-modules</id>
+    <content type="html"><![CDATA[<p>Continuing from <a href="http://robdodson.me/blog/2012/05/28/mocking-requests-with-mocha-chai-and-sinon/">yesterday's post</a> I'm going to start to incorporate Backbone into my BDD setup. I'm going to use the <a href="https://github.com/tbranyen/backbone-boilerplate">Backbone Boilerplate</a> and <a href="https://github.com/backbone-boilerplate/grunt-bbb">grunt-bbb</a> to setup a new project. If you're new to the boilerplate or grunt-bbb <a href="http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/">checkout my previous post on getting started.</a></p>
+
+<h3>Shiny and new</h3>
+
+<p>I've created a new directory called <code>amd-tests</code> and once I <code>cd</code> inside I run <code>bbb init</code> to template out a new project. By default the boilerplate uses Require.js and AMD modules and we have a little example one already created for us. It's called, well, Example :) We'll use this to create our model for testing since I know that everyone should be on the same page with this module.</p>
+
+<p>I'm going to change our model's name from Example.Model to Example.Photo so our terminalogy won't get muddy. We'll give it some default properties for <code>src</code> and <code>caption</code>. Later on we'll test that a freshly created model has these same defaults. When we're done setting up our <code>/app/example.js</code> file should look like this. Keep in mind that the boilerplate adds a lot of stuff to get us started so you can ignore everything that isn't Example.Photo</p>
+
+<p>``` js /app/example.js
+define([
+  "namespace",</p>
+
+<p>  // Libs
+  "use!backbone"</p>
+
+<p>  // Modules</p>
+
+<p>  // Plugins
+],</p>
+
+<p>function(namespace, Backbone) {</p>
+
+<p>  // Create a new module
+  var Example = namespace.module();</p>
+
+<p>  // !!! Our awesome new model !!!
+  Example.Photo = Backbone.Model.extend({</p>
+
+<pre><code>defaults: {
+  src: '/images/placeholder.jpg',
+  caption: 'Waiting for content...'
+}
+</code></pre>
+
+<p>  });</p>
+
+<p>  Example.Collection = Backbone.Collection.extend({ /<em> ... </em>/ });
+  Example.Router = Backbone.Router.extend({ /<em> ... </em>/ });</p>
+
+<p>  // This will fetch the tutorial template and render it.
+  Example.Views.Tutorial = Backbone.View.extend({</p>
+
+<pre><code>template: "app/templates/example.html",
+
+render: function(done) {
+  var view = this;
+
+  // Fetch the template, render it to the View element and call done.
+  namespace.fetchTemplate(this.template, function(tmpl) {
+    view.el.innerHTML = tmpl();
+
+    // If a done function is passed, call it with the element
+    if (_.isFunction(done)) {
+      done(view.el);
+    }
+  });
+}
+</code></pre>
+
+<p>  });</p>
+
+<p>  // Required, return the module for AMD compliance
+  return Example;</p>
+
+<p>});
+```
+Now comes the rather tricky part. We need to create a test runner HTML file that can incorporate mocha, chai and sinon. It also has to load our Example module and maintain all of that module's dependencies. I spent a <em>ton</em> of time on IRC today sorting this out so here is my current best stab at things based on some <a href="https://gist.github.com/2655876">VERY generous gists</a> from <a href="https://github.com/kmiyashiro">Kelly Miyashiro.</a></p>
+
+<p>Let's start with the index.html file that'll be our test runner:</p>
+
+<p>``` html test/index.html
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mocha Tests</title>
+  <link rel="stylesheet" href="mocha/mocha.css" />
+  <script src="../assets/js/libs/require.js"></script>
+  <script src="mocha/mocha.js"></script>
+  <script src="sinon/sinon.js"></script>
+  <script src="config.js"></script>
+</head>
+<body>
+  <script></p>
+
+<pre><code>require([
+  '../test/test.example'
+], runMocha);
+</code></pre>
+
+<p>  </script>
+  <div id="mocha"></div>
+</body>
+</html>
+```</p>
+
+<p>The first thing we do is add require.js, then mocha and sinon. Why no Chai? Good question. Kelly didn't do it so I didn't do it. If anyone wants to cite the pros and cons of this approach I'm all ears. Next we add our own config.js that is specific to our tests. We might have a config.js somewhere else that runs our main app but we'll also need this one to run our tests. Finally we have a script block sitting on top of our <code>#mocha</code> div. The script block loads in our specs (in this case I've only written one but you can do multiple specs here). A final argument to the require call is <code>runMocha</code>. Essentially this is the function that is executed <em>AFTER</em> the modules have finished loading. In our case runMocha is located inside the new config.js we've defined just for our tests. Let's take a look at it now.</p>
+
+<p>``` js test/config.js
+require.config({</p>
+
+<pre><code>// Base URL relative to the test runner
+// Paths are relative to this
+baseUrl: '../app',
+paths: {
+    // Testing libs
+    'chai'          : '../test/chai/chai',
+    'common'        : '../test/common',
+    'jquery'        : '../assets/js/libs/jquery',
+    'underscore'    : '../assets/js/libs/underscore',
+    'backbone'      : '../assets/js/libs/backbone',
+    'use'           : '../assets/js/plugins/use'
+},
+use: {
+    backbone: {
+        deps: ['use!underscore', 'jquery'],
+        attach: 'Backbone'
+    },
+    underscore: {
+        attach: '_'
+    },
+    mocha: {
+        attach: 'mocha'
+    }
+},
+priority: [
+    'jquery',
+    'underscore',
+    'common'
+]
+</code></pre>
+
+<p>});</p>
+
+<p>mocha.setup({</p>
+
+<pre><code>ui: 'bdd',
+ignoreLeaks: true
+</code></pre>
+
+<p>});</p>
+
+<p>// Protect from barfs
+console = window.console || function() {};</p>
+
+<p>var runMocha = function() {</p>
+
+<pre><code>mocha.run();
+</code></pre>
+
+<p>};
+```</p>
+
+<p>Lots of stuff here but nothing to get alarmed about. <a href="http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/">If you've read my previous getting started post you'll know all about the config.js file.</a> Go back and read the previous post if none of this makes sense to you. The thing to take note of is the <code>priority</code> array and the <code>runMocha</code> function at the bottom of the page. I don't have much experience with the priority array and I didn't find much documentation on it but Kelly uses it <a href="https://gist.github.com/2655876">in the gists</a> to make sure that jQuery, chai and any chai plugins are properly setup on the page.</p>
+
+<p>``` js test/common.js
+// Include and setup all the stuff for testing
+define(function(require) {</p>
+
+<pre><code>window.$ = window.jQuery = require('jquery');
+window.chai         = require('chai');
+window.expect       = chai.expect;
+</code></pre>
+
+<p>});
+```</p>
+
+<p>Good practice? Bad practice? I'm not sure and I would love comments if anyone has a take on things. Underneath the priority array is a setup function which sends some configuration parameters to mocha. <code>ignoreLeaks</code> is useful because it's easy for mocha to see jQuery or any other global variable as a good reason to abort a test. IMO that's what JSLint/Hint is for, and bailing everytime you see a global is going to make testing 3rd party code especially difficult. My advice, leave it off. Finally we call <code>mocha.run()</code> via the <code>runMocha</code> function. Remember that this function is executed inside our test runner after all the specs are loaded, like so:</p>
+
+<p>``` html test/index.html</p>
+
+<script>
+    require([
+      '../test/test.example'
+    ], runMocha);
+  </script>
+
+
+<p>```</p>
+
+<p>Doing it this way guarantees that all the dependencies our module needs will be loaded before we start running our tests.</p>
+
+<h3>Oh right, the tests!</h3>
+
+<p>Wow! OK so hopefully you're still with me because after all of that we <em>still</em> need to generate some tests. Since it's getting late I'm just going to put together a really simple spec to make sure our default values are being set on the model.</p>
+
+<p>I've created a file called <code>test.example.js</code> which will test our <code>Example</code> module.</p>
+
+<p>``` js test/test.example.js
+define(function(require) {
+  var Example = require('modules/example');</p>
+
+<p>  describe('Example', function() {</p>
+
+<pre><code>describe('Photo', function() {
+  var photo = new Example.Photo();
+  it('should have proper defaults', function(done) {
+      expect(photo.get('src')).to.equal('/images/placeholder.jpg');
+      expect(photo.get('caption')).to.equal('Waiting for content...');
+      done();
+  });
+});
+</code></pre>
+
+<p>  });
+});
+```</p>
+
+<p>It isn't amazing but it gets us started testing our module. I'm explicitly calling <code>done()</code> at the end of our test because I saw mention on StackOverflow that you should do this when testing AMD modules in the browser with mocha otherwise you can get false passing tests. Not sure if it's absolutely necessary but I guess better safe than sorry!</p>
+
+<p>At this point I'm exhausted and hopefully you have a decent head start on your tests. I know that this post jumps around a lot so please take a moment <a href="https://github.com/robdodson/backbone-boilerplate-mocha">to grab the repo I've posted which contains all the source code.</a> Again. Caveat. I'm learning along with you so there are lots of newbie mistakes being made, I'm sure. I really want to hear your feedback if you have any. Good luck!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here</a></p>
+
+<ul>
+<li>Time: 8:094 pm</li>
+<li>Mood: Awake, Antsy</li>
+<li>Sleep: 6</li>
+<li>Hunger: 3</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Backbone Events: Framework Communication]]></title>
@@ -853,299 +1082,6 @@ Backbone.history.start({ pushState: true });
 <li>Coffee: 0</li>
 </ul>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Some More Backbone.js Basics]]></title>
-    <link href="http://robdodson.me/blog/2012/05/20/some-more-backbone-dot-js-basics/"/>
-    <updated>2012-05-20T08:19:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/20/some-more-backbone-dot-js-basics</id>
-    <content type="html"><![CDATA[<p>Here are some quick Backbone snippets to help visualize concepts. I'll move around fairly quickly so if you're interested in going more in-depth then checkout the documentation.</p>
-
-<h3>Events</h3>
-
-<p>Backbone events are pretty straightforward. To create a pub/sub relationship you use the <code>on</code> and <code>off</code> methods of <code>Backbone.Events</code>:</p>
-
-<p>In the above example you could make <code>dispatcher</code> into an AMD module and load the dependency with Require.js, something <a href="http://robdodson.me/blog/2012/05/18/backbone-boilerplate-playing-with-require-dot-js/">I've covered in a previous post.</a></p>
-
-<p>``` js
-var dispatcher = {};
-_.extend(dispatcher, Backbone.Events);</p>
-
-<p>var receiver = {</p>
-
-<pre><code>initialize: function() {
-    // Start listening for the 'hello' event from the dispatcher.
-    // When we hear the 'hello' event we'll run a function
-    dispatcher.on('hello', this.sayHello, this);
-},
-sayHello: function() {
-    console.log('hello!');
-    // Kill the listener so we only get called once
-    dispatcher.off('hello', this.sayHello, this); 
-}
-</code></pre>
-
-<p>};</p>
-
-<p>receiver.initialize();
-dispatcher.trigger('hello');
-dispatcher.trigger('hello');
-```</p>
-
-<h3>Models</h3>
-
-<p>Backbone models are interesting because they implement explicit <code>get</code> and <code>set</code> methods. When you change a property with the get and set methods it will fire off an event. Here's a fiddle showing how to model a <code>Book</code>. We'll change the author and the DOM will reflect this update.</p>
-
-<iframe style="width: 100%; height: 400px" src="http://jsfiddle.net/robdodson/dC5GD/1/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
-
-
-<p>If your model implements an <code>initialize</code> function it will be called as soon as the object is created. In other words, its a constructor. If you pass a hash to the model's constructor it will set those attributes on itself. The hash and any additional arguments will also be passed to <code>initialize</code>.</p>
-
-<p>``` js
-// Define an initialize function for our book
-// Initialize will be called anytime we say new Book()
-var Book = Backbone.Model.extend({</p>
-
-<pre><code>initialize: function(foo, bar) {
-    console.log(foo);
-    console.log(bar);
-}
-</code></pre>
-
-<p>});</p>
-
-<p>// You can pass in a hash to set initial values on the model
-// The hash and any additional arguments will also be passed
-// to the initialize function
-book = new Book({</p>
-
-<pre><code>author: 'Hunter S. Thompson',
-title: 'Fear and Loating in Las Vegas'
-</code></pre>
-
-<p>}, 'hello world!');</p>
-
-<p>console.log(book.get('author'));
-```</p>
-
-<h4>Poor man's data-binding</h4>
-
-<p>Now that we have a basic understanding of models we can write our own simple binding setup. This example presumes we have an <code>#author</code> and a <code>#title</code> element somewhere on our page.</p>
-
-<p>``` js
-var Book = Backbone.Model.extend({});</p>
-
-<p>book = new Book({</p>
-
-<pre><code>author: 'Hunter S. Thompson',
-title: 'Fear and Loating in Las Vegas'
-</code></pre>
-
-<p>});</p>
-
-<p>// Listen for any change event coming from the model.
-// When any attribute changes we'll tell our elements to
-// automatically update.
-book.on('change', function() {</p>
-
-<pre><code>$('#author').html(book.get('author'));
-$('#title').html(book.get('title'));
-</code></pre>
-
-<p>});</p>
-
-<p>book.set('author', 'Mickey Mouse');
-book.set('title', 'Everyone Poops');
-```</p>
-
-<h4>Backbone.sync</h4>
-
-<p>To mess around with saving data we'll need to alter <code>Backbone.sync</code>.</p>
-
-<blockquote><p>Backbone.sync is the function that Backbone calls every time it attempts to read or save a model to the server. By default, it uses (jQuery/Zepto).ajax to make a RESTful JSON request and returns a jqXHR. You can override it in order to use a different persistence strategy, such as WebSockets, XML transport, or Local Storage.</p></blockquote>
-
-<p>Backbone will decide whether a save call should perform a create with <code>HTTP POST</code> or an update <code>HTTP PUT</code> based on whether or not our model has an id attribute already.</p>
-
-<p>Here's an example from the Backbone docs which overrides the sync functionality and fakes a request to a server.</p>
-
-<p>``` js
-Backbone.sync = function(method, model) {
-  console.log(method + ": " + JSON.stringify(model));
-  model.id = 1; // This line is crucial!
-};</p>
-
-<p>var book = new Backbone.Model({
-  title: "The Rough Riders",
-  author: "Theodore Roosevelt"
-});</p>
-
-<p>book.save();
-// create: {"title":"The Rough Riders","author":"Theodore Roosevelt"}</p>
-
-<p>book.save({author: "Teddy"});
-// update: {"title":"The Rough Riders","author":"Teddy"}
-<code>``
-​If we don't give our model an</code>id` on line 3 then Backbone has no way of knowing if the model has been previously saved or not. It will keep doing create/POST until it receives that id.</p>
-
-<h3>Collections</h3>
-
-<p>If you don't want to setup a server but you do want to play around with saving models and collections you can use <a href="https://github.com/jeromegn/Backbone.localStorage">the Backbone LocalStorage adapter written by Jerome Gravel-Niquet</a>. After you've included the js file in your code somewhere you can use it like so:</p>
-
-<p>``` js
-var Book = Backbone.Model.extend({});</p>
-
-<p>var Books = Backbone.Collection.extend({</p>
-
-<pre><code>model: Book,
-localStorage: new Backbone.LocalStorage("Books")
-</code></pre>
-
-<p>});</p>
-
-<p>var library = new Books();
-library.on('sync', function() {</p>
-
-<pre><code>console.log('sync succesful!');
-</code></pre>
-
-<p>});</p>
-
-<p>var othello = library.create({
-  title: "Othello",
-  author: "William Shakespeare"
-});
-```</p>
-
-<p>To <code>fetch</code> the models in the collection at a later point you can do the following:</p>
-
-<p>``` js
-var Book = Backbone.Model.extend({});</p>
-
-<p>var Books = Backbone.Collection.extend({</p>
-
-<pre><code>model: Book,
-localStorage: new Backbone.LocalStorage("Books")
-</code></pre>
-
-<p>});</p>
-
-<p>var library = new Books();
-library.fetch();
-console.log(library);
-```</p>
-
-<p>The docs mention that you shouldn't use this to initialize your collections. Instead you should <a href="http://documentcloud.github.com/backbone/#FAQ-bootstrap">bootstrap your app</a> at page load. Here's the passage:</p>
-
-<blockquote><p>Note that fetch should not be used to populate collections on page load — all models needed at load time should already be bootstrapped in to place. fetch is intended for lazily-loading models for interfaces that are not needed immediately: for example, documents with collections of notes that may be toggled open and closed.</p></blockquote>
-
-<h3>Routers</h3>
-
-<p>Routers are used to map URLs to actions. If you're using the Backbone Boilerplate you should see this block of code in your main.js.</p>
-
-<p>``` js
-// Defining the application router, you can attach sub routers here.
-var Router = Backbone.Router.extend({
-  routes: {</p>
-
-<pre><code>"": "index",
-":hash": "index"
-</code></pre>
-
-<p>  },</p>
-
-<p>  index: function(hash) {</p>
-
-<pre><code>var route = this;
-var tutorial = new Example.Views.Tutorial();
-
-// Attach the tutorial to the DOM
-tutorial.render(function(el) {
-  $("#main").html(el);
-
-  // Fix for hashes in pushState and hash fragment
-  if (hash &amp;&amp; !route._alreadyTriggered) {
-    // Reset to home, pushState support automatically converts hashes
-    Backbone.history.navigate("", false);
-
-    // Trigger the default browser behavior
-    location.hash = hash;
-
-    // Set an internal flag to stop recursive looping
-    route._alreadyTriggered = true;
-  }
-});
-</code></pre>
-
-<p>  }
-});
-```</p>
-
-<p>One gotcha is that the definition of <code>":hash": "index"</code> will send any route that follows the base domain to the index function. For instance if you did the following:</p>
-
-<p>``` js
-routes: {</p>
-
-<pre><code>"": "index",
-":hash": "index"
-"search": "search"
-</code></pre>
-
-<p>  },</p>
-
-<p>  ...</p>
-
-<p>  search: function() {</p>
-
-<pre><code>console.log('time to search!');
-</code></pre>
-
-<p>  }
-<code>``
-Instead of the search function running what will actually happen is mysite.com/search will be converted into mysite.com/#search and the word</code>search<code>will be sent to the index function to supply the</code>hash<code>argument. To fix this you'll need to remove the</code>":hash": "index"` route.</p>
-
-<h3>Views</h3>
-
-<p>Views can either work with existing DOM elements or create new ones. Here's a very basic fiddle in which a BodyView is created to wrap our <code>body</code> tag and BoxView is appended to it. We add a little jQuery animation to show the process in action.</p>
-
-<iframe style="width: 100%; height: 400px" src="http://jsfiddle.net/robdodson/rJEkv/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
-
-
-<p>You'll often want to link a view's render method up to a model's change event so the two will stay in sync. Here's a quick and dirty example showing how to bind in this fashion.</p>
-
-<p>``` js
-var Book = Backbone.Model.extend({});</p>
-
-<p>var BookView = Backbone.View.extend({</p>
-
-<pre><code>className: 'book-view',
-initialize: function() {
-    this.model.on('change', this.render, this);
-    this.render();        
-},
-render: function() {
-    this.$el.html(this.model.get('title') + ' by ' + this.model.get('author'));
-}
-</code></pre>
-
-<p>});</p>
-
-<p>var outliers = new Book({</p>
-
-<pre><code>author: 'Malcolm Gladwell',
-title: 'Outliers'
-</code></pre>
-
-<p>});</p>
-
-<p>var bookView = new BookView({model: outliers});</p>
-
-<p>$('body').append(bookView.el);</p>
-
-<p>outliers.set('author', 'Mickey Mouse');
-```
-Instead of throwing your HTML into the render method as a String it's advised that you use some kind of templating library. Underscore templates seem like a good place to start but Backbone is designed to be template agnostic so you could easily switch to Mustache/Handelbars or HAML if you want. Tomorrow I'll look into displaying some content using an Underscore template linked up to a model. Till then.. :D</p>
 ]]></content>
   </entry>
   
