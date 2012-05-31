@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-30T12:01:28-07:00</updated>
+  <updated>2012-05-31T14:34:40-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,216 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to use EJS in Express]]></title>
+    <link href="http://robdodson.me/blog/2012/05/31/how-to-use-ejs-in-express/"/>
+    <updated>2012-05-31T11:34:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/05/31/how-to-use-ejs-in-express</id>
+    <content type="html"><![CDATA[<p>Here&#8217;s a quick explanation of how to use EJS instead of Jade in your Express projects. This is super easy and covered well in the documentation but I wanted to put it here since that&#8217;s what I worked on today :)</p>
+
+<p>To start I&#8217;ll create a new project from the command line:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>express foobar
+</span><span class='line'>cd foobar
+</span><span class='line'>npm install</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that I have my foobar project created I need to install <code>ejs</code>.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>npm install ejs</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you&#8217;re within your project directory this will place ejs in the <code>node_modules</code> dir. Let&#8217;s also add it to our package.json.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>{
+</span><span class='line'>  "name": "foobar",
+</span><span class='line'>  "version": "0.0.1",
+</span><span class='line'>  "private": true,
+</span><span class='line'>  "dependencies": {
+</span><span class='line'>    "express": "~2.5.8",
+</span><span class='line'>    "ejs": "~0.7.1"
+</span><span class='line'>  }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The tilde operator means that we require ejs verion 0.7.1 or greater but only up to the next major release. So the following are equivalent: <code>"~1.2" = "&gt;=1.2.0 &lt;2.0.0"</code>. For a deeper explanation of package.json and NPM in general <a href="http://howtonode.org/introduction-to-npm">checkout this great post</a>.</p>
+
+<h3>Leaving Jade for EJS</h3>
+
+<p>If you&#8217;re using the boilerplate that Express generates then it should be setup to use Jade as the rendering engine for its views. I think that Jade is cool but I need to baby step into Node/Express and make sure I understand everything that&#8217;s going on instead of trying to consume so many different tools at once. With this in mind I decided to switch from Jade to EJS at least in the beginning because the syntax has no learning curve. To change your rendering engine you&#8217;ll need to either add or edit the following call:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;view engine&#39;</span><span class="p">,</span> <span class="s1">&#39;ejs&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The boilerplate should have this set to <code>jade</code> inside of a configuration block. Once we&#8217;ve changed that line to read <code>ejs</code> we&#8217;re ready to start writing some views.</p>
+
+<h3>Setting up your layout</h3>
+
+<p>By default Express&#8217; boilerplate will look for a file named layout in our views directory. Let&#8217;s write one called <code>layout.ejs</code>:</p>
+
+<figure class='code'><figcaption><span>views/layout.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span><span class='line'><span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">&quot;en&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Pivotal Search<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;description&quot;</span> <span class="na">content=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;author&quot;</span> <span class="na">content=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">&lt;!-- HTML5 shim, for IE6-8 support of HTML elements --&gt;</span>
+</span><span class='line'>    <span class="c">&lt;!--[if lt IE 9]&gt;</span>
+</span><span class='line'><span class="c">      &lt;script src=&quot;http://html5shim.googlecode.com/svn/trunk/html5.js&quot;&gt;&lt;/script&gt;</span>
+</span><span class='line'><span class="c">    &lt;![endif]--&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">&lt;!-- styles --&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">&quot;stylesheets/style.css&quot;</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
+</span><span class='line'>    <span class="err">&lt;</span>%- body %&gt;
+</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is all really straightforward with the exception of the <code>&lt;%- body %&gt;</code> line which basically works like a <code>yield</code> in erb. Whatever template we pass to Express&#8217; <code>response.render()</code> function will fill this dependency, here&#8217;s an example:</p>
+
+<figure class='code'><figcaption><span>app.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;The index page!&#39;</span> <span class="p">})</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>views/index.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;title&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="err">&lt;</span>%= title %&gt;
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/rendering_the_index_template.png" title="'Rendering the index template'" ></p>
+
+<p>Furthermore we can use partials with Express and EJS like so:</p>
+
+<figure class='code'><figcaption><span>views/layout.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span><span class='line'><span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">&quot;en&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Pivotal Search<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;description&quot;</span> <span class="na">content=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;author&quot;</span> <span class="na">content=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">&lt;!-- HTML5 shim, for IE6-8 support of HTML elements --&gt;</span>
+</span><span class='line'>    <span class="c">&lt;!--[if lt IE 9]&gt;</span>
+</span><span class='line'><span class="c">      &lt;script src=&quot;http://html5shim.googlecode.com/svn/trunk/html5.js&quot;&gt;&lt;/script&gt;</span>
+</span><span class='line'><span class="c">    &lt;![endif]--&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">&lt;!-- styles --&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">&quot;stylesheets/style.css&quot;</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
+</span><span class='line'>    <span class="err">&lt;</span>%- partial(&#39;header.ejs&#39;) %&gt;
+</span><span class='line'>    <span class="err">&lt;</span>%- body %&gt;
+</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>views/header.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;header&gt;</span>
+</span><span class='line'>    My awesome header!
+</span><span class='line'><span class="nt">&lt;/header&gt;</span>
+</span><span class='line'><span class="nt">&lt;hr&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/rendering_the_header_partial.png" title="'Rendering the header partial'" ></p>
+
+<p>And there ya go! Simple but hopefully useful if you&#8217;re just getting started like I am :) - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 11:36 am</li>
+<li>Mood: Eager, Alert</li>
+<li>Sleep: 7</li>
+<li>Hunger: 7</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using jQuery Deferred to Load an Underscore Template]]></title>
@@ -5198,320 +5408,6 @@ Initially the test fails so now we need to update our <code>Crawler</code> to ch
 <li>Mood: Alert, Awake, Anxious</li>
 <li>Sleep: 8</li>
 <li>Hunger: 3</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 4]]></title>
-    <link href="http://robdodson.me/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4/"/>
-    <updated>2012-05-11T07:20:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4</id>
-    <content type="html"><![CDATA[<p>Continuing from our <a href="http://robdodson.me/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/">previous post</a> we&#8217;re going to keep working on our <code>Crawler</code> and our specs to see if we can start pulling real data from our site.</p>
-
-<p>The first thing I did this morning was to run my tests:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>bundle exec rspec spec/
-</span><span class='line'>
-</span><span class='line'>..............
-</span><span class='line'>
-</span><span class='line'>Finished in 0.01271 seconds
-</span><span class='line'>14 examples, 0 failures</span></code></pre></td></tr></table></div></figure>
-
-
-<p>As someone totally new to TDD/BDD this is kind of an awesome feeling. I left my code for a few days and now I can come back and verify that everything still works. We can take it even further and run rspec with a documentation formatter to get some pretty printed output:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">bundle</span> <span class="nb">exec</span> <span class="n">rspec</span> <span class="n">spec</span><span class="o">/</span> <span class="o">-</span><span class="n">cf</span> <span class="n">d</span>
-</span><span class='line'>
-</span><span class='line'><span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span>
-</span><span class='line'>  <span class="n">constructors</span>
-</span><span class='line'>    <span class="c1">#from_uri</span>
-</span><span class='line'>      <span class="n">should</span> <span class="n">respond</span>
-</span><span class='line'>      <span class="n">should</span> <span class="k">return</span> <span class="n">an</span> <span class="n">instance</span>
-</span><span class='line'>  <span class="n">instances</span>
-</span><span class='line'>    <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#get_words_by_selector</span>
-</span><span class='line'>    <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#get_metadata_by_selector</span>
-</span><span class='line'>
-</span><span class='line'><span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span>
-</span><span class='line'>  <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#uri</span>
-</span><span class='line'>  <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#post_selector</span>
-</span><span class='line'>  <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#metadata_selector</span>
-</span><span class='line'>  <span class="c1">#initialize</span>
-</span><span class='line'>    <span class="k">when</span> <span class="n">parsing</span> <span class="n">the</span> <span class="no">URI</span>
-</span><span class='line'>      <span class="k">when</span> <span class="no">URI</span> <span class="n">is</span> <span class="n">valid</span>
-</span><span class='line'>        <span class="n">should</span> <span class="nb">display</span> <span class="n">the</span> <span class="n">right</span> <span class="no">URI</span>
-</span><span class='line'>      <span class="k">when</span> <span class="no">URI</span> <span class="n">is</span> <span class="n">invalid</span>
-</span><span class='line'>        <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="n">exception</span>
-</span><span class='line'>      <span class="k">when</span> <span class="no">URI</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">contain</span> <span class="n">a</span> <span class="n">scheme</span>
-</span><span class='line'>        <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="no">IO</span> <span class="n">exception</span>
-</span><span class='line'>      <span class="k">when</span> <span class="no">URI</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">contain</span> <span class="n">a</span> <span class="n">host</span>
-</span><span class='line'>        <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="no">IO</span> <span class="n">exception</span>
-</span><span class='line'>
-</span><span class='line'><span class="no">Tentacles</span><span class="o">::</span><span class="no">Runner</span>
-</span><span class='line'>  <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#run</span>
-</span><span class='line'>  <span class="k">when</span> <span class="n">parsing</span> <span class="n">the</span> <span class="n">config</span> <span class="n">file</span>
-</span><span class='line'>    <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="n">error</span> <span class="k">if</span> <span class="n">the</span> <span class="n">config</span> <span class="n">file</span> <span class="n">is</span> <span class="n">missing</span>
-</span><span class='line'>    <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="n">error</span> <span class="k">if</span> <span class="n">the</span> <span class="n">config</span> <span class="n">file</span> <span class="n">is</span> <span class="n">invalid</span>
-</span><span class='line'>
-</span><span class='line'><span class="no">Finished</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="mo">0135</span><span class="mi">9</span> <span class="n">seconds</span>
-</span><span class='line'><span class="mi">14</span> <span class="n">examples</span><span class="p">,</span> <span class="mi">0</span> <span class="n">failures</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In rspec the <code>-c</code> flag enables color in the output. The <code>-f</code> flag sets a formatter and <code>d</code> specifies the documentation format.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>-f, --format FORMATTER           Choose a formatter.
-</span><span class='line'>                                       <span class="o">[</span>p<span class="o">]</span>rogress <span class="o">(</span>default - dots<span class="o">)</span>
-</span><span class='line'>                                       <span class="o">[</span>d<span class="o">]</span>ocumentation <span class="o">(</span>group and example names<span class="o">)</span>
-</span><span class='line'>                                       <span class="o">[</span>h<span class="o">]</span>tml
-</span><span class='line'>                                       <span class="o">[</span>t<span class="o">]</span>extmate
-</span><span class='line'>                                       custom formatter class name
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Neat.</p>
-
-<p>In <code>crawler_spec.rb</code> I&#8217;m going to add a test that checks to see if our instance has actually stored the content from our mocked web request.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;../lib/tentacles/crawler&#39;</span>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;fakeweb&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">describe</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span> <span class="k">do</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">before</span> <span class="k">do</span>
-</span><span class='line'>    <span class="c1"># Create a mock options object</span>
-</span><span class='line'>    <span class="vi">@options</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>      <span class="n">uri</span><span class="p">:</span> <span class="s1">&#39;http://robdodson.me&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="n">post_selector</span><span class="p">:</span> <span class="s1">&#39;.entry-content&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="n">metadata_selector</span><span class="p">:</span> <span class="s1">&#39;.personal-metadata&#39;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># Create a mock web request</span>
-</span><span class='line'>    <span class="no">FakeWeb</span><span class="o">.</span><span class="n">register_uri</span><span class="p">(</span><span class="ss">:get</span><span class="p">,</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">,</span> <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="s2">&quot;Hello World! Hello San Francisco!&quot;</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;constructors&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">describe</span> <span class="s2">&quot;#from_uri&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should respond&quot;</span> <span class="k">do</span>
-</span><span class='line'>        <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:from_uri</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should return an instance&quot;</span> <span class="k">do</span>
-</span><span class='line'>        <span class="n">crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">crawler</span><span class="o">.</span><span class="n">should</span> <span class="n">be_an_instance_of</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;instances&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">before</span> <span class="k">do</span>
-</span><span class='line'>      <span class="vi">@crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">subject</span> <span class="p">{</span> <span class="vi">@crawler</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:get_words_by_selector</span><span class="p">)</span> <span class="p">}</span>
-</span><span class='line'>    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:get_metadata_by_selector</span><span class="p">)</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;post-construct&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should have the right document&quot;</span> <span class="k">do</span>
-</span><span class='line'>        <span class="vi">@crawler</span><span class="o">.</span><span class="n">doc</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">should</span> <span class="o">=~</span> <span class="sr">/Hello World! Hello San Francisco!/</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I want to write a test to parse the content for keywords but I realize now that our FakeWeb request returns a string without any classes or id&#8217;s. Gotta go back and wrap it in some HTML to match our selectors. So I&#8217;m changing the mock web request to look like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Create a mock web request</span>
-</span><span class='line'>    <span class="no">FakeWeb</span><span class="o">.</span><span class="n">register_uri</span><span class="p">(</span><span class="ss">:get</span><span class="p">,</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">,</span>
-</span><span class='line'>                         <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="s1">&#39;&lt;div class=&quot;&#39;</span> <span class="o">+</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">]</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;Hello World! Hello San Francisco!&lt;/div&gt;&#39;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Hello Hello Hello World!</h3>
-
-<p>After a lot of back and forth I finally get my test to pass. I realize along the way that there are a bunch of things I need to change. For starters having most of my words be the same count doesn&#8217;t really help me to validate that my keyword counting is working all that well. So I&#8217;m changing our FakeWeb request and the subsequent specs which test against it.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Create a mock web request</span>
-</span><span class='line'>    <span class="no">FakeWeb</span><span class="o">.</span><span class="n">register_uri</span><span class="p">(</span><span class="ss">:get</span><span class="p">,</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">,</span>
-</span><span class='line'>                         <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="s1">&#39;&lt;div class=&quot;&#39;</span> <span class="o">+</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">].</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;Hello Hello Hello World World Foobar!&lt;/div&gt;&#39;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">context</span> <span class="s2">&quot;post-construct&quot;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">it</span> <span class="s2">&quot;should have the right document&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="vi">@crawler</span><span class="o">.</span><span class="n">doc</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">should</span> <span class="o">=~</span> <span class="sr">/Hello Hello Hello World World Foobar!/</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Next I need to make sure that my <code>get_words_by_selector</code> method is accepting a selector.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">get_words_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">entries</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="s1">&#39;div.entry-content&#39;</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">entries</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">entry</span><span class="o">|</span>
-</span><span class='line'>        <span class="n">words</span> <span class="o">=</span> <span class="n">words_from_string</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">count_frequency</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="n">sorted</span> <span class="o">=</span> <span class="vi">@counts</span><span class="o">.</span><span class="n">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="n">count</span> <span class="p">}</span>
-</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">reverse!</span>
-</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">word</span><span class="si">}</span><span class="s2">: </span><span class="si">#{</span><span class="n">count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
-</span><span class='line'>    <span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I also realize that I&#8217;d like my Array of keywords to be in desceding order so I <code>reverse</code> it after the initial sort.</p>
-
-<p>Next I&#8217;m going to write the test to verify that we&#8217;ve received a group of words, counted them up and tossed them into an Array in descending order:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">describe</span> <span class="s2">&quot;#get_words_by_selector&quot;</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">it</span> <span class="s2">&quot;should produce an Array of keywords&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">expected_array</span> <span class="o">=</span> <span class="o">[</span><span class="s1">&#39;hello: 3&#39;</span><span class="p">,</span> <span class="s1">&#39;world: 2&#39;</span><span class="p">,</span> <span class="s1">&#39;foobar: 1&#39;</span><span class="o">]</span>
-</span><span class='line'>    <span class="n">actual_array</span> <span class="o">=</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">get_words_by_selector</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">]</span><span class="p">)</span>
-</span><span class='line'>    <span class="n">actual_array</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="n">expected_array</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I actually wrote the test first and did everything else to make it pass. But at this point it should all be passing and we can verify that given a request with the appropriate selector we should be able to build a basic word frequency list. Yay!</p>
-
-<ul>
-<li>Time: 7:35 am</li>
-<li>Mood: Calm, Awake, Curious</li>
-<li>Sleep: 7</li>
-<li>Hunger: 4</li>
 <li>Coffee: 0</li>
 </ul>
 

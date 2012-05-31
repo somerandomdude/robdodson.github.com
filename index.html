@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Today&#8217;s post is meant to scratch an itch I had the other day regarding templates. My friend wanted to load an underscore template along with &hellip;">
+  <meta name="description" content="Here&#8217;s a quick explanation of how to use EJS instead of Jade in your Express projects. This is super easy and covered well in the documentation &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,243 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/31/how-to-use-ejs-in-express/">How to Use EJS in Express</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-31T11:34:00-07:00" pubdate data-updated="true">May 31<span>st</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Here&#8217;s a quick explanation of how to use EJS instead of Jade in your Express projects. This is super easy and covered well in the documentation but I wanted to put it here since that&#8217;s what I worked on today :)</p>
+
+<p>To start I&#8217;ll create a new project from the command line:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>express foobar
+</span><span class='line'>cd foobar
+</span><span class='line'>npm install</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that I have my foobar project created I need to install <code>ejs</code>.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>npm install ejs</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you&#8217;re within your project directory this will place ejs in the <code>node_modules</code> dir. Let&#8217;s also add it to our package.json.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>{
+</span><span class='line'>  "name": "foobar",
+</span><span class='line'>  "version": "0.0.1",
+</span><span class='line'>  "private": true,
+</span><span class='line'>  "dependencies": {
+</span><span class='line'>    "express": "~2.5.8",
+</span><span class='line'>    "ejs": "~0.7.1"
+</span><span class='line'>  }
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The tilde operator means that we require ejs verion 0.7.1 or greater but only up to the next major release. So the following are equivalent: <code>"~1.2" = "&gt;=1.2.0 &lt;2.0.0"</code>. For a deeper explanation of package.json and NPM in general <a href="http://howtonode.org/introduction-to-npm">checkout this great post</a>.</p>
+
+<h3>Leaving Jade for EJS</h3>
+
+<p>If you&#8217;re using the boilerplate that Express generates then it should be setup to use Jade as the rendering engine for its views. I think that Jade is cool but I need to baby step into Node/Express and make sure I understand everything that&#8217;s going on instead of trying to consume so many different tools at once. With this in mind I decided to switch from Jade to EJS at least in the beginning because the syntax has no learning curve. To change your rendering engine you&#8217;ll need to either add or edit the following call:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;view engine&#39;</span><span class="p">,</span> <span class="s1">&#39;ejs&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The boilerplate should have this set to <code>jade</code> inside of a configuration block. Once we&#8217;ve changed that line to read <code>ejs</code> we&#8217;re ready to start writing some views.</p>
+
+<h3>Setting up your layout</h3>
+
+<p>By default Express&#8217; boilerplate will look for a file named layout in our views directory. Let&#8217;s write one called <code>layout.ejs</code>:</p>
+
+<figure class='code'><figcaption><span>views/layout.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span><span class='line'><span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">&quot;en&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Pivotal Search<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;description&quot;</span> <span class="na">content=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;author&quot;</span> <span class="na">content=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">&lt;!-- HTML5 shim, for IE6-8 support of HTML elements --&gt;</span>
+</span><span class='line'>    <span class="c">&lt;!--[if lt IE 9]&gt;</span>
+</span><span class='line'><span class="c">      &lt;script src=&quot;http://html5shim.googlecode.com/svn/trunk/html5.js&quot;&gt;&lt;/script&gt;</span>
+</span><span class='line'><span class="c">    &lt;![endif]--&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">&lt;!-- styles --&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">&quot;stylesheets/style.css&quot;</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
+</span><span class='line'>    <span class="err">&lt;</span>%- body %&gt;
+</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is all really straightforward with the exception of the <code>&lt;%- body %&gt;</code> line which basically works like a <code>yield</code> in erb. Whatever template we pass to Express&#8217; <code>response.render()</code> function will fill this dependency, here&#8217;s an example:</p>
+
+<figure class='code'><figcaption><span>app.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;The index page!&#39;</span> <span class="p">})</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>views/index.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;title&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="err">&lt;</span>%= title %&gt;
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/rendering_the_index_template.png" title="'Rendering the index template'" ></p>
+
+<p>Furthermore we can use partials with Express and EJS like so:</p>
+
+<figure class='code'><figcaption><span>views/layout.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span><span class='line'><span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">&quot;en&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Pivotal Search<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;description&quot;</span> <span class="na">content=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;author&quot;</span> <span class="na">content=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">&lt;!-- HTML5 shim, for IE6-8 support of HTML elements --&gt;</span>
+</span><span class='line'>    <span class="c">&lt;!--[if lt IE 9]&gt;</span>
+</span><span class='line'><span class="c">      &lt;script src=&quot;http://html5shim.googlecode.com/svn/trunk/html5.js&quot;&gt;&lt;/script&gt;</span>
+</span><span class='line'><span class="c">    &lt;![endif]--&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c">&lt;!-- styles --&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">&quot;stylesheets/style.css&quot;</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
+</span><span class='line'>    <span class="err">&lt;</span>%- partial(&#39;header.ejs&#39;) %&gt;
+</span><span class='line'>    <span class="err">&lt;</span>%- body %&gt;
+</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>views/header.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;header&gt;</span>
+</span><span class='line'>    My awesome header!
+</span><span class='line'><span class="nt">&lt;/header&gt;</span>
+</span><span class='line'><span class="nt">&lt;hr&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/rendering_the_header_partial.png" title="'Rendering the header partial'" ></p>
+
+<p>And there ya go! Simple but hopefully useful if you&#8217;re just getting started like I am :) - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 11:36 am</li>
+<li>Mood: Eager, Alert</li>
+<li>Sleep: 7</li>
+<li>Hunger: 7</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -3123,241 +3360,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/21/exploring-the-backbone-router-and-history-api/">Exploring the Backbone Router and History API</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-21T07:59:00-07:00" pubdate data-updated="true">May 21<span>st</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I want to talk a bit more about the Backbone Router because I think it&#8217;s one of the first pieces of the framework that people run up against that deviates from the standard MVC setup. If you&#8217;ve used Rails before you&#8217;re used to the idea of <code>routes</code> which pick apart a url and figure out which controller to run. CodeIgniter uses the same paradigm but I&#8217;m not sure if they also call them routes or use a different term. Contrary to this, in Backbone the Router is like a controller for the entire application. This makes it similar to Sinatra. Creating two different routes which replace the content of the page each time would look like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">Router</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">routes</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;&quot;</span><span class="o">:</span> <span class="s2">&quot;index&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;search&quot;</span><span class="o">:</span> <span class="s2">&quot;search&quot;</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">index</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">tutorial</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Tutorial</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Attach the tutorial page to the DOM</span>
-</span><span class='line'>    <span class="nx">tutorial</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#main&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">el</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">search</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">search</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Search</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Attach the search page to the DOM</span>
-</span><span class='line'>    <span class="nx">search</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#main&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">el</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you&#8217;re using the Backbone Boilerplate you won&#8217;t need to tell the Router to update every time someone clicks a link. The Boilerplate implements the following block of code at the very bottom of main.js</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// All navigation that is relative should be passed through the navigate</span>
-</span><span class='line'>  <span class="c1">// method, to be processed by the router.  If the link has a data-bypass</span>
-</span><span class='line'>  <span class="c1">// attribute, bypass the delegation completely.</span>
-</span><span class='line'>  <span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;click&quot;</span><span class="p">,</span> <span class="s2">&quot;a:not([data-bypass])&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">evt</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// Get the anchor href and protcol</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">href</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;href&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">protocol</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">protocol</span> <span class="o">+</span> <span class="s2">&quot;//&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Ensure the protocol is not part of URL, meaning its relative.</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">href</span> <span class="o">&amp;&amp;</span> <span class="nx">href</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">protocol</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="o">!==</span> <span class="nx">protocol</span> <span class="o">&amp;&amp;</span>
-</span><span class='line'>        <span class="nx">href</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s2">&quot;javascript:&quot;</span><span class="p">)</span> <span class="o">!==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="c1">// Stop the default event to ensure the link will not cause a page</span>
-</span><span class='line'>      <span class="c1">// refresh.</span>
-</span><span class='line'>      <span class="nx">evt</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="c1">// `Backbone.history.navigate` is sufficient for all Routers and will</span>
-</span><span class='line'>      <span class="c1">// trigger the correct events.  The Router&#39;s internal `navigate` method</span>
-</span><span class='line'>      <span class="c1">// calls this anyways.</span>
-</span><span class='line'>      <span class="nx">Backbone</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">navigate</span><span class="p">(</span><span class="nx">href</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In short this is an application wide handler for any relative anchor that doesn&#8217;t have a <code>data-bypass</code> attribute. So something like <code>&lt;a href="search"&gt;Search&lt;/a&gt;</code> would get passed through here.
-The last few bits prevent the link from completely refreshing the page—<code>evt.preventDefault()</code>—and pipe the href through the router. Actually the href gets piped through <code>Backbone.history.navigate</code> which <code>Router.navigate</code> proxies. When you call <code>Router.navigate('foobar')</code> you&#8217;re supposed to pash a hash of <code>{trigger: true}</code> if you&#8217;d like the router to run the corresponding <code>foobar</code> method. If you dig into the source you can see that just passing true will also have the same effect and that&#8217;s what&#8217;s done here by the Boilerplate.</p>
-
-<p>Originally I had written my View like this because I thought I had to use the Router explicitly.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// This will fetch the tutorial template and render it.</span>
-</span><span class='line'><span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Tutorial</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">template</span><span class="o">:</span> <span class="s2">&quot;app/templates/example.html&quot;</span><span class="p">,</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c1">// Listen for when the user clicks our anchor tag</span>
-</span><span class='line'>  <span class="nx">events</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="s1">&#39;click .search&#39;</span><span class="o">:</span> <span class="s1">&#39;search&#39;</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="c1">// Note: I&#39;m stopping the event and explicitly telling the Router to</span>
-</span><span class='line'>  <span class="c1">// update the history and trigger the corresponding search method.</span>
-</span><span class='line'>  <span class="nx">search</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
-</span><span class='line'>    <span class="nx">namespace</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span><span class="p">(</span><span class="s1">&#39;search&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">trigger</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Notice that I&#8217;ve defined a <code>search</code> method which listens for a click on my anchor of class <code>.search</code>. This is inline with the vanilla Backbone.js documentation but since the Boilerplate has added that application wide handler for us, we don&#8217;t need this function unless there&#8217;s some additional work that search needs to do. By just letting that global handler do its thing our route will still be called and we can save a fair bit of boilerplate in our templates.</p>
-
-<p>If you want to subvert the handler then you can just call <code>preventDefault</code> and <code>stopPropagation</code> on the click event like so:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Tutorial</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">template</span><span class="o">:</span> <span class="s2">&quot;app/templates/example.html&quot;</span><span class="p">,</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">events</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="s1">&#39;click .search&#39;</span><span class="o">:</span> <span class="s1">&#39;search&#39;</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">search</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
-</span><span class='line'>    <span class="nx">e</span><span class="p">.</span><span class="nx">stopPropagation</span><span class="p">();</span>
-</span><span class='line'>    <span class="nx">namespace</span><span class="p">.</span><span class="nx">app</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span><span class="p">(</span><span class="s1">&#39;whatever&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Something else to keep in mind is that the boilerplate comes with <code>History pushState</code> turned on by default.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Trigger the initial route and enable HTML5 History API support</span>
-</span><span class='line'><span class="nx">Backbone</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">start</span><span class="p">({</span> <span class="nx">pushState</span><span class="o">:</span> <span class="kc">true</span> <span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><s>This lets you create routes that look like this: <code>mysite.com/search/foobar</code> instead of using a hash <code>mysite.com/#search/foobar</code>. The only problem is that for HTML5 History pushState to work your server has to keep resolving to index.html. The boilerplate tutorial says to use <code>node build/server</code> to run your project server, even though elsewhere it says to use <code>bbb server</code>. Neither works so I&#8217;ve <a href="https://github.com/backbone-boilerplate/grunt-bbb/issues/21">logged an issue on Github.</a> Very possible I&#8217;m doing it wrong but we&#8217;ll see. For now I&#8217;m not using pushState so I changed the line in main.js to read <code>Backbone.history.start()</code> and instead I&#8217;m using the hash approach.</s></p>
-
-<p><em>UPDATE: Turns out there was a bug in the Backbone Boilerplate, make sure in your index.html file that the data-main attribute starts from the root of the site, like so: <code>data-main="/app/config"</code>. Also make sure to use bbb server as node build/server is deprecated.</em></p>
-
-<ul>
-<li>Time: 7:59 am</li>
-<li>Mood: Awake, Hurried, Focused</li>
-<li>Sleep: 8</li>
-<li>Hunger: 0</li>
-<li>Coffee: 0</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -3373,6 +3375,10 @@ The last few bits prevent the link from completely refreshing the page—<code>e
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/05/31/how-to-use-ejs-in-express/">How to use EJS in Express</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/">Using jQuery Deferred to Load an Underscore Template</a>
       </li>
     
@@ -3386,10 +3392,6 @@ The last few bits prevent the link from completely refreshing the page—<code>e
     
       <li class="post">
         <a href="/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai/">Getting started with Mocha and Chai</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/27/penner-easing-equations-with-gfx-and-css3/">Penner easing equations with GFX and CSS3</a>
       </li>
     
   </ul>
