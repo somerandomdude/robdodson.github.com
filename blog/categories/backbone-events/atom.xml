@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Backbone Events | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/backbone-events/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-05-31T14:34:40-07:00</updated>
+  <updated>2012-06-01T07:37:39-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -35,7 +35,7 @@ var doc = Documents.first(); // &lt;-- Model object</p>
 
 <h3>Communicating between Views in Backbone</h3>
 
-<p>To facilitate this communication we're going to use the <code>app</code> object that Backbone Boilerplate creates for us. If you look in the <code>namespace.js</code> file that comes with the boilerplate you should see a line like this way down at the bottom:</p>
+<p>To facilitate this communication we're going to use the <code>app</code> object that <a href="https://github.com/tbranyen/backbone-boilerplate">Backbone Boilerplate</a> creates for us. If you look in the <code>namespace.js</code> file that comes with the boilerplate you should see a line like this way down at the bottom:</p>
 
 <p><code>js namespace.js
 app: _.extend({}, Backbone.Events)
