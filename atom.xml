@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-02T17:27:46-07:00</updated>
+  <updated>2012-06-02T18:21:27-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -14,10 +14,10 @@
 
   
   <entry>
-    <title type="html"><![CDATA[The State Design Pattern in JavaScript]]></title>
-    <link href="http://robdodson.me/blog/2012/06/02/the-state-design-pattern-in-javascript/"/>
+    <title type="html"><![CDATA[Take Control of your App with the JavaScript State Pattern]]></title>
+    <link href="http://robdodson.me/blog/2012/06/02/take-control-of-your-app-with-the-javascript-state-patten/"/>
     <updated>2012-06-02T00:09:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/02/the-state-design-pattern-in-javascript</id>
+    <id>http://robdodson.me/blog/2012/06/02/take-control-of-your-app-with-the-javascript-state-patten</id>
     <content type="html"><![CDATA[<p>Last week I wrote a post about <a href="http://robdodson.me/blog/2012/05/25/backbone-events-framework-communication/">communicating between views in Backbone.js</a> and since then it has easily become my most popular article. The comments have forced me to think about the ways in which I typically manage state in very large Flash applications and how that might translate to JavaScript and Backbone. Today I want to present my all time favorite design pattern, the State pattern, and illustrate how it can help you maintain control of your application. I want to warn you that I&#8217;m going to show a rather large block of what looks like repetitive code because I want the pattern to be obvious. In tomorrow&#8217;s post we&#8217;ll clean it up and try it out with a Backbone Model and View.</p>
 
 <h3>The State pattern?</h3>
