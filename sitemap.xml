@@ -189,11 +189,17 @@
         <lastmod>2012-06-02T18:20:54-07:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://robdodson.me/blog/2012/06/02/managing-your-backbone-views-with-the-state-pattern/
+        </loc>
+        <lastmod>2012-06-02T22:43:59-07:00</lastmod>
+    </url>
+    <url>
         <loc>http://robdodson.me/blog/archives/</loc>
-        <lastmod>2012-06-02T18:20:54-07:00</lastmod>
+        <lastmod>2012-06-02T22:43:59-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/</loc>
-        <lastmod>2012-06-02T18:20:54-07:00</lastmod>
+        <lastmod>2012-06-02T22:43:59-07:00</lastmod>
     </url>
 </urlset>
