@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-02T22:44:26-07:00</updated>
+  <updated>2012-06-03T10:22:44-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -3665,11 +3665,11 @@
       top: 10px;
       width: 20px;
       height: 20px;
-      -webkit-transition: background-color 1s linear, left 1s, top 2s
-      -moz-transition: background-color 1s linear, left 1s, top 2s
-      -ms-transition: background-color 1s linear, left 1s, top 2s
-      -o-transition: background-color 1s linear, left 1s, top 2s
-      transition: background-color 1s linear, left 1s, top 2s
+      -webkit-transition: background-color 1s linear, left 1s, top 2s;
+      -moz-transition: background-color 1s linear, left 1s, top 2s;
+      -ms-transition: background-color 1s linear, left 1s, top 2s;
+      -o-transition: background-color 1s linear, left 1s, top 2s;
+      transition: background-color 1s linear, left 1s, top 2s;
     }
   </style>
 </div>
@@ -3732,11 +3732,11 @@
 </span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
 </span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">20px</span><span class="p">;</span>
 </span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">20px</span><span class="p">;</span>
-</span><span class='line'>  <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span>
-</span><span class='line'>  <span class="o">-</span><span class="n">moz</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span>
-</span><span class='line'>  <span class="o">-</span><span class="n">ms</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span>
-</span><span class='line'>  <span class="o">-</span><span class="err">o</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span>
-</span><span class='line'>  <span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">moz</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">ms</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">o</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
@@ -3755,6 +3755,12 @@
 
 
 <p>After tinkering with Gfx for what seems like hours at this point I haven&#8217;t figured out a way to pass two different times to simultaneous animations. From one animation to the next you have to specify the end points from the previous animations or else the styles will revert. That&#8217;s why I&#8217;m passing <code>translateX: '200px'</code> in both places&#8230;although I&#8217;m not 100% if that&#8217;s what I should be doing. I emailed the author of Gfx so we&#8217;ll see what he says :)</p>
+
+<p><em>Update: Alex responded:</em></p>
+
+<blockquote><p>atm gfx is -webkit-transition: all - perhaps that&#8217;s something that should be added.</p></blockquote>
+
+<p>I&#8217;ve looked at other libraries including <a href="http://ricostacruz.com/jquery.transit/">jQuery Transit</a> and <a href="http://visionmedia.github.com/move.js/">Move.js</a>, and they all seem to be set to the &#8216;all&#8217; mode. If anyone knows of a good library that can handle simultaneous animations I would love to hear about it. I think otherwise you would just need to create two animation objects and run them at the same time&#8230; but I haven&#8217;t tested that theory yet.</p>
 
 <ul>
 <li>Time: 8:07 am</li>

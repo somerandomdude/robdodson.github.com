@@ -4,7 +4,7 @@
   <title><![CDATA[Category: CSS3 | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/css3/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-02T22:44:26-07:00</updated>
+  <updated>2012-06-03T10:22:44-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -92,11 +92,11 @@ easing: Ease.easeInExpo
       top: 10px;
       width: 20px;
       height: 20px;
-      -webkit-transition: background-color 1s linear, left 1s, top 2s
-      -moz-transition: background-color 1s linear, left 1s, top 2s
-      -ms-transition: background-color 1s linear, left 1s, top 2s
-      -o-transition: background-color 1s linear, left 1s, top 2s
-      transition: background-color 1s linear, left 1s, top 2s
+      -webkit-transition: background-color 1s linear, left 1s, top 2s;
+      -moz-transition: background-color 1s linear, left 1s, top 2s;
+      -ms-transition: background-color 1s linear, left 1s, top 2s;
+      -o-transition: background-color 1s linear, left 1s, top 2s;
+      transition: background-color 1s linear, left 1s, top 2s;
     }
   </style>
 </div>
@@ -134,11 +134,11 @@ easing: Ease.easeInExpo
   top: 10px;
   width: 20px;
   height: 20px;
-  -webkit-transition: background-color 1s linear, left 1s, top 2s
-  -moz-transition: background-color 1s linear, left 1s, top 2s
-  -ms-transition: background-color 1s linear, left 1s, top 2s
-  -o-transition: background-color 1s linear, left 1s, top 2s
-  transition: background-color 1s linear, left 1s, top 2s
+  -webkit-transition: background-color 1s linear, left 1s, top 2s;
+  -moz-transition: background-color 1s linear, left 1s, top 2s;
+  -ms-transition: background-color 1s linear, left 1s, top 2s;
+  -o-transition: background-color 1s linear, left 1s, top 2s;
+  transition: background-color 1s linear, left 1s, top 2s;
 }
 ```
 We definitely don't want all that logic in our CSS. Ideally we could trigger these kinds of things from JavaScript, which is where Gfx comes in.</p>
@@ -155,6 +155,12 @@ $("#widget")</p>
 <p>```</p>
 
 <p>After tinkering with Gfx for what seems like hours at this point I haven't figured out a way to pass two different times to simultaneous animations. From one animation to the next you have to specify the end points from the previous animations or else the styles will revert. That's why I'm passing <code>translateX: '200px'</code> in both places...although I'm not 100% if that's what I should be doing. I emailed the author of Gfx so we'll see what he says :)</p>
+
+<p><em>Update: Alex responded:</em></p>
+
+<blockquote><p>atm gfx is -webkit-transition: all - perhaps that's something that should be added.</p></blockquote>
+
+<p>I've looked at other libraries including <a href="http://ricostacruz.com/jquery.transit/">jQuery Transit</a> and <a href="http://visionmedia.github.com/move.js/">Move.js</a>, and they all seem to be set to the 'all' mode. If anyone knows of a good library that can handle simultaneous animations I would love to hear about it. I think otherwise you would just need to create two animation objects and run them at the same time... but I haven't tested that theory yet.</p>
 
 <ul>
 <li>Time: 8:07 am</li>
