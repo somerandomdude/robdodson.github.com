@@ -4,7 +4,7 @@
   <title><![CDATA[Category: State Pattern | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/state-pattern/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-02T01:40:39-07:00</updated>
+  <updated>2012-06-02T17:27:46-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -260,9 +260,9 @@ player.play();</p>
 <p>// Quick call pause!
 player.pause();</p>
 
-<p>=> tearing down the playing state
-=> setting up the pausing state
-=> pausing!</p>
+<p>=> 'tearing down the playing state'
+=> 'setting up the pausing state'
+=> 'pausing!'</p>
 
 <p>// Um... call pause like 3 times cuz
 // I'm a button masher!!!
@@ -270,16 +270,16 @@ player.pause();
 player.pause();
 player.pause();</p>
 
-<p>=> already paused!
-=> already paused!
-=> already paused!</p>
+<p>=> 'already paused!'
+=> 'already paused!'
+=> 'already paused!'</p>
 
 <p>// OK call play again!
 player.play();</p>
 
-<p>=> tearing down the pausing state!
-=> setting up the playing state
-=> playing!
+<p>=> 'tearing down the pausing state!'
+=> 'setting up the playing state'
+=> 'playing!'
 ```</p>
 
 <h3>I like it, but...</h3>
