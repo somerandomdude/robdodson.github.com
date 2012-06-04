@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-03T10:22:44-07:00</updated>
+  <updated>2012-06-03T21:26:11-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,182 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Make Your Own jQuery Deferreds and Promises]]></title>
+    <link href="http://robdodson.me/blog/2012/06/03/make-your-own-jquery-deferreds-and-promises/"/>
+    <updated>2012-06-03T20:33:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/03/make-your-own-jquery-deferreds-and-promises</id>
+    <content type="html"><![CDATA[<p>Last week <a href="http://robdodson.me/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/">I did a post on how to load an Underscore template using jQuery's Deferred method</a>. I got some great feedback from folks and decided I should do a follow up showing how to create your own Deferreds.</p>
+
+<h3>What's a Deferred again...?</h3>
+
+<p>So, quick summary time. jQuery has a neat little Object called a <code>Deferred</code> which is basically a wrapper around a function or a group of functions. Let's say that you want to load 3 different json files via ajax and when all that's done you want to let the rest of the world know. Using jQuery's <code>Deferred</code> Object we can actually put a wrapper around those 3 ajax functions and fire off a callback when they've all finished. <a href="http://robdodson.me/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/">Refer back to my previous post (toward the bottom) where I explain some of these callbacks.</a></p>
+
+<p><code>Deferred</code> isn't limited to ajax calls, it can work in just about any environment. Let's do an example using jQuery's animate function. We'll fade an item and when it's finished animating we'll resolve our <code>Deferred</code> object.</p>
+
+<h3>Our First Deferred</h3>
+
+<p>Here's the code we'll be using in our index.html file:</p>
+
+<p>``` html index.html
+&lt;!DOCTYPE html>
+<html lang="en">
+  <head></p>
+
+<pre><code>&lt;meta charset="utf-8"&gt;
+&lt;title&gt;Deferred Sandbox&lt;/title&gt;
+&lt;style type="text/css"&gt;
+  #container {
+    width: 100px;
+    height: 100px;
+    background: #CCC;
+  }
+&lt;/style&gt;
+
+&lt;script src="jquery.js"&gt;&lt;/script&gt;
+&lt;script src="main.js"&gt;&lt;/script&gt;
+</code></pre>
+
+<p>  </head>
+  <body></p>
+
+<pre><code>&lt;div id="main"&gt;
+  &lt;div id="container"&gt;&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>  </body>
+</html>
+```</p>
+
+<p>Take note of the fact that I've included jquery.js and main.js in the same folder as index.html. If you run the above you should get a simple little grey square in the top left of your screen. Now let's dive into the JavaScript.</p>
+
+<p>``` js main.js
+var container = {</p>
+
+<pre><code>initialize: function($el) {
+    // Store a reference to our element
+    // on the page
+    this.$el = $el;
+},
+fadeOut: function() {
+    // Create a new Deferred.
+    var dfd = new $.Deferred();
+
+    this.$el.animate({
+        opacity: 0
+    }, 2000, function() {
+        // When we're done animating
+        // we'll resolve our Deferred.
+        // This will call any done() callbacks
+        // attached to either our Deferred or
+        // one of its promises.
+        dfd.resolve("Finished fading out!");
+    });
+
+    // Return an immutable promise object.
+    // Clients can listen for its done or fail
+    // callbacks but they can't resolve it themselves
+    return dfd.promise();
+}
+</code></pre>
+
+<p>};</p>
+
+<p>$(function() {</p>
+
+<pre><code>// Hook the container object up to the #container div
+container.initialize($('#container'));
+
+// Instruct the container to fade out. When we call
+// fadeOut we should get a promise back as a return value
+var promise = container.fadeOut();
+
+// Now that we have a promise we can hook a done callback
+// onto it. The done() method will fire once the promise
+// is resolved.
+promise.done(function(message) {
+    console.log(message);
+});
+</code></pre>
+
+<p>});
+```</p>
+
+<p>That's a fair bit of code so let's walk through it bit by bit. We start off by creating an object called <code>container</code> which is going to wrap the <code>#container</code> div already on the page. The real guts of container happens in the <code>fadeOut</code> method:</p>
+
+<p>``` js
+fadeOut: function() {</p>
+
+<pre><code>// Create a new Deferred.
+var dfd = new $.Deferred();
+
+this.$el.animate({
+    opacity: 0
+}, 2000, function() {
+    // When we're done animating
+    // we'll resolve our Deferred.
+    // This will call any done() callbacks
+    // attached to either our Deferred or
+    // one of its promises.
+    dfd.resolve("Finished fading out!");
+});
+
+// Return an immutable promise object.
+// Clients can listen for its done or fail
+// callbacks but they can't resolve it themselves
+return dfd.promise();
+</code></pre>
+
+<p>}
+<code>``
+The first thing we do is to create a new</code>Deferred<code>using jQuery's Deferred constructor. Ignore the animation function for a moment and look at the bottom of this method. See how we're returning</code>dfd.promise()<code>? A promise is a dynamically generated object which lets clients hook onto our</code>done<code>and</code>fail<code>callbacks but it doesn't let them do anything to change our original</code>Deferred<code>object. A promise is an</code>immutable<code>object, meaning clients can listen to it but they can't really do anything to change it. We want this functionality because we don't want someone else to come along and accidentally resolve our</code>Deferred<code>. So instead of returning the</code>Deferred<code>we just created, we only return its</code>promise`.</p>
+
+<p>OK back to the animation function:</p>
+
+<p>``` js
+this.$el.animate({</p>
+
+<pre><code>opacity: 0
+</code></pre>
+
+<p>}, 2000, function() {</p>
+
+<pre><code>// When we're done animating
+// we'll resolve our Deferred.
+// This will call any done() callbacks
+// attached to either our Deferred or
+// one of its promises.
+dfd.resolve("Finished fading out!");
+</code></pre>
+
+<p>});
+<code>``
+If you've used</code>jQuery.animate<code>before this should look pretty straightforward to you. At the end of our animation we pass in an anonymouse function which will be run when the animation completes. In this function we tell our</code>Deferred<code>to resolve. Resolving the</code>Deferred<code>causes any</code>done<code>callbacks to fire. In this case we're also passing along a little snippet of text. When you resolve a</code>Deferred<code>you can give it an optional payload object which will be passed to all the</code>done` callbacks. This is extremely useful if you're using ajax to pass along the final data value. In this case we're just going to log the message into the console:</p>
+
+<p>``` js
+promise.done(function(message) {</p>
+
+<pre><code>console.log(message);
+</code></pre>
+
+<p>});
+<code>``
+There are more cool things you can do with</code>Deferreds<code>I highly recommend you [spend some time with the documentation](http://api.jquery.com/category/deferred-object/) and trying out some of the other methods like</code>pipe<code>or</code>resolveWith`. Let me know if this is helpful or if you have any questions. Till tomorrow! - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 8:35 pm</li>
+<li>Mood: Silly, Lazy</li>
+<li>Sleep: 7</li>
+<li>Hunger: 5</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Managing Your Backbone Views with the State Pattern]]></title>
@@ -878,235 +1054,6 @@ function successFunc() {
 <li>Mood: Reserved, Sedate</li>
 <li>Sleep: 7</li>
 <li>Hunger: 4</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Testing AMD Backbone Modules]]></title>
-    <link href="http://robdodson.me/blog/2012/05/29/testing-backbone-modules/"/>
-    <updated>2012-05-29T08:03:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/29/testing-backbone-modules</id>
-    <content type="html"><![CDATA[<p>Continuing from <a href="http://robdodson.me/blog/2012/05/28/mocking-requests-with-mocha-chai-and-sinon/">yesterday's post</a> I'm going to start to incorporate Backbone into my BDD setup. I'm going to use the <a href="https://github.com/tbranyen/backbone-boilerplate">Backbone Boilerplate</a> and <a href="https://github.com/backbone-boilerplate/grunt-bbb">grunt-bbb</a> to setup a new project. If you're new to the boilerplate or grunt-bbb <a href="http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/">checkout my previous post on getting started.</a></p>
-
-<h3>Shiny and new</h3>
-
-<p>I've created a new directory called <code>amd-tests</code> and once I <code>cd</code> inside I run <code>bbb init</code> to template out a new project. By default the boilerplate uses Require.js and AMD modules and we have a little example one already created for us. It's called, well, Example :) We'll use this to create our model for testing since I know that everyone should be on the same page with this module.</p>
-
-<p>I'm going to change our model's name from Example.Model to Example.Photo so our terminalogy won't get muddy. We'll give it some default properties for <code>src</code> and <code>caption</code>. Later on we'll test that a freshly created model has these same defaults. When we're done setting up our <code>/app/example.js</code> file should look like this. Keep in mind that the boilerplate adds a lot of stuff to get us started so you can ignore everything that isn't Example.Photo</p>
-
-<p>``` js /app/example.js
-define([
-  "namespace",</p>
-
-<p>  // Libs
-  "use!backbone"</p>
-
-<p>  // Modules</p>
-
-<p>  // Plugins
-],</p>
-
-<p>function(namespace, Backbone) {</p>
-
-<p>  // Create a new module
-  var Example = namespace.module();</p>
-
-<p>  // !!! Our awesome new model !!!
-  Example.Photo = Backbone.Model.extend({</p>
-
-<pre><code>defaults: {
-  src: '/images/placeholder.jpg',
-  caption: 'Waiting for content...'
-}
-</code></pre>
-
-<p>  });</p>
-
-<p>  Example.Collection = Backbone.Collection.extend({ /<em> ... </em>/ });
-  Example.Router = Backbone.Router.extend({ /<em> ... </em>/ });</p>
-
-<p>  // This will fetch the tutorial template and render it.
-  Example.Views.Tutorial = Backbone.View.extend({</p>
-
-<pre><code>template: "app/templates/example.html",
-
-render: function(done) {
-  var view = this;
-
-  // Fetch the template, render it to the View element and call done.
-  namespace.fetchTemplate(this.template, function(tmpl) {
-    view.el.innerHTML = tmpl();
-
-    // If a done function is passed, call it with the element
-    if (_.isFunction(done)) {
-      done(view.el);
-    }
-  });
-}
-</code></pre>
-
-<p>  });</p>
-
-<p>  // Required, return the module for AMD compliance
-  return Example;</p>
-
-<p>});
-```
-Now comes the rather tricky part. We need to create a test runner HTML file that can incorporate mocha, chai and sinon. It also has to load our Example module and maintain all of that module's dependencies. I spent a <em>ton</em> of time on IRC today sorting this out so here is my current best stab at things based on some <a href="https://gist.github.com/2655876">VERY generous gists</a> from <a href="https://github.com/kmiyashiro">Kelly Miyashiro.</a></p>
-
-<p>Let's start with the index.html file that'll be our test runner:</p>
-
-<p>``` html test/index.html
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Mocha Tests</title>
-  <link rel="stylesheet" href="mocha/mocha.css" />
-  <script src="../assets/js/libs/require.js"></script>
-  <script src="mocha/mocha.js"></script>
-  <script src="sinon/sinon.js"></script>
-  <script src="config.js"></script>
-</head>
-<body>
-  <script></p>
-
-<pre><code>require([
-  '../test/test.example'
-], runMocha);
-</code></pre>
-
-<p>  </script>
-  <div id="mocha"></div>
-</body>
-</html>
-```</p>
-
-<p>The first thing we do is add require.js, then mocha and sinon. Why no Chai? Good question. Kelly didn't do it so I didn't do it. If anyone wants to cite the pros and cons of this approach I'm all ears. Next we add our own config.js that is specific to our tests. We might have a config.js somewhere else that runs our main app but we'll also need this one to run our tests. Finally we have a script block sitting on top of our <code>#mocha</code> div. The script block loads in our specs (in this case I've only written one but you can do multiple specs here). A final argument to the require call is <code>runMocha</code>. Essentially this is the function that is executed <em>AFTER</em> the modules have finished loading. In our case runMocha is located inside the new config.js we've defined just for our tests. Let's take a look at it now.</p>
-
-<p>``` js test/config.js
-require.config({</p>
-
-<pre><code>// Base URL relative to the test runner
-// Paths are relative to this
-baseUrl: '../app',
-paths: {
-    // Testing libs
-    'chai'          : '../test/chai/chai',
-    'common'        : '../test/common',
-    'jquery'        : '../assets/js/libs/jquery',
-    'underscore'    : '../assets/js/libs/underscore',
-    'backbone'      : '../assets/js/libs/backbone',
-    'use'           : '../assets/js/plugins/use'
-},
-use: {
-    backbone: {
-        deps: ['use!underscore', 'jquery'],
-        attach: 'Backbone'
-    },
-    underscore: {
-        attach: '_'
-    },
-    mocha: {
-        attach: 'mocha'
-    }
-},
-priority: [
-    'jquery',
-    'underscore',
-    'common'
-]
-</code></pre>
-
-<p>});</p>
-
-<p>mocha.setup({</p>
-
-<pre><code>ui: 'bdd',
-ignoreLeaks: true
-</code></pre>
-
-<p>});</p>
-
-<p>// Protect from barfs
-console = window.console || function() {};</p>
-
-<p>var runMocha = function() {</p>
-
-<pre><code>mocha.run();
-</code></pre>
-
-<p>};
-```</p>
-
-<p>Lots of stuff here but nothing to get alarmed about. <a href="http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/">If you've read my previous getting started post you'll know all about the config.js file.</a> Go back and read the previous post if none of this makes sense to you. The thing to take note of is the <code>priority</code> array and the <code>runMocha</code> function at the bottom of the page. I don't have much experience with the priority array and I didn't find much documentation on it but Kelly uses it <a href="https://gist.github.com/2655876">in the gists</a> to make sure that jQuery, chai and any chai plugins are properly setup on the page.</p>
-
-<p>``` js test/common.js
-// Include and setup all the stuff for testing
-define(function(require) {</p>
-
-<pre><code>window.$ = window.jQuery = require('jquery');
-window.chai         = require('chai');
-window.expect       = chai.expect;
-</code></pre>
-
-<p>});
-```</p>
-
-<p>Good practice? Bad practice? I'm not sure and I would love comments if anyone has a take on things. Underneath the priority array is a setup function which sends some configuration parameters to mocha. <code>ignoreLeaks</code> is useful because it's easy for mocha to see jQuery or any other global variable as a good reason to abort a test. IMO that's what JSLint/Hint is for, and bailing everytime you see a global is going to make testing 3rd party code especially difficult. My advice, leave it off. Finally we call <code>mocha.run()</code> via the <code>runMocha</code> function. Remember that this function is executed inside our test runner after all the specs are loaded, like so:</p>
-
-<p>``` html test/index.html</p>
-
-<script>
-    require([
-      '../test/test.example'
-    ], runMocha);
-  </script>
-
-
-<p>```</p>
-
-<p>Doing it this way guarantees that all the dependencies our module needs will be loaded before we start running our tests.</p>
-
-<h3>Oh right, the tests!</h3>
-
-<p>Wow! OK so hopefully you're still with me because after all of that we <em>still</em> need to generate some tests. Since it's getting late I'm just going to put together a really simple spec to make sure our default values are being set on the model.</p>
-
-<p>I've created a file called <code>test.example.js</code> which will test our <code>Example</code> module.</p>
-
-<p>``` js test/test.example.js
-define(function(require) {
-  var Example = require('modules/example');</p>
-
-<p>  describe('Example', function() {</p>
-
-<pre><code>describe('Photo', function() {
-  var photo = new Example.Photo();
-  it('should have proper defaults', function(done) {
-      expect(photo.get('src')).to.equal('/images/placeholder.jpg');
-      expect(photo.get('caption')).to.equal('Waiting for content...');
-      done();
-  });
-});
-</code></pre>
-
-<p>  });
-});
-```</p>
-
-<p>It isn't amazing but it gets us started testing our module. I'm explicitly calling <code>done()</code> at the end of our test because I saw mention on StackOverflow that you should do this when testing AMD modules in the browser with mocha otherwise you can get false passing tests. Not sure if it's absolutely necessary but I guess better safe than sorry!</p>
-
-<p>At this point I'm exhausted and hopefully you have a decent head start on your tests. I know that this post jumps around a lot so please take a moment <a href="https://github.com/robdodson/backbone-boilerplate-mocha">to grab the repo I've posted which contains all the source code.</a> Again. Caveat. I'm learning along with you so there are lots of newbie mistakes being made, I'm sure. I really want to hear your feedback if you have any. Good luck!</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here</a></p>
-
-<ul>
-<li>Time: 8:04 am</li>
-<li>Mood: Awake, Antsy</li>
-<li>Sleep: 6</li>
-<li>Hunger: 3</li>
 <li>Coffee: 0</li>
 </ul>
 

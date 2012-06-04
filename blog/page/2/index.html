@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="I&#8217;m going to try to approach some of my future articles as more of a question/answer setup so they don&#8217;t turn into these sprawling &hellip;">
+  <meta name="description" content="Today I want to figure out what kind of events to use when one of my views is added to the DOM. This can have a lot of ramifications for positioning &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,462 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/24/backbone-events-between-views/">Backbone Events: Adding Views to the DOM</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-24T07:23:00-07:00" pubdate data-updated="true">May 24<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Today I want to figure out what kind of events to use when one of my views is added to the DOM. This can have a lot of ramifications for positioning elements around the view and setting up properties on the view itself.</p>
+
+<h3>View Events and the DOM</h3>
+
+<p>After looking around for a bit I&#8217;ve found this <a href="http://documentcloud.github.com/backbone/#FAQ-events">list of the events that Backbone can dispatch.</a> Nothing in there about render or adding elements to the DOM :(</p>
+
+<p>More searching reveals that almost everyone points to the <a href="http://docs.jquery.com/Plugins/livequery">livequery plugin for jQuery.</a> Livequery seems like a mostly deprecated plugin since jQuery has both <code>.live()</code> and <code>.delegate()</code> methods now. The one exception is that livequery will fire a callback when an element is created.</p>
+
+<p>Another alternative is to fire a custom event from my View&#8217;s render method. While this does seem cleaner than using a plugin unfortunately we might call render over and over again. A middle of the road solution would be to use <code>.one()</code> to bind to the first render event.</p>
+
+<p>In my mind I would like every Backbone View to extend a base class which dispatches a custom <code>addedToDOM</code> event and <code>removedFromDOM</code> event. I&#8217;m not sure what the performance cost of using livequery to do this is but let&#8217;s write it up and maybe we can do a jsPerf later.</p>
+
+<h3>Load a jQuery plugin with AMD</h3>
+
+<p>Let&#8217;s download livequery <a href="https://github.com/brandonaaron/livequery">from the git repo.</a> Now that we have it we&#8217;re in another little dilemma. The boilerplate loads jQuery like an AMD module&#8230;so how do you use a jQuery plugin with AMD?</p>
+
+<p>It&#8217;s very possible this is not the intended method but here&#8217;s how I&#8217;ve gone about solving the problem. Since require.js is only going to load stuff if we specify it as a dependency then we&#8217;ll need to request the plugin just like any other module. If we put the plugin in our <code>assets/js/plugins</code> folder then we&#8217;ll already have a path to <code>plugins</code> provided by <code>config.js</code>.</p>
+
+<figure class='code'><figcaption><span>config.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">require</span><span class="p">.</span><span class="nx">config</span><span class="p">({</span>
+</span><span class='line'>  <span class="c1">// Initialize the application with the main application file</span>
+</span><span class='line'>  <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;main&quot;</span><span class="p">],</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">paths</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// JavaScript folders</span>
+</span><span class='line'>    <span class="nx">libs</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">plugins</span><span class="o">:</span> <span class="s2">&quot;../assets/js/plugins&quot;</span><span class="p">,</span> <span class="c1">// &lt;---- !!! look here! </span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Libraries</span>
+</span><span class='line'>    <span class="nx">jquery</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/jquery&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">underscore</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/underscore&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">backbone</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/backbone&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Shim Plugin</span>
+</span><span class='line'>    <span class="nx">use</span><span class="o">:</span> <span class="s2">&quot;../assets/js/plugins/use&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">use</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">backbone</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;use!underscore&quot;</span><span class="p">,</span> <span class="s2">&quot;jquery&quot;</span><span class="p">],</span>
+</span><span class='line'>      <span class="nx">attach</span><span class="o">:</span> <span class="s2">&quot;Backbone&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">underscore</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">attach</span><span class="o">:</span> <span class="s2">&quot;_&quot;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then we can load livequery as if it were any other module. This might seem odd because a dependency gets passed to our pseudo-constructor as an argument:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">define</span><span class="p">([</span>
+</span><span class='line'>  <span class="s2">&quot;namespace&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Libs</span>
+</span><span class='line'>  <span class="s2">&quot;use!backbone&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Modules</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Plugins</span>
+</span><span class='line'>  <span class="s2">&quot;plugins/jquery.livequery&quot;</span>
+</span><span class='line'><span class="p">],</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span><span class="p">(</span><span class="nx">namespace</span><span class="p">,</span> <span class="nx">Backbone</span><span class="p">,</span> <span class="nx">livequery</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// &lt;-- see how livequery is passed</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But we&#8217;re not going to use that argument. It&#8217;s just there to make sure that <code>jquery.livequery.js</code> gets added to the page. We&#8217;ll ignore it and use livequery via jquery instead, like so:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#sections&#39;</span><span class="p">).</span><span class="nx">livequery</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;sections added to DOM!&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">},</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;sections removed from DOM!&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Keep in mind that require.js and AMD are just tacking the script elements onto the page. Requiring our plugin in this fashion is no different than tacking a <code>script</code> onto the HTML at runtime.</p>
+
+<p>Here&#8217;s my example.js file <a href="http://robdodson.me/blog/2012/05/23/how-do-you-switch-between-views-in-backbone/">from the last post</a>, now using livequery to listen for when the element is added to and removed from the DOM.</p>
+
+<figure class='code'><figcaption><span>example.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">define</span><span class="p">([</span>
+</span><span class='line'>  <span class="s2">&quot;namespace&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Libs</span>
+</span><span class='line'>  <span class="s2">&quot;use!backbone&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Modules</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Plugins</span>
+</span><span class='line'>  <span class="s2">&quot;plugins/jquery.livequery&quot;</span>
+</span><span class='line'><span class="p">],</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span><span class="p">(</span><span class="nx">namespace</span><span class="p">,</span> <span class="nx">Backbone</span><span class="p">,</span> <span class="nx">livequery</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Create a new module</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">Example</span> <span class="o">=</span> <span class="nx">namespace</span><span class="p">.</span><span class="nx">module</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Example extendings</span>
+</span><span class='line'>  <span class="nx">Example</span><span class="p">.</span><span class="nx">Model</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span> <span class="cm">/* ... */</span> <span class="p">});</span>
+</span><span class='line'>  <span class="nx">Example</span><span class="p">.</span><span class="nx">Collection</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Collection</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span> <span class="cm">/* ... */</span> <span class="p">});</span>
+</span><span class='line'>  <span class="nx">Example</span><span class="p">.</span><span class="nx">Router</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span> <span class="cm">/* ... */</span> <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// This will fetch the tutorial template and render it.</span>
+</span><span class='line'>  <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Tutorial</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">template</span><span class="o">:</span> <span class="s2">&quot;app/templates/example.html&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">view</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// Fetch the template, render it to the View element and call done.</span>
+</span><span class='line'>      <span class="nx">namespace</span><span class="p">.</span><span class="nx">fetchTemplate</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">template</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">tmpl</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">view</span><span class="p">.</span><span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">tmpl</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">// If a done function is passed, call it with the element</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">done</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">done</span><span class="p">(</span><span class="nx">view</span><span class="p">.</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>      <span class="p">});</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Left</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;left-container&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;container&#39;</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Middle</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;middle-container&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;container&#39;</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Right</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;right-container&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;container&#39;</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Sections</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">tagName</span><span class="o">:</span> <span class="s1">&#39;div&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">id</span><span class="o">:</span> <span class="s1">&#39;sections&#39;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">leftView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">middleView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">rightView</span><span class="o">:</span> <span class="kc">undefined</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">events</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="s2">&quot;click .container&quot;</span><span class="o">:</span>    <span class="s2">&quot;onChildClicked&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">leftView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Left</span><span class="p">();</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">middleView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Middle</span><span class="p">();</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">rightView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Right</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">leftView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">middleView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">rightView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#sections&#39;</span><span class="p">).</span><span class="nx">livequery</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;sections added to DOM!&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">},</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;sections removed from DOM!&#39;</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">});</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// We should do this work with events instead of methods</span>
+</span><span class='line'>    <span class="nx">setInitialPosition</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">css</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">});</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">onChildClicked</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">$target</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">$e</span><span class="p">.</span><span class="nx">target</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">switch</span><span class="p">(</span><span class="nx">$e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">case</span> <span class="s1">&#39;left-container&#39;</span><span class="o">:</span>
+</span><span class='line'>          <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="nx">$target</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">});</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">case</span> <span class="s1">&#39;middle-container&#39;</span><span class="o">:</span>
+</span><span class='line'>          <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">});</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">case</span> <span class="s1">&#39;right-container&#39;</span><span class="o">:</span>
+</span><span class='line'>          <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span><span class="nx">left</span><span class="o">:</span> <span class="nx">$</span><span class="p">(</span><span class="nb">window</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">+</span> <span class="nx">$target</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">});</span>
+</span><span class='line'>          <span class="k">break</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Required, return the module for AMD compliance</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">Example</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I tried this out by adding and removing the <code>Example.Sections</code> view from the DOM and both console logs fired, so yeah, awesome! In lieu of creating a base class and adding an addedToDOM and removedFromDOM event we can do something like this to achieve that effect:</p>
+
+<figure class='code'><figcaption><span>example.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">leftView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Left</span><span class="p">();</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">middleView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Middle</span><span class="p">();</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">rightView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Right</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">leftView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">middleView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">rightView</span><span class="p">.</span><span class="nx">render</span><span class="p">().</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">_</span><span class="p">.</span><span class="nx">bindAll</span><span class="p">(</span><span class="k">this</span><span class="p">);</span> <span class="c1">// make sure all the methods of our object have the right &#39;this&#39;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#sections&#39;</span><span class="p">).</span><span class="nx">livequery</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">onAddedToDOM</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onRemovedFromDOM</span><span class="p">);</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">onAddedToDOM</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;added to DOM!&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">onRemovedFromDOM</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;removed from DOM!&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">},</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Time: 7:47 am</li>
+<li>Mood: Awake, Hot</li>
+<li>Sleep: 5</li>
+<li>Hunger: 5</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2519,94 +2975,6 @@ bear in mind that each module requires an http request to load it so you don&#82
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/14/hacking-the-path-variable-in-sublime-text/">Hacking the PATH Variable in Sublime Text</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-14T20:26:00-07:00" pubdate data-updated="true">May 14<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This is going to be a bit of a lightning post but I wanted to quickly show off how to edit the PATH variable that Sublime text uses. I should warn you that that I am neither an expert in Python nor am I a very seasoned Sublime user. So having said that take all of this with a grain of salt and use at your own risk.</p>
-
-<h3>Our first (crappy) plugin!</h3>
-
-<p>Sublime has a great plugin architecture that makes it extremely easy to add to the platform. If you create a <code>.py</code> file in the <code>~/Library/Application Support/Sublime Text 2/Packages/User/</code> folder it will be loaded as soon as Sublime starts. Writing plugins seems to be actually quite easy based on their <a href="http://www.sublimetext.com/docs/plugin-basics">documentation and examples.</a> We won&#8217;t be following the typical plugin architecture since we&#8217;re just trying to hack a system variable and that doesn&#8217;t seem to necessitate the use of their built in modules.</p>
-
-<p>Here&#8217;s a script I&#8217;m calling <code>Pathway</code> at the moment.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">os</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">LOCAL</span> <span class="o">=</span> <span class="s">&#39;/usr/local/bin:/usr/local/sbin:&#39;</span>
-</span><span class='line'><span class="n">HOME</span> <span class="o">=</span> <span class="s">&#39;/Users/Rob&#39;</span>  <span class="c">### !!! REPLACE WITH YOUR HOME PATH !!! ###</span>
-</span><span class='line'><span class="n">RVM</span> <span class="o">=</span> <span class="n">HOME</span> <span class="o">+</span> <span class="s">&#39;/.rvm/bin:&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c"># Sublime&#39;s default path is</span>
-</span><span class='line'><span class="c"># /usr/bin:/bin:/usr/sbin:/sbin</span>
-</span><span class='line'><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;PATH&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="s">&#39;:&#39;</span>
-</span><span class='line'><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;PATH&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">LOCAL</span>
-</span><span class='line'><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;PATH&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">RVM</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">print</span> <span class="s">&#39;PATH = &#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;PATH&#39;</span><span class="p">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you add this file to the Sublime user&#8217;s directory outlined above you should be able to hit cmd + ` to fire up the Sublime console which will print out our new PATH variable.</p>
-
-<p>I would also recommend adding a shell plugin to Sublime. At the moment I use <a href="https://github.com/misfo/Shell-Turtlestein">Shell Turtlestein.</a>.</p>
-
-<p>Now that I have my hacked path variable and my shell plugin I can check to see if RVM works. Using Shell Turtlestein you can hit <code>cmd-shift-c</code> to open a little console prompt. Typing <code>rvm current</code> returns our ruby version number and gemset. Nice! What&#8217;s even nicer is this means I can now run Rake tasks from inside of Sublime!</p>
-
-<p>I should point out if all you want to do is run Rake or Ant then there are already plugins for that sort of thing. My main effort in doing all this is to try to integrate the command line with Sublime a bit better. If <em>anyone</em> knows how to simply tell Sublime to use the path in my .bash_profile or .bashrc then I would gladly use that approach instead. But after crawling the forums for a while it looks like this is still a common problem with no good solution.</p>
-
-<ul>
-<li>Time: 8:26 pm</li>
-<li>Mood: Happy, Peaceful, Hurried</li>
-<li>Sleep: 7</li>
-<li>Hunger: 6</li>
-<li>Coffee: 0</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -2624,6 +2992,10 @@ bear in mind that each module requires an http request to load it so you don&#82
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/03/make-your-own-jquery-deferreds-and-promises/">Make Your Own jQuery Deferreds and Promises</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/02/managing-your-backbone-views-with-the-state-pattern/">Managing Your Backbone Views with the State Pattern</a>
       </li>
     
@@ -2637,10 +3009,6 @@ bear in mind that each module requires an http request to load it so you don&#82
     
       <li class="post">
         <a href="/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/">Using jQuery Deferred to Load an Underscore Template</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/29/testing-backbone-modules/">Testing AMD Backbone Modules</a>
       </li>
     
   </ul>
