@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Promises | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/promises/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-05T00:08:37-07:00</updated>
+  <updated>2012-06-05T09:09:46-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -174,7 +174,9 @@ promise.done(function(message) {</p>
 
 <p>});
 <code>``
-There are more cool things you can do with</code>Deferreds<code>I highly recommend you [spend some time with the documentation](http://api.jquery.com/category/deferred-object/) and trying out some of the other methods like</code>pipe<code>or</code>resolveWith`. Let me know if this is helpful or if you have any questions. Till tomorrow! - Rob</p>
+There are more cool things you can do with</code>Deferreds<code>I highly recommend you [spend some time with the documentation](http://api.jquery.com/category/deferred-object/) and trying out some of the other methods like</code>pipe<code>or</code>resolveWith<code>. Also as a side note [checkout this page](http://api.jquery.com/promise/) which shows how to extract a</code>promise` by type. It will actually let you do everything we've done in our animation example but with fewer lines of code.</p>
+
+<p>Let me know if this is helpful or if you have any questions. Till tomorrow! - Rob</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 

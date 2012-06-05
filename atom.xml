@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-05T00:08:37-07:00</updated>
+  <updated>2012-06-05T09:09:46-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -672,7 +672,9 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>There are more cool things you can do with <code>Deferreds</code> I highly recommend you <a href="http://api.jquery.com/category/deferred-object/">spend some time with the documentation</a> and trying out some of the other methods like <code>pipe</code> or <code>resolveWith</code>. Let me know if this is helpful or if you have any questions. Till tomorrow! - Rob</p>
+<p>There are more cool things you can do with <code>Deferreds</code> I highly recommend you <a href="http://api.jquery.com/category/deferred-object/">spend some time with the documentation</a> and trying out some of the other methods like <code>pipe</code> or <code>resolveWith</code>. Also as a side note <a href="http://api.jquery.com/promise/">checkout this page</a> which shows how to extract a <code>promise</code> by type. It will actually let you do everything we&#8217;ve done in our animation example but with fewer lines of code.</p>
+
+<p>Let me know if this is helpful or if you have any questions. Till tomorrow! - Rob</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
