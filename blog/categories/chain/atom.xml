@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-03T21:26:11-07:00</updated>
+  <updated>2012-06-05T00:06:09-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,321 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Deploying Your First Node.js and Socket.io App to Heroku]]></title>
+    <link href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/"/>
+    <updated>2012-06-04T22:01:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku</id>
+    <content type="html"><![CDATA[<p>At my office we like to shoot each other from across the room with Nerf guns. In an effort to actually remain productive we've implemented a rule that whenever you get shot you're dead for 1 hour. But that hour can be a little tricky to keep track of between players. Who's dead and who isn't? Am I about to be shot right now??</p>
+
+<p>In an effort to keep track of things (and also because I need to write a blog post) I decided to start working on a little <a href="http://nodejs.org/">Node.js</a> and <a href="http://socket.io/">Socket.io</a> app. In this first post I'm just going to get things setup and deploy them to Heroku. Hopefully tomorrow we can work on implementing the actual timers. If you've never worked with Heroku before <a href="https://devcenter.heroku.com/articles/quickstart">you'll need to follow their getting started guide</a> to make sure you have all the proper command line tools. Don't worry, it's really easy and their documentation is <strong>awesome</strong>.</p>
+
+<h3>Express it!</h3>
+
+<p>To start us off we'll use <a href="http://expressjs.com/">Express</a> since it provides a nice, <a href="http://www.sinatrarb.com/">Sinatra</a> like layer on top of Node. If you haven't installed Node yet you can do it from the <a href="http://nodejs.org/">Node.js</a> site. The installer will also include <code>npm</code> which is Node's package manager. Following the instructions on the <a href="http://expressjs.com/">Express</a> site you should be able to just type:</p>
+
+<p><code>
+npm install -g express
+</code></p>
+
+<p>Now that you have Express installed you can use it to create a new project.</p>
+
+<p><code>
+express defcon
+</code>
+I'm calling my project <code>defcon</code> because I luvz <a href="http://en.wikipedia.org/wiki/WarGames">WarGames</a>. You can call yours whatever you'd like :)</p>
+
+<p>Next we need to <code>cd</code> into the defcon folder so we can install Socket.io and our other dependencies. There's a version of Socket.io designed to work with Express so we'll install that one.</p>
+
+<p><code>
+npm install -d  # install Express dependencies
+npm install socket.io express
+</code></p>
+
+<p>We'll also need to add socket.io to our <code>package.json</code> which is similar to a <code>Gemfile</code> if you're coming from Ruby, or just a big list of file dependencies if you're coming from something else :D When you distribute your app other developers can just run 'npm install -d' and it will add all of the modules listed to their project. Heroku will also use our <code>package.json</code> when we push our app to their servers. I'm also going to replace the <a href="http://jade-lang.com/">Jade</a> rendering engine with <a href="http://embeddedjs.com/">EJS</a> since it's easier for me to work with.</p>
+
+<p>``` js package.json
+{</p>
+
+<pre><code>"name": "defcon",
+"version": "0.0.1",
+"private": true,
+"dependencies": {
+  "express": "~2.5.8",
+  "ejs": "~0.7.1",
+  "socket.io": "~0.9.6"
+</code></pre>
+
+<p>  },
+  "engines": {</p>
+
+<pre><code>"node": "0.6.x"
+</code></pre>
+
+<p>  }
+}
+```</p>
+
+<p>The tilde <code>~</code> character tells NPM that it's ok to install this version of our module, or anything less than the next highest version number. So the following are equivalent: <code>"~1.2" = "&gt;=1.2.0 &lt;2.0.0"</code>. This is typically a good practice with modules because you'd like to receive bug fixes and patches but you don't want to let your app potentially download a v2 of some library which breaks the API.</p>
+
+<p>Run <code>npm install -d</code> again to make sure that <code>ejs</code> and anything else you've added are properly installed. Open up your app.js file that Express provided for you. We'll need to change a lot of stuff so it's probably easiest for you to just copy and paste this one that I've already prepared. Paste it into a new file if you'd like so you can compare all the differences.</p>
+
+<p>``` js app.js
+var express = require('express'),</p>
+
+<pre><code>app = express.createServer(express.logger()),
+io = require('socket.io').listen(app),
+routes = require('./routes');
+</code></pre>
+
+<p>// Configuration</p>
+
+<p>app.configure(function() {
+  app.set('views', <strong>dirname + '/views');
+  app.set('view engine', 'ejs');
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(app.router);
+  app.use(express.static(</strong>dirname + '/public'));
+});</p>
+
+<p>app.configure('development', function() {
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+});</p>
+
+<p>app.configure('production', function() {
+  app.use(express.errorHandler());
+});</p>
+
+<p>// Heroku won't actually allow us to use WebSockets
+// so we have to setup polling instead.
+// https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
+// io.configure(function () {
+//   io.set("transports", ["xhr-polling"]);
+//   io.set("polling duration", 10);
+// });</p>
+
+<p>// Routes</p>
+
+<p>var port = process.env.PORT || 5000; // Use the port that Heroku provides or default to 5000
+app.listen(port, function() {
+  console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+});</p>
+
+<p>app.get('/', routes.index);</p>
+
+<p>var status = "All is well.";</p>
+
+<p>io.sockets.on('connection', function (socket) {
+  io.sockets.emit('status', { status: status }); // note the use of io.sockets to emit but socket.on to listen
+  socket.on('reset', function (data) {</p>
+
+<pre><code>status = "War is imminent!";
+io.sockets.emit('status', { status: status });
+</code></pre>
+
+<p>  });
+});
+```</p>
+
+<p>In my views folder I've created a <code>layout.ejs</code>...</p>
+
+<p>``` html views/layout.ejs
+&lt;!DOCTYPE html>
+<html lang="en">
+  <head></p>
+
+<pre><code>&lt;meta charset="utf-8"&gt;
+&lt;title&gt;Title&lt;/title&gt;
+&lt;meta name="description" content=""&gt;
+&lt;meta name="author" content=""&gt;
+
+&lt;!-- HTML5 shim, for IE6-8 support of HTML elements --&gt;
+&lt;!--[if lt IE 9]&gt;
+  &lt;script src="http://html5shim.googlecode.com/svn/trunk/html5.js"&gt;&lt;/script&gt;
+&lt;![endif]--&gt;
+
+&lt;!-- styles --&gt;
+&lt;link href="http://robdodson.me/css/main.css" rel="stylesheet"&gt;
+</code></pre>
+
+<p>  </head>
+  <body></p>
+
+<pre><code>&lt;%- body %&gt;
+&lt;script src="http://robdodson.me/socket.io/socket.io.js"&gt;&lt;/script&gt;
+&lt;script src="http://robdodson.me/js/libs/jquery.js"&gt;&lt;/script&gt;
+&lt;script src="http://robdodson.me/js/main.js"&gt;&lt;/script&gt;
+</code></pre>
+
+<p>  </body>
+</html>
+```</p>
+
+<p>and an <code>index.ejs</code>.</p>
+
+<p>``` html views/index.ejs</p>
+
+<div id="status"></div>
+
+
+<p><button id="reset">Reset!</button>
+```</p>
+
+<p>If you'd like you can open up <code>routes/index.js' and look around but you don't need to. It should render</code>layout.ejs<code>and</code>index.ejs` by default.</p>
+
+<p>A few more items to go...We need to add a copy of <a href="http://jquery.com/">jQuery</a> to our <code>public</code> folder and also a <code>main.js</code> file. I've renamed the structure to look like this:</p>
+
+<p>```
+public
+|
+|<em> css
+|</em> img
+|_ js</p>
+
+<pre><code>|_ libs
+    |_ jquery.js
+|_ plugins
+|_ main.js
+</code></pre>
+
+<p>```</p>
+
+<p>I guess that's just a habit of using Backbone Boilerplate all the time :) Here's what <code>main.js</code> should look like:</p>
+
+<p>``` js public/js/main.js
+var socket = io.connect(window.location.hostname);</p>
+
+<p>socket.on('status', function (data) {</p>
+
+<pre><code>$('#status').html(data.status);
+</code></pre>
+
+<p>});</p>
+
+<p>$('#reset').click(function() {</p>
+
+<pre><code>socket.emit('reset');
+</code></pre>
+
+<p>});
+```</p>
+
+<p>It's important to note the line that says <code>var socket = io.connect(window.location.hostname);</code>. In the socket.io docs they usually tell you to connect to <code>localhost</code> but since we're on heroku we'll need to instead connect to whatever our custom domain is.</p>
+
+<h3>Cross your fingers</h3>
+
+<p>At this point we should be ready to test everything. From the root of your project run <code>node app.js</code>. If all goes well you should see something like this:</p>
+
+<p><code>
+   info  - socket.io started
+Express server listening on port 5000 in development mode
+</code></p>
+
+<p>If not leave me a comment and I'll see if I can help you debug it. However let's assume that everything DID go well for you and now you're ready to connect to the local version of your app. Point your browser to http://localhost:5000 and you should see something like this:</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/all_is_well_with_sockets.png" title="'All is well with Socket.io'" ></p>
+
+<p>Now open another browser window and also point it at localhost:5000. In one of the windows click the button that says <code>Reset</code> which should change the copy in <em>both</em> windows to 'War is imminent!'</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/war_is_imminent_sockets.png" title="'War is Immentin with Socket.io'" ></p>
+
+<h3>Git'er done!</h3>
+
+<p>Alright we should have a functioning app at this point so let's put this baby into Git.</p>
+
+<p><code>
+git init
+echo 'node_modules' &gt;&gt; .gitignore
+</code></p>
+
+<p>We'll ignore the node_modules directory so Heroku can create its own version. Heroku requires that we deploy our app from Git which is kind of an awesome practice. We'll also need to define a <code>Procfile</code> which will list the processes that our app can run.</p>
+
+<p><code>
+touch Procfile
+echo 'web: node app.js' &gt;&gt; Procfile
+</code>
+To verify that our <code>Procfile</code> is working we can use Heroku's built in utility called <code>foreman</code>.</p>
+
+<p>```
+$ foreman start</p>
+
+<p>23:47:32 web.1     | started with pid 53197
+23:47:32 web.1     | info: socket.io started
+23:47:32 web.1     | Express server listening on port 5000 in development mode
+```</p>
+
+<p>Point your browser to <code>localhost:5000</code> to verify that things are still working. If everything looks good we're ready to commit to git.</p>
+
+<p><code>
+git add .
+git commit -m 'initial commit'
+</code></p>
+
+<h3>Deploy to Heroku</h3>
+
+<p>Now that our app is safely tucked away in git it's time to fire up a new Heroku instance.</p>
+
+<p><code>
+$ heroku create --stack cedar
+</code></p>
+
+<p>Heroku will do the work of setting up a new <code>git remote</code> for us to push our app to.</p>
+
+<p><code>
+$ git push heroku master
+</code></p>
+
+<p>We'll need to scale our web process before we can use the app.</p>
+
+<p><code>
+$ heroku ps:scale web=1
+</code></p>
+
+<p>To see which processes are running on Heroku you can use the <code>heroku ps</code> command.</p>
+
+<p>```
+$ heroku ps
+Process       State               Command</p>
+
+<hr />
+
+<p>web.1         up for 10s          node app.js
+```</p>
+
+<p>With everything setup we should be able to run <code>heroku open</code> which will fire up our browser and direct it to an instance of our app. There seems to be a fair bit of latency so it can take several seconds for the initial status of 'All is well' to show up. If you see the Reset button with nothing above it give it around 10 seconds to see if it eventually updates. Open another browser window and point it at the Heroku domain in the address bar. If you press the Reset button in one window it should immediately update in the next one.</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/heroku_war_is_imminent.png" title="'Heroku: War is Imminent'" ></p>
+
+<h3>Wrapping up</h3>
+
+<p>Well I hope you enjoyed this brief tour of Socket.io and Heroku. Before we sign off let's make sure to turn off the running process on our Heroku instance:</p>
+
+<p><code>
+$ heroku ps:scale web=0
+</code></p>
+
+<p>If all went well you should have a decent starting point to build your own Socket.io app. If you're still having trouble checkout some of the great documentation from Heroku and/or leave a comment:</p>
+
+<p><a href="https://devcenter.heroku.com/articles/nodejs">https://devcenter.heroku.com/articles/nodejs</a></p>
+
+<p><a href="https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku">https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku</a></p>
+
+<p>Good Luck! - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 10:02 pm</li>
+<li>Mood: Tired, Antsy</li>
+<li>Sleep: 5</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Make Your Own jQuery Deferreds and Promises]]></title>
@@ -857,203 +1172,6 @@ app.get('/', function(req, res) {
 <li>Mood: Eager, Alert</li>
 <li>Sleep: 7</li>
 <li>Hunger: 7</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using jQuery Deferred to Load an Underscore Template]]></title>
-    <link href="http://robdodson.me/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/"/>
-    <updated>2012-05-30T08:53:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template</id>
-    <content type="html"><![CDATA[<p>Today's post is meant to scratch an itch I had the other day regarding templates. My friend wanted to load an underscore template along with some JSON data but wasn't sure what the best approach would be. Since I'm using Backbone Boilerplate I've gotten used to having my template loading method already stubbed out for me. Here's the one they use:</p>
-
-<p>``` js
-fetchTemplate: function(path, done) {
-  var JST = window.JST = window.JST || {};
-  var def = new $.Deferred();</p>
-
-<p>  // Should be an instant synchronous way of getting the template, if it
-  // exists in the JST object.
-  if (JST[path]) {</p>
-
-<pre><code>if (_.isFunction(done)) {
-  done(JST[path]);
-}
-
-return def.resolve(JST[path]);
-</code></pre>
-
-<p>  }</p>
-
-<p>  // Fetch it asynchronously if not available from JST, ensure that
-  // template requests are never cached and prevent global ajax event
-  // handlers from firing.
-  $.ajax({</p>
-
-<pre><code>url: path,
-type: "get",
-dataType: "text",
-cache: false,
-global: false,
-
-success: function(contents) {
-  JST[path] = _.template(contents);
-
-  // Set the global JST cache and return the template
-  if (_.isFunction(done)) {
-    done(JST[path]);
-  }
-
-  // Resolve the template deferred
-  def.resolve(JST[path]);
-}
-</code></pre>
-
-<p>  });</p>
-
-<p>  // Ensure a normalized return value (Promise)
-  return def.promise();
-}
-```</p>
-
-<p>Not having previous experience working with <a href="http://api.jquery.com/category/deferred-object/">jQuery.Deferred</a> I was initially put-off by the idea of just copy/pasting this function over to him, especially since I couldn't explain what was going on. I knew that I probably wanted to use Deferreds and Promises but I wasn't sure how best to explain the concepts nor did this method seem to do much in the way of loading JSON, it was just for loading templates. Since my friend only wanted to load 1 template and 1 JSON file I thought it best for us to start small, and to write something that we could easily debug. Knowing I wanted to use Deferreds I found <a href="http://msdn.microsoft.com/en-us/magazine/gg723713.aspx">this wonderful article by Addy Osmani and Julian Aubourg</a> detailing how Deferreds work. It is VERY comprehensive and for our purposes I only needed to read the first few paragraphs before I had enough to start.</p>
-
-<p>In a nutshell deferreds are objects which contain promises (also objects). Promises can be in various states, <code>pending</code>, <code>resolved</code> or <code>rejected</code>. Once you have a deferred (or it's promise) you can hook functions on to it so when it changes from a <code>pending</code> to <code>resolved</code> state all those functions fire. It's actually the promise that changes state but you can use the deferred like a promise because in most cases it will just proxy the calls to its promise object. Using deferreds can be nice for several reasons. For starters, you can avoid the jQuery <em>pyramid of doom</em></p>
-
-<p>``` js</p>
-
-<p>// NOOOOOOoooooooooo</p>
-
-<p>$.ajax({
-  url: 'foo.php',
-  success: function() {</p>
-
-<pre><code>$.ajax({
-  url: 'bar.php',
-  success: function() {
-    $.ajax({
-      url: 'baz.php',
-      success: function() {
-        ...
-      }
-    })
-  }
-})
-</code></pre>
-
-<p>  }
-})</p>
-
-<p>```</p>
-
-<p>Secondly your deferreds/promises are little tokens that you can hand out from your services so other actors don't have to get all up in your ajax guts. Someone makes an API request, you give em a token, when it resolves they play with the data.</p>
-
-<p>``` js
-function doSomethingWithHugeData(data) {
-  console.log("man, look at all these 1's and 0's!");
-}</p>
-
-<p>var dfd = myService.getSomeHugeData();
-dfd.done(doSomethingWithHugeData);
-```</p>
-
-<p>This is a much nicer approach than passing in a callback that your service will need to execute whenever it finishes getting its data. Your service shouldn't care about your callbacks. It should care about getting data and letting people know when that data's been got! :D</p>
-
-<h3>But I digress...</h3>
-
-<p>We were <em>trying</em> to load some JSON and a template, so let's get back to the task at hand. Since we know that we have two ajax calls, one for the JSON and one for the template, and we know that we don't really want to do anything till both of these calls have completed we've got a perfect use case for <a href="http://api.jquery.com/jQuery.when/">$.when</a>. <code>when</code> accepts a list of deferreds/promises and acts as one big deferred, waiting for all of its children to resolve before it resolves. This is a nice way to build a sequencer. In our case we're going to take  two ajax calls and toss them into <code>$.when</code>. When it resolves we'll use <code>$.then</code> to tell it what our success and failure callbacks should be.</p>
-
-<p>``` html index.html
-&lt;!DOCTYPE html>
-<html lang="en">
-  <head></p>
-
-<pre><code>&lt;meta charset="utf-8"&gt;
-&lt;title&gt;Deferred Sandbox&lt;/title&gt;
-&lt;script src="jquery.js"&gt;&lt;/script&gt;
-&lt;script src="underscore.js"&gt;&lt;/script&gt;
-</code></pre>
-
-<p>  </head>
-  <body></p>
-
-<pre><code>&lt;div id="main"&gt;&lt;/div&gt;
-
-&lt;script&gt;
-  $(function() {
-
-    function successFunc(jsonRes, templateRes) {
-      var json = _.first(jsonRes);
-      var template = _.first(templateRes);
-      var compiled = _.template(template, json);
-      $('#main').html(compiled);
-    }
-
-    function failureFunc() {
-      console.log('fail whale!');
-    }
-
-    $.when(
-      $.ajax("person.json"),
-      $.ajax("person.template.html")
-    ).then(successFunc, failureFunc);
-
-  });
-&lt;/script&gt;
-</code></pre>
-
-<p>  </body>
-</html>
-```</p>
-
-<p>In our case everything is in the same folder as index.html so there's no need for any paths. Keep in mind that in most (all?) browsers you'll need to be running a local server for the above code to actually work. In Chrome, at least, you can't run an html file from file:// and have it load external resources, it'll complain that the access-origin is not allowed.</p>
-
-<p>Let me take a moment to explain <code>$.then</code> a little bit. We know that <code>$.ajax</code> returns a deferred, and that the deferred's promise can be in three states: <code>pending</code>, <code>resolved</code>, <code>rejected</code>. So if we did something like this:</p>
-
-<p><code>js
-var dfd = $.ajax('foobar.php');
-</code></p>
-
-<p><code>dfd</code> would be a deferred object with a <code>pending</code> promise. Deferred's let us link methods up to them for when their state changes. These methods are: <code>done()</code>, <code>fail()</code>, <code>always()</code>, <code>progress()</code>, and <code>then()</code>. There are more but <a href="http://api.jquery.com/category/deferred-object/">I'll let the documentation explain them.</a> <code>done()</code> and <code>fail()</code> each accept either a single callback or an array of callbacks to be fired when the deferred changes to either the <code>resolved</code> or <code>rejected</code> state.</p>
-
-<p>``` js
-function successFunc() {
-  console.log('success! do stuff with data!');
-}</p>
-
-<p>function failureFunc() {
-  console.log('failure! um...give up!');
-}</p>
-
-<p>var service = {
-  getJSON: function() {</p>
-
-<pre><code>return $.ajax('person.json');
-</code></pre>
-
-<p>  }
-};</p>
-
-<p>service.getJSON()
-.done(successFunc)
-.fail(failureFunc);</p>
-
-<p>```</p>
-
-<p><code>always()</code> fires its callbacks regardless of whether the deferred was <code>resolved</code> or <code>rejected</code>. This might be a good place to put any cleanup code. <code>progress()</code> is fired during any progress events that the process might emit. Finally there's <code>then()</code> which is what we're using in our template example. <code>then()</code> is essentially shorthand for <code>done()</code> and <code>fail()</code> so you can pass it two callbacks or two arrays of success/fail callbacks.</p>
-
-<p>Hopefully that's helpful for you all and you can go back and clean up some of those pyramids that might be lingering in your code. Till tomorrow! - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 8:00 am</li>
-<li>Mood: Reserved, Sedate</li>
-<li>Sleep: 7</li>
-<li>Hunger: 4</li>
 <li>Coffee: 0</li>
 </ul>
 
