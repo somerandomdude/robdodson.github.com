@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Pangrams in Ruby - Rob Dodson talks internets</title>
+  <title>Building a Countdown Timer with Socket.io - Rob Dodson talks internets</title>
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="I&#8217;m a big fan of sites like RubyQuiz and CodeEval. In my opinion doing short puzzles and brain-teasers is a great way to explore a language. &hellip;">
+  <meta name="description" content="Yesterday I put together a very simple Node/Socket.io application and showed how to deploy it to Heroku. Today I&#8217;m going to keep going with &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://robdodson.me/blog/2012/05/09/pangrams-in-ruby">
+  <link rel="canonical" href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -77,7 +77,7 @@
   
   <header>
     
-      <h1 class="entry-title">Pangrams in Ruby</h1>
+      <h1 class="entry-title">Building a Countdown Timer With Socket.io</h1>
     
     
       <p class="meta">
@@ -93,20 +93,20 @@
   
 
 
-<time datetime="2012-05-09T23:15:00-07:00" pubdate data-updated="true">May 9<span>th</span>, 2012</time>
+<time datetime="2012-06-05T08:07:00-07:00" pubdate data-updated="true">Jun 5<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>I&#8217;m a big fan of sites like <a href="http://www.rubyquiz.com/">RubyQuiz</a> and <a href="http://www.codeeval.com/">CodeEval</a>. In my opinion doing short puzzles and brain-teasers is a great way to explore a language. Here&#8217;s one such puzzle taken from CodeEval which asks that you devise a program to read in a file, parse each line and decide if it is a pangram or not.</p>
+<div class="entry-content"><p>Yesterday I put together a very simple Node/Socket.io application and showed how to deploy it to Heroku. Today I&#8217;m going to keep going with that app to see if I can get the functionality that I want. The app is a basic stopwatch so that shouldn&#8217;t be too hard. If you want to catch up <a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">checkout yesterday&#8217;s article</a> which explains setting everything up.</p>
 
-<blockquote><p>The sentence &#8216;A quick brown fox jumps over the lazy dog&#8217; contains every single letter in the alphabet. Such sentences are called pangrams. You are to write a program, which takes a sentence, and returns all the letters it is missing (which prevent it from being a pangram). You should ignore the case of the letters in sentence, and your return should be all lower case letters, in alphabetical order. You should also ignore all non US-ASCII characters.In case the input sentence is already a pangram, print out the string NULL</p></blockquote>
+<h3>Countdown</h3>
 
-<p>Here&#8217;s my first attempt. Hopefully I can come back to this post in a few weeks and try it again in a bit more elegant fashion :)</p>
+<p>Just to get the ball rolling I&#8217;m going to write a little code in my <code>app.js</code> file right at the bottom to setup a very crude counter.</p>
 
-<figure class='code'><figcaption><span>pangrams.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>app.js  </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -118,66 +118,60 @@
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="no">ARGV</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">each_line</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">countdown</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+</span><span class='line'><span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">countdown</span><span class="o">--</span><span class="p">;</span>
+</span><span class='line'>  <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;timer&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">countdown</span><span class="o">:</span> <span class="nx">countdown</span> <span class="p">});</span>
+</span><span class='line'><span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="n">missing_letters</span> <span class="o">=</span> <span class="o">[]</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">unless</span> <span class="n">line</span><span class="o">.</span><span class="n">chomp</span><span class="o">.</span><span class="n">empty?</span>
-</span><span class='line'>    <span class="n">line</span><span class="o">.</span><span class="n">chomp!</span>
-</span><span class='line'>    <span class="n">line</span><span class="o">.</span><span class="n">downcase!</span>
-</span><span class='line'>    <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="o">.</span><span class="n">.</span><span class="s1">&#39;z&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">l</span><span class="o">|</span>
-</span><span class='line'>      <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">.</span><span class="n">nil?</span>
-</span><span class='line'>        <span class="n">missing_letters</span> <span class="o">&lt;&lt;</span> <span class="n">l</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">if</span> <span class="n">missing_letters</span><span class="o">.</span><span class="n">empty?</span>
-</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;NULL&quot;</span>
-</span><span class='line'>  <span class="k">else</span>
-</span><span class='line'>    <span class="nb">puts</span> <span class="n">missing_letters</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
+</span><span class='line'><span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">countdown</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;timer&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">countdown</span><span class="o">:</span> <span class="nx">countdown</span> <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>And here&#8217;s some input:</p>
+<p>Elsewhere in my client-side js I&#8217;m going to listen for the <code>timer</code> event and update my DOM elements.</p>
 
-<figure class='code'><figcaption><span>sentences.txt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='text'><span class='line'>A quick brown fox jumps over the lazy dog
-</span><span class='line'>A slow yellow fox crawls under the proactive dog
-</span><span class='line'>AbC
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>To run it from the command line you&#8217;ll need to pass in the path to the sentece file as an argument. Here&#8217;s what it would look like if <code>pangrams.rb</code> and <code>sentences.txt</code> were in the same folder:</p>
-
-<figure class='code'><figcaption><span>sentences.txt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='text'><span class='line'>ruby pangrams.rb sentences.txt
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">socket</span> <span class="o">=</span> <span class="nx">io</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span><span class="p">);</span>
 </span><span class='line'>
-</span><span class='line'># outputs...
-</span><span class='line'>NULL
-</span><span class='line'>bjkmqz
-</span><span class='line'>defghijklmnopqrstuvwxyz
+</span><span class='line'><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;timer&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#counter&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">countdown</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#reset&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Play around with this, throw some different sentence combinations at it to see what it spits out. Then try to write your own implementation. A good next step would be to modify the script so it can support empty lines in the text file.</p>
+<p>Every second we&#8217;ll decrement our countdown variable and broadcast its new value. If a client sends us a <code>reset</code> event we&#8217;ll restart the timer and immediately broadcast the update to anyone connected. I noticed that since I&#8217;m using <code>xhr-polling</code> it can sometimes take a while for the timer to show up in my browser so keep that in mind.</p>
+
+<p>While this implementation isn&#8217;t pretty it does get us a little bit further down the road. Unfortunately I&#8217;ve been tripped up by a bunch of Node&#8217;s module issues so I have to cut tonight&#8217;s post short :\</p>
+
+<p>Hopefully better luck tomorrow. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 8:08 am</li>
+<li>Mood: Sedate, Sleepy</li>
+<li>Sleep: 5</li>
+<li>Hunger: 4</li>
+<li>Coffee: 0</li>
+</ul>
+
 </div>
 
 
@@ -200,12 +194,12 @@
   
 
 
-<time datetime="2012-05-09T23:15:00-07:00" pubdate data-updated="true">May 9<span>th</span>, 2012</time>
+<time datetime="2012-06-05T08:07:00-07:00" pubdate data-updated="true">Jun 5<span>th</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/puzzles/'>Puzzles</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a>
+    <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/node/'>Node</a>, <a class='category' href='/blog/categories/socket-io/'>Socket.io</a>
   
 </span>
 
@@ -214,7 +208,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -227,10 +221,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/" title="Previous Post: Object Oriented Scraper Backed With Tests Pt. 3">&laquo; Object Oriented Scraper Backed With Tests Pt. 3</a>
+        <a class="basic-alignment left" href="/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/" title="Previous Post: Deploying Your First Node.js and Socket.io App to Heroku">&laquo; Deploying Your First Node.js and Socket.io App to Heroku</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2012/05/10/design-by-configuration-sucks/" title="Next Post: Design by Configuration Sucks">Design by Configuration Sucks &raquo;</a>
       
     </p>
   </footer>
@@ -360,8 +352,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/';
-        var disqus_url = 'http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/';
+        var disqus_identifier = 'http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/';
+        var disqus_url = 'http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/';
         var disqus_script = 'embed.js';
       
     (function () {

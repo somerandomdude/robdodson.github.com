@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="I want to figure out how to communicate on a framework level within Backbone. Coming from Flash and RobotLegs I&#8217;m used to a few MVC conventions &hellip;">
+  <meta name="description" content="This is going to be a bit of lightening post because it&#8217;s rather late and I need to get to bed. I spent most of the day either eating dim sum &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,80 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/27/penner-easing-equations-with-gfx-and-css3/">Penner Easing Equations With GFX and CSS3</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-27T00:07:00-07:00" pubdate data-updated="true">May 27<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This is going to be a bit of lightening post because it&#8217;s rather late and I need to get to bed. I spent most of the day either eating dim sum or hanging out at the <a href="http://www.meetup.com/San-Francisco-Creative-Coders/">SF Creative Coders BBQ</a> so I&#8217;ve neglected my blogging duties a bit.</p>
+
+<p>I have something which will hopefully be useful for some folks who are getting into CSS3 animations with the Gfx plugin for jQuery. <a href="http://robdodson.me/blog/2012/05/22/css3-transitions-with-gfx/">I&#8217;ve blogged a bit about Gfx before</a> and one of the first things I noticed was the lack of a built in easing library. Coming from the Flash world where <a href="http://www.greensock.com/tweenlite/">TweenLite is king</a> I&#8217;ve grown very accustomed to using Robert Penner&#8217;s easing equations for great effect. The same equations are used by the jQuery framework to do its animations. Thankfully <a href="http://matthewlein.com/ceaser/">Matthew Lein was kind enough to convert those over to cubic-beziers</a> for those of us doing CSS3 animations. Since Gfx accepts cubic-beziers I moved the equations from Matthew&#8217;s tool into an AMD compliant module and <a href="https://github.com/robdodson/amd-css3-ease">put it up on Github.</a> It&#8217;s very simple so if AMD isn&#8217;t your thing you can just rip those parts out :D</p>
+
+<p>Example usage looks something like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// After requiring the ease module and</span>
+</span><span class='line'><span class="c1">// passing it into your View with the</span>
+</span><span class='line'><span class="c1">// name &#39;Ease&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">gfx</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">translateY</span><span class="o">:</span> <span class="s1">&#39;300px&#39;</span>
+</span><span class='line'><span class="p">},</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">duration</span><span class="o">:</span> <span class="mi">500</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">easing</span><span class="o">:</span> <span class="nx">Ease</span><span class="p">.</span><span class="nx">easeInExpo</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Give it a shot and consider donating to Matthew&#8217;s project or buying Robert Penner like a million beers!</p>
+
+<ul>
+<li>Time: 12:09 am</li>
+<li>Mood: Tired, Tipsy</li>
+<li>Sleep: 7</li>
+<li>Hunger: 0</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2745,341 +2819,6 @@ bear in mind that each module requires an http request to load it so you don&#82
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8/">Object Oriented Scraper Backed With Tests Pt. 8</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-16T07:42:00-07:00" pubdate data-updated="true">May 16<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Yesterday&#8217;s I refactored my specs and crawler to support ignoring selections. While I started parsing the metadata I quickly realized that certain bits were rather specific and needed to have custom parsing methods. Today I&#8217;m going to write some format objects to help with all that.</p>
-
-<p>Our metadata on the page looks like this:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Time: 7:42 am
-</span><span class='line'>Mood: Awake, Alert, Focused
-</span><span class='line'>Sleep: 6
-</span><span class='line'>Hunger: 0
-</span><span class='line'>Coffee: 0</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Sleep, hunger and coffee are all floats, so one object could be just <code>FloatFormat</code>. Mood should produce an <code>Array</code> of objects so we could have a <code>CollectionFormat</code>. Finally time is going to combine the time listed in the metadata and the post date. We&#8217;ll make a <code>DateTimeFormat</code> for that. These could all be methods of one big Format object as well but experience tells me that you need to be careful of monolithic actors that consume tons of different data types and spit out results. Those classes have a tendency to bloat very easily as project requirements change. I think it&#8217;s better to produce classes which can be extended or abstracted as needs arise.</p>
-
-<p>So we know <em>who</em> is going to format but we still don&#8217;t know <em>how</em>. I think I&#8217;d like to build a manifest which matches the metadata category to a format. Maybe something like this?</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="p">{</span>
-</span><span class='line'>  <span class="s1">&#39;Time&#39;</span>    <span class="o">=&gt;</span> <span class="no">DateTimeFormat</span><span class="p">,</span>
-</span><span class='line'>  <span class="s1">&#39;Mood&#39;</span>    <span class="o">=&gt;</span> <span class="no">CollectionFormat</span><span class="p">,</span>
-</span><span class='line'>  <span class="s1">&#39;Sleep&#39;</span>   <span class="o">=&gt;</span> <span class="no">FloatFormat</span><span class="p">,</span>
-</span><span class='line'>  <span class="s1">&#39;Hunger&#39;</span>  <span class="o">=&gt;</span> <span class="no">FloatFormat</span><span class="p">,</span>
-</span><span class='line'>  <span class="s1">&#39;Coffee&#39;</span>  <span class="o">=&gt;</span> <span class="no">FloatFormat</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I could probably look at each item and &#8220;detect&#8221; what kind of format it needs but I&#8217;d rather be explicit. If, for instance, I want to add another format, it&#8217;s a lot easier to just change my manifest file vs. hacking on some detection scheme. I think we can just produce this manifest file in YAML and load it in at runtime. One thing I don&#8217;t like about this approach is that it specifically names our format classes. You could generalize it so that it just matches a category to the desired output data, for instance <code>'Coffee' =&gt; Float</code> but then you run into problems with flexibility. What if Coffee still needed to output a float but had to go through a different Format than Hunger or Sleep? With that in mind we&#8217;ll stick to the plan already laid out.</p>
-
-<figure class='code'><figcaption><span>tentacles/lib/tentacles/formats.yml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="l-Scalar-Plain">time</span><span class="p-Indicator">:</span>     <span class="l-Scalar-Plain">DateTimeFormat</span>
-</span><span class='line'><span class="l-Scalar-Plain">mood</span><span class="p-Indicator">:</span>     <span class="l-Scalar-Plain">CollectionFormat</span>
-</span><span class='line'><span class="l-Scalar-Plain">sleep</span><span class="p-Indicator">:</span>    <span class="l-Scalar-Plain">FloatFormat</span>
-</span><span class='line'><span class="l-Scalar-Plain">hunger</span><span class="p-Indicator">:</span>   <span class="l-Scalar-Plain">FloatFormat</span>
-</span><span class='line'><span class="l-Scalar-Plain">coffee</span><span class="p-Indicator">:</span>   <span class="l-Scalar-Plain">FloatFormat</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>The Format object</h3>
-
-<p>I would love it if I could use the Format object as a module and just call a method on it from Crawler. It might look like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">metadata_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
-</span><span class='line'>  <span class="n">node</span> <span class="o">=</span> <span class="n">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span><span class="o">.</span><span class="n">first</span>
-</span><span class='line'>  <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span class='line'>  <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">child</span><span class="o">|</span>
-</span><span class='line'>    <span class="no">Tentacles</span><span class="o">::</span><span class="no">Format</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The only problem is <code>Format</code> needs to load in and parse its formats.yml file before it&#8217;s any good to us. There&#8217;s some interesting talk of the <a href="http://www.subelsky.com/2008/05/using-rubys-autoload-method-to.html">Module#autoload method</a> but that&#8217;s not quite what I need&#8230;</p>
-
-<p>Seems like I can&#8217;t find any good documentation on this so instead we&#8217;ll make it an instance of the class. Also I&#8217;m lazy so I&#8217;m going to have that instance load its own formats.yml file. Normally I like to only have one entry point for configuration files but&#8230;whatever.</p>
-
-<h3>How do I convert a string into a class name in Ruby?</h3>
-
-<p>Well we know we can load our YAML file but all of our format classes are going to come in as strings. I did some digging to figure out how to convert the string into an actual class that can then be instantiated. If you just want to convert a String into a class you can use <code>Object.const_get('Foobar').new</code> but that&#8217;s not going to work for us since our code is wrapped in a module. To convert a string into a module class we&#8217;ll need to use the name of our module: <code>Tentacles.const_get('DateTimeFormat').new</code>.</p>
-
-<p>With that in mind I want to spec out a simple test that passes in string of metadata and receives a printed notification that the right formatter has been created. We&#8217;ll then refactor it to actually use the formatter on the string.</p>
-
-<figure class='code'><figcaption><span>tentacles/spec/format_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;../lib/tentacles/format&#39;</span>
-</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;../lib/tentacles/date_time_format&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">describe</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Format</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;when asked to parse some metadata&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should create the right formatter&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="vi">@format</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Format</span><span class="o">.</span><span class="n">new</span>
-</span><span class='line'>      <span class="vi">@format</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s1">&#39;Time: 8:03 am&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">should</span> <span class="n">be_an_instance_of</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">DateTimeFormat</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>tentacles/lib/format.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;yaml&#39;</span>
-</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;date_time_format&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Format</span>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span>
-</span><span class='line'>      <span class="vi">@categories</span> <span class="o">=</span> <span class="no">YAML</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/formats.yml&#39;</span><span class="p">))</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">category</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
-</span><span class='line'>      <span class="n">category</span><span class="o">.</span><span class="n">downcase!</span>
-</span><span class='line'>      <span class="no">Tentacles</span><span class="o">.</span><span class="n">const_get</span><span class="p">(</span><span class="vi">@categories</span><span class="o">[</span><span class="n">category</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">new</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>tentacles/lib/date_time_format.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">DateTimeFormat</span>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span>
-</span><span class='line'>      <span class="nb">puts</span> <span class="s1">&#39;DateTimeFormat created!&#39;</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now let&#8217;s take it a step further so we can convert an actual time into a DateTime object. Here&#8217;s our updated spec:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;../lib/tentacles/format&#39;</span>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;date&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">describe</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Format</span> <span class="k">do</span>
-</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;when asked to parse some metadata&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should create the right formatter&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="vi">@format</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Format</span><span class="o">.</span><span class="n">new</span>
-</span><span class='line'>      <span class="vi">@format</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s1">&#39;Time: 8:03 am&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">should</span> <span class="n">be_an_instance_of</span><span class="p">(</span><span class="no">Date</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>To pull this off we&#8217;ll need the help of at least 2 new gems: <a href="http://rubygems.org/gems/chronic">Chronic</a> and <a href="http://rubygems.org/gems/activesupport">ActiveSupport</a>. Chronic is a natural language parser which can convert strings into useable timestamps. ActiveSupport is a library of extensions originally created for Rails which have been abstracted into a general purpose toolset. We&#8217;re going to combine these two gems to turn the phrase &#8220;8:03 am&#8221; into a Ruby DateTime.</p>
-
-<p>Gotta first update the Gemfile with our new dependencies and run <code>bundle install</code>.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">source</span> <span class="s1">&#39;https://rubygems.org&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;rspec&#39;</span><span class="p">,</span> <span class="s1">&#39;2.9.0&#39;</span>
-</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;nokogiri&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt;1.5.2&#39;</span>
-</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;awesome_print&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt;1.0.2&#39;</span>
-</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;fakeweb&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt;1.3.0&#39;</span>
-</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;chronic&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt; 0.6.7&#39;</span>
-</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;activesupport&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt; 3.2.3&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Next we bang out a quick parse method inside of DateTimeFormat. Our Tentacles::Format is going to delegate its parse call to whichever subordinate formatter it creates. Code speaks louder than words:</p>
-
-<figure class='code'><figcaption><span>tentacles/lib/tentacles/format.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;yaml&#39;</span>
-</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;date_time_format&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Format</span>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span>
-</span><span class='line'>      <span class="vi">@categories</span> <span class="o">=</span> <span class="no">YAML</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/formats.yml&#39;</span><span class="p">))</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1"># Create a formatter based on the content of the passed</span>
-</span><span class='line'>    <span class="c1"># in data. Delegate the parse call to this new formatter</span>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">category</span><span class="p">,</span> <span class="o">*</span><span class="n">content</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">category</span><span class="o">.</span><span class="n">downcase!</span>
-</span><span class='line'>      <span class="n">formatter</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">.</span><span class="n">const_get</span><span class="p">(</span><span class="vi">@categories</span><span class="o">[</span><span class="n">category</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">new</span>
-</span><span class='line'>      <span class="n">formatter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>tentacles/lib/tentacles/date_time_format.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;chronic&#39;</span>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;active_support/core_ext/string/conversions.rb&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">DateTimeFormat</span>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span>
-</span><span class='line'>      <span class="nb">puts</span> <span class="s1">&#39;DateTimeFormat created!&#39;</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
-</span><span class='line'>      <span class="no">Chronic</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">to_datetime</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>With all that in place our test should pass. Nice!!!!!! We&#8217;re well on our way to processing the remaining metadata. Tomorrow I&#8217;ll whip up our other formats and figure out how to pull the date out of a blog post so we can combine that with the time to get a proper DateTime.</p>
-
-<ul>
-<li>Time: 7:42 am</li>
-<li>Mood: Awake, Alert, Focused</li>
-<li>Sleep: 6</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -3097,6 +2836,10 @@ bear in mind that each module requires an http request to load it so you don&#82
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/">Building a Countdown Timer with Socket.io</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">Deploying Your First Node.js and Socket.io App to Heroku</a>
       </li>
     
@@ -3110,10 +2853,6 @@ bear in mind that each module requires an http request to load it so you don&#82
     
       <li class="post">
         <a href="/blog/2012/06/02/take-control-of-your-app-with-the-javascript-state-patten/">Take Control of your App with the JavaScript State Pattern</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/31/how-to-use-ejs-in-express/">How to use EJS in Express</a>
       </li>
     
   </ul>

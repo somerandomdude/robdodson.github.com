@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Node | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/node/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-05T09:09:46-07:00</updated>
+  <updated>2012-06-05T23:19:57-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,74 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building a Countdown Timer with Socket.io]]></title>
+    <link href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/"/>
+    <updated>2012-06-05T08:07:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io</id>
+    <content type="html"><![CDATA[<p>Yesterday I put together a very simple Node/Socket.io application and showed how to deploy it to Heroku. Today I'm going to keep going with that app to see if I can get the functionality that I want. The app is a basic stopwatch so that shouldn't be too hard. If you want to catch up <a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">checkout yesterday's article</a> which explains setting everything up.</p>
+
+<h3>Countdown</h3>
+
+<p>Just to get the ball rolling I'm going to write a little code in my <code>app.js</code> file right at the bottom to setup a very crude counter.</p>
+
+<p>``` js app.js<br/>
+var countdown = 1000;
+setInterval(function() {
+  countdown--;
+  io.sockets.emit('timer', { countdown: countdown });
+}, 1000);</p>
+
+<p>io.sockets.on('connection', function (socket) {
+  socket.on('reset', function (data) {</p>
+
+<pre><code>countdown = 1000;
+io.sockets.emit('timer', { countdown: countdown });
+</code></pre>
+
+<p>  });
+});
+```</p>
+
+<p>Elsewhere in my client-side js I'm going to listen for the <code>timer</code> event and update my DOM elements.</p>
+
+<p>``` js main.js
+var socket = io.connect(window.location.hostname);</p>
+
+<p>socket.on('timer', function (data) {</p>
+
+<pre><code>$('#counter').html(data.countdown);
+</code></pre>
+
+<p>});</p>
+
+<p>$('#reset').click(function() {</p>
+
+<pre><code>socket.emit('reset');
+</code></pre>
+
+<p>});
+```</p>
+
+<p>Every second we'll decrement our countdown variable and broadcast its new value. If a client sends us a <code>reset</code> event we'll restart the timer and immediately broadcast the update to anyone connected. I noticed that since I'm using <code>xhr-polling</code> it can sometimes take a while for the timer to show up in my browser so keep that in mind.</p>
+
+<p>While this implementation isn't pretty it does get us a little bit further down the road. Unfortunately I've been tripped up by a bunch of Node's module issues so I have to cut tonight's post short :\</p>
+
+<p>Hopefully better luck tomorrow. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 8:08 am</li>
+<li>Mood: Sedate, Sleepy</li>
+<li>Sleep: 5</li>
+<li>Hunger: 4</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Deploying Your First Node.js and Socket.io App to Heroku]]></title>

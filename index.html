@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="At my office we like to shoot each other from across the room with Nerf guns. In an effort to actually remain productive we&#8217;ve implemented a &hellip;">
+  <meta name="description" content="Yesterday I put together a very simple Node/Socket.io application and showed how to deploy it to Heroku. Today I&#8217;m going to keep going with &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,113 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/">Building a Countdown Timer With Socket.io</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-05T08:07:00-07:00" pubdate data-updated="true">Jun 5<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Yesterday I put together a very simple Node/Socket.io application and showed how to deploy it to Heroku. Today I&#8217;m going to keep going with that app to see if I can get the functionality that I want. The app is a basic stopwatch so that shouldn&#8217;t be too hard. If you want to catch up <a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">checkout yesterday&#8217;s article</a> which explains setting everything up.</p>
+
+<h3>Countdown</h3>
+
+<p>Just to get the ball rolling I&#8217;m going to write a little code in my <code>app.js</code> file right at the bottom to setup a very crude counter.</p>
+
+<figure class='code'><figcaption><span>app.js  </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">countdown</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+</span><span class='line'><span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">countdown</span><span class="o">--</span><span class="p">;</span>
+</span><span class='line'>  <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;timer&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">countdown</span><span class="o">:</span> <span class="nx">countdown</span> <span class="p">});</span>
+</span><span class='line'><span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">countdown</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;timer&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">countdown</span><span class="o">:</span> <span class="nx">countdown</span> <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Elsewhere in my client-side js I&#8217;m going to listen for the <code>timer</code> event and update my DOM elements.</p>
+
+<figure class='code'><figcaption><span>main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">socket</span> <span class="o">=</span> <span class="nx">io</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;timer&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#counter&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">countdown</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#reset&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Every second we&#8217;ll decrement our countdown variable and broadcast its new value. If a client sends us a <code>reset</code> event we&#8217;ll restart the timer and immediately broadcast the update to anyone connected. I noticed that since I&#8217;m using <code>xhr-polling</code> it can sometimes take a while for the timer to show up in my browser so keep that in mind.</p>
+
+<p>While this implementation isn&#8217;t pretty it does get us a little bit further down the road. Unfortunately I&#8217;ve been tripped up by a bunch of Node&#8217;s module issues so I have to cut tonight&#8217;s post short :\</p>
+
+<p>Hopefully better luck tomorrow. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 8:08 am</li>
+<li>Mood: Sedate, Sleepy</li>
+<li>Sleep: 5</li>
+<li>Hunger: 4</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -3512,80 +3619,6 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/27/penner-easing-equations-with-gfx-and-css3/">Penner Easing Equations With GFX and CSS3</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-27T00:07:00-07:00" pubdate data-updated="true">May 27<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This is going to be a bit of lightening post because it&#8217;s rather late and I need to get to bed. I spent most of the day either eating dim sum or hanging out at the <a href="http://www.meetup.com/San-Francisco-Creative-Coders/">SF Creative Coders BBQ</a> so I&#8217;ve neglected my blogging duties a bit.</p>
-
-<p>I have something which will hopefully be useful for some folks who are getting into CSS3 animations with the Gfx plugin for jQuery. <a href="http://robdodson.me/blog/2012/05/22/css3-transitions-with-gfx/">I&#8217;ve blogged a bit about Gfx before</a> and one of the first things I noticed was the lack of a built in easing library. Coming from the Flash world where <a href="http://www.greensock.com/tweenlite/">TweenLite is king</a> I&#8217;ve grown very accustomed to using Robert Penner&#8217;s easing equations for great effect. The same equations are used by the jQuery framework to do its animations. Thankfully <a href="http://matthewlein.com/ceaser/">Matthew Lein was kind enough to convert those over to cubic-beziers</a> for those of us doing CSS3 animations. Since Gfx accepts cubic-beziers I moved the equations from Matthew&#8217;s tool into an AMD compliant module and <a href="https://github.com/robdodson/amd-css3-ease">put it up on Github.</a> It&#8217;s very simple so if AMD isn&#8217;t your thing you can just rip those parts out :D</p>
-
-<p>Example usage looks something like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// After requiring the ease module and</span>
-</span><span class='line'><span class="c1">// passing it into your View with the</span>
-</span><span class='line'><span class="c1">// name &#39;Ease&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">gfx</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">translateY</span><span class="o">:</span> <span class="s1">&#39;300px&#39;</span>
-</span><span class='line'><span class="p">},</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">duration</span><span class="o">:</span> <span class="mi">500</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">easing</span><span class="o">:</span> <span class="nx">Ease</span><span class="p">.</span><span class="nx">easeInExpo</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Give it a shot and consider donating to Matthew&#8217;s project or buying Robert Penner like a million beers!</p>
-
-<ul>
-<li>Time: 12:09 am</li>
-<li>Mood: Tired, Tipsy</li>
-<li>Sleep: 7</li>
-<li>Hunger: 0</li>
-<li>Coffee: 0</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -3601,6 +3634,10 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/">Building a Countdown Timer with Socket.io</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">Deploying Your First Node.js and Socket.io App to Heroku</a>
       </li>
     
@@ -3614,10 +3651,6 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
     
       <li class="post">
         <a href="/blog/2012/06/02/take-control-of-your-app-with-the-javascript-state-patten/">Take Control of your App with the JavaScript State Pattern</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/31/how-to-use-ejs-in-express/">How to use EJS in Express</a>
       </li>
     
   </ul>
