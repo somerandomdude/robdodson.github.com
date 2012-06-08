@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-06T12:25:28-07:00</updated>
+  <updated>2012-06-07T21:19:15-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -215,6 +215,8 @@ end
 
 <p>With all that in place our test should pass. Nice!!!!!! We're well on our way to processing the remaining metadata. Tomorrow I'll whip up our other formats and figure out how to pull the date out of a blog post so we can combine that with the time to get a proper DateTime.</p>
 
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
 <ul>
 <li>Time: 7:42 am</li>
 <li>Mood: Awake, Alert, Focused</li>
@@ -299,6 +301,8 @@ Coffee: [" 0"]
 </code></p>
 
 <p>Close... but still not perfect. I think the best thing to do would be to write some formatter objects or functions to handle the different kinds of metadata. We'll tackle that tomorrow.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
 <ul>
 <li>Time: 9:34pm</li>
@@ -564,6 +568,8 @@ post-construct
 
 <p>I could either tell my crawler to explicitly ignore that content or wrap my blog entry in an even more specific class and just select that. I guess that'll be an exercise for tomorrow :\</p>
 
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
 <ul>
 <li>Time: 8:03 am</li>
 <li>Mood: Happy, Drowsy, Peaceful</li>
@@ -734,6 +740,8 @@ end
 ```</p>
 
 <p>All tests passing, we're good to go :)</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
 <ul>
 <li>Time: 7:00 am</li>
@@ -961,6 +969,8 @@ end
 <p>```</p>
 
 <p>I actually wrote the test first and did everything else to make it pass. But at this point it should all be passing and we can verify that given a request with the appropriate selector we should be able to build a basic word frequency list. Yay!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
 <ul>
 <li>Time: 7:35 am</li>

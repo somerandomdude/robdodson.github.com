@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Puzzles | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/puzzles/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-06T12:25:28-07:00</updated>
+  <updated>2012-06-07T21:19:15-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -74,6 +74,8 @@ bjkmqz
 defghijklmnopqrstuvwxyz
 ```
 Play around with this, throw some different sentence combinations at it to see what it spits out. Then try to write your own implementation. A good next step would be to modify the script so it can support empty lines in the text file.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Python | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-06T12:25:28-07:00</updated>
+  <updated>2012-06-07T21:19:15-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -50,6 +50,8 @@ If you add this file to the Sublime user's directory outlined above you should b
 <p>Now that I have my hacked path variable and my shell plugin I can check to see if RVM works. Using Shell Turtlestein you can hit <code>cmd-shift-c</code> to open a little console prompt. Typing <code>rvm current</code> returns our ruby version number and gemset. Nice! What's even nicer is this means I can now run Rake tasks from inside of Sublime!</p>
 
 <p>I should point out if all you want to do is run Rake or Ant then there are already plugins for that sort of thing. My main effort in doing all this is to try to integrate the command line with Sublime a bit better. If <em>anyone</em> knows how to simply tell Sublime to use the path in my .bash_profile or .bashrc then I would gladly use that approach instead. But after crawling the forums for a while it looks like this is still a common problem with no good solution.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
 <ul>
 <li>Time: 8:26 pm</li>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Grunt | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/grunt/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-06T12:25:28-07:00</updated>
+  <updated>2012-06-07T21:19:15-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -162,6 +162,8 @@ underscore: {
 <p>Let's start at the bottom so we can see that underscore is defined and mapped to "_". <code>attach</code> is going to take whatever library we're defining and attach it to <code>window</code>. So underscore will be attached as <code>window._</code>. Next we see that backbone is defined and depends on our version of underscore and jquery. Since jquery is AMD compliant we don't need the call to <code>use!</code> but we will need it for underscore. Finally backbone is attached to the window as <code>window.Backbone</code>.</p>
 
 <p>That covers the configuration file. I'll move on to main.js in the next post.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
 <ul>
 <li>Time: 7:49 am</li>

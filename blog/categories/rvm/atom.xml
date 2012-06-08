@@ -4,7 +4,7 @@
   <title><![CDATA[Category: RVM | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/rvm/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-06T12:25:28-07:00</updated>
+  <updated>2012-06-07T21:19:15-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -159,6 +159,8 @@ rvm gemset delete my-new-rails-setup
 <p>And recreate it however we want :D</p>
 
 <p>That wraps it up for today. If you have any questions you can post a comment or hit me up on twitter <a href="http://twitter.com/robdodson">@rob_dodson</a>.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   

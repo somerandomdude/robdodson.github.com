@@ -4,7 +4,7 @@
   <title><![CDATA[Category: D3 | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/d3/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-06T12:25:28-07:00</updated>
+  <updated>2012-06-07T21:19:15-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -247,6 +247,8 @@ As each element of the array is passed to our width accessor it's run through th
 <h3>Conclusion</h3>
 
 <p>Now that we've got one scale under our belt the others should be pretty easy to digest. Over the next couple of posts we'll focus on ordinal scales followed by time scales. Stay tuned and ping me if you have any questions. Thanks!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   
@@ -364,6 +366,8 @@ x.range([0, 1000]);
 <h3>To Be Continued...</h3>
 
 <p>Scales are a huge topic so we'll stop here for now. In the next post we'll talk about <code>linear</code>, <code>time</code> and <code>ordinal</code> scales; once you've mastered them everything else becomes a lot easier. Stay tuned :)</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   
@@ -667,6 +671,8 @@ x.range([0, 1000]);
 After we declare the self-executing function we include another function called</code>draw<code>. Using a separate function lets us later *redraw* the graph if the user resizes their browser. This also works on the iPhone when the user changes from portrait to landscape mode. Inside of</code>draw<code>we first make sure that the containing div is empty (otherwise we'd end up drawing graphs on top of one another). You can skip most of the D3 code—we'll cover that over the next couple of days—but take a look at the last few lines where we call</code>draw()<code>and add another handler for</code>window.resize<code>. Whenever the user changes their browser size our global</code>width` value will be updated, then our graphs will redraw themselves using this new width.</p>
 
 <p>At the moment you need to add this handler to each of your visualizations. Not terrible but not very DRY either. I think in a future iteration I'll add a queue which holds a reference to each <code>draw</code> instance and calls them in sync. For now this is the quick and dirty way to get a graph up on Octopress. <a href="https://github.com/robdodson/octopress-templates">You can download the entire post template from Github.</a> Enjoy!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   

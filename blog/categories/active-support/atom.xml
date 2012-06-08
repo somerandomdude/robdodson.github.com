@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Active Support | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/active-support/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-06T12:25:28-07:00</updated>
+  <updated>2012-06-07T21:19:15-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -174,6 +174,8 @@ Which brings us back to one of our first examples of finding the date 7 days ago
 <a href="http://stackoverflow.com/questions/962544/one-line-hash-creation-in-ruby">http://stackoverflow.com/questions/962544/one-line-hash-creation-in-ruby</a>
 <a href="http://www.developer.com/open/article.php/3729206/Telling-Time-with-Ruby.htm">http://www.developer.com/open/article.php/3729206/Telling-Time-with-Ruby.htm</a>
 <a href="http://guides.rubyonrails.org/active_support_core_extensions.html">http://guides.rubyonrails.org/active_support_core_extensions.html</a></small></p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   

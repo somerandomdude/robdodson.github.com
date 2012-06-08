@@ -4,7 +4,7 @@
   <title><![CDATA[Category: BDD | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/bdd/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-06T12:25:28-07:00</updated>
+  <updated>2012-06-07T21:19:15-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -1074,6 +1074,8 @@ end
 
 <p>With all that in place our test should pass. Nice!!!!!! We're well on our way to processing the remaining metadata. Tomorrow I'll whip up our other formats and figure out how to pull the date out of a blog post so we can combine that with the time to get a proper DateTime.</p>
 
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
 <ul>
 <li>Time: 7:42 am</li>
 <li>Mood: Awake, Alert, Focused</li>
@@ -1158,6 +1160,8 @@ Coffee: [" 0"]
 </code></p>
 
 <p>Close... but still not perfect. I think the best thing to do would be to write some formatter objects or functions to handle the different kinds of metadata. We'll tackle that tomorrow.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
 <ul>
 <li>Time: 9:34pm</li>

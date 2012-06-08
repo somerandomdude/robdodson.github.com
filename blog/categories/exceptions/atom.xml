@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Exceptions | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/exceptions/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-06T12:25:28-07:00</updated>
+  <updated>2012-06-07T21:19:15-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -266,6 +266,8 @@ post-construct
 
 <p>I could either tell my crawler to explicitly ignore that content or wrap my blog entry in an even more specific class and just select that. I guess that'll be an exercise for tomorrow :\</p>
 
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
 <ul>
 <li>Time: 8:03 am</li>
 <li>Mood: Happy, Drowsy, Peaceful</li>
@@ -436,6 +438,8 @@ end
 ```</p>
 
 <p>All tests passing, we're good to go :)</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
 <ul>
 <li>Time: 7:00 am</li>
