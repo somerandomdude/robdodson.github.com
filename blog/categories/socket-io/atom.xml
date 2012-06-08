@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Socket.io | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/socket-io/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-08T10:37:26-07:00</updated>
+  <updated>2012-06-08T10:38:51-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -861,7 +861,7 @@ io.sockets.emit('status', { status: status });
 <p><button id="reset">Reset!</button>
 ```</p>
 
-<p>If you'd like you can open up <code>routes/index.js' and look around but you don't need to. It should render</code>layout.ejs<code>and</code>index.ejs` by default.</p>
+<p>If you'd like you can open up <code>routes/index.js</code> and look around but you don't need to. It should render <code>layout.ejs</code> and <code>index.ejs</code> by default.</p>
 
 <p>A few more items to go...We need to add a copy of <a href="http://jquery.com/">jQuery</a> to our <code>public</code> folder and also a <code>main.js</code> file. I've renamed the structure to look like this:</p>
 
