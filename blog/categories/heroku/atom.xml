@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Heroku | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/heroku/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-08T07:21:35-07:00</updated>
+  <updated>2012-06-08T10:37:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -102,10 +102,10 @@ routes = require('./routes');
 <p>// Heroku won't actually allow us to use WebSockets
 // so we have to setup polling instead.
 // https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
-// io.configure(function () {
-//   io.set("transports", ["xhr-polling"]);
-//   io.set("polling duration", 10);
-// });</p>
+io.configure(function () {
+  io.set("transports", ["xhr-polling"]);
+  io.set("polling duration", 10);
+});</p>
 
 <p>// Routes</p>
 

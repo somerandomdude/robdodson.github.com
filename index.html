@@ -1322,10 +1322,10 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
 </span><span class='line'><span class="c1">// Heroku won&#39;t actually allow us to use WebSockets</span>
 </span><span class='line'><span class="c1">// so we have to setup polling instead.</span>
 </span><span class='line'><span class="c1">// https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku</span>
-</span><span class='line'><span class="c1">// io.configure(function () { </span>
-</span><span class='line'><span class="c1">//   io.set(&quot;transports&quot;, [&quot;xhr-polling&quot;]); </span>
-</span><span class='line'><span class="c1">//   io.set(&quot;polling duration&quot;, 10); </span>
-</span><span class='line'><span class="c1">// });</span>
+</span><span class='line'><span class="nx">io</span><span class="p">.</span><span class="nx">configure</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">io</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;transports&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;xhr-polling&quot;</span><span class="p">]);</span>
+</span><span class='line'>  <span class="nx">io</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;polling duration&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
 </span><span class='line'>
 </span><span class='line'><span class="c1">// Routes</span>
 </span><span class='line'>
