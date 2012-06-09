@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-08T10:38:51-07:00</updated>
+  <updated>2012-06-09T09:44:27-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,104 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[CSS Semantics: Best Practices]]></title>
+    <link href="http://robdodson.me/blog/2012/06/09/css-semantics/"/>
+    <updated>2012-06-09T07:19:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/09/css-semantics</id>
+    <content type="html"><![CDATA[<p>CSS is, for me, one of the most challenging and nerve wracking aspects of my job. With most programming languages there are frameworks and guides and heuristics that all make up a suite of best practices. CSS doesn't <em>really</em> have anything like this and as a result it's kind of a mish-mash of good rules to follow, definite don'ts, and lots and lots of grey area. Since I'm starting a new CSS heavy project, and because I want to further my own understanding in this realm, I'm going to spend a few posts exploring the topic of what makes good, maintainable CSS. Along the way I'm also going to point out a few frameworks that I've been looking at, in particular <a href="http://oocss.org/">OOCSS</a> and <a href="http://smacss.com/">SMACSS.</a> But lets kick things off with a discussion of what it means to write good, semantic CSS selectors and we'll follow up with frameworks in our next post.</p>
+
+<h2>Define Semantic</h2>
+
+<p>When I was trolling the interwebs for talks on writing large-scale maintainable CSS I somehow managed to come across <a href="http://css-tricks.com/semantic-class-names/">this article on css-tricks comparing the semantics of various css selectors.</a> After reading it I had this weird feeling like maybe I haven't been putting as much thought into my css selectors as I should. My selectors need to be highly semantic, but what does that really <em>mean?</em></p>
+
+<p>Trying to look up the definition of "semantic" is kind of a fun, albeit a slightly annoying task since most definitions look like this:</p>
+
+<p><em>Of, relating to, or according to the science of semantics.</em></p>
+
+<p>Well...thanks. <a href="http://www.wordnik.com/words/semantic">The wonderful Wordnik site has a great list of definitions</a> the most useful of which is probably this: <em>Reflecting intended structure and meaning.</em></p>
+
+<p>So a semantic CSS selector should reflect the intended structure or meaning of the element it is applied to. Hmm...that's still a rather broad definition but at least we have a starting point. If I have a div that holds a bunch of news articles there's probably a gradient of increasingly more semantic names I could use for it.</p>
+
+<p>``` html</p>
+
+<div class="container"></div>
+
+
+
+
+<div class="article-box"></div>
+
+
+
+
+<div class="newsstand"></div>
+
+
+<p>```</p>
+
+<p>On the far end of the spectrum, <code>container</code> is about as generic as you can get and basically restates that something is a <code>div</code>. While I've been guilty of doing this in the past, if you're saying a containing HTML Element is a 'container' you're restating the obvious and should probably work on improving the name.</p>
+
+<p><code>article-box</code> is much more descriptive than just <code>container</code> so I'd say it has a higher semantic "score". But there is the potential for some semantic weirdness here, for instance, if we decide at some point that we want our articles to be contained in a horizontal list it might make less sense to call it an "article-<em>box</em>". So maybe <code>article-container</code> is semantically similar but also a bit more flexible?</p>
+
+<p>Finally we have <code>newsstand</code> which is highly semantic and probably my favorite of the bunch. While newsstand describes what our element <em>is</em> it doesn't bother delving into how our element works. As a result <code>newsstand</code> can work however we want, it can be list like, or grid like, tabular, etc and it won't matter. You might argue that this would be a good place to use an ID instead of a class but that decision should be weighed carefully. You have to make sure that 3 months or a year from now there isn't the potential of having two newsstands on the same page.</p>
+
+<h3>If we only worked on contived examples...</h3>
+
+<p>Of course there's a litany of cases where highly semantic naming just doesn't quite cut it. Often times we're given a layout which has a few primary areas (columns, headers, footer) and the designer is putting all sorts of content into those divisions. On one page it could be news articles, then a list of search results, then a directory of users, and so on. I would argue that for major layout elements it's ok to use less semantic names, and in fact this is probably a good idea. So things like <code>column_1</code>, <code>flex-box</code>, <code>constrained-container</code>, are all specifying, at varying degrees, what the element is doing. They are less semantically rich than, say, <code>rolodex</code> or <code>id-badge</code>, but that's because their very intention is to be generic.</p>
+
+<h3>What about helpers?</h3>
+
+<ul>
+<li>Preface: I know about SASS and LESS. Let's pretend they don't exist for a moment :D *</li>
+</ul>
+
+
+<p>Here is an area where I recently got very tripped up and I'm still not entirely sure what the best approach might be. Let's say you have a brand color, something like Facebook's blue, and you need to apply it to all sorts of different and unrelated elements. If you're like me then your brain starts thinking, "Well, that blue value is essentially a variable that I'd like to reuse in multiple places. Maybe I should just make a helper style for it..." and so you produce something like this in a helpers.css file:</p>
+
+<p>``` css helpers.css
+.light-blue {</p>
+
+<pre><code>#00C
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Now our HTML has little <code>light-blue</code>s sprinkled on top of it and we don't have to worry about declaring that same blue value over and over again in our styles. But what happens when our company decides to rebrand and now our primary color is a bright red? Uh oh...You definitely don't want to have to change HTML <em>and</em> CSS just to update a color.</p>
+
+<p><a href="http://css-tricks.com/semantic-class-names/#comment-102571">Neal G on CSS-Tricks made a very good comment regarding this scenario:</a></p>
+
+<blockquote><p>Perhaps an easier way to explain semantic CSS is simply, don’t name your classes or ids anything related to a CSS property. A property could be color, font-family, float, border, background etc.</p></blockquote>
+
+<p><a href="http://www.webdesignerdepot.com/2009/05/10-best-css-practices-to-improve-your-code/">Also from the Web Designer Depot</a></p>
+
+<blockquote><p>Name your elements based on what they are, not what they look like. For example, .comment-blue is much less versatile than .comment-beta, and .post-largefont is more limiting than .post-title.</p></blockquote>
+
+<p>Perhaps a better helper would have been <code>.brand-color</code> but again this is a contrived example. What about all the <em>other</em> colors on the site. And what about helpers that wrap commonly used styles like <code>float: left</code> and <code>clear: both</code>?</p>
+
+<p>The debate is pretty hot and heavy <a href="http://css-tricks.com/semantic-class-names">on the css-tricks article.</a> Just seach for the word 'float' and you'll see some pretty interesting discussions on it. My opinion is that you probably don't want to tack a bunch of <code>.bright-red</code> or <code>.larger</code> classes everywhere but at the same time something like <code>.float-right</code> can be extremely useful and <a href="http://css-tricks.com/semantic-class-names/#comment-102906">in some cases forcing semantics into a design can actually make things worse</a> especially for <a href="http://css-tricks.com/semantic-class-names/#comment-103076">less technically inclined clients.</a></p>
+
+<p>As a bit of a homework assignment I would recommend looking into a few of the resources I'm posting below. Obviouslyl take everything with a grain of salt, there isn't any true gospel for CSS so do what works best for you. I'll cover OOCSS and SMACSS in my next post, till then, thanks for reading! - Rob</p>
+
+<p><a href="http://css-tricks.com/semantic-class-names/">What Makes For a Semantic Class Name?</a>
+<a href="http://www.stubbornella.org/content/2011/04/28/our-best-practices-are-killing-us/">Our Best Practices Are Killing Us</a>
+<a href="https://github.com/styleguide/css">Github CSS Style Guide</a>
+<a href="https://github.com/csswizardry/CSS-Guidelines/blob/master/CSS%20Guidelines.md">CSS Wizardry: CSS Guidelines</a></p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 7:23 am</li>
+<li>Mood: Awake, Annoyed</li>
+<li>Sleep: 7</li>
+<li>Hunger: 0</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a Countdown Timer with Socket.io pt. 3]]></title>
@@ -1011,184 +1109,6 @@ $ heroku ps:scale web=0
 <li>Sleep: 5</li>
 <li>Hunger: 0</li>
 <li>Coffee: 1</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Make Your Own jQuery Deferreds and Promises]]></title>
-    <link href="http://robdodson.me/blog/2012/06/03/make-your-own-jquery-deferreds-and-promises/"/>
-    <updated>2012-06-03T20:33:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/03/make-your-own-jquery-deferreds-and-promises</id>
-    <content type="html"><![CDATA[<p>Last week <a href="http://robdodson.me/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/">I did a post on how to load an Underscore template using jQuery's Deferred method</a>. I got some great feedback from folks and decided I should do a follow up showing how to create your own Deferreds.</p>
-
-<h3>What's a Deferred again...?</h3>
-
-<p>So, quick summary time. jQuery has a neat little Object called a <code>Deferred</code> which is basically a wrapper around a function or a group of functions. Let's say that you want to load 3 different json files via ajax and when all that's done you want to let the rest of the world know. Using jQuery's <code>Deferred</code> Object we can actually put a wrapper around those 3 ajax functions and fire off a callback when they've all finished. <a href="http://robdodson.me/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/">Refer back to my previous post (toward the bottom) where I explain some of these callbacks.</a></p>
-
-<p><code>Deferred</code> isn't limited to ajax calls, it can work in just about any environment. Let's do an example using jQuery's animate function. We'll fade an item and when it's finished animating we'll resolve our <code>Deferred</code> object.</p>
-
-<h3>Our First Deferred</h3>
-
-<p>Here's the code we'll be using in our index.html file:</p>
-
-<p>``` html index.html
-&lt;!DOCTYPE html>
-<html lang="en">
-  <head></p>
-
-<pre><code>&lt;meta charset="utf-8"&gt;
-&lt;title&gt;Deferred Sandbox&lt;/title&gt;
-&lt;style type="text/css"&gt;
-  #container {
-    width: 100px;
-    height: 100px;
-    background: #CCC;
-  }
-&lt;/style&gt;
-
-&lt;script src="jquery.js"&gt;&lt;/script&gt;
-&lt;script src="main.js"&gt;&lt;/script&gt;
-</code></pre>
-
-<p>  </head>
-  <body></p>
-
-<pre><code>&lt;div id="main"&gt;
-  &lt;div id="container"&gt;&lt;/div&gt;
-&lt;/div&gt;
-</code></pre>
-
-<p>  </body>
-</html>
-```</p>
-
-<p>Take note of the fact that I've included jquery.js and main.js in the same folder as index.html. If you run the above you should get a simple little grey square in the top left of your screen. Now let's dive into the JavaScript.</p>
-
-<p>``` js main.js
-var container = {</p>
-
-<pre><code>initialize: function($el) {
-    // Store a reference to our element
-    // on the page
-    this.$el = $el;
-},
-fadeOut: function() {
-    // Create a new Deferred.
-    var dfd = new $.Deferred();
-
-    this.$el.animate({
-        opacity: 0
-    }, 2000, function() {
-        // When we're done animating
-        // we'll resolve our Deferred.
-        // This will call any done() callbacks
-        // attached to either our Deferred or
-        // one of its promises.
-        dfd.resolve("Finished fading out!");
-    });
-
-    // Return an immutable promise object.
-    // Clients can listen for its done or fail
-    // callbacks but they can't resolve it themselves
-    return dfd.promise();
-}
-</code></pre>
-
-<p>};</p>
-
-<p>$(function() {</p>
-
-<pre><code>// Hook the container object up to the #container div
-container.initialize($('#container'));
-
-// Instruct the container to fade out. When we call
-// fadeOut we should get a promise back as a return value
-var promise = container.fadeOut();
-
-// Now that we have a promise we can hook a done callback
-// onto it. The done() method will fire once the promise
-// is resolved.
-promise.done(function(message) {
-    console.log(message);
-});
-</code></pre>
-
-<p>});
-```</p>
-
-<p>That's a fair bit of code so let's walk through it bit by bit. We start off by creating an object called <code>container</code> which is going to wrap the <code>#container</code> div already on the page. The real guts of container happens in the <code>fadeOut</code> method:</p>
-
-<p>``` js
-fadeOut: function() {</p>
-
-<pre><code>// Create a new Deferred.
-var dfd = new $.Deferred();
-
-this.$el.animate({
-    opacity: 0
-}, 2000, function() {
-    // When we're done animating
-    // we'll resolve our Deferred.
-    // This will call any done() callbacks
-    // attached to either our Deferred or
-    // one of its promises.
-    dfd.resolve("Finished fading out!");
-});
-
-// Return an immutable promise object.
-// Clients can listen for its done or fail
-// callbacks but they can't resolve it themselves
-return dfd.promise();
-</code></pre>
-
-<p>}
-<code>``
-The first thing we do is to create a new</code>Deferred<code>using jQuery's Deferred constructor. Ignore the animation function for a moment and look at the bottom of this method. See how we're returning</code>dfd.promise()<code>? A promise is a dynamically generated object which lets clients hook onto our</code>done<code>and</code>fail<code>callbacks but it doesn't let them do anything to change our original</code>Deferred<code>object. A promise is an</code>immutable<code>object, meaning clients can listen to it but they can't really do anything to change it. We want this functionality because we don't want someone else to come along and accidentally resolve our</code>Deferred<code>. So instead of returning the</code>Deferred<code>we just created, we only return its</code>promise`.</p>
-
-<p>OK back to the animation function:</p>
-
-<p>``` js
-this.$el.animate({</p>
-
-<pre><code>opacity: 0
-</code></pre>
-
-<p>}, 2000, function() {</p>
-
-<pre><code>// When we're done animating
-// we'll resolve our Deferred.
-// This will call any done() callbacks
-// attached to either our Deferred or
-// one of its promises.
-dfd.resolve("Finished fading out!");
-</code></pre>
-
-<p>});
-<code>``
-If you've used</code>jQuery.animate<code>before this should look pretty straightforward to you. At the end of our animation we pass in an anonymouse function which will be run when the animation completes. In this function we tell our</code>Deferred<code>to resolve. Resolving the</code>Deferred<code>causes any</code>done<code>callbacks to fire. In this case we're also passing along a little snippet of text. When you resolve a</code>Deferred<code>you can give it an optional payload object which will be passed to all the</code>done` callbacks. This is extremely useful if you're using ajax to pass along the final data value. In this case we're just going to log the message into the console:</p>
-
-<p>``` js
-promise.done(function(message) {</p>
-
-<pre><code>console.log(message);
-</code></pre>
-
-<p>});
-<code>``
-There are more cool things you can do with</code>Deferreds<code>I highly recommend you [spend some time with the documentation](http://api.jquery.com/category/deferred-object/) and trying out some of the other methods like</code>pipe<code>or</code>resolveWith<code>. Also as a side note [checkout this page](http://api.jquery.com/promise/) which shows how to extract a</code>promise` by type. It will actually let you do everything we've done in our animation example but with fewer lines of code.</p>
-
-<p>Let me know if this is helpful or if you have any questions. Till tomorrow! - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 8:35 pm</li>
-<li>Mood: Silly, Lazy</li>
-<li>Sleep: 7</li>
-<li>Hunger: 5</li>
-<li>Coffee: 0</li>
 </ul>
 
 ]]></content>

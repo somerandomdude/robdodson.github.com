@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-08T10:38:51-07:00</updated>
+  <updated>2012-06-09T09:44:27-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,100 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[CSS Semantics: Best Practices]]></title>
+    <link href="http://robdodson.me/blog/2012/06/09/css-semantics/"/>
+    <updated>2012-06-09T07:19:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/09/css-semantics</id>
+    <content type="html"><![CDATA[<p>CSS is, for me, one of the most challenging and nerve wracking aspects of my job. With most programming languages there are frameworks and guides and heuristics that all make up a suite of best practices. CSS doesn&#8217;t <em>really</em> have anything like this and as a result it&#8217;s kind of a mish-mash of good rules to follow, definite don&#8217;ts, and lots and lots of grey area. Since I&#8217;m starting a new CSS heavy project, and because I want to further my own understanding in this realm, I&#8217;m going to spend a few posts exploring the topic of what makes good, maintainable CSS. Along the way I&#8217;m also going to point out a few frameworks that I&#8217;ve been looking at, in particular <a href="http://oocss.org/">OOCSS</a> and <a href="http://smacss.com/">SMACSS.</a> But lets kick things off with a discussion of what it means to write good, semantic CSS selectors and we&#8217;ll follow up with frameworks in our next post.</p>
+
+<h2>Define Semantic</h2>
+
+<p>When I was trolling the interwebs for talks on writing large-scale maintainable CSS I somehow managed to come across <a href="http://css-tricks.com/semantic-class-names/">this article on css-tricks comparing the semantics of various css selectors.</a> After reading it I had this weird feeling like maybe I haven&#8217;t been putting as much thought into my css selectors as I should. My selectors need to be highly semantic, but what does that really <em>mean?</em></p>
+
+<p>Trying to look up the definition of &#8220;semantic&#8221; is kind of a fun, albeit a slightly annoying task since most definitions look like this:</p>
+
+<p><em>Of, relating to, or according to the science of semantics.</em></p>
+
+<p>Well&#8230;thanks. <a href="http://www.wordnik.com/words/semantic">The wonderful Wordnik site has a great list of definitions</a> the most useful of which is probably this: <em>Reflecting intended structure and meaning.</em></p>
+
+<p>So a semantic CSS selector should reflect the intended structure or meaning of the element it is applied to. Hmm&#8230;that&#8217;s still a rather broad definition but at least we have a starting point. If I have a div that holds a bunch of news articles there&#8217;s probably a gradient of increasingly more semantic names I could use for it.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;container&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;article-box&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;newsstand&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>On the far end of the spectrum, <code>container</code> is about as generic as you can get and basically restates that something is a <code>div</code>. While I&#8217;ve been guilty of doing this in the past, if you&#8217;re saying a containing HTML Element is a &#8216;container&#8217; you&#8217;re restating the obvious and should probably work on improving the name.</p>
+
+<p><code>article-box</code> is much more descriptive than just <code>container</code> so I&#8217;d say it has a higher semantic &#8220;score&#8221;. But there is the potential for some semantic weirdness here, for instance, if we decide at some point that we want our articles to be contained in a horizontal list it might make less sense to call it an &#8220;article-<em>box</em>&#8221;. So maybe <code>article-container</code> is semantically similar but also a bit more flexible?</p>
+
+<p>Finally we have <code>newsstand</code> which is highly semantic and probably my favorite of the bunch. While newsstand describes what our element <em>is</em> it doesn&#8217;t bother delving into how our element works. As a result <code>newsstand</code> can work however we want, it can be list like, or grid like, tabular, etc and it won&#8217;t matter. You might argue that this would be a good place to use an ID instead of a class but that decision should be weighed carefully. You have to make sure that 3 months or a year from now there isn&#8217;t the potential of having two newsstands on the same page.</p>
+
+<h3>If we only worked on contived examples&#8230;</h3>
+
+<p>Of course there&#8217;s a litany of cases where highly semantic naming just doesn&#8217;t quite cut it. Often times we&#8217;re given a layout which has a few primary areas (columns, headers, footer) and the designer is putting all sorts of content into those divisions. On one page it could be news articles, then a list of search results, then a directory of users, and so on. I would argue that for major layout elements it&#8217;s ok to use less semantic names, and in fact this is probably a good idea. So things like <code>column_1</code>, <code>flex-box</code>, <code>constrained-container</code>, are all specifying, at varying degrees, what the element is doing. They are less semantically rich than, say, <code>rolodex</code> or <code>id-badge</code>, but that&#8217;s because their very intention is to be generic.</p>
+
+<h3>What about helpers?</h3>
+
+<ul>
+<li>Preface: I know about SASS and LESS. Let&#8217;s pretend they don&#8217;t exist for a moment :D *</li>
+</ul>
+
+
+<p>Here is an area where I recently got very tripped up and I&#8217;m still not entirely sure what the best approach might be. Let&#8217;s say you have a brand color, something like Facebook&#8217;s blue, and you need to apply it to all sorts of different and unrelated elements. If you&#8217;re like me then your brain starts thinking, &#8220;Well, that blue value is essentially a variable that I&#8217;d like to reuse in multiple places. Maybe I should just make a helper style for it&#8230;&#8221; and so you produce something like this in a helpers.css file:</p>
+
+<figure class='code'><figcaption><span>helpers.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.light-blue</span> <span class="p">{</span>
+</span><span class='line'>    <span class="m">#00C</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now our HTML has little <code>light-blue</code>s sprinkled on top of it and we don&#8217;t have to worry about declaring that same blue value over and over again in our styles. But what happens when our company decides to rebrand and now our primary color is a bright red? Uh oh&#8230;You definitely don&#8217;t want to have to change HTML <em>and</em> CSS just to update a color.</p>
+
+<p><a href="http://css-tricks.com/semantic-class-names/#comment-102571">Neal G on CSS-Tricks made a very good comment regarding this scenario:</a></p>
+
+<blockquote><p>Perhaps an easier way to explain semantic CSS is simply, don’t name your classes or ids anything related to a CSS property. A property could be color, font-family, float, border, background etc.</p></blockquote>
+
+<p><a href="http://www.webdesignerdepot.com/2009/05/10-best-css-practices-to-improve-your-code/">Also from the Web Designer Depot</a></p>
+
+<blockquote><p>Name your elements based on what they are, not what they look like. For example, .comment-blue is much less versatile than .comment-beta, and .post-largefont is more limiting than .post-title.</p></blockquote>
+
+<p>Perhaps a better helper would have been <code>.brand-color</code> but again this is a contrived example. What about all the <em>other</em> colors on the site. And what about helpers that wrap commonly used styles like <code>float: left</code> and <code>clear: both</code>?</p>
+
+<p>The debate is pretty hot and heavy <a href="http://css-tricks.com/semantic-class-names">on the css-tricks article.</a> Just seach for the word &#8216;float&#8217; and you&#8217;ll see some pretty interesting discussions on it. My opinion is that you probably don&#8217;t want to tack a bunch of <code>.bright-red</code> or <code>.larger</code> classes everywhere but at the same time something like <code>.float-right</code> can be extremely useful and <a href="http://css-tricks.com/semantic-class-names/#comment-102906">in some cases forcing semantics into a design can actually make things worse</a> especially for <a href="http://css-tricks.com/semantic-class-names/#comment-103076">less technically inclined clients.</a></p>
+
+<p>As a bit of a homework assignment I would recommend looking into a few of the resources I&#8217;m posting below. Obviouslyl take everything with a grain of salt, there isn&#8217;t any true gospel for CSS so do what works best for you. I&#8217;ll cover OOCSS and SMACSS in my next post, till then, thanks for reading! - Rob</p>
+
+<p><a href="http://css-tricks.com/semantic-class-names/">What Makes For a Semantic Class Name?</a>
+<a href="http://www.stubbornella.org/content/2011/04/28/our-best-practices-are-killing-us/">Our Best Practices Are Killing Us</a>
+<a href="https://github.com/styleguide/css">Github CSS Style Guide</a>
+<a href="https://github.com/csswizardry/CSS-Guidelines/blob/master/CSS%20Guidelines.md">CSS Wizardry: CSS Guidelines</a></p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 7:23 am</li>
+<li>Mood: Awake, Annoyed</li>
+<li>Sleep: 7</li>
+<li>Hunger: 0</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a Countdown Timer with Socket.io pt. 3]]></title>
@@ -6075,47 +6169,6 @@ The last few bits prevent the link from completely refreshing the page—<code>e
 
 
 <p>Instead of throwing your HTML into the render method as a String it&#8217;s advised that you use some kind of templating library. Underscore templates seem like a good place to start but Backbone is designed to be template agnostic so you could easily switch to Mustache/Handelbars or HAML if you want. Tomorrow I&#8217;ll look into displaying some content using an Underscore template linked up to a model. Till then.. :D</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[My First Chain]]></title>
-    <link href="http://robdodson.me/blog/2012/05/19/my-first-chain/"/>
-    <updated>2012-05-19T22:53:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/19/my-first-chain</id>
-    <content type="html"><![CDATA[<p>Back in April I was reading hacker news when I came across a blog posted titled <a href="http://japhr.blogspot.com/2012/04/366-or-how-i-tricked-myself-into-being.html">&#8216;366 or How I Tricked Myself into Being Awesome&#8217;</a>. It was written by a fellow named Chris Strom. It was written on blogspot. It was mostly unstyled.</p>
-
-<p>Chris wrote every single day for 366 days and in so doing self-published three books on programming languages that he knew nothing about. His post was to champion that milestone. At the time I read it and thought, &#8220;I can totally do this,&#8221; meaning if I follow the steps that Chris has outlined I can potentially trick myself into becoming a blogger.</p>
-
-<p>That probably seems rather silly to say but it&#8217;s true. Every developer I know Googles for answers when they&#8217;re stuck or trying to learn something new. <a href="http://css-tricks.com/">And it seems like</a>, <a href="http://www.alistapart.com/">over and</a> <a href="http://www.leebrimelow.com/">over again</a>, <a href="http://devblog.avdi.org/">we end up</a> <a href="http://yehudakatz.com/">in the same places.</a> And if you&#8217;re a developer, or maybe if you&#8217;re just me, you totally revere these people. They are guides in what is a truly unfamiliar world and they do it without asking anything in return.</p>
-
-<p>So I set out to try to do my own chain. I have to write until I go to Europe on June 27th. At this moment I have 22 blog posts that I&#8217;ve written as a result of the chain. Prior to that I&#8217;d written 3 in an entire year. At first I found the whole process exhilarating, until it started to get in the way of my personal activities. Now I have to figure out how to write something of substance while still balancing my job and my home life. This is not easy. It requires setting boundaries and self-discipline. I try to write in the mornings, usually between the hours of 7 to 9. Frequently I don&#8217;t finish and my posts have to be resumed in the evening. But working like this interferes with the time I can spend with my girlfriend and that breaks one of the unspoken rules I have which is that writing should not disturb my normal social life. Getting to the first 10 posts this was not a problem but now that I&#8217;m passing 20 it is. I&#8217;ve changed my writing style from full blown tutorials to more of a play-by-play as I code. I&#8217;m always striving to be more succinct in what I write but usually the challenge is disappearing down a rabbit hole while I research something new only to realize that I&#8217;ve blown half an hour of my writing time googling minutia. I&#8217;m going to try to associate googling minutia with some guy getting in between me and my girlfriend. As a result I will want to stab googling minutia.</p>
-
-<p>Anyway, if you find this post and you are thinking about writing let me tell you that I <strong>highly</strong> recommend it. Here is some quick advice:</p>
-
-<h3>Don&#8217;t worry about what your blog looks like.</h3>
-
-<p>I&#8217;m 100% serious on this point. If you spend any time designing your blog before you write your first 5 articles then you&#8217;re doing it wrong. I have fallen into this trap innumerable times. Just accept this challenge: Make it to 10 blog posts, then you can redesign the thing.</p>
-
-<p>I think we fall in love with the idea of having a beautiful blog and get lost in design and programming how everything will look. This is a mistake. Blogging is supposed to just be a journal of what you&#8217;re currently working on and thinking. Assume no one will read it (this is probably true). After you have a few readers then work on the look and feel if you choose. Personally I&#8217;ve found that not worrying about the design at all has been incredibly freeing. Again, look at <a href="http://japhr.blogspot.com/2012/04/366-or-how-i-tricked-myself-into-being.html">Chris Strom&#8217;s blog</a>. He has a ton of readers, is a published author, and is running the default blogspot theme.</p>
-
-<h3>Try to write at the same time every day</h3>
-
-<p>I find it easiest to focus in the morning especially when everyone else is asleep. I think Chris works late at night. Figure out what times suits you and do your best to stick to it. When I finish a post in the morning I feel free for the whole rest of the day. It&#8217;s kind of cool to have that sense of accomplishment before arriving at work :D</p>
-
-<h3>Use the best tools you can</h3>
-
-<p>I tried writing in Wordpress on several different occasions. I&#8217;ve also tried Tumblr and Posterous. I find writing in shitty WYSIWYG editors drives me totally crazy. There are apps out there that let you write in more of a desktop setting but I&#8217;m not sure if they are still subject to Wordpress or Tumblr&#8217;s weird formatting. Basically if you&#8217;re writing a code blog it fucking sucks to use a WYSIWYG because they&#8217;ll try to wrap all of your funky syntax in weird markup. I found <a href="http://octopress.org/">Octopress</a> and it&#8217;s been the best tool I&#8217;ve ever used for writing. I also <a href="http://robdodson.me/blog/2012/04/30/custom-domain-with-octopress-and-github-pages/">wrote a little article</a> on it if you&#8217;re trying to get it setup for your personal domain. Octopress is great because it uses <a href="http://daringfireball.net/projects/markdown/">Markdown</a>, the same language that&#8217;s used to generate most of the pages on Github, there&#8217;s no database and you can write in any text editor. I do all of my blogging in <a href="http://www.sublimetext.com/2">Sublime Text 2</a>, often times with my blog in one cell with my code in the other. Here&#8217;s a screenshot of what this can look like.</p>
-
-<p><img class="center" src="http://robdodson.me/images/side_by_side_blogging.png" title="'Awesome splits!'" ></p>
-
-<h3>Don&#8217;t worry when no one reads it</h3>
-
-<p>Finally, don&#8217;t get too hung up on who is (or isn&#8217;t) reading your blog. I know that pretty much all of the visits I see in my google analytics are actually just me checking the site on my phone or laptop. Definitely <em>do</em> add analytics so you can see which parts are successful and which are not but don&#8217;t expect to be <a href="http://daringfireball.net/">Daring Fireball</a> overnight. In fact, don&#8217;t ever expect to be Daring Fireball. Keep in mind that what you&#8217;re doing is a personal journal. It may not seem like blogs are framed in that context but that&#8217;s what they&#8217;re best at. I often times find this really interesting flow where I write down what I think I should build before I build it, then I write a test, then I write the implementation. Often times I work out what I&#8217;m doing in the blog post well before I&#8217;ve even written the test. This is like a whole other kind of BDD, Blog Driven Development :) Use it for what it&#8217;s best at and you&#8217;ll find it rewarding.</p>
-
-<p>Ok that&#8217;s it for now. Goodnight!</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
