@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-09T20:56:35-07:00</updated>
+  <updated>2012-06-09T20:58:03-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -1091,7 +1091,7 @@
 
 <figure class='code'><figcaption><span>views/index.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;status&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;counter&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
 </span><span class='line'><span class="nt">&lt;button</span> <span class="na">id=</span><span class="s">&quot;reset&quot;</span><span class="nt">&gt;</span>Reset!<span class="nt">&lt;/button&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
