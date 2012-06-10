@@ -158,6 +158,15 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>You&#8217;ll also need to update your index.ejs file so it reads like this:</p>
+
+<figure class='code'><figcaption><span>views/index.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;status&quot;</span><span class="o">&gt;&lt;</span><span class="err">/div&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">button</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;reset&quot;</span><span class="o">&gt;</span><span class="nx">Reset</span><span class="o">!&lt;</span><span class="err">/button&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
 <p>Every second we&#8217;ll decrement our countdown variable and broadcast its new value. If a client sends us a <code>reset</code> event we&#8217;ll restart the timer and immediately broadcast the update to anyone connected. I noticed that since I&#8217;m using <code>xhr-polling</code> it can sometimes take a while for the timer to show up in my browser so keep that in mind.</p>
 
 <p>While this implementation isn&#8217;t pretty it does get us a little bit further down the road. Unfortunately I&#8217;ve been tripped up by a bunch of Node&#8217;s module issues so I have to cut tonight&#8217;s post short :\</p>

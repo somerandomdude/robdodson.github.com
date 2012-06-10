@@ -4,7 +4,7 @@
   <title><![CDATA[Category: SMACSS | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/smacss/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-09T09:44:27-07:00</updated>
+  <updated>2012-06-09T20:52:15-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -28,9 +28,11 @@
 
 <p><em>Of, relating to, or according to the science of semantics.</em></p>
 
-<p>Well...thanks. <a href="http://www.wordnik.com/words/semantic">The wonderful Wordnik site has a great list of definitions</a> the most useful of which is probably this: <em>Reflecting intended structure and meaning.</em></p>
+<p>Well...thanks. <a href="http://www.wordnik.com/words/semantic">The wonderful Wordnik site has a great list of definitions</a> the most useful of which is probably this:</p>
 
-<p>So a semantic CSS selector should reflect the intended structure or meaning of the element it is applied to. Hmm...that's still a rather broad definition but at least we have a starting point. If I have a div that holds a bunch of news articles there's probably a gradient of increasingly more semantic names I could use for it.</p>
+<p><em>Reflecting intended structure and meaning.</em></p>
+
+<p>So a semantic CSS selector should reflect the intended structure or meaning of the element it is applied to. Hmm...that's still a rather broad definition but at least we have a starting point. If I have a <code>div</code> that holds a bunch of news articles there's probably a gradient of increasingly more semantic names I could use for it.</p>
 
 <p>``` html</p>
 
@@ -51,9 +53,9 @@
 
 <p>On the far end of the spectrum, <code>container</code> is about as generic as you can get and basically restates that something is a <code>div</code>. While I've been guilty of doing this in the past, if you're saying a containing HTML Element is a 'container' you're restating the obvious and should probably work on improving the name.</p>
 
-<p><code>article-box</code> is much more descriptive than just <code>container</code> so I'd say it has a higher semantic "score". But there is the potential for some semantic weirdness here, for instance, if we decide at some point that we want our articles to be contained in a horizontal list it might make less sense to call it an "article-<em>box</em>". So maybe <code>article-container</code> is semantically similar but also a bit more flexible?</p>
+<p><code>article-box</code> is much more descriptive than just <code>container</code> so I'd say it has a higher semantic "score". But there is the potential for some semantic weirdness here, for instance, if we decide at a later date that we want our articles to be contained in a horizontal list it might make less sense to call it an "article-<em>box</em>". So maybe <code>article-container</code> is semantically similar but also a bit more flexible?</p>
 
-<p>Finally we have <code>newsstand</code> which is highly semantic and probably my favorite of the bunch. While newsstand describes what our element <em>is</em> it doesn't bother delving into how our element works. As a result <code>newsstand</code> can work however we want, it can be list like, or grid like, tabular, etc and it won't matter. You might argue that this would be a good place to use an ID instead of a class but that decision should be weighed carefully. You have to make sure that 3 months or a year from now there isn't the potential of having two newsstands on the same page.</p>
+<p>Finally we have <code>newsstand</code> which is highly semantic and probably my favorite of the bunch. <code>newsstand</code> describes what our element <em>is</em> but it doesn't bother delving into how our element works. As a result <code>newsstand</code> can work however we want, it can be list like, or grid like, tabular, etc and it won't matter. You might argue that this would be a good place to use an ID instead of a class but that decision should be weighed carefully. You have to make sure that 3 months or a year from now there isn't the potential of having two newsstands on the same page.</p>
 
 <h3>If we only worked on contived examples...</h3>
 
@@ -61,12 +63,9 @@
 
 <h3>What about helpers?</h3>
 
-<ul>
-<li>Preface: I know about SASS and LESS. Let's pretend they don't exist for a moment :D *</li>
-</ul>
+<p><em>Preface: I know about SASS and LESS. Let's pretend they don't exist for a moment :D</em></p>
 
-
-<p>Here is an area where I recently got very tripped up and I'm still not entirely sure what the best approach might be. Let's say you have a brand color, something like Facebook's blue, and you need to apply it to all sorts of different and unrelated elements. If you're like me then your brain starts thinking, "Well, that blue value is essentially a variable that I'd like to reuse in multiple places. Maybe I should just make a helper style for it..." and so you produce something like this in a helpers.css file:</p>
+<p>Here is an area where I recently got very tripped up and I'm still not entirely sure what the best approach might be. Let's say you have a brand color, something like Facebook's blue, and you need to apply it to all sorts of different and unrelated elements. If you're like me then your brain starts thinking, "Well, that blue value is essentially a variable that I'd like to reuse. Maybe I should just make a helper style for it..." and so you produce something like this in a helpers.css file:</p>
 
 <p>``` css helpers.css
 .light-blue {</p>
@@ -93,10 +92,13 @@
 
 <p>As a bit of a homework assignment I would recommend looking into a few of the resources I'm posting below. Obviouslyl take everything with a grain of salt, there isn't any true gospel for CSS so do what works best for you. I'll cover OOCSS and SMACSS in my next post, till then, thanks for reading! - Rob</p>
 
-<p><a href="http://css-tricks.com/semantic-class-names/">What Makes For a Semantic Class Name?</a>
-<a href="http://www.stubbornella.org/content/2011/04/28/our-best-practices-are-killing-us/">Our Best Practices Are Killing Us</a>
-<a href="https://github.com/styleguide/css">Github CSS Style Guide</a>
-<a href="https://github.com/csswizardry/CSS-Guidelines/blob/master/CSS%20Guidelines.md">CSS Wizardry: CSS Guidelines</a></p>
+<p><a href="http://css-tricks.com/semantic-class-names/">What Makes For a Semantic Class Name?</a></p>
+
+<p><a href="http://www.stubbornella.org/content/2011/04/28/our-best-practices-are-killing-us/">Our Best Practices Are Killing Us</a></p>
+
+<p><a href="https://github.com/styleguide/css">Github CSS Style Guide</a></p>
+
+<p><a href="https://github.com/csswizardry/CSS-Guidelines/blob/master/CSS%20Guidelines.md">CSS Wizardry: CSS Guidelines</a></p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 

@@ -113,9 +113,11 @@
 
 <p><em>Of, relating to, or according to the science of semantics.</em></p>
 
-<p>Well&#8230;thanks. <a href="http://www.wordnik.com/words/semantic">The wonderful Wordnik site has a great list of definitions</a> the most useful of which is probably this: <em>Reflecting intended structure and meaning.</em></p>
+<p>Well&#8230;thanks. <a href="http://www.wordnik.com/words/semantic">The wonderful Wordnik site has a great list of definitions</a> the most useful of which is probably this:</p>
 
-<p>So a semantic CSS selector should reflect the intended structure or meaning of the element it is applied to. Hmm&#8230;that&#8217;s still a rather broad definition but at least we have a starting point. If I have a div that holds a bunch of news articles there&#8217;s probably a gradient of increasingly more semantic names I could use for it.</p>
+<p><em>Reflecting intended structure and meaning.</em></p>
+
+<p>So a semantic CSS selector should reflect the intended structure or meaning of the element it is applied to. Hmm&#8230;that&#8217;s still a rather broad definition but at least we have a starting point. If I have a <code>div</code> that holds a bunch of news articles there&#8217;s probably a gradient of increasingly more semantic names I could use for it.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -132,9 +134,9 @@
 
 <p>On the far end of the spectrum, <code>container</code> is about as generic as you can get and basically restates that something is a <code>div</code>. While I&#8217;ve been guilty of doing this in the past, if you&#8217;re saying a containing HTML Element is a &#8216;container&#8217; you&#8217;re restating the obvious and should probably work on improving the name.</p>
 
-<p><code>article-box</code> is much more descriptive than just <code>container</code> so I&#8217;d say it has a higher semantic &#8220;score&#8221;. But there is the potential for some semantic weirdness here, for instance, if we decide at some point that we want our articles to be contained in a horizontal list it might make less sense to call it an &#8220;article-<em>box</em>&#8221;. So maybe <code>article-container</code> is semantically similar but also a bit more flexible?</p>
+<p><code>article-box</code> is much more descriptive than just <code>container</code> so I&#8217;d say it has a higher semantic &#8220;score&#8221;. But there is the potential for some semantic weirdness here, for instance, if we decide at a later date that we want our articles to be contained in a horizontal list it might make less sense to call it an &#8220;article-<em>box</em>&#8221;. So maybe <code>article-container</code> is semantically similar but also a bit more flexible?</p>
 
-<p>Finally we have <code>newsstand</code> which is highly semantic and probably my favorite of the bunch. While newsstand describes what our element <em>is</em> it doesn&#8217;t bother delving into how our element works. As a result <code>newsstand</code> can work however we want, it can be list like, or grid like, tabular, etc and it won&#8217;t matter. You might argue that this would be a good place to use an ID instead of a class but that decision should be weighed carefully. You have to make sure that 3 months or a year from now there isn&#8217;t the potential of having two newsstands on the same page.</p>
+<p>Finally we have <code>newsstand</code> which is highly semantic and probably my favorite of the bunch. <code>newsstand</code> describes what our element <em>is</em> but it doesn&#8217;t bother delving into how our element works. As a result <code>newsstand</code> can work however we want, it can be list like, or grid like, tabular, etc and it won&#8217;t matter. You might argue that this would be a good place to use an ID instead of a class but that decision should be weighed carefully. You have to make sure that 3 months or a year from now there isn&#8217;t the potential of having two newsstands on the same page.</p>
 
 <h3>If we only worked on contived examples&#8230;</h3>
 
@@ -142,12 +144,9 @@
 
 <h3>What about helpers?</h3>
 
-<ul>
-<li>Preface: I know about SASS and LESS. Let&#8217;s pretend they don&#8217;t exist for a moment :D *</li>
-</ul>
+<p><em>Preface: I know about SASS and LESS. Let&#8217;s pretend they don&#8217;t exist for a moment :D</em></p>
 
-
-<p>Here is an area where I recently got very tripped up and I&#8217;m still not entirely sure what the best approach might be. Let&#8217;s say you have a brand color, something like Facebook&#8217;s blue, and you need to apply it to all sorts of different and unrelated elements. If you&#8217;re like me then your brain starts thinking, &#8220;Well, that blue value is essentially a variable that I&#8217;d like to reuse in multiple places. Maybe I should just make a helper style for it&#8230;&#8221; and so you produce something like this in a helpers.css file:</p>
+<p>Here is an area where I recently got very tripped up and I&#8217;m still not entirely sure what the best approach might be. Let&#8217;s say you have a brand color, something like Facebook&#8217;s blue, and you need to apply it to all sorts of different and unrelated elements. If you&#8217;re like me then your brain starts thinking, &#8220;Well, that blue value is essentially a variable that I&#8217;d like to reuse. Maybe I should just make a helper style for it&#8230;&#8221; and so you produce something like this in a helpers.css file:</p>
 
 <figure class='code'><figcaption><span>helpers.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -174,10 +173,13 @@
 
 <p>As a bit of a homework assignment I would recommend looking into a few of the resources I&#8217;m posting below. Obviouslyl take everything with a grain of salt, there isn&#8217;t any true gospel for CSS so do what works best for you. I&#8217;ll cover OOCSS and SMACSS in my next post, till then, thanks for reading! - Rob</p>
 
-<p><a href="http://css-tricks.com/semantic-class-names/">What Makes For a Semantic Class Name?</a>
-<a href="http://www.stubbornella.org/content/2011/04/28/our-best-practices-are-killing-us/">Our Best Practices Are Killing Us</a>
-<a href="https://github.com/styleguide/css">Github CSS Style Guide</a>
-<a href="https://github.com/csswizardry/CSS-Guidelines/blob/master/CSS%20Guidelines.md">CSS Wizardry: CSS Guidelines</a></p>
+<p><a href="http://css-tricks.com/semantic-class-names/">What Makes For a Semantic Class Name?</a></p>
+
+<p><a href="http://www.stubbornella.org/content/2011/04/28/our-best-practices-are-killing-us/">Our Best Practices Are Killing Us</a></p>
+
+<p><a href="https://github.com/styleguide/css">Github CSS Style Guide</a></p>
+
+<p><a href="https://github.com/csswizardry/CSS-Guidelines/blob/master/CSS%20Guidelines.md">CSS Wizardry: CSS Guidelines</a></p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
@@ -1248,6 +1250,15 @@
 </span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#reset&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
 </span><span class='line'>    <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">);</span>
 </span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You&#8217;ll also need to update your index.ejs file so it reads like this:</p>
+
+<figure class='code'><figcaption><span>views/index.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;status&quot;</span><span class="o">&gt;&lt;</span><span class="err">/div&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nx">button</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;reset&quot;</span><span class="o">&gt;</span><span class="nx">Reset</span><span class="o">!&lt;</span><span class="err">/button&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 

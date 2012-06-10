@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Node | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/node/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-09T09:44:27-07:00</updated>
+  <updated>2012-06-09T20:52:15-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -679,6 +679,16 @@ var socket = io.connect(window.location.hostname);</p>
 </code></pre>
 
 <p>});
+```</p>
+
+<p>You'll also need to update your index.ejs file so it reads like this:</p>
+
+<p>``` js views/index.ejs</p>
+
+<div id="status"></div>
+
+
+<p><button id="reset">Reset!</button>
 ```</p>
 
 <p>Every second we'll decrement our countdown variable and broadcast its new value. If a client sends us a <code>reset</code> event we'll restart the timer and immediately broadcast the update to anyone connected. I noticed that since I'm using <code>xhr-polling</code> it can sometimes take a while for the timer to show up in my browser so keep that in mind.</p>
