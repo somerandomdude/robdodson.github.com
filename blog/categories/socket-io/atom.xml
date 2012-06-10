@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Socket.io | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/socket-io/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-09T20:52:15-07:00</updated>
+  <updated>2012-06-09T20:56:35-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -683,7 +683,7 @@ var socket = io.connect(window.location.hostname);</p>
 
 <p>You'll also need to update your index.ejs file so it reads like this:</p>
 
-<p>``` js views/index.ejs</p>
+<p>``` html views/index.ejs</p>
 
 <div id="status"></div>
 
