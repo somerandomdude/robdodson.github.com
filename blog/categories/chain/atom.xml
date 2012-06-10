@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-09T20:58:03-07:00</updated>
+  <updated>2012-06-09T23:20:01-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,292 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Let's Talk SMACSS, Man]]></title>
+    <link href="http://robdodson.me/blog/2012/06/09/lets-talk-smacss/"/>
+    <updated>2012-06-09T21:03:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/09/lets-talk-smacss</id>
+    <content type="html"><![CDATA[<p>In an effort to further my understanding of CSS best practices I've ended up with two sort of looming frameworks: <a href="http://oocss.org/">OOCSS</a> and <a href="http://smacss.com/">SMACSS.</a> After reading up on both I feel more drawn toward SMACSS, most likely because it features a lumberjack on its site. I want to give a quick summary of what SMACSS has to offer. In so doing I'm going to borrow liberally from the documentation and then explain my thinking as it relates to certain passages. Cool? OK.</p>
+
+<h2>The Skinny</h2>
+
+<p>The ideas behind SMACSS were fostered over time by its creator, Jonathan Snook, who has worked on tons of sites, most notably YAHOO! Mail's latest redesign. SMACSS is not a library of ready-made code that you can just download like <a href="http://twitter.github.com/bootstrap/">Twitter's Bootstrap</a> or <a href="http://foundation.zurb.com/">ZURB's Foundation.</a> Instead it is a collection of design ideas and suggestions codefied in an easy to read ebook. Think of it as a tool to help you decide <em>how</em> you're going to write your CSS, rather than something which will write your CSS for you.</p>
+
+<p>The Core of the book, which is what I'm going to focus on today, is separated by stylesheet: Base Rules, Layout Rules, Module Rules, State Rules, and Theme Rules.</p>
+
+<h2>Base Rules</h2>
+
+<blockquote><p>Base rules are the defaults. They are almost exclusively single element selectors but it could include attribute selectors, pseudo-class selectors, child selectors or sibling selectors. Essentially, a base style says that wherever this element is on the page, it should look like this. -- SMACSS, Categorizing CSS Rules</p></blockquote>
+
+<p><a href="http://www.stubbornella.org/content/">Nicole Sullivan</a>, creator of OOCSS, suggests that we start with the smallest possible elements of our site and design up from there. In the SMACSS philosophy this process would start with our <code>base.css</code> file. Think of it as the place where we define the absolute most basic styles any element on our site can have.</p>
+
+<p>``` css base.css
+body, form {</p>
+
+<pre><code>margin: 0;
+padding: 0;
+</code></pre>
+
+<p>}</p>
+
+<p>a {</p>
+
+<pre><code>color: #039;
+</code></pre>
+
+<p>}</p>
+
+<p>a:hover {</p>
+
+<pre><code>color: #03F;    
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The idea is to give us a decent, even playing field where all of our core pieces are ready to be used in whatever fashion we see fit. You might find that you enjoy adding your css reset or normalization to a base.css file but personally I like to keep my reset separate to reduce clutter.</p>
+
+<h2>Layout Rules</h2>
+
+<blockquote><p>Layout rules divide the page into sections. Layouts hold one or more modules together. -- SMACSS, Categorizing CSS Rules</p></blockquote>
+
+<p>Your layout rules are where prototypes start to come to life. Every site can be broken down into two very broad layers. The first is the scaffolding of the page and the second is the modules which live in the scaffolding.</p>
+
+<p>To understand scaffolding, try looking at a website like <a href="http://www.cnn.com/">CNN</a> and unfocusing your eyes. Once you're ignoring the words and pictures you should be able to easily describe the major areas of content: the header, the primary content, sidebars, etc. The rules which govern the positioning of those elements should live in <code>layout.css</code>.</p>
+
+<p>``` css layout.css</p>
+
+<h1>header, #article, #footer {</h1>
+
+<pre><code>width: 960px;
+margin: auto;
+</code></pre>
+
+<p>}</p>
+
+<h1>article {</h1>
+
+<pre><code>border: solid #CCC;
+border-width: 1px 0 0;
+</code></pre>
+
+<p>}
+```</p>
+
+<p>It's also a good place to put other generalized layout styles which might be used elsewhere in your site. For instance, a horizontal list for menu items or breadcrumbs:</p>
+
+<p>``` css layout.css
+.h-list {</p>
+
+<pre><code>margin: 0;
+padding: 0;
+list-style-type: none;
+</code></pre>
+
+<p>}
+.h-list > li {</p>
+
+<pre><code>display: inline-block;
+margin: 0 10px 0 0; 
+
+/* IE7 hack to mimic inline-block on block elements */
+*display: inline;
+*zoom: 1;
+</code></pre>
+
+<p>}
+```</p>
+
+<p>These styles don't care about the color or background or any other specifics of their elements. They only care about how those elements will be layed out in space.</p>
+
+<h2>Module Rules</h2>
+
+<blockquote><p>Modules are the reusable, modular parts of our design. They are the callouts, the sidebar sections, the product lists and so on. -- SMACSS, Categorizing CSS Rules</p></blockquote>
+
+<p>The module rules are where the majority of your site code will go, as this sheet defines all the little inhabitants of that second layer I mentioned, the modules <em>inside</em> the scaffolding. Each module should be able to stand on its own, and as such, it might be a good idea to design them first in a separate file so there is no temptation to leverage styles already on the page. Once your module is complete you can drop it into your document and it <em>should</em> play nice with everyone else.</p>
+
+<p>Each module will typically start with a class name, and all subsequent selectors should work from this point down. Or if our module is going to be rather complex we can namespace our selectors. For instance:</p>
+
+<p>``` css modules.css</p>
+
+<p>.pod {</p>
+
+<pre><code>width: 100%
+</code></pre>
+
+<p>}</p>
+
+<p>.pod > h3 {</p>
+
+<pre><code>color: #F00;
+</code></pre>
+
+<p>}</p>
+
+<p>/<em> Or... </em>/</p>
+
+<p>.pod-title {</p>
+
+<pre><code>color: #F00;
+</code></pre>
+
+<p>}</p>
+
+<p>```</p>
+
+<p>Whether you use descendant selectors or namespaced clases is really up to you and how complex your modules get. You definitely don't want to end up with classitis. The advantage to using <code>.pod-title</code> is that it doesn't tie us to an <code>h3</code>, however your markup might become a total mess if every single element requires its own class. Balance is key.</p>
+
+<h3>Subclassing Modules</h3>
+
+<p>One very important concept to keep in mind is that of subclassing modules. Imagine a scenario where you have a widget which exists in your primary content area. One day your boss tells you to move it into the sidebar, and once it's there 99% of the styles should look the same, except the widget will now be about 3/4ths of its normal width and its text should be red instead of blue. Your first inclination might be to move the code for the widget into the sidebar and then to do something like this:</p>
+
+<p>``` css modules.css
+/*</p>
+
+<p>DON'T DO THIS!</p>
+
+<p>*/</p>
+
+<p>.widget {</p>
+
+<pre><code>width: 100px;
+</code></pre>
+
+<p>}</p>
+
+<p>.widget .widget-title {</p>
+
+<pre><code>color: #00F;
+</code></pre>
+
+<p>}</p>
+
+<h1>sidebar .widget {</h1>
+
+<pre><code>width: 75px;
+</code></pre>
+
+<p>}</p>
+
+<h1>sidebar .widget .widget-title {</h1>
+
+<pre><code>width: 75px;
+</code></pre>
+
+<p>}
+```</p>
+
+<p>By leveraging the parent context we've now locked ourselves into a specificity war. Any change to our second widget requires the <code>#sidebar</code> id, which also means that this second widget cannot live anywhere else. Rather than using the parent we should consider the widget that lives in the sidebar as an <em>extension</em> of our original object.</p>
+
+<p>``` css modules.css
+.widget {</p>
+
+<pre><code>width: 100px;
+</code></pre>
+
+<p>}</p>
+
+<p>.widget .widget-title {</p>
+
+<pre><code>color: #00F;
+</code></pre>
+
+<p>}</p>
+
+<p>/<em> Our Subclass </em>/
+.widget-constrained {</p>
+
+<pre><code>width: 75px;
+</code></pre>
+
+<p>}</p>
+
+<p>.widget-constrained .widget-title {</p>
+
+<pre><code>color: #F00;
+</code></pre>
+
+<p>}
+```</p>
+
+<p>To use a subclass we should apply both the original and the subclass styles to our element:</p>
+
+<p>``` html</p>
+
+<div class="widget widget-constrained">...</div>
+
+
+<p>```</p>
+
+<p>The benefit of doing it this way is that the styles are easier to read and also more flexible. Since there's no parent coupling our <code>widget-constrained</code> can be used in the sidebar, footer, modals, or anywhere else you'd like.</p>
+
+<h2>State Rules</h2>
+
+<blockquote><p>State rules are ways to describe how our modules or layouts will look when in a particular state. Is it hidden or expanded? Is it active or inactive? They are about describing how a module or layout looks on screens that are smaller or bigger. They are also about describing how a module might look in different views like the home page or the inside page. -- SMACSS, Categorizing CSS Rules</p></blockquote>
+
+<p>The best example of what should go into a <code>states.css</code> is the classic error state.</p>
+
+<p>``` css states.css
+.is-error {</p>
+
+<pre><code>border: 1px solid red;
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Really anything that would potentially be added with JavaScript to illustrate a change in a module's state would be a good candidate. Some other ones that come to mind are <code>is-hidden</code> or <code>is-pressed</code>.</p>
+
+<p>One rather sticky point to the whole idea of a <code>states.css</code> is that most of the states would need to either rely on being loaded after all your other stylesheets or have an <code>!important</code> added to them. I think for a lot of folks that is a dealbreaker, although in my opinion, if used properly, those few !importants can be very useful. For instance, if we add an <code>is-hidden</code> state to one of our elements I think it's perfectly ok to <code>!important</code> the <code>display: none</code>.</p>
+
+<h3>Module States</h3>
+
+<p>An alternative to using <code>!important</code> all over the place is the idea of module states. So rather than <code>.is-pressed</code> in our <code>states.css</code> we would have <code>.is-btn-pressed</code> next to our <code>.btn</code> module in <code>modules.css</code>. I like this approach a lot and think it solves many of the places where <code>states.css</code> feels too general.</p>
+
+<h2>Theme Rules</h2>
+
+<blockquote><p>Theme rules are similar to state rules in that they describe how modules or layouts might look. Most sites don’t require a layer of theming but it is good to be aware of it.</p></blockquote>
+
+<p>The primary consideration for theme rules are when your site is able to be reskinned and also if the typography can be changed.</p>
+
+<p>Skinning a new module with a <code>theme.css</code> might look something like this:</p>
+
+<p>``` css
+/<em> in modules.css </em>/
+.mod {</p>
+
+<pre><code>border: 1px solid;
+</code></pre>
+
+<p>}</p>
+
+<p>/<em> in theme.css </em>/
+.mod {</p>
+
+<pre><code>border-color: blue;
+</code></pre>
+
+<p>}
+<code>``
+Likewise if you need to switch to a different font or size, here is where you would do that. To be honest I don't currently need to make any of my projects skinnable so I haven't explored the ideas around</code>theme.css` all that much, but I do think it's a good idea to keep in the back of your hat.</p>
+
+<h2>Wrap it up!</h2>
+
+<p>That does it for tonight. Hopefully you're a little more enlightened with regards to SMACSS. Definitely <a href="http://smacss.com/">checkout the SMACSS site</a> and grab the book. And as always please feel free to leave comments and feedback. Thanks! - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 9:03 pm</li>
+<li>Mood: Anxious</li>
+<li>Sleep: 7</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[CSS Semantics: Best Practices]]></title>
@@ -805,322 +1091,6 @@ var socket = io.connect(window.location.hostname);</p>
 <li>Sleep: 5</li>
 <li>Hunger: 4</li>
 <li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Deploying Your First Node.js and Socket.io App to Heroku]]></title>
-    <link href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/"/>
-    <updated>2012-06-04T22:01:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku</id>
-    <content type="html"><![CDATA[<p>At my office we like to shoot each other from across the room with Nerf guns. In an effort to actually remain productive we've implemented a rule that whenever you get shot you're dead for 1 hour. But that hour can be a little tricky to keep track of between players. Who's dead and who isn't? Am I about to be shot right now??</p>
-
-<p>In an effort to keep track of things (and also because I need to write a blog post) I decided to start working on a little <a href="http://nodejs.org/">Node.js</a> and <a href="http://socket.io/">Socket.io</a> app. In this first post I'm just going to get things setup and deploy them to Heroku. Hopefully tomorrow we can work on implementing the actual timers. If you've never worked with Heroku before <a href="https://devcenter.heroku.com/articles/quickstart">you'll need to follow their getting started guide</a> to make sure you have all the proper command line tools. Don't worry, it's really easy and their documentation is <strong>awesome</strong>.</p>
-
-<h3>Express it!</h3>
-
-<p>To start us off we'll use <a href="http://expressjs.com/">Express</a> since it provides a nice, <a href="http://www.sinatrarb.com/">Sinatra</a> like layer on top of Node. If you haven't installed Node yet you can do it from the <a href="http://nodejs.org/">Node.js</a> site. The installer will also include <code>npm</code> which is Node's package manager. Following the instructions on the <a href="http://expressjs.com/">Express</a> site you should be able to just type:</p>
-
-<p><code>
-npm install -g express
-</code></p>
-
-<p>Now that you have Express installed you can use it to create a new project.</p>
-
-<p><code>
-express defcon
-</code>
-I'm calling my project <code>defcon</code> because I luvz <a href="http://en.wikipedia.org/wiki/WarGames">WarGames</a>. You can call yours whatever you'd like :)</p>
-
-<p>Next we need to <code>cd</code> into the defcon folder so we can install Socket.io and our other dependencies. There's a version of Socket.io designed to work with Express so we'll install that one.</p>
-
-<p><code>
-npm install -d  # install Express dependencies
-npm install socket.io express
-</code></p>
-
-<p>We'll also need to add socket.io to our <code>package.json</code> which is similar to a <code>Gemfile</code> if you're coming from Ruby, or just a big list of file dependencies if you're coming from something else :D When you distribute your app other developers can just run 'npm install -d' and it will add all of the modules listed to their project. Heroku will also use our <code>package.json</code> when we push our app to their servers. I'm also going to replace the <a href="http://jade-lang.com/">Jade</a> rendering engine with <a href="http://embeddedjs.com/">EJS</a> since it's easier for me to work with.</p>
-
-<p>``` js package.json
-{</p>
-
-<pre><code>"name": "defcon",
-"version": "0.0.1",
-"private": true,
-"dependencies": {
-  "express": "~2.5.8",
-  "ejs": "~0.7.1",
-  "socket.io": "~0.9.6"
-</code></pre>
-
-<p>  },
-  "engines": {</p>
-
-<pre><code>"node": "0.6.x"
-</code></pre>
-
-<p>  }
-}
-```</p>
-
-<p>The tilde <code>~</code> character tells NPM that it's ok to install this version of our module, or anything less than the next highest version number. So the following are equivalent: <code>"~1.2" = "&gt;=1.2.0 &lt;2.0.0"</code>. This is typically a good practice with modules because you'd like to receive bug fixes and patches but you don't want to let your app potentially download a v2 of some library which breaks the API.</p>
-
-<p>Run <code>npm install -d</code> again to make sure that <code>ejs</code> and anything else you've added are properly installed. Open up your app.js file that Express provided for you. We'll need to change a lot of stuff so it's probably easiest for you to just copy and paste this one that I've already prepared. Paste it into a new file if you'd like so you can compare all the differences.</p>
-
-<p>``` js app.js
-var express = require('express'),</p>
-
-<pre><code>app = express.createServer(express.logger()),
-io = require('socket.io').listen(app),
-routes = require('./routes');
-</code></pre>
-
-<p>// Configuration</p>
-
-<p>app.configure(function() {
-  app.set('views', <strong>dirname + '/views');
-  app.set('view engine', 'ejs');
-  app.use(express.bodyParser());
-  app.use(express.methodOverride());
-  app.use(app.router);
-  app.use(express.static(</strong>dirname + '/public'));
-});</p>
-
-<p>app.configure('development', function() {
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-});</p>
-
-<p>app.configure('production', function() {
-  app.use(express.errorHandler());
-});</p>
-
-<p>// Heroku won't actually allow us to use WebSockets
-// so we have to setup polling instead.
-// https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku
-io.configure(function () {
-  io.set("transports", ["xhr-polling"]);
-  io.set("polling duration", 10);
-});</p>
-
-<p>// Routes</p>
-
-<p>var port = process.env.PORT || 5000; // Use the port that Heroku provides or default to 5000
-app.listen(port, function() {
-  console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
-});</p>
-
-<p>app.get('/', routes.index);</p>
-
-<p>var status = "All is well.";</p>
-
-<p>io.sockets.on('connection', function (socket) {
-  io.sockets.emit('status', { status: status }); // note the use of io.sockets to emit but socket.on to listen
-  socket.on('reset', function (data) {</p>
-
-<pre><code>status = "War is imminent!";
-io.sockets.emit('status', { status: status });
-</code></pre>
-
-<p>  });
-});
-```</p>
-
-<p>In my views folder I've created a <code>layout.ejs</code>...</p>
-
-<p>``` html views/layout.ejs
-&lt;!DOCTYPE html>
-<html lang="en">
-  <head></p>
-
-<pre><code>&lt;meta charset="utf-8"&gt;
-&lt;title&gt;Title&lt;/title&gt;
-&lt;meta name="description" content=""&gt;
-&lt;meta name="author" content=""&gt;
-
-&lt;!-- HTML5 shim, for IE6-8 support of HTML elements --&gt;
-&lt;!--[if lt IE 9]&gt;
-  &lt;script src="http://html5shim.googlecode.com/svn/trunk/html5.js"&gt;&lt;/script&gt;
-&lt;![endif]--&gt;
-
-&lt;!-- styles --&gt;
-&lt;link href="http://robdodson.me/css/main.css" rel="stylesheet"&gt;
-</code></pre>
-
-<p>  </head>
-  <body></p>
-
-<pre><code>&lt;%- body %&gt;
-&lt;script src="http://robdodson.me/socket.io/socket.io.js"&gt;&lt;/script&gt;
-&lt;script src="http://robdodson.me/js/libs/jquery.js"&gt;&lt;/script&gt;
-&lt;script src="http://robdodson.me/js/main.js"&gt;&lt;/script&gt;
-</code></pre>
-
-<p>  </body>
-</html>
-```</p>
-
-<p>and an <code>index.ejs</code>.</p>
-
-<p>``` html views/index.ejs</p>
-
-<div id="status"></div>
-
-
-<p><button id="reset">Reset!</button>
-```</p>
-
-<p>If you'd like you can open up <code>routes/index.js</code> and look around but you don't need to. It should render <code>layout.ejs</code> and <code>index.ejs</code> by default.</p>
-
-<p>A few more items to go...We need to add a copy of <a href="http://jquery.com/">jQuery</a> to our <code>public</code> folder and also a <code>main.js</code> file. I've renamed the structure to look like this:</p>
-
-<p>```
-public
-|
-|<em> css
-|</em> img
-|_ js</p>
-
-<pre><code>|_ libs
-    |_ jquery.js
-|_ plugins
-|_ main.js
-</code></pre>
-
-<p>```</p>
-
-<p>I guess that's just a habit of using Backbone Boilerplate all the time :) Here's what <code>main.js</code> should look like:</p>
-
-<p>``` js public/js/main.js
-var socket = io.connect(window.location.hostname);</p>
-
-<p>socket.on('status', function (data) {</p>
-
-<pre><code>$('#status').html(data.status);
-</code></pre>
-
-<p>});</p>
-
-<p>$('#reset').click(function() {</p>
-
-<pre><code>socket.emit('reset');
-</code></pre>
-
-<p>});
-```</p>
-
-<p>It's important to note the line that says <code>var socket = io.connect(window.location.hostname);</code>. In the socket.io docs they usually tell you to connect to <code>localhost</code> but since we're on heroku we'll need to instead connect to whatever our custom domain is.</p>
-
-<h3>Cross your fingers</h3>
-
-<p>At this point we should be ready to test everything. From the root of your project run <code>node app.js</code>. If all goes well you should see something like this:</p>
-
-<p><code>
-   info  - socket.io started
-Express server listening on port 5000 in development mode
-</code></p>
-
-<p>If not leave me a comment and I'll see if I can help you debug it. However let's assume that everything DID go well for you and now you're ready to connect to the local version of your app. Point your browser to http://localhost:5000 and you should see something like this:</p>
-
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/all_is_well_with_sockets.png" title="'All is well with Socket.io'" ></p>
-
-<p>Now open another browser window and also point it at localhost:5000. In one of the windows click the button that says <code>Reset</code> which should change the copy in <em>both</em> windows to 'War is imminent!'</p>
-
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/war_is_imminent_sockets.png" title="'War is Immentin with Socket.io'" ></p>
-
-<h3>Git'er done!</h3>
-
-<p>Alright we should have a functioning app at this point so let's put this baby into Git.</p>
-
-<p><code>
-git init
-echo 'node_modules' &gt;&gt; .gitignore
-</code></p>
-
-<p>We'll ignore the node_modules directory so Heroku can create its own version. Heroku requires that we deploy our app from Git which is kind of an awesome practice. We'll also need to define a <code>Procfile</code> which will list the processes that our app can run.</p>
-
-<p><code>
-touch Procfile
-echo 'web: node app.js' &gt;&gt; Procfile
-</code>
-To verify that our <code>Procfile</code> is working we can use Heroku's built in utility called <code>foreman</code>.</p>
-
-<p>```
-$ foreman start</p>
-
-<p>23:47:32 web.1     | started with pid 53197
-23:47:32 web.1     | info: socket.io started
-23:47:32 web.1     | Express server listening on port 5000 in development mode
-```</p>
-
-<p>Point your browser to <code>localhost:5000</code> to verify that things are still working. If everything looks good we're ready to commit to git.</p>
-
-<p><code>
-git add .
-git commit -m 'initial commit'
-</code></p>
-
-<h3>Deploy to Heroku</h3>
-
-<p>Now that our app is safely tucked away in git it's time to fire up a new Heroku instance.</p>
-
-<p><code>
-$ heroku create --stack cedar
-</code></p>
-
-<p>Heroku will do the work of setting up a new <code>git remote</code> for us to push our app to.</p>
-
-<p><code>
-$ git push heroku master
-</code></p>
-
-<p>We'll need to scale our web process before we can use the app.</p>
-
-<p><code>
-$ heroku ps:scale web=1
-</code></p>
-
-<p>To see which processes are running on Heroku you can use the <code>heroku ps</code> command.</p>
-
-<p>```
-$ heroku ps</p>
-
-<p>Process       State               Command</p>
-
-<hr />
-
-<p>web.1         up for 10s          node app.js
-```</p>
-
-<p>With everything setup we should be able to run <code>heroku open</code> which will fire up our browser and direct it to an instance of our app. There seems to be a fair bit of latency so it can take several seconds for the initial status of 'All is well' to show up. If you see the Reset button with nothing above it give it around 10 seconds to see if it eventually updates. Open another browser window and point it at the Heroku domain in the address bar. If you press the Reset button in one window it should immediately update in the next one.</p>
-
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/heroku_war_is_imminent.png" title="'Heroku: War is Imminent'" ></p>
-
-<h3>Wrapping up</h3>
-
-<p>Well I hope you enjoyed this brief tour of Socket.io and Heroku. Before we sign off let's make sure to turn off the running process on our Heroku instance:</p>
-
-<p><code>
-$ heroku ps:scale web=0
-</code></p>
-
-<p>If all went well you should have a decent starting point to build your own Socket.io app. If you're still having trouble checkout some of the great documentation from Heroku and/or leave a comment:</p>
-
-<p><a href="https://devcenter.heroku.com/articles/nodejs">https://devcenter.heroku.com/articles/nodejs</a></p>
-
-<p><a href="https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku">https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku</a></p>
-
-<p>Good Luck! - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 10:02 pm</li>
-<li>Mood: Tired, Antsy</li>
-<li>Sleep: 5</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
 </ul>
 
 ]]></content>
