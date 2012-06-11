@@ -4,7 +4,7 @@
   <title><![CDATA[Category: CSS | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/css/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-11T07:31:56-07:00</updated>
+  <updated>2012-06-11T07:35:11-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -321,7 +321,7 @@ background: #CCC;
 
 <p><img class="center" src="https://s3.amazonaws.com/robdodson/images/responsive_hide_on_phones.png" title="'Hiding the aside'" ></p>
 
-<p>Nice and simple, yeah? If you'd like to checkout the project running live you can <a href="http://robdodson.s3-website-us-east-1.amazonaws.com/tutorials/building-a-responsive-grid-with-foundation/index.html">follow this link</a>. - Rob</p>
+<p>Nice and simple, yeah? If you'd like to checkout the project running live you can <a href="http://robdodson.s3-website-us-east-1.amazonaws.com/tutorials/building-a-responsive-grid-with-foundation/index.html">follow this link</a>. Resize your browser or hit it with an iPhone to see it do its magic. - Rob</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
