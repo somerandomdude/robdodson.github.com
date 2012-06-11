@@ -9,7 +9,10 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="I&#8217;m going to try to write this as a bit of a lightening post to see if I can bring down the time it takes me to produce something. Octopress is &hellip;">
+  <meta name="description" content="Coming from JavaScript I&#8217;m very accustomed to doing something like this: Javascript1
+2
+3
+var person = { name: &#39;Rob&#39;, city: &#39;San &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +77,296 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/01/ruby-objects-and-dot-syntax/">Ruby Objects and Dot Syntax</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-01T07:37:00-07:00" pubdate data-updated="true">May 1<span>st</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Coming from JavaScript I&#8217;m very accustomed to doing something like this:</p>
+
+<figure class='code'><figcaption><span>Javascript</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">person</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="nx">city</span><span class="o">:</span> <span class="s1">&#39;San Francisco&#39;</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">person</span><span class="p">.</span><span class="nx">city</span> <span class="p">);</span>   <span class="c1">// &#39;San Francisco&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Using dot syntax to access a <code>Hash</code> is second nature to me. That&#8217;s why I was surprised when I ran into the following error yesterday while writing some Ruby.</p>
+
+<figure class='code'><figcaption><span>Ruby</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">person</span> <span class="o">=</span> <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="n">city</span><span class="p">:</span> <span class="s1">&#39;San Francisco&#39;</span><span class="p">}</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="p">{</span><span class="ss">:name</span><span class="o">=&gt;</span><span class="s2">&quot;Rob&quot;</span><span class="p">,</span> <span class="ss">:city</span><span class="o">=&gt;</span><span class="s2">&quot;San Francisco&quot;</span><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">puts</span> <span class="n">person</span><span class="o">.</span><span class="n">city</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">NoMethodError</span><span class="p">:</span> <span class="n">undefined</span> <span class="nb">method</span> <span class="sb">`city&#39; for {:name=&gt;&quot;Rob&quot;, :city=&gt;&quot;San Francisco&quot;}:Hash</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>&#8220;Hmm, weird,&#8221; I thought. I know I&#8217;ve seen dot syntax used in Ruby before..what gives?</p>
+
+<h3>Dot Syntax and the Ruby Hash Object</h3>
+
+<p>As it turns out Ruby does not support dot syntax for the <code>Hash</code> object. If I had wanted to access the <code>city</code> property from my previous example I should have done it using the symbol key like so:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">person</span><span class="o">[</span><span class="ss">:city</span><span class="o">]</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;San Francisco&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There are a few data structures that are very similar to <code>Hashes</code> and seeing those used in the wild perhaps threw me off. So I figured I&#8217;d write a post about the do&#8217;s and dont&#8217;s of dot syntax and how different object types react to it.</p>
+
+<h4>Class</h4>
+
+<p>The first and most obvious one is the <code>Class</code> object. Really I&#8217;m talking about instances of a <code>Class</code> here, for example an instance of class <code>Person</code> might have a <code>city</code> attribute. Here&#8217;s what that would look like.</p>
+
+<figure class='code'><figcaption><span>Person: Long Version</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Person</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">city</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@name</span> <span class="o">=</span> <span class="nb">name</span>
+</span><span class='line'>    <span class="vi">@city</span> <span class="o">=</span> <span class="n">city</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
+</span><span class='line'>    <span class="vi">@name</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">city</span>
+</span><span class='line'>    <span class="vi">@city</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">person</span> <span class="o">=</span> <span class="no">Person</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="s1">&#39;San Francisco&#39;</span><span class="p">)</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;Person:0x007ff15412a8c0 @name=&quot;Rob&quot;, @city=&quot;San Francisco&quot;&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">city</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;San Francisco&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since I&#8217;ve defined methods for both <code>name</code> and <code>city</code>, using dot syntax to access those properties basically means we&#8217;re calling those methods. The methods just return the instance variables, acting as getters. You can shorten this by using <code>attr_reader</code> or <code>attr_accessor</code>.</p>
+
+<figure class='code'><figcaption><span>Person: Short Version</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Person</span>
+</span><span class='line'>  <span class="kp">attr_accessor</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:city</span>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">city</span><span class="p">)</span>
+</span><span class='line'>    <span class="vi">@name</span> <span class="o">=</span> <span class="nb">name</span>
+</span><span class='line'>    <span class="vi">@city</span> <span class="o">=</span> <span class="n">city</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">person</span> <span class="o">=</span> <span class="no">Person</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="s1">&#39;San Francisco&#39;</span><span class="p">)</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;Person:0x007ff15412a8c0 @name=&quot;Rob&quot;, @city=&quot;San Francisco&quot;&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">city</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;San Francisco&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Struct</h4>
+
+<p>The <code>Struct</code> object is another commonly used element which allows dot access to its attributes. Quoting from <a href="http://www.ruby-doc.org/core-1.9.3/Struct.html">the documentation</a>:</p>
+
+<blockquote><p>A Struct is a convenient way to bundle a number of attributes together, using accessor methods, without having to write an explicit class.</p></blockquote>
+
+<p>Examples speak louder than words so here&#8217;s our <code>Person</code> again.</p>
+
+<figure class='code'><figcaption><span>Person Struct</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Person</span> <span class="o">=</span> <span class="no">Struct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="ss">:city</span><span class="p">)</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="no">Person</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">person</span> <span class="o">=</span> <span class="no">Person</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="s1">&#39;San Francisco&#39;</span><span class="p">)</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;struct Person name=&quot;Rob&quot;, city=&quot;San Francisco&quot;&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">city</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;San Francisco&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As I understand it a <code>Struct</code> is basically sealed after you&#8217;ve given it an initial definition. This means that you can&#8217;t keep tacking on properties like you can with a <code>Hash</code></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Continuing from above...</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="mi">28</span>
+</span><span class='line'><span class="no">NoMethodError</span><span class="p">:</span> <span class="n">undefined</span> <span class="nb">method</span> <span class="sb">`age=&#39; for #&lt;struct Person name=&quot;Rob&quot;, city=&quot;San Francisco&quot;&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="sb">person[:age] = 28</span>
+</span><span class='line'><span class="sb">NameError: no member &#39;age&#39; in struct</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>OpenStruct</h4>
+
+<p>Finally we come to the <code>OpenStruct</code> which has both dynamic attributes and dot syntax. <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/ostruct/rdoc/OpenStruct.html">The documentation describes it like so</a>:</p>
+
+<blockquote><p>An OpenStruct is a data structure, similar to a Hash, that allows the definition of arbitrary attributes with their accompanying values.</p></blockquote>
+
+<p>And again here is our <code>Person</code> from before. Note that <code>OpenStruct</code> needs you to <code>require</code> it.</p>
+
+<figure class='code'><figcaption><span>Person OpenStruct</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;ostruct&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">person</span> <span class="o">=</span> <span class="no">OpenStruct</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;OpenStruct&gt; </span>
+</span><span class='line'>
+</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Rob&#39;</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;Rob&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">city</span> <span class="o">=</span> <span class="s1">&#39;San Francisco&#39;</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;San Francisco&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">city</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;San Francisco&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you noticed, we didn&#8217;t need to define the attributes of our <code>Person</code> before creating an instance of it. This means we could keep adding attributes indefinitely. Want your person to respond to <code>age</code>? Just tack it on.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="mi">28</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="mi">28</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">age</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="mi">28</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>For the sake of brevity you can pass in a <code>Hash</code> and <code>OpenStruct</code> will covert it for you.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;ostruct&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">person</span> <span class="o">=</span> <span class="no">OpenStruct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="n">city</span><span class="p">:</span> <span class="s1">&#39;San Francisco&#39;</span><span class="p">)</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;OpenStruct name=&quot;Rob&quot;, city=&quot;San Francisco&quot;&gt; </span>
+</span><span class='line'>
+</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">city</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;San Francisco&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This all seems wonderful but there&#8217;s one huge caveat which comes from the way <code>OpenStruct</code> finds all of these dynamic attributes. As <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/ostruct/rdoc/OpenStruct.html">the documentation describes it</a>:</p>
+
+<blockquote><p>An OpenStruct utilizes Ruby’s method lookup structure to and find and define the necessary methods for properties. This is accomplished through the method method_missing and define_method.</p>
+
+<p>This should be a consideration if there is a concern about the performance of the objects that are created, as there is much more overhead in the setting of these properties compared to using a Hash or a Struct.</p></blockquote>
+
+<p>Definitely keep that in mind if you&#8217;re writing time sensitive code. In those situations you&#8217;ll want to use a <code>Hash</code> or a <code>Struct</code> instead.</p>
+
+<p><small>Source:<br />
+<a href="http://www.ruby-doc.org/core-1.9.3/Class.html">http://www.ruby-doc.org/core-1.9.3/Class.html</a><br />
+<a href="http://www.ruby-doc.org/core-1.9.3/Struct.html">http://www.ruby-doc.org/core-1.9.3/Struct.html</a><br />
+<a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/ostruct/rdoc/OpenStruct.html">http://ruby-doc.org/stdlib-1.9.3/libdoc/ostruct/rdoc/OpenStruct.html</a><br />
+<a href="http://stackoverflow.com/questions/9356704/unable-to-use-dot-syntax-for-ruby-hash">http://stackoverflow.com/questions/9356704/unable-to-use-dot-syntax-for-ruby-hash</a><br />
+<a href="http://www.rubyist.net/~slagell/ruby/accessors.html">http://www.rubyist.net/~slagell/ruby/accessors.html</a>
+</small></p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1153,6 +1446,10 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/10/building-a-responsive-grid-with-foundation/">Building a Responsive Grid with Foundation</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/09/lets-talk-smacss/">Let&#8217;s Talk SMACSS, Man</a>
       </li>
     
@@ -1166,10 +1463,6 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
     
       <li class="post">
         <a href="/blog/2012/06/06/building-a-countdown-timer-with-socket-dot-io-pt-2/">Building a Countdown Timer with Socket.io pt. 2</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/">Building a Countdown Timer with Socket.io</a>
       </li>
     
   </ul>
