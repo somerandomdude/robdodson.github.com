@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="I want to talk a bit more about the Backbone Router because I think it&#8217;s one of the first pieces of the framework that people run up against &hellip;">
+  <meta name="description" content="CSS3 is a rather verbose tool especially when it comes to transitions and animations. I want to see if there&#8217;s a way to clean a lot of that up &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,179 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/22/css3-transitions-with-gfx/">CSS3 Transitions With GFX</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-22T08:06:00-07:00" pubdate data-updated="true">May 22<span>nd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>CSS3 is a rather verbose tool especially when it comes to transitions and animations. I want to see if there&#8217;s a way to clean a lot of that up with either a SASS mixin or a jQuery library like <a href="http://maccman.github.com/gfx/">gfx.</a></p>
+
+<p>We&#8217;ll try to do something simple at first to recreate an animation like the one we have below.</p>
+
+<p><small>Rollover the grey area to activate it.</small></p>
+
+<!-- CSS Styles: -->
+
+
+<div>
+  <style type="text/css">
+    .container {
+      width: 300px;
+      height: 300px;
+      position: relative;
+      background-color: #CCC;
+    }
+
+    #example1 .container:hover .widget {
+      background-color: red;
+      left: 200px;
+      top: 200px;
+    }
+
+    #example1 .widget {
+      background-color: black;
+      left: 10px;
+      position: absolute;
+      top: 10px;
+      width: 20px;
+      height: 20px;
+      -webkit-transition: background-color 1s linear, left 1s, top 2s;
+      -moz-transition: background-color 1s linear, left 1s, top 2s;
+      -ms-transition: background-color 1s linear, left 1s, top 2s;
+      -o-transition: background-color 1s linear, left 1s, top 2s;
+      transition: background-color 1s linear, left 1s, top 2s;
+    }
+  </style>
+</div>
+
+
+
+
+<div id="example1">
+  <div class="container">
+      <div class="widget"></div>
+  </div>​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
+</div>
+
+
+<p>The code to produce the above animation looks something like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.container</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">position</span><span class="o">:</span> <span class="k">relative</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="m">#CCC</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.container</span><span class="nd">:hover</span> <span class="nc">.widget</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="nb">red</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">left</span><span class="o">:</span> <span class="m">200px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">200px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">.widget</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="nb">black</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">left</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">20px</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">20px</span><span class="p">;</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">moz</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">ms</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
+</span><span class='line'>  <span class="o">-</span><span class="n">o</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
+</span><span class='line'>  <span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We definitely don&#8217;t want all that logic in our CSS. Ideally we could trigger these kinds of things from JavaScript, which is where Gfx comes in.</p>
+
+<p>Using Gfx we can get similar but not exactly the same result with the following snippet:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#widget&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">gfx</span><span class="p">({</span> <span class="nx">translateX</span><span class="o">:</span> <span class="s1">&#39;200px&#39;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">duration</span><span class="o">:</span> <span class="s1">&#39;1000&#39;</span><span class="p">,</span> <span class="nx">queue</span><span class="o">:</span> <span class="kc">false</span> <span class="p">})</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">gfx</span><span class="p">({</span> <span class="nx">translateX</span><span class="o">:</span> <span class="s1">&#39;200px&#39;</span><span class="p">,</span> <span class="nx">translateY</span><span class="o">:</span> <span class="s1">&#39;200px&#39;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">duration</span><span class="o">:</span> <span class="s1">&#39;2000&#39;</span> <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After tinkering with Gfx for what seems like hours at this point I haven&#8217;t figured out a way to pass two different times to simultaneous animations. From one animation to the next you have to specify the end points from the previous animations or else the styles will revert. That&#8217;s why I&#8217;m passing <code>translateX: '200px'</code> in both places&#8230;although I&#8217;m not 100% if that&#8217;s what I should be doing. I emailed the author of Gfx so we&#8217;ll see what he says :)</p>
+
+<p><em>Update: Alex responded:</em></p>
+
+<blockquote><p>atm gfx is -webkit-transition: all - perhaps that&#8217;s something that should be added.</p></blockquote>
+
+<p>I&#8217;ve looked at other libraries including <a href="http://ricostacruz.com/jquery.transit/">jQuery Transit</a> and <a href="http://visionmedia.github.com/move.js/">Move.js</a>, and they all seem to be set to the &#8216;all&#8217; mode. If anyone knows of a good library that can handle simultaneous animations I would love to hear about it. I think otherwise you would just need to create two animation objects and run them at the same time&#8230; but I haven&#8217;t tested that theory yet.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 8:07 am</li>
+<li>Mood: Sedated, Upset-Stomach, Laggy</li>
+<li>Sleep: 5.5</li>
+<li>Hunger: 0</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2465,292 +2638,6 @@ bear in mind that each module requires an http request to load it so you don&#82
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/">Object Oriented Scraper Backed With Tests Pt. 5</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-12T07:02:00-07:00" pubdate data-updated="true">May 12<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Last night I got the <code>Crawler</code> passing its test for <code>#get_words_by_selector</code>. This morning I realize that when someone sends in a junk selector I want to raise an exception of some kind. Since I don&#8217;t know much about Ruby Exceptions I&#8217;m doing a little digging&#8230;Ruby has both <code>throw</code>/<code>catch</code> and <code>raise</code>/<code>rescue</code> so what&#8217;s the difference between throw/catch and raise/rescue in Ruby?</p>
-
-<h3>Throwing exceptions for control flow</h3>
-
-<p>There&#8217;s a great guest post by Avdi Grimm on <a href="http://rubylearning.com/blog/2011/07/12/throw-catch-raise-rescue-im-so-confused/">RubyLearning</a> which covers this topic in depth. To summarize <code>throw</code>/<code>catch</code> is mainly used when doing <em>exceptions as control flow</em>. In other words, if you need to break out of a deeply nested loop or some other expensive operation you can throw an exception symbol which can be caught someone high up the call stack. Initially this rubbed me the wrong way since I know that things like <code>goto</code> and <code>labels</code> are a bad practice. Someone else raised this point in the comments to which Avid responded:</p>
-
-<blockquote><p>There is a fundamental difference between throw/catch and goto. Goto, in languages which support it, pays no attention to the stack. Any resources which were allocated before the goto are simply left dangling unless they are manually cleaned up.</p>
-
-<p>throw/catch, like exception handling, unwinds the stack, triggering ensure blocks along the way. So, for example, if you throw inside an open() {…} block, the open file will be closed on the way up to the catch() block.</p></blockquote>
-
-<h3>Raising exceptions for everything else</h3>
-
-<p>With <code>throw</code>/<code>catch</code> out of the way that leaves <code>raise</code>/<code>rescue</code> to handle everything else. I&#8217;m willing to bet that 99% of error code should probably be raising exceptions and throw/catch should only be used in situations where you need the control flow behavior. With that knowledge in hand I need to decide between one of Ruby&#8217;s built-in Exceptions or defining one of my own. Let&#8217;s define one of our own so we can get that experience under our belt.</p>
-
-<h3>Creating an exception subclass in Ruby</h3>
-
-<p>One tip I picked up while doing my research into <code>raise</code> and <code>throw</code> is that any exception that doesn&#8217;t subclass StandardError will not be caught by default. Here&#8217;s an example to illustrate:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">###</span>
-</span><span class='line'><span class="c1"># First we define an exception class which doesn&#39;t</span>
-</span><span class='line'><span class="c1"># inherit from StandardError. As a result it won&#39;t</span>
-</span><span class='line'><span class="c1"># be caught by a simple rescue. Instead we would</span>
-</span><span class='line'><span class="c1"># need to rescue by its class name</span>
-</span><span class='line'><span class="c1">###</span>
-</span><span class='line'><span class="k">class</span> <span class="nc">MyBadException</span> <span class="o">&lt;</span> <span class="no">Exception</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">miss_bad_exception</span>
-</span><span class='line'>  <span class="k">raise</span> <span class="no">MyBadException</span><span class="o">.</span><span class="n">new</span>
-</span><span class='line'>  <span class="k">rescue</span>
-</span><span class='line'>  <span class="nb">p</span> <span class="s2">&quot;I&#39;ll never be called :(&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">miss_bad_exception</span>
-</span><span class='line'><span class="no">MyBadException</span><span class="p">:</span> <span class="no">MyBadException</span>
-</span><span class='line'>  <span class="n">from</span> <span class="p">(</span><span class="n">irb</span><span class="p">):</span><span class="mi">4</span><span class="ss">:in</span> <span class="sb">`miss_bad_exception&#39;</span>
-</span><span class='line'><span class="sb">  from (irb):8</span>
-</span><span class='line'><span class="sb">  from /Users/Rob/.rvm/rubies/ruby-1.9.3-p125/bin/irb:16:in `</span><span class="o">&lt;</span><span class="n">main</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># See that calling the method produces an uncaught exception...</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="c1">###</span>
-</span><span class='line'><span class="c1"># Next we&#39;ll subclass StandardError. As a result</span>
-</span><span class='line'><span class="c1"># we won&#39;t have to explicitly define our class name</span>
-</span><span class='line'><span class="c1"># for a rescue to work.</span>
-</span><span class='line'><span class="c1">###</span>
-</span><span class='line'><span class="k">class</span> <span class="nc">MyGoodException</span> <span class="o">&lt;</span> <span class="no">StandardError</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">save_good_exception</span>
-</span><span class='line'>  <span class="k">raise</span> <span class="no">MyGoodException</span><span class="o">.</span><span class="n">new</span>
-</span><span class='line'>  <span class="k">rescue</span>
-</span><span class='line'>  <span class="nb">p</span> <span class="s2">&quot;I&#39;m saved! My hero!&quot;</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">save_good_exception</span>
-</span><span class='line'><span class="s2">&quot;I&#39;m saved! My hero!&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># Yay! Our exception was caught!</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We&#8217;ll call our Exception <code>SelectorError</code> to indicate that the provided selector did not return any results. For reference I often refer to <a href="http://rubylearning.com/satishtalim/ruby_exceptions.html">this chart on RubyLearning</a> when I want to see a list of all the available Exception classes. In our case we&#8217;ll just inherit from StandardError.</p>
-
-<figure class='code'><figcaption><span>tentacles/lib/selection_error.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">SelectionError</span> <span class="o">&lt;</span> <span class="no">StandardError</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I don&#8217;t think we actually need to do much more than that. The ability to pass a payload message should come from the super class so I think we&#8217;re good to go. Here&#8217;s our updated spec:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">it</span> <span class="s2">&quot;should raise an exception if nothing was returned&quot;</span> <span class="k">do</span>
-</span><span class='line'>        <span class="n">expect</span> <span class="p">{</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">get_words_by_selector</span><span class="p">(</span><span class="s1">&#39;some-gibberish-selector&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span> <span class="s1">&#39;The selector did not return an results!&#39;</span><span class="p">)</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>    <br/>
-Initially the test fails so now we need to update our <code>Crawler</code> to check if nothing was returned and raise the custom exception.</p>
-
-<p>Here&#8217;s our updated <code>Crawler</code> with additional require and updated method.</p>
-
-<figure class='code'><figcaption><span>tentacles/lib/crawler.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;open-uri&#39;</span>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;nokogiri&#39;</span>
-</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;selection_error&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Crawler</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:doc</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
-</span><span class='line'>      <span class="kp">new</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
-</span><span class='line'>      <span class="vi">@uri</span> <span class="o">=</span> <span class="n">uri</span>
-</span><span class='line'>      <span class="vi">@doc</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="vi">@uri</span><span class="p">))</span>
-</span><span class='line'>      <span class="vi">@counts</span> <span class="o">=</span> <span class="no">Hash</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">get_words_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">entries</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">raise</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span>
-</span><span class='line'>        <span class="s1">&#39;The selector did not return an results!&#39;</span> <span class="k">if</span> <span class="n">entries</span><span class="o">.</span><span class="n">empty?</span>
-</span><span class='line'>      <span class="n">entries</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">entry</span><span class="o">|</span>
-</span><span class='line'>        <span class="n">words</span> <span class="o">=</span> <span class="n">words_from_string</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">count_frequency</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="n">sorted</span> <span class="o">=</span> <span class="vi">@counts</span><span class="o">.</span><span class="n">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="n">count</span> <span class="p">}</span>
-</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">reverse!</span>
-</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">word</span><span class="si">}</span><span class="s2">: </span><span class="si">#{</span><span class="n">count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">get_metadata_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
-</span><span class='line'>      <span class="c1"># TODO</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kp">private</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">words_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">string</span><span class="o">.</span><span class="n">downcase</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="sr">/[\w&#39;]+/</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">count_frequency</span><span class="p">(</span><span class="n">word_list</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">for</span> <span class="n">word</span> <span class="k">in</span> <span class="n">word_list</span>
-</span><span class='line'>        <span class="vi">@counts</span><span class="o">[</span><span class="n">word</span><span class="o">]</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>      <span class="vi">@counts</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>All tests passing, we&#8217;re good to go :)</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:00 am</li>
-<li>Mood: Alert, Awake, Anxious</li>
-<li>Sleep: 8</li>
-<li>Hunger: 3</li>
-<li>Coffee: 0</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -2768,6 +2655,10 @@ Initially the test fails so now we need to update our <code>Crawler</code> to ch
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/11/some-octopress-rake-tips/">Some Octopress Rake Tips</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/10/building-a-responsive-grid-with-foundation/">Building a Responsive Grid with Foundation</a>
       </li>
     
@@ -2781,10 +2672,6 @@ Initially the test fails so now we need to update our <code>Crawler</code> to ch
     
       <li class="post">
         <a href="/blog/2012/06/07/building-a-countdown-timer-with-socket-dot-io-pt-3/">Building a Countdown Timer with Socket.io pt. 3</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/06/building-a-countdown-timer-with-socket-dot-io-pt-2/">Building a Countdown Timer with Socket.io pt. 2</a>
       </li>
     
   </ul>

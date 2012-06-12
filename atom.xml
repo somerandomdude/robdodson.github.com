@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-11T07:36:36-07:00</updated>
+  <updated>2012-06-11T19:30:40-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Some Octopress Rake Tips]]></title>
+    <link href="http://robdodson.me/blog/2012/06/11/some-octopress-rake-tips/"/>
+    <updated>2012-06-11T19:04:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/11/some-octopress-rake-tips</id>
+    <content type="html"><![CDATA[<p>This is a quick post just to scratch one of my own itches. I&#8217;ve been using Octopress every single day for around two months now and the generation time for my blog is slowly starting to creep up. I&#8217;d heard that you could isolate a post and just preview/generate it instead of doing the whole blog every time but it wasn&#8217;t until today that I finally decided to look into it.</p>
+
+<p>Turns out it&#8217;s really simple. Let&#8217;s say we are going through our usual steps of creating a new post:</p>
+
+<p><code>rake new_post["Today is a Wonderful Day"]</code></p>
+
+<p>Now that we have our post ready we can isolate it from all the others:</p>
+
+<p><code>rake isolate[wonderful-day]</code></p>
+
+<p>Notice I didn&#8217;t pass in the entire filename? That&#8217;s because the Rake task inspects each of our posts and stashes anything that doesn&#8217;t include the String &#8216;wonderful-day&#8217; in the filename.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">#{</span><span class="n">source_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="n">posts_dir</span><span class="si">}</span><span class="s2">/*.*&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">post</span><span class="o">|</span>
+</span><span class='line'>    <span class="no">FileUtils</span><span class="o">.</span><span class="n">mv</span> <span class="n">post</span><span class="p">,</span> <span class="n">stash_dir</span> <span class="k">unless</span> <span class="n">post</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that our post is isolated we can preview it, like we always do:</p>
+
+<p><code>rake preview</code></p>
+
+<p>Write a little bit, save, and hit <code>localhost:4000</code> to see your super speedy blog post!</p>
+
+<p>When we&#8217;re all done we integrate the post back in with the rest of our blog.</p>
+
+<p><code>rake integrate</code></p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 7:18 pm</li>
+<li>Mood: Caffeinated</li>
+<li>Sleep: 7</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a Responsive Grid with Foundation]]></title>
@@ -6197,152 +6246,6 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
 <li>Time: 7:57 am</li>
 <li>Mood: Laggy, Pensive</li>
 <li>Sleep: 5</li>
-<li>Hunger: 0</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[CSS3 Transitions with GFX]]></title>
-    <link href="http://robdodson.me/blog/2012/05/22/css3-transitions-with-gfx/"/>
-    <updated>2012-05-22T08:06:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/22/css3-transitions-with-gfx</id>
-    <content type="html"><![CDATA[<p>CSS3 is a rather verbose tool especially when it comes to transitions and animations. I want to see if there&#8217;s a way to clean a lot of that up with either a SASS mixin or a jQuery library like <a href="http://maccman.github.com/gfx/">gfx.</a></p>
-
-<p>We&#8217;ll try to do something simple at first to recreate an animation like the one we have below.</p>
-
-<p><small>Rollover the grey area to activate it.</small></p>
-
-<!-- CSS Styles: -->
-
-
-<div>
-  <style type="text/css">
-    .container {
-      width: 300px;
-      height: 300px;
-      position: relative;
-      background-color: #CCC;
-    }
-
-    #example1 .container:hover .widget {
-      background-color: red;
-      left: 200px;
-      top: 200px;
-    }
-
-    #example1 .widget {
-      background-color: black;
-      left: 10px;
-      position: absolute;
-      top: 10px;
-      width: 20px;
-      height: 20px;
-      -webkit-transition: background-color 1s linear, left 1s, top 2s;
-      -moz-transition: background-color 1s linear, left 1s, top 2s;
-      -ms-transition: background-color 1s linear, left 1s, top 2s;
-      -o-transition: background-color 1s linear, left 1s, top 2s;
-      transition: background-color 1s linear, left 1s, top 2s;
-    }
-  </style>
-</div>
-
-
-
-
-<div id="example1">
-  <div class="container">
-      <div class="widget"></div>
-  </div>​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
-</div>
-
-
-<p>The code to produce the above animation looks something like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.container</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">300px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">position</span><span class="o">:</span> <span class="k">relative</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="m">#CCC</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.container</span><span class="nd">:hover</span> <span class="nc">.widget</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="nb">red</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">left</span><span class="o">:</span> <span class="m">200px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">200px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.widget</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="nb">black</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">left</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">top</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">20px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">20px</span><span class="p">;</span>
-</span><span class='line'>  <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
-</span><span class='line'>  <span class="o">-</span><span class="n">moz</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
-</span><span class='line'>  <span class="o">-</span><span class="n">ms</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
-</span><span class='line'>  <span class="o">-</span><span class="n">o</span><span class="o">-</span><span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">transition</span><span class="o">:</span> <span class="k">background-color</span> <span class="m">1s</span> <span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="m">1s</span><span class="o">,</span> <span class="k">top</span> <span class="m">2s</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We definitely don&#8217;t want all that logic in our CSS. Ideally we could trigger these kinds of things from JavaScript, which is where Gfx comes in.</p>
-
-<p>Using Gfx we can get similar but not exactly the same result with the following snippet:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#widget&quot;</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">gfx</span><span class="p">({</span> <span class="nx">translateX</span><span class="o">:</span> <span class="s1">&#39;200px&#39;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">duration</span><span class="o">:</span> <span class="s1">&#39;1000&#39;</span><span class="p">,</span> <span class="nx">queue</span><span class="o">:</span> <span class="kc">false</span> <span class="p">})</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">gfx</span><span class="p">({</span> <span class="nx">translateX</span><span class="o">:</span> <span class="s1">&#39;200px&#39;</span><span class="p">,</span> <span class="nx">translateY</span><span class="o">:</span> <span class="s1">&#39;200px&#39;</span> <span class="p">},</span> <span class="p">{</span> <span class="nx">duration</span><span class="o">:</span> <span class="s1">&#39;2000&#39;</span> <span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>After tinkering with Gfx for what seems like hours at this point I haven&#8217;t figured out a way to pass two different times to simultaneous animations. From one animation to the next you have to specify the end points from the previous animations or else the styles will revert. That&#8217;s why I&#8217;m passing <code>translateX: '200px'</code> in both places&#8230;although I&#8217;m not 100% if that&#8217;s what I should be doing. I emailed the author of Gfx so we&#8217;ll see what he says :)</p>
-
-<p><em>Update: Alex responded:</em></p>
-
-<blockquote><p>atm gfx is -webkit-transition: all - perhaps that&#8217;s something that should be added.</p></blockquote>
-
-<p>I&#8217;ve looked at other libraries including <a href="http://ricostacruz.com/jquery.transit/">jQuery Transit</a> and <a href="http://visionmedia.github.com/move.js/">Move.js</a>, and they all seem to be set to the &#8216;all&#8217; mode. If anyone knows of a good library that can handle simultaneous animations I would love to hear about it. I think otherwise you would just need to create two animation objects and run them at the same time&#8230; but I haven&#8217;t tested that theory yet.</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 8:07 am</li>
-<li>Mood: Sedated, Upset-Stomach, Laggy</li>
-<li>Sleep: 5.5</li>
 <li>Hunger: 0</li>
 <li>Coffee: 0</li>
 </ul>

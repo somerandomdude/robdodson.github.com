@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-11T07:36:36-07:00</updated>
+  <updated>2012-06-11T19:30:40-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Some Octopress Rake Tips]]></title>
+    <link href="http://robdodson.me/blog/2012/06/11/some-octopress-rake-tips/"/>
+    <updated>2012-06-11T19:04:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/11/some-octopress-rake-tips</id>
+    <content type="html"><![CDATA[<p>This is a quick post just to scratch one of my own itches. I've been using Octopress every single day for around two months now and the generation time for my blog is slowly starting to creep up. I'd heard that you could isolate a post and just preview/generate it instead of doing the whole blog every time but it wasn't until today that I finally decided to look into it.</p>
+
+<p>Turns out it's really simple. Let's say we are going through our usual steps of creating a new post:</p>
+
+<p><code>rake new_post["Today is a Wonderful Day"]</code></p>
+
+<p>Now that we have our post ready we can isolate it from all the others:</p>
+
+<p><code>rake isolate[wonderful-day]</code></p>
+
+<p>Notice I didn't pass in the entire filename? That's because the Rake task inspects each of our posts and stashes anything that doesn't include the String 'wonderful-day' in the filename.</p>
+
+<p>``` ruby
+Dir.glob("#{source_dir}/#{posts_dir}/<em>.</em>") do |post|</p>
+
+<pre><code>FileUtils.mv post, stash_dir unless post.include?(args.filename)
+</code></pre>
+
+<p>end
+```</p>
+
+<p>Now that our post is isolated we can preview it, like we always do:</p>
+
+<p><code>rake preview</code></p>
+
+<p>Write a little bit, save, and hit <code>localhost:4000</code> to see your super speedy blog post!</p>
+
+<p>When we're all done we integrate the post back in with the rest of our blog.</p>
+
+<p><code>rake integrate</code></p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 7:18 pm</li>
+<li>Mood: Caffeinated</li>
+<li>Sleep: 7</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a Responsive Grid with Foundation]]></title>
@@ -1053,287 +1102,6 @@ Finally I chose to use some funky buttons from [Chad Mazzola's CSS3 Buttons proj
 <li>Sleep: 6</li>
 <li>Hunger: 3</li>
 <li>Coffee: 1</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Building a Countdown Timer with Socket.io pt. 2]]></title>
-    <link href="http://robdodson.me/blog/2012/06/06/building-a-countdown-timer-with-socket-dot-io-pt-2/"/>
-    <updated>2012-06-06T07:47:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/06/building-a-countdown-timer-with-socket-dot-io-pt-2</id>
-    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/">Continuing from yesterday's post</a> we started out with a rather crude timer and today I want to upgrade it to a full fledged model, <code>Stopwatch</code>, which dispatches events for the view to hook on to.</p>
-
-<h3>Extend Node's EventEmitter</h3>
-
-<p>We want to extend Node's EventEmitter object in order for our Stopwatch to dispatch its tick events. <a href="http://elegantcode.com/2011/02/21/taking-baby-steps-with-node-js-implementing-events/">Following this great article by Jan Van Ryswyck</a> I've arrived at something that looks like this:</p>
-
-<p>``` js models/stopwatch.js
-var util = require('util'),</p>
-
-<pre><code>events = require('events');
-</code></pre>
-
-<p>function Stopwatch() {</p>
-
-<pre><code>if(false === (this instanceof Stopwatch)) {
-    return new Stopwatch();
-}
-
-events.EventEmitter.call(this);
-
-var self = this;
-setInterval(function() {
-    self.emit('tick');
-}, 1000);
-</code></pre>
-
-<p>};</p>
-
-<p>util.inherits(Stopwatch, events.EventEmitter);
-module.exports = Stopwatch;
-```</p>
-
-<p>In our app.js we'll need to <code>require</code> our new Stopwatch module, create an instance of it, and add a listener for the tick event. Here's the abbreviated version:</p>
-
-<p>``` js app.js
-var Stopwatch = require('./models/stopwatch');</p>
-
-<p>...</p>
-
-<p>var stopwatch = new Stopwatch();
-stopwatch.on('tick', function() {
-  console.log('stopwatch tick!');
-});
-```
-If all goes well when you restart your server you should see 'stopwatch tick!' arriving every second.</p>
-
-<h3>Add to the prototype the RIGHT way</h3>
-
-<p>This next part is what tripped me up the other night and since it was rather late in the evening I was too out of it to figure out what was going wrong.</p>
-
-<p>To recap, we've created a model called <code>Stopwatch</code>, we gave it a constructor function and we told it to extend <code>events.EventEmitter</code>.</p>
-
-<p>Now I want to add a new method to my stopwatch but here's where you might run into a real gotcha. If you're like me you'd probably add it like this:</p>
-
-<p>``` js models/stopwatch.js
-var util = require('util'),</p>
-
-<pre><code>events = require('events');
-</code></pre>
-
-<p>function Stopwatch() {</p>
-
-<pre><code>if(false === (this instanceof Stopwatch)) {
-    return new Stopwatch();
-}
-
-events.EventEmitter.call(this);
-</code></pre>
-
-<p>};</p>
-
-<p>Stopwatch.prototype.foobar = function() {</p>
-
-<pre><code>console.log('foobar!');
-</code></pre>
-
-<p>}</p>
-
-<p>util.inherits(Stopwatch, events.EventEmitter);</p>
-
-<p>module.exports = Stopwatch;
-```</p>
-
-<p>Aaaand your app would explode like this:</p>
-
-<p><code>
-[ERROR] TypeError
-TypeError: Object #&lt;Stopwatch&gt; has no method 'foobar'
-</code></p>
-
-<p>That's because we can only add new methods <strong>after calling <code>util.inherits</code>.</strong> The proper way would look like this:</p>
-
-<p>``` js models/stopwatch.js</p>
-
-<p>var util = require('util'),</p>
-
-<pre><code>events = require('events');
-</code></pre>
-
-<p>function Stopwatch() {</p>
-
-<pre><code>if(false === (this instanceof Stopwatch)) {
-    return new Stopwatch();
-}
-
-events.EventEmitter.call(this);
-</code></pre>
-
-<p>};</p>
-
-<p>util.inherits(Stopwatch, events.EventEmitter);</p>
-
-<p>Stopwatch.prototype.foobar = function() {</p>
-
-<pre><code>console.log('foobar!');
-</code></pre>
-
-<p>}</p>
-
-<p>module.exports = Stopwatch;</p>
-
-<p>```</p>
-
-<p>This is also the approach <a href="http://nodejs.org/api/util.html#util_util_inherits_constructor_superconstructor">taken in the documentation.</a> Guess it pays to rtfm :D</p>
-
-<p>Here's what my final <code>Stopwatch</code> looks like:</p>
-
-<p>``` js models/stopwatch.js
-var util    = require('util'),</p>
-
-<pre><code>events  = require('events')
-_       = require('underscore');
-</code></pre>
-
-<p>// ---------------------------------------------
-// Constructor
-// ---------------------------------------------
-function Stopwatch() {</p>
-
-<pre><code>if(false === (this instanceof Stopwatch)) {
-    return new Stopwatch();
-}
-
-this.hour = 3600000;
-this.minute = 60000;
-this.second = 1000;
-this.time = this.hour;
-this.interval = undefined;
-
-events.EventEmitter.call(this);
-
-// Use Underscore to bind all of our methods
-// to the proper context
-_.bindAll(this);
-</code></pre>
-
-<p>};</p>
-
-<p>// ---------------------------------------------
-// Inherit from EventEmitter
-// ---------------------------------------------
-util.inherits(Stopwatch, events.EventEmitter);</p>
-
-<p>// ---------------------------------------------
-// Methods
-// ---------------------------------------------
-Stopwatch.prototype.start = function() {</p>
-
-<pre><code>console.log('Starting Stopwatch!');
-// note the use of _.bindAll in the constructor
-// with bindAll we can pass one of our methods to
-// setInterval and have it called with the proper 'this' value
-this.interval = setInterval(this.onTick, this.second);
-this.emit('start');
-</code></pre>
-
-<p>};</p>
-
-<p>Stopwatch.prototype.stop = function() {</p>
-
-<pre><code>console.log('Stopping Stopwatch!');
-if (this.interval) {
-    clearInterval(this.interval);
-    this.emit('stop');
-}
-</code></pre>
-
-<p>};</p>
-
-<p>Stopwatch.prototype.reset = function() {</p>
-
-<pre><code>console.log('Resetting Stopwatch!');
-this.time = this.hour;
-this.emit('reset');
-</code></pre>
-
-<p>};</p>
-
-<p>Stopwatch.prototype.onTick = function() {</p>
-
-<pre><code>var remainder = this.time,
-    numHours,
-    numMinutes,
-    numSeconds,
-    output = "";
-
-if (this.time === 0) {
-    this.stop();
-    return;
-}
-
-numHours = String(parseInt(remainder / this.hour, 10));
-remainder -= this.hour * numHours;
-
-numMinutes = String(parseInt(remainder / this.minute, 10));
-remainder -= this.minute * numMinutes;
-
-numSeconds = String(parseInt(remainder / this.second, 10));
-
-output = _.map([numHours, numMinutes, numSeconds], function(str) {
-    if (str.length === 1) {
-        str = "0" + str;
-    }
-    return str;
-}).join(":");
-
-this.emit('tick', output);
-this.time -= this.second;
-</code></pre>
-
-<p>};</p>
-
-<p>// ---------------------------------------------
-// Export
-// ---------------------------------------------
-module.exports = Stopwatch;
-```</p>
-
-<p>And here's how I'm using it in <code>app.js</code></p>
-
-<p>``` js app.js
-var Stopwatch = require('./models/stopwatch');</p>
-
-<p>...</p>
-
-<p>var stopwatch = new Stopwatch();
-stopwatch.on('tick', function(time) {
-  console.log('tick: ' + time);
-});
-stopwatch.start();
-```</p>
-
-<p>Running the above should give you something like this in your console:</p>
-
-<p><code>
-tick: 01:00:00
-tick: 00:59:59
-tick: 00:59:58
-tick: 00:59:57
-</code></p>
-
-<p>Ok that's it for today. Tomorrow we'll connect all this goodness to a View. If you have questions or feedback feel free to leave a comment. Thanks! - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:50 am</li>
-<li>Mood: Tired</li>
-<li>Sleep: 6</li>
-<li>Hunger: 4</li>
-<li>Coffee: 0</li>
 </ul>
 
 ]]></content>

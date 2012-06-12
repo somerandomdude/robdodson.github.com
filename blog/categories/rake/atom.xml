@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Rake | Rob Dodson talks internets]]></title>
+  <link href="http://robdodson.me/blog/categories/rake/atom.xml" rel="self"/>
+  <link href="http://robdodson.me/"/>
+  <updated>2012-06-11T19:30:40-07:00</updated>
+  <id>http://robdodson.me/</id>
+  <author>
+    <name><![CDATA[Rob Dodson]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Some Octopress Rake Tips]]></title>
+    <link href="http://robdodson.me/blog/2012/06/11/some-octopress-rake-tips/"/>
+    <updated>2012-06-11T19:04:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/11/some-octopress-rake-tips</id>
+    <content type="html"><![CDATA[<p>This is a quick post just to scratch one of my own itches. I've been using Octopress every single day for around two months now and the generation time for my blog is slowly starting to creep up. I'd heard that you could isolate a post and just preview/generate it instead of doing the whole blog every time but it wasn't until today that I finally decided to look into it.</p>
+
+<p>Turns out it's really simple. Let's say we are going through our usual steps of creating a new post:</p>
+
+<p><code>rake new_post["Today is a Wonderful Day"]</code></p>
+
+<p>Now that we have our post ready we can isolate it from all the others:</p>
+
+<p><code>rake isolate[wonderful-day]</code></p>
+
+<p>Notice I didn't pass in the entire filename? That's because the Rake task inspects each of our posts and stashes anything that doesn't include the String 'wonderful-day' in the filename.</p>
+
+<p>``` ruby
+Dir.glob("#{source_dir}/#{posts_dir}/<em>.</em>") do |post|</p>
+
+<pre><code>FileUtils.mv post, stash_dir unless post.include?(args.filename)
+</code></pre>
+
+<p>end
+```</p>
+
+<p>Now that our post is isolated we can preview it, like we always do:</p>
+
+<p><code>rake preview</code></p>
+
+<p>Write a little bit, save, and hit <code>localhost:4000</code> to see your super speedy blog post!</p>
+
+<p>When we're all done we integrate the post back in with the rest of our blog.</p>
+
+<p><code>rake integrate</code></p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 7:18 pm</li>
+<li>Mood: Caffeinated</li>
+<li>Sleep: 7</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>
