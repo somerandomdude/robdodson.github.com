@@ -131,6 +131,57 @@
 
 <p><code>rake integrate</code></p>
 
+<p>And finally we generate and deploy it, which can be done in a single command:</p>
+
+<p><code>rake gen_deploy</code></p>
+
+<p>There are a few other useful rake tasks, you can see the whole list by running:</p>
+
+<p><code>rake -T</code></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="n">clean</span>                     <span class="c1"># Clean out caches: .pygments-cache, .gist-cache, .sass-cache</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">copydot</span><span class="o">[</span><span class="n">source</span><span class="p">,</span><span class="n">dest</span><span class="o">]</span>      <span class="c1"># copy dot files for deployment</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">deploy</span>                    <span class="c1"># Default deploy task</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">gen_deploy</span>                <span class="c1"># Generate website and deploy</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">generate</span>                  <span class="c1"># Generate jekyll site</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">install</span><span class="o">[</span><span class="n">theme</span><span class="o">]</span>            <span class="c1"># Initial setup for Octopress: copies the default theme into the path of Jekyll&#39;s generator.</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">integrate</span>                 <span class="c1"># Move all stashed posts back into the posts directory, ready for site generation.</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">isolate</span><span class="o">[</span><span class="n">filename</span><span class="o">]</span>         <span class="c1"># Move all other posts than the one currently being worked on to a temporary stash location (stas...</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">list</span>                      <span class="c1"># list tasks</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">new_page</span><span class="o">[</span><span class="n">filename</span><span class="o">]</span>        <span class="c1"># Create a new page in source/(filename)/index.markdown</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">new_post</span><span class="o">[</span><span class="n">title</span><span class="o">]</span>           <span class="c1"># Begin a new post in source/_posts</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">preview</span>                   <span class="c1"># preview the site in a web browser</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">push</span>                      <span class="c1"># deploy public directory to github pages</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">rsync</span>                     <span class="c1"># Deploy website via rsync</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">set_root_dir</span><span class="o">[</span><span class="n">dir</span><span class="o">]</span>         <span class="c1"># Update configurations to support publishing to root or sub directory</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">setup_github_pages</span><span class="o">[</span><span class="n">repo</span><span class="o">]</span>  <span class="c1"># Set up _deploy folder and deploy branch for Github Pages deployment</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">update_source</span><span class="o">[</span><span class="n">theme</span><span class="o">]</span>      <span class="c1"># Move source to source.old, install source theme updates, replace source/_includes/navigation.ht...</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">update_style</span><span class="o">[</span><span class="n">theme</span><span class="o">]</span>       <span class="c1"># Move sass to sass.old, install sass theme updates, replace sass/custom with sass.old/custom</span>
+</span><span class='line'><span class="n">rake</span> <span class="n">watch</span>                     <span class="c1"># Watch the site and regenerate when it changes</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I&#8217;m looking forward to trying out Octopress 2.1 as it includes <a href="https://github.com/imathis/octopress/pull/207">a more streamlined generate task</a> as well as some other nifty features. - Rob</p>
+
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
 <ul>

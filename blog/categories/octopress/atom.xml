@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Octopress | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/octopress/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-11T19:30:40-07:00</updated>
+  <updated>2012-06-11T19:34:51-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -48,6 +48,38 @@ Dir.glob("#{source_dir}/#{posts_dir}/<em>.</em>") do |post|</p>
 <p>When we're all done we integrate the post back in with the rest of our blog.</p>
 
 <p><code>rake integrate</code></p>
+
+<p>And finally we generate and deploy it, which can be done in a single command:</p>
+
+<p><code>rake gen_deploy</code></p>
+
+<p>There are a few other useful rake tasks, you can see the whole list by running:</p>
+
+<p><code>rake -T</code></p>
+
+<p><code>
+rake clean                     # Clean out caches: .pygments-cache, .gist-cache, .sass-cache
+rake copydot[source,dest]      # copy dot files for deployment
+rake deploy                    # Default deploy task
+rake gen_deploy                # Generate website and deploy
+rake generate                  # Generate jekyll site
+rake install[theme]            # Initial setup for Octopress: copies the default theme into the path of Jekyll's generator.
+rake integrate                 # Move all stashed posts back into the posts directory, ready for site generation.
+rake isolate[filename]         # Move all other posts than the one currently being worked on to a temporary stash location (stas...
+rake list                      # list tasks
+rake new_page[filename]        # Create a new page in source/(filename)/index.markdown
+rake new_post[title]           # Begin a new post in source/_posts
+rake preview                   # preview the site in a web browser
+rake push                      # deploy public directory to github pages
+rake rsync                     # Deploy website via rsync
+rake set_root_dir[dir]         # Update configurations to support publishing to root or sub directory
+rake setup_github_pages[repo]  # Set up _deploy folder and deploy branch for Github Pages deployment
+rake update_source[theme]      # Move source to source.old, install source theme updates, replace source/_includes/navigation.ht...
+rake update_style[theme]       # Move sass to sass.old, install sass theme updates, replace sass/custom with sass.old/custom
+rake watch                     # Watch the site and regenerate when it changes
+</code></p>
+
+<p>I'm looking forward to trying out Octopress 2.1 as it includes <a href="https://github.com/imathis/octopress/pull/207">a more streamlined generate task</a> as well as some other nifty features. - Rob</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
