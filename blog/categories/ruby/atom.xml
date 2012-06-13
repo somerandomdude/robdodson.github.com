@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-12T23:03:53-07:00</updated>
+  <updated>2012-06-13T09:42:53-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,113 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Writing a Command Line Tool in Ruby]]></title>
+    <link href="http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby/"/>
+    <updated>2012-06-13T07:29:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby</id>
+    <content type="html"><![CDATA[<p>Yesterday I tried to do a post on creating your first Ruby Gem as a command line tool. <a href="http://robdodson.me/blog/2012/06/12/messing-around-with-gems/">It didn't go very well.</a> In an effort to better understand what goes on with command line tools I'm going to start from the most basic, a ruby script that is in our <code>PATH</code>.</p>
+
+<p>I've previously added the folder <code>~/bin</code> to my PATH so I know that if I drop an executable script in there I should be able to run it by just typing its name. Let's give that a shot.</p>
+
+<p>``` ruby ~/bin/sherpa</p>
+
+<h1>!/usr/bin/env ruby</h1>
+
+<p>puts 'I am the sherpa!!!'
+```</p>
+
+<p>If I now type <code>sherpa</code> into the command line, it should fire back <code>I am the sherpa!!!</code></p>
+
+<p>Ok cool so we've got that part working. Now let's see if we can get some arguments in there. We'll iterate the <code>ARGV</code> object to see what comes in.</p>
+
+<p>``` ruby ~/bin/sherpa</p>
+
+<h1>!/usr/bin/env ruby</h1>
+
+<p>ARGV.each do |arg|</p>
+
+<pre><code>puts arg
+</code></pre>
+
+<p>end
+```</p>
+
+<p>With that little bit of code we should be able to pass just about anything to our command and have it echoed back.</p>
+
+<p>```
+sherpa foo bar baz</p>
+
+<p> => foo
+ => bar
+ => baz
+```</p>
+
+<p>Ok cool. Now let's step this up a notch or two. Let's say we want to send in commands and options. For that we'll use the built-in <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/optparse/rdoc/OptionParser.html">OptionParser</a>. Here's <a href="http://rubylearning.com/blog/2011/01/03/how-do-i-make-a-command-line-tool-in-ruby/">a link to the article I've been following which details how to use the OptionParser.</a> In my case, I'm going to tell <code>sherpa</code> to either <code>say_hello</code> or <code>say_goodbye</code>. When I pass in the <code>-n</code> flag it should accept a name, otherwise it will use the name 'Master'. So the line <code>sherpa say_hello -n Rob</code> should produce <code>Hello Rob</code> and likewise if I left off the option and just used <code>sherpa say_hello</code> it should produce <code>Hello Master</code>.</p>
+
+<p>Here's the code to accomplish this:</p>
+
+<p>``` ruby ~/bin</p>
+
+<h1>!/usr/bin/env ruby</h1>
+
+<p>require 'optparse'</p>
+
+<p>options = {}</p>
+
+<p>opt_parser = OptionParser.new do |opt|
+  opt.banner = "Usage: opt_parser COMMAND [OPTIONS]"
+  opt.separator  ""
+  opt.separator  "Commands"
+  opt.separator  "     name: the name the sherpa should use when addressing you"
+  opt.separator  ""
+  opt.separator  "Options"</p>
+
+<p>  opt.on("-n","--name NAME","tell the sherpa what to call you") do |name|</p>
+
+<pre><code>options[:name] = name
+</code></pre>
+
+<p>  end</p>
+
+<p>  opt.on("-h","--help","help") do</p>
+
+<pre><code>puts opt_parser
+</code></pre>
+
+<p>  end
+end</p>
+
+<p>opt_parser.parse!
+name = options[:name] || 'Master'</p>
+
+<p>case ARGV[0]
+when "say_hello"
+  puts "Hello #{name}"
+when "say_goodbye"
+  puts "Goodbye #{name}"
+else
+  puts opt_parser
+end
+```</p>
+
+<p>And there we go, our first command line Ruby tool. I'll pick it up tomorrow to try to improve upon it.</p>
+
+<p>Awesome, we're starting small but at least we have something that works!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 7:31 am</li>
+<li>Mood: Tired, Patient</li>
+<li>Sleep: 6</li>
+<li>Hunger: 1</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Messing around with Gems]]></title>
@@ -605,179 +712,6 @@ post-construct
 <li>Time: 8:03 am</li>
 <li>Mood: Happy, Drowsy, Peaceful</li>
 <li>Sleep: 5.5</li>
-<li>Hunger: 3</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 5]]></title>
-    <link href="http://robdodson.me/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/"/>
-    <updated>2012-05-12T07:02:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5</id>
-    <content type="html"><![CDATA[<p>Last night I got the <code>Crawler</code> passing its test for <code>#get_words_by_selector</code>. This morning I realize that when someone sends in a junk selector I want to raise an exception of some kind. Since I don't know much about Ruby Exceptions I'm doing a little digging...Ruby has both <code>throw</code>/<code>catch</code> and <code>raise</code>/<code>rescue</code> so what's the difference between throw/catch and raise/rescue in Ruby?</p>
-
-<h3>Throwing exceptions for control flow</h3>
-
-<p>There's a great guest post by Avdi Grimm on <a href="http://rubylearning.com/blog/2011/07/12/throw-catch-raise-rescue-im-so-confused/">RubyLearning</a> which covers this topic in depth. To summarize <code>throw</code>/<code>catch</code> is mainly used when doing <em>exceptions as control flow</em>. In other words, if you need to break out of a deeply nested loop or some other expensive operation you can throw an exception symbol which can be caught someone high up the call stack. Initially this rubbed me the wrong way since I know that things like <code>goto</code> and <code>labels</code> are a bad practice. Someone else raised this point in the comments to which Avid responded:</p>
-
-<blockquote><p>There is a fundamental difference between throw/catch and goto. Goto, in languages which support it, pays no attention to the stack. Any resources which were allocated before the goto are simply left dangling unless they are manually cleaned up.</p>
-
-<p>throw/catch, like exception handling, unwinds the stack, triggering ensure blocks along the way. So, for example, if you throw inside an open() {…} block, the open file will be closed on the way up to the catch() block.</p></blockquote>
-
-<h3>Raising exceptions for everything else</h3>
-
-<p>With <code>throw</code>/<code>catch</code> out of the way that leaves <code>raise</code>/<code>rescue</code> to handle everything else. I'm willing to bet that 99% of error code should probably be raising exceptions and throw/catch should only be used in situations where you need the control flow behavior. With that knowledge in hand I need to decide between one of Ruby's built-in Exceptions or defining one of my own. Let's define one of our own so we can get that experience under our belt.</p>
-
-<h3>Creating an exception subclass in Ruby</h3>
-
-<p>One tip I picked up while doing my research into <code>raise</code> and <code>throw</code> is that any exception that doesn't subclass StandardError will not be caught by default. Here's an example to illustrate:</p>
-
-<p>```ruby</p>
-
-<h2>#</h2>
-
-<h1>First we define an exception class which doesn't</h1>
-
-<h1>inherit from StandardError. As a result it won't</h1>
-
-<h1>be caught by a simple rescue. Instead we would</h1>
-
-<h1>need to rescue by its class name</h1>
-
-<h2>#</h2>
-
-<p>class MyBadException &lt; Exception
-end</p>
-
-<p>def miss_bad_exception
-  raise MyBadException.new
-  rescue
-  p "I'll never be called :("
-end</p>
-
-<p>miss_bad_exception
-MyBadException: MyBadException
-  from (irb):4:in <code>miss_bad_exception'
-  from (irb):8
-  from /Users/Rob/.rvm/rubies/ruby-1.9.3-p125/bin/irb:16:in</code><main></p>
-
-<h1>See that calling the method produces an uncaught exception...</h1>
-
-<h2>#</h2>
-
-<h1>Next we'll subclass StandardError. As a result</h1>
-
-<h1>we won't have to explicitly define our class name</h1>
-
-<h1>for a rescue to work.</h1>
-
-<h2>#</h2>
-
-<p>class MyGoodException &lt; StandardError
-end</p>
-
-<p>def save_good_exception
-  raise MyGoodException.new
-  rescue
-  p "I'm saved! My hero!"
-end</p>
-
-<p>save_good_exception
-"I'm saved! My hero!"</p>
-
-<h1>Yay! Our exception was caught!</h1>
-
-<p><code>``
-We'll call our Exception</code>SelectorError` to indicate that the provided selector did not return any results. For reference I often refer to <a href="http://rubylearning.com/satishtalim/ruby_exceptions.html">this chart on RubyLearning</a> when I want to see a list of all the available Exception classes. In our case we'll just inherit from StandardError.</p>
-
-<p><code>ruby tentacles/lib/selection_error.rb
-module Tentacles
-  class SelectionError &lt; StandardError
-  end
-end
-</code>
-I don't think we actually need to do much more than that. The ability to pass a payload message should come from the super class so I think we're good to go. Here's our updated spec:</p>
-
-<p>```ruby
-it "should raise an exception if nothing was returned" do</p>
-
-<pre><code>    expect { @crawler.get_words_by_selector('some-gibberish-selector') }.to raise_error(Tentacles::SelectionError, 'The selector did not return an results!')  
-</code></pre>
-
-<p>end
-<code>``      
-Initially the test fails so now we need to update our</code>Crawler` to check if nothing was returned and raise the custom exception.</p>
-
-<p>Here's our updated <code>Crawler</code> with additional require and updated method.</p>
-
-<p>```ruby tentacles/lib/crawler.rb
-require 'open-uri'
-require 'nokogiri'
-require_relative 'selection_error'</p>
-
-<p>module Tentacles
-  class Crawler</p>
-
-<pre><code>attr_reader :doc
-
-def self.from_uri(uri)
-  new(uri)
-end
-
-def initialize(uri)
-  @uri = uri
-  @doc = Nokogiri::HTML(open(@uri))
-  @counts = Hash.new(0)
-end
-
-def get_words_by_selector(selector)
-  entries = doc.css(selector)
-  raise Tentacles::SelectionError, 
-    'The selector did not return an results!' if entries.empty?
-  entries.each do |entry|
-    words = words_from_string(entry.content)
-    count_frequency(words)
-  end
-
-  sorted = @counts.sort_by { |word, count| count }
-  sorted.reverse!
-  sorted.map { |word, count| "#{word}: #{count}"}
-end
-
-def get_metadata_by_selector(selector)
-  # TODO
-end
-</code></pre>
-
-<p>  private</p>
-
-<pre><code>def words_from_string(string)
-  string.downcase.scan(/[\w']+/)
-end
-
-def count_frequency(word_list)
-  for word in word_list
-    @counts[word] += 1
-  end
-  @counts
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>All tests passing, we're good to go :)</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:00 am</li>
-<li>Mood: Alert, Awake, Anxious</li>
-<li>Sleep: 8</li>
 <li>Hunger: 3</li>
 <li>Coffee: 0</li>
 </ul>
