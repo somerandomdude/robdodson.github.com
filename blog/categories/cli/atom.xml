@@ -4,7 +4,7 @@
   <title><![CDATA[Category: CLI | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/cli/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-13T09:42:53-07:00</updated>
+  <updated>2012-06-13T09:56:16-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -103,9 +103,7 @@ else
 end
 ```</p>
 
-<p>And there we go, our first command line Ruby tool. I'll pick it up tomorrow to try to improve upon it.</p>
-
-<p>Awesome, we're starting small but at least we have something that works!</p>
+<p>And there we go, our first command line Ruby tool. I'll pick it up tomorrow to try to improve upon it. We're starting small but at least we have something that works!</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
