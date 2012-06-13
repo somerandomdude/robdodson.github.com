@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="This is a quick post just to scratch one of my own itches. I&#8217;ve been using Octopress every single day for around two months now and the &hellip;">
+  <meta name="description" content="I want to work on a code generation tool, similar to the one offered up by Rails. However my Ruby-fu is a bit rusty at the moment so this might be an &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,63 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/12/messing-around-with-gems/">Messing Around With Gems</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-12T22:22:00-07:00" pubdate data-updated="true">Jun 12<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I want to work on a code generation tool, similar to the one offered up by Rails. However my Ruby-fu is a bit rusty at the moment so this might be an interesting struggle.</p>
+
+<p>The first thing I&#8217;m going to do is create a new gemset with rvm. Our gem is going to be called <code>r2</code> after the much beloved R2D2 so we&#8217;ll also call our gemset <code>r2</code>.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>rvm gemset create r2
+</span><span class='line'>rvm use 1.9.3@r2</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ugh after spending about an 2 hours fucking around with bundler I&#8217;m getting nowhere. I&#8217;ll have to pick this up tomorrow. :\ #WorstPostEver</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 10:28 pm</li>
+<li>Mood: Tired, Cranky</li>
+<li>Sleep: 6</li>
+<li>Hunger: 8</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2985,315 +3042,6 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/02/managing-your-backbone-views-with-the-state-pattern/">Managing Your Backbone Views With the State Pattern</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-02T18:22:00-07:00" pubdate data-updated="true">Jun 2<span>nd</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://robdodson.me/blog/2012/06/02/take-control-of-your-app-with-the-javascript-state-patten/">Yesterday I wrote a post to illustrate the concepts behind the State pattern</a> (one of my all time favorite tools). If you&#8217;re new to this pattern and haven&#8217;t read my previous post I suggest you start there and read this one after you&#8217;ve had a chance to play around with the ideas.</p>
-
-<p>I wanted to write about this pattern in the context of a Backbone app because I think there&#8217;s a lot of value in exploring different ways to manage our Views and Models. Here&#8217;s an example Video Player in which several State objects inherit from a common ancestor, <code>BaseState</code>. I chose to make <code>BaseState</code> extend <code>Backbone.Model</code> because it seemed like the best fit for this kind of thing, although typically when I implement this pattern in other languages I just use generic Objects. I would have done that here but Backbone&#8217;s <code>extend</code> functionality makes the code so much cleaner.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">BaseState</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">owner</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">owner</span> <span class="o">=</span> <span class="nx">owner</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">enter</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// Implement me in your state objects</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">execute</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// Implement me in your state objects</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">play</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;changing to the playing state...&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">owner</span><span class="p">.</span><span class="nx">changeState</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">owner</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">playing</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">stop</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;changing to the stopping state...&#39;</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">owner</span><span class="p">.</span><span class="nx">changeState</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">owner</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">stopping</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">pause</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;changing to the pausing state...&#39;</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">owner</span><span class="p">.</span><span class="nx">changeState</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">owner</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">pausing</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">exit</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// Implement me in your state objects</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">PlayingState</span> <span class="o">=</span> <span class="nx">BaseState</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">execute</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;playing the video!&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">play</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;already playing!&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">StoppingState</span> <span class="o">=</span> <span class="nx">BaseState</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">enter</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;we have entered the stopping state...&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">execute</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;stopping the video...&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">stop</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;already stopped!&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">PausingState</span> <span class="o">=</span> <span class="nx">BaseState</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">execute</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;pausing the video.&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">pause</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;already paused!&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-
-<p>Every state inherits from <code>BaseState</code> which means they all create a reference to an <code>owner</code> object in their <code>initialize</code> methods. The <code>owner</code> is going to be our actual <code>VideoPlayer</code> object. Rather than having <code>videoPlayer.play</code> lead to some big weird conditional:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">play</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="s1">&#39;playing&#39;</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="k">return</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="s1">&#39;stopped&#39;</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="c1">// play the video</span>
-</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">status</span> <span class="o">==</span> <span class="s1">&#39;paused&#39;</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="c1">// unpause and play</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="k">else</span> <span class="k">if</span> <span class="p">...</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>we&#8217;re instead going to delegate the work to our State objects. They&#8217;ll handle switching from one State to the next and so long as we provide the exact same public API methods in each, they should be interchangeable. Inheriting from the same BaseState ensures that all of the States have the same public methods and each State can choose how or if it wants to override them. In our example the <code>StoppingState</code> overrides the <code>enter</code> method to display some text as we&#8217;re transitioning into this state. Again, you can override some or all of the methods, <code>enter</code> and <code>exit</code> are great for building up/tearing down anything that our state might need and <code>execute</code> is where the main work of our state should happen.</p>
-
-<p>Let&#8217;s take a look at the <code>VideoPlayer</code> which is a <code>Backbone.View</code> that will leverage our State objects:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">VideoPlayer</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">states</span> <span class="o">=</span> <span class="p">{};</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">playing</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PlayingState</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">stopping</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">StoppingState</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">pausing</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PausingState</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">changeState</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">states</span><span class="p">.</span><span class="nx">pausing</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">play</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">play</span><span class="p">();</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">stop</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">pause</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">pause</span><span class="p">();</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">changeState</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// Make sure the current state wasn&#39;t passed in</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">!==</span> <span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="c1">// Make sure the current state exists before</span>
-</span><span class='line'>      <span class="c1">// calling exit() on it</span>
-</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">exit</span><span class="p">();</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="nx">state</span><span class="p">;</span>
-</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">enter</span><span class="p">();</span>
-</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">execute</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You&#8217;ll notice that <code>VideoPlayer</code> instantiates its own State objects when it is first created. Then whenever we call one of its public methods the call is delegated to whichever state object is currently residing in <code>this.state</code>.</p>
-
-<p>Let&#8217;s instantiate a new VideoPlayer to see it in action:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">videoPlayer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">VideoPlayer</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">=&gt;</span> <span class="s1">&#39;pausing the video.&#39;</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="nx">videoPlayer</span><span class="p">.</span><span class="nx">play</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">=&gt;</span> <span class="s1">&#39;changing to the playing state...&#39;</span>
-</span><span class='line'><span class="o">=&gt;</span> <span class="s1">&#39;playing the video!&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">videoPlayer</span><span class="p">.</span><span class="nx">play</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">=&gt;</span> <span class="s1">&#39;already playing!&#39;</span>
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="nx">videoPlayer</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">=&gt;</span> <span class="s1">&#39;changing to the stopping state...&#39;</span>
-</span><span class='line'><span class="o">=&gt;</span> <span class="s1">&#39;we have entered the stopping state...&#39;</span>
-</span><span class='line'><span class="o">=&gt;</span> <span class="s1">&#39;stopping the video...&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Hopefully this gives you some food for thought the next time you&#8217;re trying to wrangle some unwieldy component. I cannot count how many times I&#8217;ve used this pattern in other languages to tidy up and organize my code. I&#8217;m looking forward to working with it again in Backbone and I&#8217;d love to hear anyone&#8217;s take on how this can be tweaked or improved. Till tomorrow! - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 9:48 pm</li>
-<li>Mood: Focused, Hurried</li>
-<li>Sleep: 5</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -3309,6 +3057,10 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/12/messing-around-with-gems/">Messing around with Gems</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/11/some-octopress-rake-tips/">Some Octopress Rake Tips</a>
       </li>
     
@@ -3322,10 +3074,6 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
     
       <li class="post">
         <a href="/blog/2012/06/09/css-semantics/">CSS Semantics: Best Practices</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/07/building-a-countdown-timer-with-socket-dot-io-pt-3/">Building a Countdown Timer with Socket.io pt. 3</a>
       </li>
     
   </ul>

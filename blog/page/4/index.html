@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Last night I got the Crawler passing its test for #get_words_by_selector. This morning I realize that when someone sends in a junk selector I want to &hellip;">
+  <meta name="description" content="Yesterday we verified that our Crawler was able to hit a document and, given the right selector, pull down a list of words and their frequency on the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,451 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/">Object Oriented Scraper Backed With Tests Pt. 6</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-13T07:52:00-07:00" pubdate data-updated="true">May 13<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Yesterday we verified that our <code>Crawler</code> was able to hit a document and, given the right selector, pull down a list of words and their frequency on the page. We also created a custom exception to be used whenever the selector fails to pull down the right content. I&#8217;m going to repeat this process today with the <code>get_metadata_by_selector</code>. If there&#8217;s time we&#8217;ll try to output another file with our data, otherwise that&#8217;ll be tomorrow&#8217;s homeworkd :D</p>
+
+<p>Let&#8217;s take a moment to look at today&#8217;s metadata to figure out what we&#8217;d like our output to reflect.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>- Time: 8:03 am
+</span><span class='line'>- Mood: Happy, Drowsy, Peaceful
+</span><span class='line'>- Sleep: 5.5
+</span><span class='line'>- Hunger: 3
+</span><span class='line'>- Coffee: 0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&#8217;s the actual markdown that goes into the editor but it gets converted into a <code>ul</code>. I don&#8217;t <em>think</em> you can pass a CSS class to markdown syntax otherwise I&#8217;d use one here. We could go back and wrap everything in regular HTML tags but since we know that our metadata is going to be the last ul per entry we&#8217;ll just use that knowledge to build our selector. Obviously a more robust solution would use a CSS class so that might be a good refactoring for the future.</p>
+
+<p>I figure for now we&#8217;ll just parse the metadata into a Hash that&#8217;ll look something like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>{
+</span><span class='line'>  datetime: 2012-05-13T08:03:00-07:00,
+</span><span class='line'>  mood: ['Happy', 'Drowsy', 'Peaceful'],
+</span><span class='line'>  sleep: 5.5,
+</span><span class='line'>  hunger: 3.0,
+</span><span class='line'>  coffee: 0.0
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In the final iteration we&#8217;ll toss all of our Metadata Hashes into an ordered Array so we can visualize them over time.</p>
+
+<h3>Red, Green, Refactor</h3>
+
+<p>Ok, time for a failing test. Let&#8217;s make sure that our selector pulls something down and if it doesn&#8217;t we should raise the custom <code>SelectionError</code> we defined yesterday. I&#8217;m already seeing some repetitive code in our Crawler so I&#8217;m refactoring it. Where we need to get a group of XML nodes from the document via selector I&#8217;ve created a private helper called <code>nodes_by_selector</code>. This is also where we&#8217;ll raise our exception if nothing came back. I&#8217;m also cleaning up some of the word cruff from our public API so instead of <code>get_words_by_selector</code> it&#8217;s not just <code>words_by_selector</code>. The same goes for our metadata method.</p>
+
+<figure class='code'><figcaption><span>tentacles/lib/tentacles/crawler_rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;open-uri&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;nokogiri&#39;</span>
+</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;selection_error&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Crawler</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:doc</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="kp">new</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@uri</span> <span class="o">=</span> <span class="n">uri</span>
+</span><span class='line'>      <span class="vi">@doc</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="vi">@uri</span><span class="p">))</span>
+</span><span class='line'>      <span class="vi">@counts</span> <span class="o">=</span> <span class="no">Hash</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">words_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">nodes</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">node</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">words</span> <span class="o">=</span> <span class="n">words_from_string</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">count_frequency</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">sorted</span> <span class="o">=</span> <span class="vi">@counts</span><span class="o">.</span><span class="n">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="n">count</span> <span class="p">}</span>
+</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">reverse!</span>
+</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">word</span><span class="si">}</span><span class="s2">: </span><span class="si">#{</span><span class="n">count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">metadata_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kp">private</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">nodes</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">raise</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;The selector did not return an results!&#39;</span> <span class="k">if</span> <span class="n">nodes</span><span class="o">.</span><span class="n">empty?</span>
+</span><span class='line'>      <span class="n">nodes</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">words_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">string</span><span class="o">.</span><span class="n">downcase</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="sr">/[\w&#39;]+/</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">count_frequency</span><span class="p">(</span><span class="n">word_list</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">for</span> <span class="n">word</span> <span class="k">in</span> <span class="n">word_list</span>
+</span><span class='line'>        <span class="vi">@counts</span><span class="o">[</span><span class="n">word</span><span class="o">]</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>      <span class="vi">@counts</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Going back to the tests we need to refactor a bit for any place that&#8217;s been broken. Immediately I saw that my <code>nodes_by_selector</code> method was not initially returning the nodes so I added that back in. The tests brought that to my attention before I had to do any potentially painful debugging. Beyond that we just need to fix up our method names:</p>
+
+<figure class='code'><figcaption><span>tentacles/spec/crawler_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;../lib/tentacles/crawler&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;fakeweb&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span> <span class="k">do</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">before</span> <span class="k">do</span>
+</span><span class='line'>    <span class="c1"># Create a mock options object</span>
+</span><span class='line'>    <span class="vi">@options</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">uri</span><span class="p">:</span> <span class="s1">&#39;http://robdodson.me&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">post_selector</span><span class="p">:</span> <span class="s1">&#39;.entry-content&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">metadata_selector</span><span class="p">:</span> <span class="s1">&#39;.personal-metadata&#39;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># Create a mock web request</span>
+</span><span class='line'>    <span class="no">FakeWeb</span><span class="o">.</span><span class="n">register_uri</span><span class="p">(</span><span class="ss">:get</span><span class="p">,</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>                         <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="s1">&#39;&lt;div class=&quot;&#39;</span> <span class="o">+</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">].</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">+</span>
+</span><span class='line'>                         <span class="s1">&#39;&quot;&gt;Hello Hello Hello World World Foobar!&lt;/div&gt;&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;constructors&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">describe</span> <span class="s2">&quot;#from_uri&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should respond&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:from_uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should return an instance&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">crawler</span><span class="o">.</span><span class="n">should</span> <span class="n">be_an_instance_of</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;instances&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">before</span> <span class="k">do</span>
+</span><span class='line'>      <span class="vi">@crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">subject</span> <span class="p">{</span> <span class="vi">@crawler</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:words_by_selector</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:metadata_by_selector</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;post-construct&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should have the right document&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="vi">@crawler</span><span class="o">.</span><span class="n">doc</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">should</span> <span class="o">=~</span> <span class="sr">/Hello Hello Hello World World Foobar!/</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">describe</span> <span class="s2">&quot;#words_by_selector&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should produce an Array of keywords&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">expected_array</span> <span class="o">=</span> <span class="o">[</span><span class="s1">&#39;hello: 3&#39;</span><span class="p">,</span> <span class="s1">&#39;world: 2&#39;</span><span class="p">,</span> <span class="s1">&#39;foobar: 1&#39;</span><span class="o">]</span>
+</span><span class='line'>        <span class="n">actual_array</span> <span class="o">=</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">words_by_selector</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">actual_array</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="n">expected_array</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should raise an exception if nothing was returned&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">expect</span> <span class="p">{</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">words_by_selector</span><span class="p">(</span><span class="s1">&#39;some-gibberish-selector&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span> <span class="s1">&#39;The selector did not return an results!&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">describe</span> <span class="s2">&quot;#metadata_by_selector&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should raise an exception if nothing was returned&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">expect</span> <span class="p">{</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">metadata_by_selector</span><span class="p">(</span><span class="s1">&#39;some-gibberish-selector&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span> <span class="s1">&#39;The selector did not return an results!&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&#8217;ve got a duplicate test in there where both <code>#words_by_selector</code> and <code>#metadata_by_selector</code> are checking that they both raise an exception if nothing comes down. Let&#8217;s see if we can refactor those into an RSpec shared example. I&#8217;m not sure if this is a best practice or not but here&#8217;s my implementation:</p>
+
+<figure class='code'><figcaption><span>tentacles/spec/crawler_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">shared_examples_for</span> <span class="s2">&quot;all selector methods&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;when selection has no nodes&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an exception&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">selector_method</span><span class="p">,</span> <span class="s1">&#39;some-gibberish-selector&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span> <span class="s1">&#39;The selector did not return an results!&#39;</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">### ...</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="s2">&quot;#words_by_selector&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">it_behaves_like</span> <span class="s2">&quot;all selector methods&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">let</span><span class="p">(</span><span class="ss">:selector_method</span><span class="p">)</span> <span class="p">{</span> <span class="ss">:words_by_selector</span> <span class="p">}</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># ...</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="s2">&quot;#metadata_by_selector&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">it_behaves_like</span> <span class="s2">&quot;all selector methods&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">let</span><span class="p">(</span><span class="ss">:selector_method</span><span class="p">)</span> <span class="p">{</span> <span class="ss">:metadata_by_selector</span> <span class="p">}</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Basically we&#8217;re putting our method name as a symbol into a variable using <code>let</code> and then calling that method in the shared_examples_for block. Notice how we&#8217;re using <code>@crawler.send(selector_method, ...)</code>? In this case <code>selector_method</code> refers to our method name symbol.</p>
+
+<p>If you run this in RSpec&#8217;s nested mode it looks pretty cool:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span>
+</span><span class='line'>  <span class="n">constructors</span>
+</span><span class='line'>    <span class="c1">#from_uri</span>
+</span><span class='line'>      <span class="n">should</span> <span class="n">respond</span>
+</span><span class='line'>      <span class="n">should</span> <span class="k">return</span> <span class="n">an</span> <span class="n">instance</span>
+</span><span class='line'>  <span class="n">instances</span>
+</span><span class='line'>    <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#words_by_selector</span>
+</span><span class='line'>    <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#metadata_by_selector</span>
+</span><span class='line'>    <span class="n">post</span><span class="o">-</span><span class="n">construct</span>
+</span><span class='line'>      <span class="n">should</span> <span class="n">have</span> <span class="n">the</span> <span class="n">right</span> <span class="n">document</span>
+</span><span class='line'>    <span class="c1">#words_by_selector</span>
+</span><span class='line'>      <span class="n">should</span> <span class="n">produce</span> <span class="n">an</span> <span class="nb">Array</span> <span class="n">of</span> <span class="n">keywords</span>
+</span><span class='line'>      <span class="n">behaves</span> <span class="n">like</span> <span class="n">all</span> <span class="n">selector</span> <span class="nb">methods</span>
+</span><span class='line'>        <span class="k">when</span> <span class="n">selection</span> <span class="n">has</span> <span class="n">no</span> <span class="n">nodes</span>
+</span><span class='line'>          <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="n">exception</span>
+</span><span class='line'>    <span class="c1">#metadata_by_selector</span>
+</span><span class='line'>      <span class="n">behaves</span> <span class="n">like</span> <span class="n">all</span> <span class="n">selector</span> <span class="nb">methods</span>
+</span><span class='line'>        <span class="k">when</span> <span class="n">selection</span> <span class="n">has</span> <span class="n">no</span> <span class="n">nodes</span>
+</span><span class='line'>          <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="n">exception</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ok, so we know that all of our selector methods raise the proper exception if they are called with a bunk selector. Now let&#8217;s make sure we can get our metadata downloaded and structured.</p>
+
+<p>Unfortunately I&#8217;m realizing that if the <code>ul</code> for our metadata is part of the post then those words get counted along with everything else, which is not what I want. I need to figure out how to exclude that content&#8230;</p>
+
+<p>I could either tell my crawler to explicitly ignore that content or wrap my blog entry in an even more specific class and just select that. I guess that&#8217;ll be an exercise for tomorrow :\</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 8:03 am</li>
+<li>Mood: Happy, Drowsy, Peaceful</li>
+<li>Sleep: 5.5</li>
+<li>Hunger: 3</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2830,158 +3275,6 @@ Initially the test fails so now we need to update our <code>Crawler</code> to ch
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/03/d3-basics-an-introduction-to-scales/">D3 Basics: An Introduction to Scales</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-03T10:04:00-07:00" pubdate data-updated="true">May 3<span>rd</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><!-- CSS Styles: -->
-
-
-<div>
-  <style type="text/css">
-
-    .chart {
-      font-family: Arial, sans-serif;
-      font-size: 10px;
-    }
-
-    .bar {
-      fill: steelblue;
-    }
-
-    .axis path, .axis line {
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
-    }
-
-  </style>
-</div>
-
-
-
-
-<!-- Global Variables: -->
-
-
-<script type="text/javascript">
-
-  var data = [1, 1, 2, 3, 5, 8];
-
-  var margin = {top: 40, right: 40, bottom: 40, left: 40},
-      width = $('.entry-content').width(),
-      height = 300;
-
-  $(window).resize(function() {
-    width = $('.entry-content').width();
-  });
-
-</script>
-
-
-<p>After selections, scales are probably the most frequently used element in D3 because they faciliate such great control over data and screen space. I want to spend several posts documenting how scales work to help out anyone who is struggling with the concept. We&#8217;ll start with a high level overview of what a scale is in D3 and then explore the individual objects to learn their nuances.</p>
-
-<h3>What Are D3 Scales?</h3>
-
-<p>Essentially a scale is a convenience function for mapping input data to an output range, typically x/y positions or width/height. Scales can also be used to link data to arbitrary values like categories or days of the week, or to quantize data into &#8220;buckets&#8221;.</p>
-
-<p>There are two universal properties for any scale: the <code>domain</code> and the <code>range</code>. The <code>domain</code> serves as the input for your graph while the <code>range</code> represents the output.</p>
-
-<h4>Domain</h4>
-
-<p>Since the <code>domain</code> corresponds to our graph&#8217;s input it can be either <em>continuous</em> or <em>discrete</em>. You might think of a continous data set as any number from 1 to infinity while a discrete set would be every <code>Date</code> from January 1, 2012 to January 10, 2012. The takeaway is that continous data is essentially unbounded and discrete data is finite and easily quantified.</p>
-
-<h4>Range</h4>
-
-<p>The <code>range</code> defines the potential output that the scale can generate. Values from the domain are mapped to values in the range. Let&#8217;s look at two examples to help clarify.</p>
-
-<p>Say you have an <em>identity scale</em>, meaning whatever value you use for input will also be returned as the output. We&#8217;ll call the scale <code>x</code>. If <code>x</code> has an input <code>domain</code> of 0 - 100 and an output <code>range</code> of 0 - 100, then your <code>scale of 1</code> will be 1. Your <code>scale of 50</code> will be 50. Here&#8217;s another way to write it:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="c1">// returns 50</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now let&#8217;s change the scale a bit. Let&#8217;s say that <code>x</code> still has an input <code>domain</code> of 0 - 100 but now it has an output <code>range</code> of <code>0 - 10</code>. What do you think our <code>scale of 50</code> will return? &#8230; If you guessed 5 then you are the smart! Because we limited our potential output down to any number between 0 and 10 it narrowed the mapping from our <code>domain</code> to our <code>range</code>. Being able to expand or contract this mapping is the main value in using a D3 scale. If it&#8217;s still not quite sinking in check out this great visual from <a href="http://www.jeromecukier.net/">Jerome Cukier</a> (<a href="https://twitter.com/#!/jcukier">@jcukier</a>).</p>
-
-<p><img class="center" src="http://www.jeromecukier.net/wp-content/uploads/2011/08/d3scale1.png" title="'An example of how scales work'" ></p>
-
-<p>Jerome has <a href="http://www.jeromecukier.net/blog/2011/08/11/d3-scales-and-color/">an excelent blog post</a> covering scales in D3 which inspired me to write my own post. Definitely read his as well! I feel like a great way to learn something is to not only read about it a bunch but to write about it. Hearing different views on the same topic often helps me solidify a concept.</p>
-
-<h3>Class Work Time</h3>
-
-<!-- D3.js -->
-
-
-<script type='text/javascript'>
-
-var x = d3.scale.linear()
-    .domain([0, 100])
-    .range([0, 10]);
-
-</script>
-
-
-<p>I&#8217;ve included <code>d3</code> on the page so you can play around with it. Go ahead, bust open your developer tools or firebug and type <code>d3</code> into the console. It should return an Object full of methods.</p>
-
-<p>Let&#8217;s do some experiments with our <code>x</code> scale from earlier. Type the following to see what you get.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">25</span><span class="p">);</span>
-</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">99</span><span class="p">);</span>
-</span><span class='line'><span class="nx">x</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In D3 a scale is both a <code>Function</code> and an <code>Object</code>. You can invoke a scale by using parenthesis: <code>x(100)</code> or you can set a property to change its behavior: <code>x.range([0, 1000])</code>. Let&#8217;s try that! In the console type:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">x</span><span class="p">.</span><span class="nx">range</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Our scale&#8217;s range used to be 0 - 10. Now that we&#8217;ve changed it to 0 - 1000, what do you think <code>x(100)</code> will equal? Keep in mind that 100 is the highest value in our domain. If you&#8217;re not sure try it in the console. Actually try it in the console regardless of how sure you are! The console is cool as shit!</p>
-
-<h3>To Be Continued&#8230;</h3>
-
-<p>Scales are a huge topic so we&#8217;ll stop here for now. In the next post we&#8217;ll talk about <code>linear</code>, <code>time</code> and <code>ordinal</code> scales; once you&#8217;ve mastered them everything else becomes a lot easier. Stay tuned :)</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -2999,6 +3292,10 @@ var x = d3.scale.linear()
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/12/messing-around-with-gems/">Messing around with Gems</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/11/some-octopress-rake-tips/">Some Octopress Rake Tips</a>
       </li>
     
@@ -3012,10 +3309,6 @@ var x = d3.scale.linear()
     
       <li class="post">
         <a href="/blog/2012/06/09/css-semantics/">CSS Semantics: Best Practices</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/07/building-a-countdown-timer-with-socket-dot-io-pt-3/">Building a Countdown Timer with Socket.io pt. 3</a>
       </li>
     
   </ul>
