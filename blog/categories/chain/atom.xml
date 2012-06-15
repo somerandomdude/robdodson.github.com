@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-13T09:56:16-07:00</updated>
+  <updated>2012-06-14T23:12:39-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,258 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How To Write a Command Line Ruby Gem]]></title>
+    <link href="http://robdodson.me/blog/2012/06/14/how-to-write-a-command-line-ruby-gem/"/>
+    <updated>2012-06-14T08:17:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/14/how-to-write-a-command-line-ruby-gem</id>
+    <content type="html"><![CDATA[<p>So <a href="http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby/">yesterday we saw how to setup and run ruby scripts as executables from the command line.</a> While this is pretty rad, it definitely has its limitations. For one, it's not very portable and secondly it just isn't very flexible or powerful. If we stuck with this approach we'd need to write our own semantic versioning, we'd have to setup a way to make sure that all of our required 3rd party gems get installed properly... really it'll just be a big mess if we try to hand-roll it.</p>
+
+<p>Instead we're going to turn to Bundler to help us manage our files and turn our command line tool into a ruby gem. I'm going to start fresh and create a totally new tool, called <code>zerp</code>. I don't know what <code>zerp</code>'s purpose will be in the long run, but today we're going to make it print some text to verify everything is working.</p>
+
+<h2>New RVM Gemset</h2>
+
+<p>Before I do anything with gems I want to make sure I have a cleanroom of sorts. So if anything goes horribly wrong I can just throw everything away and start over. To do this we'll use RVM to create a new gemset.</p>
+
+<p><code>
+rvm gemset create zerp
+rvm gemset use zerp
+</code></p>
+
+<p>If you run <code>rvm current</code> you should see something like this: <code>ruby-1.9.3-p125@zerp</code></p>
+
+<p>Now that we have our cleanroom we can template out a new gem.</p>
+
+<h2>Bundle Gem</h2>
+
+<p>If bundler is not one of our global gems we can go ahead and install it with <code>gem install bundler</code>. You can do <code>gem list</code> to see what gems are in your global set.</p>
+
+<p>With Bundler in hand we will generate the boilerplate for our new gem:</p>
+
+<p><code>bundle gem zerp</code></p>
+
+<p>This will create a new folder called <code>zerp/</code> and fill it with several files. <code>cd</code> into <code>zerp/</code> and take a look around.</p>
+
+<p><code>
+drwxr-xr-x  10 Rob  staff   340B Jun 14 08:38 .
+drwxr-xr-x  21 Rob  staff   714B Jun 14 08:38 ..
+drwxr-xr-x  11 Rob  staff   374B Jun 14 08:38 .git
+-rw-r--r--   1 Rob  staff   154B Jun 14 08:38 .gitignore
+-rw-r--r--   1 Rob  staff    89B Jun 14 08:38 Gemfile
+-rw-r--r--   1 Rob  staff   1.0K Jun 14 08:38 LICENSE
+-rw-r--r--   1 Rob  staff   490B Jun 14 08:38 README.md
+-rw-r--r--   1 Rob  staff    48B Jun 14 08:38 Rakefile
+drwxr-xr-x   4 Rob  staff   136B Jun 14 08:38 lib
+-rw-r--r--   1 Rob  staff   626B Jun 14 08:38 zerp.gemspec
+</code></p>
+
+<p>Bundler has already setup a git project for us, as well as including a folder structure for our library. <a href="http://rails-bestpractices.com/blog/posts/8-using-bundler-and-rvm-to-build-a-rubygem">This article from rails-bestpractices.com does a great job of explaining what everything in the boilerplate is.</a></p>
+
+<h2>Zee Codez!</h2>
+
+<p>Our project contains a folder called <code>lib</code> which is where we'll store our Ruby code. Open up <code>lib/zerp.rb</code>. We'll populate it with an example class called <code>Chatter</code> which'll spit out our version of Hello World.</p>
+
+<p>``` ruby lib/zerp.rb
+require "zerp/version"</p>
+
+<p>module Zerp
+  class Chatter</p>
+
+<pre><code>def say_hello
+  puts 'This is zerp. Coming in loud and clear. Over.'
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<h2>Executable</h2>
+
+<p>It wouldn't be much of a CLI without an executable. For that we'll need to create a folder called <code>bin</code> in the root of our project. Next create a file called <code>zerp</code> without any kind of file extension. We're going to require our <code>Chatter</code> class and tell it to <code>say_hello</code>.</p>
+
+<p>``` ruby bin/zerp</p>
+
+<h1>!/usr/bin/env ruby</h1>
+
+<p>require 'zerp'</p>
+
+<p>chatter = Zerp::Chatter.new
+chatter.say_hello
+```</p>
+
+<p>The shebang <code>#!/usr/bin/env ruby</code> tells the system that it should use Ruby to execute our code. After that we require our 'zerp' module defined previously. Finally we instantiate <code>Zerp::Chatter</code> and tell it to <code>say_hello</code>. If all goes well it should respond with</p>
+
+<p><code>
+This is zerp. Coming in loud and clear. Over.
+</code></p>
+
+<p>Let's see if we can make that happen.</p>
+
+<h2>Gemspec</h2>
+
+<p>We're going to open the <code>zerp.gemspec</code> and make it look like so:</p>
+
+<p>``` ruby zerp.gemspec</p>
+
+<h1>-<em>- encoding: utf-8 -</em>-</h1>
+
+<p>require File.expand_path('../lib/zerp/version', <strong>FILE</strong>)</p>
+
+<p>Gem::Specification.new do |gem|
+  gem.authors       = ["Rob Dodson"]
+  gem.email         = ["lets.email.rob@theawesomegmails.com"]
+  gem.description   = %q{When a problem comes along..You must zerp it}
+  gem.summary       = %q{Now zerp it..Into shape}
+  gem.homepage      = "http://robdodson.me"</p>
+
+<p>  gem.files         = <code>git ls-files</code>.split($)
+  gem.executables   = ["zerp"]
+  gem.test_files    = gem.files.grep(%r{<sup>(test|spec|features)/})</sup>
+  gem.name          = "zerp"
+  gem.require_paths = ["lib"]
+  gem.version       = Zerp::VERSION
+end
+```</p>
+
+<p>The main thing I did was to correct the two 'TODO' entries, and to change the <code>gem.executables</code> line from</p>
+
+<p><code>
+gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+</code></p>
+
+<p>to</p>
+
+<p><code>
+gem.executables   = ["zerp"]
+</code></p>
+
+<p>For reaons unknown to me the previous code wasn't picking up my executable properly so I replaced it with <code>["zerp"]</code>. I got the idea from <a href="https://github.com/lukebayes/project-sprouts/blob/master/sprout.gemspec">Project Sprouts which also uses this technique and seems to work fine on my system.</a></p>
+
+<p>Alright we're done! Let's test this thing!</p>
+
+<h2>Cross your fingers</h2>
+
+<p>To install the Gem we'll use Rake's <code>install</code> task. Go ahead and run <code>rake install</code> from the root of the project. It should create a <code>pkg</code> directory and notify us via the terminal that our gem was installed succesfully. Moment of truth time...type <code>zerp</code> into the terminal. If you see <code>This is zerp. Coming in loud and clear. Over.</code> then you're good to go. After you've committed everything to Github and setup a RubyGems account you should be able to run <code>rake release</code> to send your gem out into the world where it can wow the jaded masses and delight with all its wonders. Good Luck! - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 8:18 am</li>
+<li>Mood: Awake, Antsy</li>
+<li>Sleep: 6</li>
+<li>Hunger: 2</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Writing a Command Line Tool in Ruby]]></title>
+    <link href="http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby/"/>
+    <updated>2012-06-13T07:29:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby</id>
+    <content type="html"><![CDATA[<p>Yesterday I tried to do a post on creating your first Ruby Gem as a command line tool. <a href="http://robdodson.me/blog/2012/06/12/messing-around-with-gems/">It didn't go very well.</a> In an effort to better understand what goes on with command line tools I'm going to start from the most basic, a ruby script that is in our <code>PATH</code>.</p>
+
+<p>I've previously added the folder <code>~/bin</code> to my PATH so I know that if I drop an executable script in there I should be able to run it by just typing its name. Let's give that a shot. First we'll make a new file just called <code>sherp</code> without any file extension. Make sure to <code>chmod 755 sherpa</code> so that it's executable. Then we'll add the following:</p>
+
+<p>``` ruby ~/bin/sherpa</p>
+
+<h1>!/usr/bin/env ruby</h1>
+
+<p>puts 'I am the sherpa!!!'
+```</p>
+
+<p>If I now type <code>sherpa</code> into the command line, it should fire back <code>I am the sherpa!!!</code></p>
+
+<p>Ok cool so we've got that part working. Now let's see if we can get some arguments in there. We'll iterate the <code>ARGV</code> object to see what comes in.</p>
+
+<p>``` ruby ~/bin/sherpa</p>
+
+<h1>!/usr/bin/env ruby</h1>
+
+<p>ARGV.each do |arg|</p>
+
+<pre><code>puts arg
+</code></pre>
+
+<p>end
+```</p>
+
+<p>With that little bit of code we should be able to pass just about anything to our command and have it echoed back.</p>
+
+<p>```
+sherpa foo bar baz</p>
+
+<p> => foo
+ => bar
+ => baz
+```</p>
+
+<p>Ok cool. Now let's step this up a notch or two. Let's say we want to send in commands and options. For that we'll use the built-in <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/optparse/rdoc/OptionParser.html">OptionParser</a>. Here's <a href="http://rubylearning.com/blog/2011/01/03/how-do-i-make-a-command-line-tool-in-ruby/">a link to the article I've been following which details how to use the OptionParser.</a> In my case, I'm going to tell <code>sherpa</code> to either <code>say_hello</code> or <code>say_goodbye</code>. When I pass in the <code>-n</code> flag it should accept a name, otherwise it will use the name 'Master'. So the line <code>sherpa say_hello -n Rob</code> should produce <code>Hello Rob</code> and likewise if I left off the option and just used <code>sherpa say_hello</code> it should produce <code>Hello Master</code>.</p>
+
+<p>Here's the code to accomplish this:</p>
+
+<p>``` ruby ~/bin</p>
+
+<h1>!/usr/bin/env ruby</h1>
+
+<p>require 'optparse'</p>
+
+<p>options = {}</p>
+
+<p>opt_parser = OptionParser.new do |opt|
+  opt.banner = "Usage: opt_parser COMMAND [OPTIONS]"
+  opt.separator  ""
+  opt.separator  "Commands"
+  opt.separator  "     name: the name the sherpa should use when addressing you"
+  opt.separator  ""
+  opt.separator  "Options"</p>
+
+<p>  opt.on("-n","--name NAME","tell the sherpa what to call you") do |name|</p>
+
+<pre><code>options[:name] = name
+</code></pre>
+
+<p>  end</p>
+
+<p>  opt.on("-h","--help","help") do</p>
+
+<pre><code>puts opt_parser
+</code></pre>
+
+<p>  end
+end</p>
+
+<p>opt_parser.parse!
+name = options[:name] || 'Master'</p>
+
+<p>case ARGV[0]
+when "say_hello"
+  puts "Hello #{name}"
+when "say_goodbye"
+  puts "Goodbye #{name}"
+else
+  puts opt_parser
+end
+```</p>
+
+<p>And there we go, our first command line Ruby tool. I'll pick it up tomorrow to try to improve upon it. We're starting small but at least we have something that works!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 7:31 am</li>
+<li>Mood: Tired, Patient</li>
+<li>Sleep: 6</li>
+<li>Hunger: 1</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Some Octopress Rake Tips]]></title>
@@ -697,442 +949,6 @@ Likewise if you need to switch to a different font or size, here is where you wo
 <li>Mood: Anxious</li>
 <li>Sleep: 7</li>
 <li>Hunger: 0</li>
-<li>Coffee: 1</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[CSS Semantics: Best Practices]]></title>
-    <link href="http://robdodson.me/blog/2012/06/09/css-semantics/"/>
-    <updated>2012-06-09T07:19:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/09/css-semantics</id>
-    <content type="html"><![CDATA[<p>CSS is, for me, one of the most challenging and nerve wracking aspects of my job. With most programming languages there are frameworks and guides and heuristics that all make up a suite of best practices. CSS doesn't <em>really</em> have anything like this and as a result it's kind of a mish-mash of good rules to follow, definite don'ts, and lots and lots of grey area. Since I'm starting a new CSS heavy project, and because I want to further my own understanding in this realm, I'm going to spend a few posts exploring the topic of what makes good, maintainable CSS. Along the way I'm also going to point out a few frameworks that I've been looking at, in particular <a href="http://oocss.org/">OOCSS</a> and <a href="http://smacss.com/">SMACSS.</a> But lets kick things off with a discussion of what it means to write good, semantic CSS selectors and we'll follow up with frameworks in our next post.</p>
-
-<h2>Define Semantic</h2>
-
-<p>When I was trolling the interwebs for talks on writing large-scale maintainable CSS I somehow managed to come across <a href="http://css-tricks.com/semantic-class-names/">this article on css-tricks comparing the semantics of various css selectors.</a> After reading it I had this weird feeling like maybe I haven't been putting as much thought into my css selectors as I should. My selectors need to be highly semantic, but what does that really <em>mean?</em></p>
-
-<p>Trying to look up the definition of "semantic" is kind of a fun, albeit a slightly annoying task since most definitions look like this:</p>
-
-<p><em>Of, relating to, or according to the science of semantics.</em></p>
-
-<p>Well...thanks. <a href="http://www.wordnik.com/words/semantic">The wonderful Wordnik site has a great list of definitions</a> the most useful of which is probably this:</p>
-
-<p><em>Reflecting intended structure and meaning.</em></p>
-
-<p>So a semantic CSS selector should reflect the intended structure or meaning of the element it is applied to. Hmm...that's still a rather broad definition but at least we have a starting point. If I have a <code>div</code> that holds a bunch of news articles there's probably a gradient of increasingly more semantic names I could use for it.</p>
-
-<p>``` html</p>
-
-<div class="container"></div>
-
-
-
-
-<div class="article-box"></div>
-
-
-
-
-<div class="newsstand"></div>
-
-
-<p>```</p>
-
-<p>On the far end of the spectrum, <code>container</code> is about as generic as you can get and basically restates that something is a <code>div</code>. While I've been guilty of doing this in the past, if you're saying a containing HTML Element is a 'container' you're restating the obvious and should probably work on improving the name.</p>
-
-<p><code>article-box</code> is much more descriptive than just <code>container</code> so I'd say it has a higher semantic "score". But there is the potential for some semantic weirdness here, for instance, if we decide at a later date that we want our articles to be contained in a horizontal list it might make less sense to call it an "article-<em>box</em>". So maybe <code>article-container</code> is semantically similar but also a bit more flexible?</p>
-
-<p>Finally we have <code>newsstand</code> which is highly semantic and probably my favorite of the bunch. <code>newsstand</code> describes what our element <em>is</em> but it doesn't bother delving into how our element works. As a result <code>newsstand</code> can work however we want, it can be list like, or grid like, tabular, etc and it won't matter. You might argue that this would be a good place to use an ID instead of a class but that decision should be weighed carefully. You have to make sure that 3 months or a year from now there isn't the potential of having two newsstands on the same page.</p>
-
-<h3>If we only worked on contived examples...</h3>
-
-<p>Of course there's a litany of cases where highly semantic naming just doesn't quite cut it. Often times we're given a layout which has a few primary areas (columns, headers, footer) and the designer is putting all sorts of content into those divisions. On one page it could be news articles, then a list of search results, then a directory of users, and so on. I would argue that for major layout elements it's ok to use less semantic names, and in fact this is probably a good idea. So things like <code>column_1</code>, <code>flex-box</code>, <code>constrained-container</code>, are all specifying, at varying degrees, what the element is doing. They are less semantically rich than, say, <code>rolodex</code> or <code>id-badge</code>, but that's because their very intention is to be generic.</p>
-
-<h3>What about helpers?</h3>
-
-<p><em>Preface: I know about SASS and LESS. Let's pretend they don't exist for a moment :D</em></p>
-
-<p>Here is an area where I recently got very tripped up and I'm still not entirely sure what the best approach might be. Let's say you have a brand color, something like Facebook's blue, and you need to apply it to all sorts of different and unrelated elements. If you're like me then your brain starts thinking, "Well, that blue value is essentially a variable that I'd like to reuse. Maybe I should just make a helper style for it..." and so you produce something like this in a helpers.css file:</p>
-
-<p>``` css helpers.css
-.light-blue {</p>
-
-<pre><code>#00C
-</code></pre>
-
-<p>}
-```</p>
-
-<p>Now our HTML has little <code>light-blue</code>s sprinkled on top of it and we don't have to worry about declaring that same blue value over and over again in our styles. But what happens when our company decides to rebrand and now our primary color is a bright red? Uh oh...You definitely don't want to have to change HTML <em>and</em> CSS just to update a color.</p>
-
-<p><a href="http://css-tricks.com/semantic-class-names/#comment-102571">Neal G on CSS-Tricks made a very good comment regarding this scenario:</a></p>
-
-<blockquote><p>Perhaps an easier way to explain semantic CSS is simply, don’t name your classes or ids anything related to a CSS property. A property could be color, font-family, float, border, background etc.</p></blockquote>
-
-<p><a href="http://www.webdesignerdepot.com/2009/05/10-best-css-practices-to-improve-your-code/">Also from the Web Designer Depot</a></p>
-
-<blockquote><p>Name your elements based on what they are, not what they look like. For example, .comment-blue is much less versatile than .comment-beta, and .post-largefont is more limiting than .post-title.</p></blockquote>
-
-<p>Perhaps a better helper would have been <code>.brand-color</code> but again this is a contrived example. What about all the <em>other</em> colors on the site. And what about helpers that wrap commonly used styles like <code>float: left</code> and <code>clear: both</code>?</p>
-
-<p>The debate is pretty hot and heavy <a href="http://css-tricks.com/semantic-class-names">on the css-tricks article.</a> Just seach for the word 'float' and you'll see some pretty interesting discussions on it. My opinion is that you probably don't want to tack a bunch of <code>.bright-red</code> or <code>.larger</code> classes everywhere but at the same time something like <code>.float-right</code> can be extremely useful and <a href="http://css-tricks.com/semantic-class-names/#comment-102906">in some cases forcing semantics into a design can actually make things worse</a> especially for <a href="http://css-tricks.com/semantic-class-names/#comment-103076">less technically inclined clients.</a></p>
-
-<p>As a bit of a homework assignment I would recommend looking into a few of the resources I'm posting below. Obviouslyl take everything with a grain of salt, there isn't any true gospel for CSS so do what works best for you. I'll cover OOCSS and SMACSS in my next post, till then, thanks for reading! - Rob</p>
-
-<p><a href="http://css-tricks.com/semantic-class-names/">What Makes For a Semantic Class Name?</a></p>
-
-<p><a href="http://www.stubbornella.org/content/2011/04/28/our-best-practices-are-killing-us/">Our Best Practices Are Killing Us</a></p>
-
-<p><a href="https://github.com/styleguide/css">Github CSS Style Guide</a></p>
-
-<p><a href="https://github.com/csswizardry/CSS-Guidelines/blob/master/CSS%20Guidelines.md">CSS Wizardry: CSS Guidelines</a></p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:23 am</li>
-<li>Mood: Awake, Annoyed</li>
-<li>Sleep: 7</li>
-<li>Hunger: 0</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Building a Countdown Timer with Socket.io pt. 3]]></title>
-    <link href="http://robdodson.me/blog/2012/06/07/building-a-countdown-timer-with-socket-dot-io-pt-3/"/>
-    <updated>2012-06-07T19:41:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/07/building-a-countdown-timer-with-socket-dot-io-pt-3</id>
-    <content type="html"><![CDATA[<p>Today's the day we wrap up our countdown timer and deploy it to Heroku. But before we launch this puppy we need to clean house a little and spice up the visual appeal.</p>
-
-<h3>Refactoring the Stopwatch</h3>
-
-<p>While the Stopwatch from our last post worked OK there are a spots that can be improved. For starters I'd like to separate the formatting of the time from the <code>onTick</code> method. Mainly because I want to be able to pull the current time out whenever someone hits reset or a new connection is made. Here's how I updated Stopwatch to accomodate these changes:</p>
-
-<p>``` js modles/stopwatch.js
-var util    = require('util'),</p>
-
-<pre><code>events  = require('events')
-_       = require('underscore');
-</code></pre>
-
-<p>// ---------------------------------------------
-// Constructor
-// ---------------------------------------------
-function Stopwatch() {</p>
-
-<pre><code>if(false === (this instanceof Stopwatch)) {
-    return new Stopwatch();
-}
-
-this.hour = 3600000;
-this.minute = 60000;
-this.second = 1000;
-this.time = this.hour;
-this.interval = undefined;
-
-events.EventEmitter.call(this);
-
-// Use Underscore to bind all of our methods
-// to the proper context
-_.bindAll(this);
-</code></pre>
-
-<p>};</p>
-
-<p>// ---------------------------------------------
-// Inherit from EventEmitter
-// ---------------------------------------------
-util.inherits(Stopwatch, events.EventEmitter);</p>
-
-<p>// ---------------------------------------------
-// Methods
-// ---------------------------------------------
-Stopwatch.prototype.start = function() {</p>
-
-<pre><code>if (this.interval) {
-    return;
-}
-
-console.log('Starting Stopwatch!');
-// note the use of _.bindAll in the constructor
-// with bindAll we can pass one of our methods to
-// setInterval and have it called with the proper 'this' value
-this.interval = setInterval(this.onTick, this.second);
-this.emit('start:stopwatch');
-</code></pre>
-
-<p>};</p>
-
-<p>Stopwatch.prototype.stop = function() {</p>
-
-<pre><code>console.log('Stopping Stopwatch!');
-if (this.interval) {
-    clearInterval(this.interval);
-    this.interval = undefined;
-    this.emit('stop:stopwatch');
-}
-</code></pre>
-
-<p>};</p>
-
-<p>Stopwatch.prototype.reset = function() {</p>
-
-<pre><code>console.log('Resetting Stopwatch!');
-this.time = this.hour;
-this.emit('reset:stopwatch', this.formatTime(this.time));
-</code></pre>
-
-<p>};</p>
-
-<p>Stopwatch.prototype.onTick = function() {</p>
-
-<pre><code>this.time -= this.second;
-
-var formattedTime = this.formatTime(this.time);
-this.emit('tick:stopwatch', formattedTime);
-
-if (this.time === 0) {
-    this.stop();
-}
-</code></pre>
-
-<p>};</p>
-
-<p>Stopwatch.prototype.formatTime = function(time) {</p>
-
-<pre><code>var remainder = time,
-    numHours,
-    numMinutes,
-    numSeconds,
-    output = "";
-
-numHours = String(parseInt(remainder / this.hour, 10));
-remainder -= this.hour * numHours;
-
-numMinutes = String(parseInt(remainder / this.minute, 10));
-remainder -= this.minute * numMinutes;
-
-numSeconds = String(parseInt(remainder / this.second, 10));
-
-output = _.map([numHours, numMinutes, numSeconds], function(str) {
-    if (str.length === 1) {
-        str = "0" + str;
-    }
-    return str;
-}).join(":");
-
-return output;
-</code></pre>
-
-<p>};</p>
-
-<p>Stopwatch.prototype.getTime = function() {</p>
-
-<pre><code>return this.formatTime(this.time);
-</code></pre>
-
-<p>};</p>
-
-<p>// ---------------------------------------------
-// Export
-// ---------------------------------------------
-module.exports = Stopwatch;
-```</p>
-
-<p>I also namespaced the events so they would be easier to read when mixed in with the socket.io events. During the refactoring I noticed there were a lot of actors listening to, emitting or calling something like <code>start</code>. I'm not sure if there are common socket.io namespacing patterns but I based what I did on Backbone events and I think it works out well enough.</p>
-
-<h3>Cleaning up app.js</h3>
-
-<p>These changes to <code>Stopwatch</code> also require us to update the <code>app.js</code> that uses it.</p>
-
-<p>``` js app.js
-var stopwatch = new Stopwatch();
-stopwatch.on('tick:stopwatch', function(time) {
-  io.sockets.emit('time', { time: time });
-});</p>
-
-<p>stopwatch.on('reset:stopwatch', function(time) {
-  io.sockets.emit('time', { time: time });
-});</p>
-
-<p>stopwatch.start();</p>
-
-<p>io.sockets.on('connection', function (socket) {
-  io.sockets.emit('time', { time: stopwatch.getTime() });</p>
-
-<p>  socket.on('click:start', function () {</p>
-
-<pre><code>stopwatch.start();
-</code></pre>
-
-<p>  });</p>
-
-<p>  socket.on('click:stop', function () {</p>
-
-<pre><code>stopwatch.stop();
-</code></pre>
-
-<p>  });</p>
-
-<p>  socket.on('click:reset', function () {</p>
-
-<pre><code>stopwatch.reset();
-</code></pre>
-
-<p>  });
-});
-```</p>
-
-<p>I've made it so whenever a user resets or connects to the page they get the latest time. And of course whenever the stopwatch ticks they'll get an update as well. I think it might also be nice if pressing start dispatched the latest time, I should probably add that... ;)</p>
-
-<h3>Tweaking the views</h3>
-
-<p>Lastly I've updated the view by adding some more buttons to correspond to the start/stop and reset methods. I've also wrapped everything in a container to make it easier to position:</p>
-
-<p>``` html views/index.ejs</p>
-
-<div id="wrapper">
-    <div id="countdown"></div>
-    <button id="start" class="thoughtbot">Start</button>
-    <button id="stop" class="thoughtbot">Stop</button>
-    <button id="reset" class="thoughtbot">Reset</button>
-</div>
-
-
-<p><code>
-</code> js public/js/main.js
-var socket = io.connect(window.location.hostname);</p>
-
-<p>socket.on('time', function (data) {</p>
-
-<pre><code>$('#countdown').html(data.time);
-</code></pre>
-
-<p>});</p>
-
-<p>$('#start').click(function() {</p>
-
-<pre><code>socket.emit('click:start');
-</code></pre>
-
-<p>});</p>
-
-<p>$('#stop').click(function() {</p>
-
-<pre><code>socket.emit('click:stop');
-</code></pre>
-
-<p>});</p>
-
-<p>$('#reset').click(function() {</p>
-
-<pre><code>socket.emit('click:reset');
-</code></pre>
-
-<p>});
-```
-Also notice that the socket events coming from the view have been namespaced as well.</p>
-
-<h3>Improving the type</h3>
-
-<p>Next up I want to enhance the type using <a href="http://www.google.com/webfonts">one of Google's webfonts.</a> I chose a font called <code>Black Ops One</code> which seemed appropriately militaristic. Setting it up was as easy as adding one line to my <code>layout.ejs</code></p>
-
-<p><code>html views/layout.ejs
-&lt;link href='http://fonts.googleapis.com/css?family=Black+Ops+One' rel='stylesheet' type='text/css'&gt;
-</code></p>
-
-<p>and my <code>main.css</code> file:</p>
-
-<p>``` css public/css/main.css</p>
-
-<h1>countdown {</h1>
-
-<p>  font-family: 'Black Ops One', cursive;
-  font-size: 90px;
-}
-<code>``
-Finally I chose to use some funky buttons from [Chad Mazzola's CSS3 Buttons project.](https://github.com/ubuwaits/css3-buttons) I went with the Thoughtbot buttons since they were red and awesome. The styles are pretty long so I'm just going to post my entire</code>main.css` for you to see:</p>
-
-<p>``` css public/css/main.css</p>
-
-<h1>wrapper {</h1>
-
-<p>  width: 475px;
-  height: 171px;
-  margin: 100px auto;
-}</p>
-
-<h1>countdown {</h1>
-
-<p>  font-family: 'Black Ops One', cursive;
-  font-size: 90px;
-}</p>
-
-<p>button.thoughtbot {
-  background-color: #ee432e;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ee432e), color-stop(50%, #c63929), color-stop(50%, #b51700), color-stop(100%, #891100));
-  background-image: -webkit-linear-gradient(top, #ee432e 0%, #c63929 50%, #b51700 50%, #891100 100%);
-  background-image: -moz-linear-gradient(top, #ee432e 0%, #c63929 50%, #b51700 50%, #891100 100%);
-  background-image: -ms-linear-gradient(top, #ee432e 0%, #c63929 50%, #b51700 50%, #891100 100%);
-  background-image: -o-linear-gradient(top, #ee432e 0%, #c63929 50%, #b51700 50%, #891100 100%);
-  background-image: linear-gradient(top, #ee432e 0%, #c63929 50%, #b51700 50%, #891100 100%);
-  border: 1px solid #951100;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-  -webkit-box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4), 0 1px 3px #333333;
-  -moz-box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4), 0 1px 3px #333333;
-  box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4), 0 1px 3px #333333;
-  color: #fff;
-  font: bold 20px "helvetica neue", helvetica, arial, sans-serif;
-  line-height: 1;
-  padding: 12px 0 14px 0;
-  text-align: center;
-  text-shadow: 0px -1px 1px rgba(0, 0, 0, 0.8);
-  width: 150px;
-}</p>
-
-<p>button.thoughtbot:hover {
-  background-color: #f37873;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #f37873), color-stop(50%, #db504d), color-stop(50%, #cb0500), color-stop(100%, #a20601));
-  background-image: -webkit-linear-gradient(top, #f37873 0%, #db504d 50%, #cb0500 50%, #a20601 100%);
-  background-image: -moz-linear-gradient(top, #f37873 0%, #db504d 50%, #cb0500 50%, #a20601 100%);
-  background-image: -ms-linear-gradient(top, #f37873 0%, #db504d 50%, #cb0500 50%, #a20601 100%);
-  background-image: -o-linear-gradient(top, #f37873 0%, #db504d 50%, #cb0500 50%, #a20601 100%);
-  background-image: linear-gradient(top, #f37873 0%, #db504d 50%, #cb0500 50%, #a20601 100%);
-  cursor: pointer;
-}</p>
-
-<p>button.thoughtbot:active {
-  background-color: #d43c28;
-  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #d43c28), color-stop(50%, #ad3224), color-stop(50%, #9c1500), color-stop(100%, #700d00));
-  background-image: -webkit-linear-gradient(top, #d43c28 0%, #ad3224 50%, #9c1500 50%, #700d00 100%);
-  background-image: -moz-linear-gradient(top, #d43c28 0%, #ad3224 50%, #9c1500 50%, #700d00 100%);
-  background-image: -ms-linear-gradient(top, #d43c28 0%, #ad3224 50%, #9c1500 50%, #700d00 100%);
-  background-image: -o-linear-gradient(top, #d43c28 0%, #ad3224 50%, #9c1500 50%, #700d00 100%);
-  background-image: linear-gradient(top, #d43c28 0%, #ad3224 50%, #9c1500 50%, #700d00 100%);
-  -webkit-box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4);
-  -moz-box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4);
-  box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4);
-}
-```
-<img class="center" src="https://s3.amazonaws.com/robdodson/images/defcon_final.png" title="'Defcon final'" ></p>
-
-<p>SWEEEEEEET! I'll go ahead and host it on Heroku but first I have to find out what the cost of leaving Node.js/Socket.io running indefinitely would be. Till then you should be able to get a local version of all this working or <a href="https://github.com/robdodson/defcon">just clone the Github repo</a> and now you too can have your very own Defcon stopwatch. enjoy! - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:41 pm</li>
-<li>Mood: Tired, Lazy</li>
-<li>Sleep: 6</li>
-<li>Hunger: 3</li>
 <li>Coffee: 1</li>
 </ul>
 

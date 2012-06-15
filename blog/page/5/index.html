@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content=".chart { font-family: Arial, sans-serif; font-size: 10px; } .bar { fill: steelblue; } .axis path, .axis line { fill: none; stroke: #000; shape- &hellip;">
+  <meta name="description" content="Since I&#8217;ve been talking so much about D3.js lately I thought it might be fun to start a little project which combines D3 and Ruby. The idea is &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,202 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/05/building-a-simple-scraper-with-nokogiri-in-ruby/">Building a Simple Scraper With Nokogiri in Ruby</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-05T21:08:00-07:00" pubdate data-updated="true">May 5<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Since I&#8217;ve been talking so much about <a href="http://d3js.org/">D3.js</a> lately I thought it might be fun to start a little project which combines D3 and Ruby. The idea is to build a very simple page scraper that counts how often certain words are used in each post. I&#8217;ve also decided to start adding a little block of metadata at the end of each post so I can graph that over time as well.</p>
+
+<p>So how do we get started? Well first we&#8217;ll need to build a page scraper of some kind. This program will have to consume the contents of an HTML page, find the node that contains our blog post and count up how often each word reoccurs. For right now that should be more than enough to get us started. We&#8217;ll look at grabbing the metadata and drawing graphs in future posts. I should point out that this idea was inspired by the wonderful site <a href="http://smarterware.org/5359/taking-on-the-750-words-march-challenge">750words.com</a> which creates <a href="http://smarterware.org/5359/taking-on-the-750-words-march-challenge">a beautiful exploration section</a> any time you write a new journal entry. Definitely check out that site, it&#8217;s amazing.</p>
+
+<h3>Hello Noko</h3>
+
+<p>I decided early on that I wanted the scraper to use <a href="http://nokogiri.org/">Nokogiri</a> because I&#8217;ve heard so much about it. As the authors describe it:</p>
+
+<blockquote><p>Nokogiri (鋸) is an HTML, XML, SAX, and Reader parser. Among Nokogiri’s many features is the ability to search documents via XPath or CSS3 selectors.</p></blockquote>
+
+<p>Using CSS selectors means that working with Nokogiri is a lot like working with jQuery. Here&#8217;s a quick demonstration:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;open-uri&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;nokogiri&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">doc</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s1">&#39;https://www.google.com/search?q=unicorns&#39;</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="s1">&#39;h3.r a&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">link</span><span class="o">|</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">link</span><span class="o">.</span><span class="n">content</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Easy enough, right? Taking it a step further let&#8217;s iterate over each element on the page and place them into a <code>Hash</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;open-uri&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;nokogiri&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="vi">@counts</span> <span class="o">=</span> <span class="no">Hash</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">words_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">string</span><span class="o">.</span><span class="n">downcase</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="sr">/[\w&#39;]+/</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">count_frequency</span><span class="p">(</span><span class="n">word_list</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">for</span> <span class="n">word</span> <span class="k">in</span> <span class="n">word_list</span>
+</span><span class='line'>    <span class="vi">@counts</span><span class="o">[</span><span class="n">word</span><span class="o">]</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="vi">@counts</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">doc</span> <span class="o">=</span> <span class="no">Nokogiri</span><span class="o">::</span><span class="no">HTML</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s1">&#39;http://robdodson.me&#39;</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">####</span>
+</span><span class='line'><span class="c1"># Search for nodes by css</span>
+</span><span class='line'><span class="n">entries</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="s1">&#39;div.entry-content&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="nb">puts</span> <span class="s2">&quot;Parsing </span><span class="si">#{</span><span class="n">entries</span><span class="o">.</span><span class="n">length</span><span class="si">}</span><span class="s2"> entries&quot;</span>
+</span><span class='line'><span class="n">entries</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">entry</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">words</span> <span class="o">=</span> <span class="n">words_from_string</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">count_frequency</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">sorted</span>  <span class="o">=</span> <span class="vi">@counts</span><span class="o">.</span><span class="n">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="n">count</span> <span class="p">}</span>
+</span><span class='line'><span class="nb">puts</span> <span class="n">sorted</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">word</span><span class="si">}</span><span class="s2">: </span><span class="si">#{</span><span class="n">count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The output from this script should look (kind of) like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>...
+</span><span class='line'>ruby: 66
+</span><span class='line'>rvm: 66
+</span><span class='line'>our: 68
+</span><span class='line'>can: 71
+</span><span class='line'>3: 75
+</span><span class='line'>if: 77
+</span><span class='line'>for: 82
+</span><span class='line'>your: 88
+</span><span class='line'>2: 88
+</span><span class='line'>is: 91
+</span><span class='line'>this: 91
+</span><span class='line'>s: 94
+</span><span class='line'>we: 95
+</span><span class='line'>that: 106
+</span><span class='line'>i: 118
+</span><span class='line'>in: 119
+</span><span class='line'>it: 125
+</span><span class='line'>1: 128
+</span><span class='line'>and: 149
+</span><span class='line'>of: 170
+</span><span class='line'>a: 231
+</span><span class='line'>you: 233
+</span><span class='line'>to: 342
+</span><span class='line'>the: 382
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It looks like our regex could use a bit of work so it doesn&#8217;t grab singular letters like &#8216;s&#8217; or numbers, but it&#8217;s definitely a good start. Tomorrow we&#8217;ll put everything into a <code>Module</code> and back it with tests.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 9:16 pm</li>
+<li>Mood: Relaxed, Tired</li>
+<li>Sleep: 6.5</li>
+<li>Hunger: 5</li>
+<li>Coffee: 1</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2096,161 +2292,6 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/09/21/syntax-error-unexpected-tidentifier/">Syntax Error: Unexpected tIDENTIFIER in Rails 3</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-09-21T07:33:00-07:00" pubdate data-updated="true">Sep 21<span>st</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Today we’re going to look at this little gem, which is really nothing more than a syntax error. If you’re not used to Ruby’s syntax, this can be a particularly easy stumbling block.</p>
-
-<p>For starters here’s the image you see in Rails 3 when things go South:</p>
-
-<p><img class="center" src="/images/unexpected_tidentifier.jpg" title="'Syntax Error: Unexpected tIDENTIFIER'" ></p>
-
-<p>Just to focus your attention, I’ll post the snippet of code that was causing the issue.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='erb'><span class='line'><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s2">&quot;Goodbye&quot;</span> <span class="n">say_goodbye_path</span> <span class="cp">%&gt;</span><span class="x"></span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Can you tell me what’s wrong with the code above? If you’re coming from a Ruby background it should be plainly obvious, but if you’re coming from more of an ECMAScript or Java/C/C++ background things might be a little more subtle. What if I rewrote it like this?</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">linkTo</span><span class="p">(</span><span class="s2">&quot;Goodbye&quot;</span> <span class="n">sayGoodbyePath</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Did you notice I left out a comma when passing my function arguments? The proper code would look something like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='erb'><span class='line'><span class="x"># note the comma between arguments</span>
-</span><span class='line'><span class="cp">&lt;%=</span> <span class="n">link_to</span> <span class="s2">&quot;Goodbye&quot;</span><span class="p">,</span> <span class="n">say_goodbye_path</span> <span class="cp">%&gt;</span><span class="x"></span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you want to explore this a bit more (and if you’re new to Ruby—trust me—you do) then strap in for a brief tangent.</p>
-
-<h3>Ruby Says Goodbye to Braces (sort of)</h3>
-
-<p>One of Ruby’s double edged swords, especially if you’re coming from another language, is the exclusion of various syntactical elements to improve brevity and readability. In Actionscript 3 you might iterate over a list of items like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='actionscript3'><span class='line'><span class="k">for</span> <span class="k">each</span> <span class="o">(</span><span class="kd">var</span> <span class="n">person</span><span class="p">:</span><span class="kt">Object</span> <span class="k">in</span> <span class="n">people</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nf">trace</span><span class="o">(</span><span class="n">person</span><span class="o">.</span><span class="na">name</span><span class="o">);</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>However in Ruby you can write it much more succinctly:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">for</span> <span class="n">person</span> <span class="k">in</span> <span class="vi">@people</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="n">person</span><span class="o">.</span><span class="n">name</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># or...</span>
-</span><span class='line'>
-</span><span class='line'><span class="vi">@people</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">person</span><span class="o">|</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="n">person</span><span class="o">.</span><span class="n">name</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Just that example alone doesn’t look so bad but where it gets tricky for a newcomer like myself is when the parenthesis wrapping a function’s arguments are excluded. This is the case in our original example and it can be pretty jarring for someone not used to that kind of shorthand. Suddenly I’m left wondering if I’m calling another function, or using a keyword, or some other idiom of the language that I don’t fully grasp.</p>
-
-<p>It gets especially confusing when dealing with hashes as function arguments. Here’s a quote from <a href="http://pragprog.com/book/rails4/agile-web-development-with-rails">Agile Web Development with Rails, 4th Edition</a> with some emphasis added:</p>
-
-<blockquote><p>You can pass hashes as parameters on method calls. <strong>Ruby allows you to omit the braces, but only if the hash is the last parameter of the call.</strong> Rails makes extensive use of this feature…In effect, though, you can ignore that it’s a hash and pretend that Ruby has keyword arguments.</p></blockquote>
-
-<p>As you start to learn Rails you’ll see this kind of thing everywhere. At first I thought there was a special language construct that I was missing (similar to the ‘keyword’ referred to in the book) but in actuality it’s just hashes without the surrounding brackets. Common Rails practices take this to the extreme, mixing and omitting braces quite frequently. Take for example this validation:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">validates</span> <span class="ss">:email</span><span class="p">,</span> <span class="n">presence</span><span class="p">:</span>   <span class="kp">true</span><span class="p">,</span>
-</span><span class='line'>                    <span class="nb">format</span><span class="p">:</span>     <span class="p">{</span> <span class="n">with</span><span class="p">:</span> <span class="no">VALID_EMAIL_REGEX</span> <span class="p">},</span>
-</span><span class='line'>                    <span class="n">uniqueness</span><span class="p">:</span> <span class="p">{</span> <span class="n">case_sensitive</span><span class="p">:</span> <span class="kp">false</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>To confuse the issue even further, the hash syntax changed from Ruby 1.8.7 to 1.9 allowing you to swap the place of the colon on your symbols. This makes newer Rails examples seem like they’re using another part of the language that you might not be familiar with. Below is an example, note the position of the colons:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'> <span class="c1"># Ruby 1.8.7 hash syntax</span>
-</span><span class='line'><span class="n">say_hello</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="ss">:age</span> <span class="o">=&gt;</span> <span class="mi">27</span>
-</span><span class='line'><span class="n">say_hello</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="ss">:age</span> <span class="o">=&gt;</span> <span class="mi">27</span><span class="p">)</span>
-</span><span class='line'><span class="n">say_hello</span><span class="p">({</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="ss">:age</span> <span class="o">=&gt;</span> <span class="mi">27</span><span class="p">})</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># Ruby 1.9 hash syntax</span>
-</span><span class='line'><span class="n">say_hello</span> <span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="n">age</span><span class="p">:</span> <span class="mi">27</span>
-</span><span class='line'><span class="n">say_hello</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="n">age</span><span class="p">:</span> <span class="mi">27</span><span class="p">)</span>
-</span><span class='line'><span class="n">say_hello</span><span class="p">({</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="n">age</span><span class="p">:</span> <span class="mi">27</span><span class="p">})</span>
-</span><span class='line'><span class="n">say_hello</span> <span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="ss">:age</span> <span class="o">=&gt;</span> <span class="mi">27</span>
-</span><span class='line'><span class="n">say_hello</span><span class="p">(</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="ss">:age</span> <span class="o">=&gt;</span> <span class="mi">27</span><span class="p">)</span>
-</span><span class='line'><span class="n">say_hello</span><span class="p">({</span><span class="ss">:name</span> <span class="o">=&gt;</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="ss">:age</span> <span class="o">=&gt;</span> <span class="mi">27</span><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>All of the above code evaluates to the same thing (give it a shot in IRB). At this point we’re way off topic but I wanted to put this out there in case anyone else is struggling with these concepts. After getting used to the syntax (or lack thereof) these kinds of mistakes are easily cleared up, but for now just be mindful of what version of Ruby your examples are written in.</p>
-
-<h3>Resolution</h3>
-
-<p>Check the syntax of your method call. Odds are you forgot a comma somewhere.</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; Older</a>
@@ -2268,6 +2309,10 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/14/how-to-write-a-command-line-ruby-gem/">How To Write a Command Line Ruby Gem</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/13/writing-a-command-line-tool-in-ruby/">Writing a Command Line Tool in Ruby</a>
       </li>
     
@@ -2281,10 +2326,6 @@ otherwise you’ll need to dig into it with a path that looks like this</p>
     
       <li class="post">
         <a href="/blog/2012/06/10/building-a-responsive-grid-with-foundation/">Building a Responsive Grid with Foundation</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/09/lets-talk-smacss/">Let&#8217;s Talk SMACSS, Man</a>
       </li>
     
   </ul>
