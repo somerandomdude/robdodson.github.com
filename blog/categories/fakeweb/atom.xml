@@ -4,7 +4,7 @@
   <title><![CDATA[Category: FakeWeb | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/fakeweb/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-14T23:12:39-07:00</updated>
+  <updated>2012-06-15T20:05:39-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -510,7 +510,7 @@ end
 Previously I was testing against</code>@config = YAML.load(File.open(config))<code>to see if it would throw an error when passed</code>nil<code>or empty string for the argument. I've since realized that's basically testing [Ruby Core](http://www.ruby-doc.org/core-1.9.3/) to see if it's working as described in the docs...which seems silly to me. Now if I were *handling* those exceptions and doing something in response, then yeah, I would want to test it. But since I'm allowing the program to explode if you try to load an empty config file I figure it's best to just let the core or stdlib do their thing and assume that it was well tested. Having said that I think we've got decent coverage on</code>Options<code>and can move back to the</code>Runner<code>and then the</code>Crawler`.</p>
 
 <p>By the way, if you want a more visual representation of our tests you can run <code>bundle exec rspec -f html -o index.html</code> which will generate an html file showing what passed/failed and is still pending.
-<img class="left" src="/images/rspec_tests_visualization.png" title="'RSpec Static Test HTML'" ></p>
+{% img left /images/rspec_tests_visualization.png 'RSpec Static Test HTML' %}</p>
 
 <h3>Mocking Nokogiri requests with FakeWeb</h3>
 

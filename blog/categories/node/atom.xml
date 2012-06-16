@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Node | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/node/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-14T23:12:39-07:00</updated>
+  <updated>2012-06-15T20:05:39-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,69 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to Run a Node Script from the Command Line]]></title>
+    <link href="http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/"/>
+    <updated>2012-06-15T19:46:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line</id>
+    <content type="html"><![CDATA[<p>This post is going to be short and sweet because I have to help my lady pack for her big trip to Germany. Over the past few days I've been messing around with command line tools written in Ruby so today I decided to give it a shot in Node.</p>
+
+<p>We're going to start small in this first post and just get a little script running. After that we'll step it up so it can be distributed using NPM, <a href="http://robdodson.me/blog/2012/06/14/how-to-write-a-command-line-ruby-gem/">just like we did with our previous Ruby gem.</a></p>
+
+<h2>First write some codez</h2>
+
+<p>Make a new directory called <code>compliment</code> and create two files inside of it: <code>comliment.js</code> and <code>package.json</code>.</p>
+
+<p>In <code>compliment.js</code> we're just going to print out some kind words.</p>
+
+<p>``` js compliment/compliment.js</p>
+
+<h1>! /usr/bin/env node</h1>
+
+<p>console.log('you. are. AWESOME!');
+```</p>
+
+<p>Simple enough right? Just make sure you include that shebang up at the top which directs the system to use Node to execute our script.</p>
+
+<h2>Package it up</h2>
+
+<p>Ok now that we have our little script we'll give its <code>package.json</code> some love.</p>
+
+<p>``` compliment/package.json
+{</p>
+
+<pre><code>"name": "compliment",
+"version": "0.0.1",
+"description": "Tell us how awesome we are.",
+"preferGlobal": "true",
+"bin": { "compliment": "compliment.js" },
+"author": "Rob Dodson",
+"engines": { "node": "*" }
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Most of that should be self explanatory. The key aspect is the <code>bin</code> section where you tell it to translate <code>compliment</code> into <code>compliment.js</code>. To install it all we have to do is run <code>npm link</code>. After you've done that you should be able to type <code>compliment</code> and hear how awesome you are!</p>
+
+<ul>
+<li>Rob</li>
+</ul>
+
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 8:18 am</li>
+<li>Mood: Awake, Antsy</li>
+<li>Sleep: 6</li>
+<li>Hunger: 2</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a Countdown Timer with Socket.io pt. 3]]></title>
@@ -332,7 +395,7 @@ Finally I chose to use some funky buttons from [Chad Mazzola's CSS3 Buttons proj
   box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4);
 }
 ```
-<img class="center" src="https://s3.amazonaws.com/robdodson/images/defcon_final.png" title="'Defcon final'" ></p>
+{% img center https://s3.amazonaws.com/robdodson/images/defcon_final.png 'Defcon final' %}</p>
 
 <p>SWEEEEEEET! I'll go ahead and host it on Heroku but first I have to find out what the cost of leaving Node.js/Socket.io running indefinitely would be. Till then you should be able to get a local version of all this working or <a href="https://github.com/robdodson/defcon">just clone the Github repo</a> and now you too can have your very own Defcon stopwatch. enjoy! - Rob</p>
 
@@ -923,11 +986,11 @@ Express server listening on port 5000 in development mode
 
 <p>If not leave me a comment and I'll see if I can help you debug it. However let's assume that everything DID go well for you and now you're ready to connect to the local version of your app. Point your browser to http://localhost:5000 and you should see something like this:</p>
 
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/all_is_well_with_sockets.png" title="'All is well with Socket.io'" ></p>
+<p>{% img center https://s3.amazonaws.com/robdodson/images/all_is_well_with_sockets.png 'All is well with Socket.io' %}</p>
 
 <p>Now open another browser window and also point it at localhost:5000. In one of the windows click the button that says <code>Reset</code> which should change the copy in <em>both</em> windows to 'War is imminent!'</p>
 
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/war_is_imminent_sockets.png" title="'War is Immentin with Socket.io'" ></p>
+<p>{% img center https://s3.amazonaws.com/robdodson/images/war_is_imminent_sockets.png 'War is Immentin with Socket.io' %}</p>
 
 <h3>Git'er done!</h3>
 
@@ -995,7 +1058,7 @@ $ heroku ps</p>
 
 <p>With everything setup we should be able to run <code>heroku open</code> which will fire up our browser and direct it to an instance of our app. There seems to be a fair bit of latency so it can take several seconds for the initial status of 'All is well' to show up. If you see the Reset button with nothing above it give it around 10 seconds to see if it eventually updates. Open another browser window and point it at the Heroku domain in the address bar. If you press the Reset button in one window it should immediately update in the next one.</p>
 
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/heroku_war_is_imminent.png" title="'Heroku: War is Imminent'" ></p>
+<p>{% img center https://s3.amazonaws.com/robdodson/images/heroku_war_is_imminent.png 'Heroku: War is Imminent' %}</p>
 
 <h3>Wrapping up</h3>
 
@@ -1021,168 +1084,6 @@ $ heroku ps:scale web=0
 <li>Sleep: 5</li>
 <li>Hunger: 0</li>
 <li>Coffee: 1</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to use EJS in Express]]></title>
-    <link href="http://robdodson.me/blog/2012/05/31/how-to-use-ejs-in-express/"/>
-    <updated>2012-05-31T11:34:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/31/how-to-use-ejs-in-express</id>
-    <content type="html"><![CDATA[<p>Here's a quick explanation of how to use EJS instead of Jade in your Express projects. This is super easy and covered well in the documentation but I wanted to put it here since that's what I worked on today :)</p>
-
-<p>To start I'll create a new project from the command line:</p>
-
-<p><code>
-express foobar
-cd foobar
-npm install
-</code></p>
-
-<p>Now that I have my foobar project created I need to install <code>ejs</code>.</p>
-
-<p><code>
-npm install ejs
-</code></p>
-
-<p>If you're within your project directory this will place ejs in the <code>node_modules</code> dir. Let's also add it to our package.json.</p>
-
-<p>```
-{
-  "name": "foobar",
-  "version": "0.0.1",
-  "private": true,
-  "dependencies": {</p>
-
-<pre><code>"express": "~2.5.8",
-"ejs": "~0.7.1"
-</code></pre>
-
-<p>  }
-}
-<code>``
-The tilde operator means that we require ejs verion 0.7.1 or greater but only up to the next major release. So the following are equivalent:</code>"~1.2" = ">=1.2.0 &lt;2.0.0"`. For a deeper explanation of package.json and NPM in general <a href="http://howtonode.org/introduction-to-npm">checkout this great post</a>.</p>
-
-<h3>Leaving Jade for EJS</h3>
-
-<p>If you're using the boilerplate that Express generates then it should be setup to use Jade as the rendering engine for its views. I think that Jade is cool but I need to baby step into Node/Express and make sure I understand everything that's going on instead of trying to consume so many different tools at once. With this in mind I decided to switch from Jade to EJS at least in the beginning because the syntax has no learning curve. To change your rendering engine you'll need to either add or edit the following call:</p>
-
-<p><code>js
-app.set('view engine', 'ejs');
-</code></p>
-
-<p>The boilerplate should have this set to <code>jade</code> inside of a configuration block. Once we've changed that line to read <code>ejs</code> we're ready to start writing some views.</p>
-
-<h3>Setting up your layout</h3>
-
-<p>By default Express' boilerplate will look for a file named layout in our views directory. Let's write one called <code>layout.ejs</code>:</p>
-
-<p>``` html views/layout.ejs
-&lt;!DOCTYPE html>
-<html lang="en">
-  <head></p>
-
-<pre><code>&lt;meta charset="utf-8"&gt;
-&lt;title&gt;Pivotal Search&lt;/title&gt;
-&lt;meta name="description" content=""&gt;
-&lt;meta name="author" content=""&gt;
-
-&lt;!-- HTML5 shim, for IE6-8 support of HTML elements --&gt;
-&lt;!--[if lt IE 9]&gt;
-  &lt;script src="http://html5shim.googlecode.com/svn/trunk/html5.js"&gt;&lt;/script&gt;
-&lt;![endif]--&gt;
-
-&lt;!-- styles --&gt;
-&lt;link href="stylesheets/style.css" rel="stylesheet"&gt;
-</code></pre>
-
-<p>  </head>
-  <body></p>
-
-<pre><code>&lt;%- body %&gt;
-</code></pre>
-
-<p>  </body>
-</html>
-```</p>
-
-<p>This is all really straightforward with the exception of the <code>&lt;%- body %&gt;</code> line which basically works like a <code>yield</code> in erb. Whatever template we pass to Express' <code>response.render()</code> function will fill this dependency, here's an example:</p>
-
-<p><code>js app.js
-app.get('/', function(req, res) {
-  res.render('index', { title: 'The index page!' })
-});
-</code></p>
-
-<p>``` html views/index.ejs</p>
-
-<div class="title">
-    <%= title %>
-</div>
-
-
-<p>```
-<img class="center" src="https://s3.amazonaws.com/robdodson/images/rendering_the_index_template.png" title="'Rendering the index template'" ></p>
-
-<p>Furthermore we can use partials with Express and EJS like so:</p>
-
-<p>``` html views/layout.ejs
-&lt;!DOCTYPE html>
-<html lang="en">
-  <head></p>
-
-<pre><code>&lt;meta charset="utf-8"&gt;
-&lt;title&gt;Pivotal Search&lt;/title&gt;
-&lt;meta name="description" content=""&gt;
-&lt;meta name="author" content=""&gt;
-
-&lt;!-- HTML5 shim, for IE6-8 support of HTML elements --&gt;
-&lt;!--[if lt IE 9]&gt;
-  &lt;script src="http://html5shim.googlecode.com/svn/trunk/html5.js"&gt;&lt;/script&gt;
-&lt;![endif]--&gt;
-
-&lt;!-- styles --&gt;
-&lt;link href="stylesheets/style.css" rel="stylesheet"&gt;
-</code></pre>
-
-<p>  </head>
-  <body></p>
-
-<pre><code>&lt;%- partial('header.ejs') %&gt;
-&lt;%- body %&gt;
-</code></pre>
-
-<p>  </body>
-</html>
-```</p>
-
-<p>``` html views/header.ejs
-<header></p>
-
-<pre><code>My awesome header!
-</code></pre>
-
-<p></header></p>
-
-<hr>
-
-
-<p>```</p>
-
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/rendering_the_header_partial.png" title="'Rendering the header partial'" ></p>
-
-<p>And there ya go! Simple but hopefully useful if you're just getting started like I am :) - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 11:36 am</li>
-<li>Mood: Eager, Alert</li>
-<li>Sleep: 7</li>
-<li>Hunger: 7</li>
-<li>Coffee: 0</li>
 </ul>
 
 ]]></content>

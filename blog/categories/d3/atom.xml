@@ -4,7 +4,7 @@
   <title><![CDATA[Category: D3 | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/d3/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-14T23:12:39-07:00</updated>
+  <updated>2012-06-15T20:05:39-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -326,7 +326,7 @@ x(50) // returns 50
 
 <p>Now let's change the scale a bit. Let's say that <code>x</code> still has an input <code>domain</code> of 0 - 100 but now it has an output <code>range</code> of <code>0 - 10</code>. What do you think our <code>scale of 50</code> will return? ... If you guessed 5 then you are the smart! Because we limited our potential output down to any number between 0 and 10 it narrowed the mapping from our <code>domain</code> to our <code>range</code>. Being able to expand or contract this mapping is the main value in using a D3 scale. If it's still not quite sinking in check out this great visual from <a href="http://www.jeromecukier.net/">Jerome Cukier</a> (<a href="https://twitter.com/#!/jcukier">@jcukier</a>).</p>
 
-<p><img class="center" src="http://www.jeromecukier.net/wp-content/uploads/2011/08/d3scale1.png" title="'An example of how scales work'" ></p>
+<p>{% img center http://www.jeromecukier.net/wp-content/uploads/2011/08/d3scale1.png 'An example of how scales work' %}</p>
 
 <p>Jerome has <a href="http://www.jeromecukier.net/blog/2011/08/11/d3-scales-and-color/">an excelent blog post</a> covering scales in D3 which inspired me to write my own post. Definitely read his as well! I feel like a great way to learn something is to not only read about it a bunch but to write about it. Hearing different views on the same topic often helps me solidify a concept.</p>
 

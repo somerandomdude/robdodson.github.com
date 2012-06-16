@@ -4,7 +4,7 @@
   <title><![CDATA[Category: PostgreSQL | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/postgresql/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-14T23:12:39-07:00</updated>
+  <updated>2012-06-15T20:05:39-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -101,7 +101,7 @@ You might see some deprecation warnings about vendor plugins. For now you can (p
 
 <p>One last tip re: your new Postgres setup. If you're just starting out like me then your command line fu is probably not as strong as you'd like it to be. Personally I really like having a nice GUI to visualize the tables in my database. For MySQL I usually use the awesome (and free) <a href="http://www.sequelpro.com/">SequelPro</a>. For PostgreSQL you can use <a href="http://inductionapp.com/">Induction</a>. It doesn't seem like they have a downloadable binary on their website (weird?) but you can grab one out of <a href="https://github.com/Induction/Induction/downloads">the Github repo's downloads page</a>. Connecting to your Postgres instance can be a little tricky, you have to make sure to use the PostgreSQL adapter, localhost as the hostname, your computer's username as the user and the password can remain blank. You also <em>HAVE</em> to give it a database name (even though it says it's optional) or it will throw a <code>FATAL:  database [your username] does not exist</code>. Here's a screenshot of what mine looks like:</p>
 
-<p><img class="center" src="/images/induction_screen.png" title="'Induction Login Screen'" ></p>
+<p>{% img center /images/induction_screen.png 'Induction Login Screen' %}</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
