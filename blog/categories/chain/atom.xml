@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-15T20:05:57-07:00</updated>
+  <updated>2012-06-15T20:06:32-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -57,6 +57,8 @@
 ```</p>
 
 <p>Most of that should be self explanatory. The key aspect is the <code>bin</code> section where you tell it to translate <code>compliment</code> into <code>compliment.js</code>. To install it all we have to do is run <code>npm link</code>. After you've done that you should be able to type <code>compliment</code> and hear how awesome you are!</p>
+
+<p>Keep in mind this isn't distributable just yet, we'll work on that tomorrow. Till then have fun playing with your new powers :D</p>
 
 <ul>
 <li>Rob</li>
