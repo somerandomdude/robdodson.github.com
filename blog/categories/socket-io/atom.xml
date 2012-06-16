@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Socket.io | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/socket-io/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-15T20:05:39-07:00</updated>
+  <updated>2012-06-15T20:05:57-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -332,7 +332,7 @@ Finally I chose to use some funky buttons from [Chad Mazzola's CSS3 Buttons proj
   box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4);
 }
 ```
-{% img center https://s3.amazonaws.com/robdodson/images/defcon_final.png 'Defcon final' %}</p>
+<img class="center" src="https://s3.amazonaws.com/robdodson/images/defcon_final.png" title="'Defcon final'" ></p>
 
 <p>SWEEEEEEET! I'll go ahead and host it on Heroku but first I have to find out what the cost of leaving Node.js/Socket.io running indefinitely would be. Till then you should be able to get a local version of all this working or <a href="https://github.com/robdodson/defcon">just clone the Github repo</a> and now you too can have your very own Defcon stopwatch. enjoy! - Rob</p>
 
@@ -923,11 +923,11 @@ Express server listening on port 5000 in development mode
 
 <p>If not leave me a comment and I'll see if I can help you debug it. However let's assume that everything DID go well for you and now you're ready to connect to the local version of your app. Point your browser to http://localhost:5000 and you should see something like this:</p>
 
-<p>{% img center https://s3.amazonaws.com/robdodson/images/all_is_well_with_sockets.png 'All is well with Socket.io' %}</p>
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/all_is_well_with_sockets.png" title="'All is well with Socket.io'" ></p>
 
 <p>Now open another browser window and also point it at localhost:5000. In one of the windows click the button that says <code>Reset</code> which should change the copy in <em>both</em> windows to 'War is imminent!'</p>
 
-<p>{% img center https://s3.amazonaws.com/robdodson/images/war_is_imminent_sockets.png 'War is Immentin with Socket.io' %}</p>
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/war_is_imminent_sockets.png" title="'War is Immentin with Socket.io'" ></p>
 
 <h3>Git'er done!</h3>
 
@@ -995,7 +995,7 @@ $ heroku ps</p>
 
 <p>With everything setup we should be able to run <code>heroku open</code> which will fire up our browser and direct it to an instance of our app. There seems to be a fair bit of latency so it can take several seconds for the initial status of 'All is well' to show up. If you see the Reset button with nothing above it give it around 10 seconds to see if it eventually updates. Open another browser window and point it at the Heroku domain in the address bar. If you press the Reset button in one window it should immediately update in the next one.</p>
 
-<p>{% img center https://s3.amazonaws.com/robdodson/images/heroku_war_is_imminent.png 'Heroku: War is Imminent' %}</p>
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/heroku_war_is_imminent.png" title="'Heroku: War is Imminent'" ></p>
 
 <h3>Wrapping up</h3>
 

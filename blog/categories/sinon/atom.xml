@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Sinon | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/sinon/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-15T20:05:39-07:00</updated>
+  <updated>2012-06-15T20:05:57-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -430,7 +430,7 @@ it('should make an ajax call', function(done) {
 <p>  });
 });
 ```
-{% img center https://s3.amazonaws.com/robdodson/images/first_failing_ajax_test.png 'Our first failing test with Mocha, Chai and Sinon. Yay!' %}</p>
+<img class="center" src="https://s3.amazonaws.com/robdodson/images/first_failing_ajax_test.png" title="'Our first failing test with Mocha, Chai and Sinon. Yay!'" ></p>
 
 <p>Changing this line <code>expect($.ajax.calledOnce).to.be.false;</code> from <code>false</code> to <code>true</code> should make our test pass. Yay, first async test in the bag! Next let's try to fake a response from the server. But I'm realizing that the succesful server response should <em>do</em> something to my pickleStore object, otherwise why do I care about the data? So I'm going to update pickelStore with the following success callback on its pickles method:</p>
 
@@ -512,7 +512,7 @@ it('should update the count', function(done) {
 
 <p>Failing as expected. Aaaaand we change the expected count to 100, voila! Passing tests again!</p>
 
-<p>{% img center https://s3.amazonaws.com/robdodson/images/passing_yield_test.png 'Passing test with Sinon's yieldTo' %}</p>
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/passing_yield_test.png" title="'Passing test with Sinon's yieldTo'" ></p>
 
 <p>I'm adding the test for the status update as well so our final <code>#pickles</code> spec should look like this:</p>
 
@@ -632,7 +632,7 @@ done();
 
 <p>This is not unlike our previous spec, in fact it does even less since we're not checking count.</p>
 
-<p>{% img center https://s3.amazonaws.com/robdodson/images/failing_add_test.png 'Another failing test.' %}</p>
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/failing_add_test.png" title="'Another failing test.'" ></p>
 
 <p>To make the test pass we change the 99 to <code>amount</code>. I originally wrote the add method thinking I would go back and check the total number of pickles but I've realized now that really that's more of a test for the service and not the front end. The front end shouldn't care if that arithmetic is happening properly, it should just consume data and update its UI. For tomorrow's post I'll try to get an AMD module in here so we can start playing with Backbone again. Thanks!</p>
 

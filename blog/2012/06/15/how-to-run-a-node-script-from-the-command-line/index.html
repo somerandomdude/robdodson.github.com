@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Pangrams in Ruby - Rob Dodson talks internets</title>
+  <title>How to Run a Node Script from the Command Line - Rob Dodson talks internets</title>
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="I&#8217;m a big fan of sites like RubyQuiz and CodeEval. In my opinion doing short puzzles and brain-teasers is a great way to explore a language. &hellip;">
+  <meta name="description" content="This post is going to be short and sweet because I have to help my lady pack for her big trip to Germany. Over the past few days I&#8217;ve been &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://robdodson.me/blog/2012/05/09/pangrams-in-ruby">
+  <link rel="canonical" href="http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -77,7 +77,7 @@
   
   <header>
     
-      <h1 class="entry-title">Pangrams in Ruby</h1>
+      <h1 class="entry-title">How to Run a Node Script From the Command Line</h1>
     
     
       <p class="meta">
@@ -93,20 +93,39 @@
   
 
 
-<time datetime="2012-05-09T23:15:00-07:00" pubdate data-updated="true">May 9<span>th</span>, 2012</time>
+<time datetime="2012-06-15T19:46:00-07:00" pubdate data-updated="true">Jun 15<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>I&#8217;m a big fan of sites like <a href="http://www.rubyquiz.com/">RubyQuiz</a> and <a href="http://www.codeeval.com/">CodeEval</a>. In my opinion doing short puzzles and brain-teasers is a great way to explore a language. Here&#8217;s one such puzzle taken from CodeEval which asks that you devise a program to read in a file, parse each line and decide if it is a pangram or not.</p>
+<div class="entry-content"><p>This post is going to be short and sweet because I have to help my lady pack for her big trip to Germany. Over the past few days I&#8217;ve been messing around with command line tools written in Ruby so today I decided to give it a shot in Node.</p>
 
-<blockquote><p>The sentence &#8216;A quick brown fox jumps over the lazy dog&#8217; contains every single letter in the alphabet. Such sentences are called pangrams. You are to write a program, which takes a sentence, and returns all the letters it is missing (which prevent it from being a pangram). You should ignore the case of the letters in sentence, and your return should be all lower case letters, in alphabetical order. You should also ignore all non US-ASCII characters.In case the input sentence is already a pangram, print out the string NULL</p></blockquote>
+<p>We&#8217;re going to start small in this first post and just get a little script running. After that we&#8217;ll step it up so it can be distributed using NPM, <a href="http://robdodson.me/blog/2012/06/14/how-to-write-a-command-line-ruby-gem/">just like we did with our previous Ruby gem.</a></p>
 
-<p>Here&#8217;s my first attempt. Hopefully I can come back to this post in a few weeks and try it again in a bit more elegant fashion :)</p>
+<h2>First write some codez</h2>
 
-<figure class='code'><figcaption><span>pangrams.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>Make a new directory called <code>compliment</code> and create two files inside of it: <code>comliment.js</code> and <code>package.json</code>.</p>
+
+<p>In <code>compliment.js</code> we&#8217;re just going to print out some kind words.</p>
+
+<figure class='code'><figcaption><span>compliment/compliment.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="err">#</span><span class="o">!</span> <span class="err">/usr/bin/env node</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;you. are. AWESOME!&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Simple enough right? Just make sure you include that shebang up at the top which directs the system to use Node to execute our script.</p>
+
+<h2>Package it up</h2>
+
+<p>Ok now that we have our little script we&#8217;ll give its <code>package.json</code> some love.</p>
+
+<figure class='code'><figcaption><span>compliment/package.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -115,71 +134,35 @@
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="no">ARGV</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">)</span><span class="o">.</span><span class="n">each_line</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">missing_letters</span> <span class="o">=</span> <span class="o">[]</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">unless</span> <span class="n">line</span><span class="o">.</span><span class="n">chomp</span><span class="o">.</span><span class="n">empty?</span>
-</span><span class='line'>    <span class="n">line</span><span class="o">.</span><span class="n">chomp!</span>
-</span><span class='line'>    <span class="n">line</span><span class="o">.</span><span class="n">downcase!</span>
-</span><span class='line'>    <span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="o">.</span><span class="n">.</span><span class="s1">&#39;z&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">l</span><span class="o">|</span>
-</span><span class='line'>      <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">l</span><span class="p">)</span><span class="o">.</span><span class="n">nil?</span>
-</span><span class='line'>        <span class="n">missing_letters</span> <span class="o">&lt;&lt;</span> <span class="n">l</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">if</span> <span class="n">missing_letters</span><span class="o">.</span><span class="n">empty?</span>
-</span><span class='line'>    <span class="nb">puts</span> <span class="s2">&quot;NULL&quot;</span>
-</span><span class='line'>  <span class="k">else</span>
-</span><span class='line'>    <span class="nb">puts</span> <span class="n">missing_letters</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;compliment&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;version&quot;</span><span class="o">:</span> <span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;description&quot;</span><span class="o">:</span> <span class="s2">&quot;Tell us how awesome we are.&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;preferGlobal&quot;</span><span class="o">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;bin&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;compliment&quot;</span><span class="o">:</span> <span class="s2">&quot;compliment.js&quot;</span> <span class="p">},</span>
+</span><span class='line'>    <span class="s2">&quot;author&quot;</span><span class="o">:</span> <span class="s2">&quot;Rob Dodson&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;engines&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;node&quot;</span><span class="o">:</span> <span class="s2">&quot;*&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>And here&#8217;s some input:</p>
+<p>Most of that should be self explanatory. The key aspect is the <code>bin</code> section where you tell it to translate <code>compliment</code> into <code>compliment.js</code>. To install it all we have to do is run <code>npm link</code>. After you&#8217;ve done that you should be able to type <code>compliment</code> and hear how awesome you are!</p>
 
-<figure class='code'><figcaption><span>sentences.txt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='text'><span class='line'>A quick brown fox jumps over the lazy dog
-</span><span class='line'>A slow yellow fox crawls under the proactive dog
-</span><span class='line'>AbC
-</span></code></pre></td></tr></table></div></figure>
+<ul>
+<li>Rob</li>
+</ul>
 
-
-<p>To run it from the command line you&#8217;ll need to pass in the path to the sentece file as an argument. Here&#8217;s what it would look like if <code>pangrams.rb</code> and <code>sentences.txt</code> were in the same folder:</p>
-
-<figure class='code'><figcaption><span>sentences.txt</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='text'><span class='line'>ruby pangrams.rb sentences.txt
-</span><span class='line'>
-</span><span class='line'># outputs...
-</span><span class='line'>NULL
-</span><span class='line'>bjkmqz
-</span><span class='line'>defghijklmnopqrstuvwxyz
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Play around with this, throw some different sentence combinations at it to see what it spits out. Then try to write your own implementation. A good next step would be to modify the script so it can support empty lines in the text file.</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 8:18 am</li>
+<li>Mood: Awake, Antsy</li>
+<li>Sleep: 6</li>
+<li>Hunger: 2</li>
+<li>Coffee: 0</li>
+</ul>
+
 </div>
 
 
@@ -202,12 +185,12 @@
   
 
 
-<time datetime="2012-05-09T23:15:00-07:00" pubdate data-updated="true">May 9<span>th</span>, 2012</time>
+<time datetime="2012-06-15T19:46:00-07:00" pubdate data-updated="true">Jun 15<span>th</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/puzzles/'>Puzzles</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a>
+    <a class='category' href='/blog/categories/cli/'>CLI</a>, <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/node/'>Node</a>
   
 </span>
 
@@ -216,7 +199,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -229,10 +212,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/" title="Previous Post: Object Oriented Scraper Backed With Tests Pt. 3">&laquo; Object Oriented Scraper Backed With Tests Pt. 3</a>
+        <a class="basic-alignment left" href="/blog/2012/06/14/how-to-write-a-command-line-ruby-gem/" title="Previous Post: How To Write a Command Line Ruby Gem">&laquo; How To Write a Command Line Ruby Gem</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2012/05/10/design-by-configuration-sucks/" title="Next Post: Design by Configuration Sucks">Design by Configuration Sucks &raquo;</a>
       
     </p>
   </footer>
@@ -362,8 +343,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/';
-        var disqus_url = 'http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/';
+        var disqus_identifier = 'http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/';
+        var disqus_url = 'http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/';
         var disqus_script = 'embed.js';
       
     (function () {

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Backbone Events | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/backbone-events/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-15T20:05:39-07:00</updated>
+  <updated>2012-06-15T20:05:57-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -140,7 +140,7 @@ chatty: function() {
 ```</p>
 
 <p>And there you have it. When we click on <code>Subject</code> it should replace the content in <code>Observer</code> like so:
-{% img center /images/subject_observer.png 'The Observer hears the Subject' %}</p>
+<img class="center" src="/images/subject_observer.png" title="'The Observer hears the Subject'" ></p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
