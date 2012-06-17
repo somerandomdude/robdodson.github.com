@@ -4,7 +4,7 @@
   <title><![CDATA[Category: CLI | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/cli/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-15T20:06:32-07:00</updated>
+  <updated>2012-06-16T23:25:53-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,67 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Publish your Node Library to NPM]]></title>
+    <link href="http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm/"/>
+    <updated>2012-06-16T23:06:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm</id>
+    <content type="html"><![CDATA[<p>Alright, <a href="http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/">contuing from yesterday</a> we want to take our little Node module and make it available to the world as a really awesome command line tool.</p>
+
+<p>The first thing we need to do is register an NPM account.</p>
+
+<p><code>npm adduser</code></p>
+
+<p>Fill in your credentials and it should be ready to go.</p>
+
+<p>If we have any dependencies they should be added to our <code>package.json</code> file. Our simple <code>compliment</code> program doesn't need any extra libraries but we'll add <code>xml2json</code> just to demonstrate how it's done.</p>
+
+<p>``` js package.json
+{</p>
+
+<pre><code>"name": "compliment",
+"version": "0.0.1",
+"description": "Tell us how awesome we are.",
+"preferGlobal": "true",
+"bin": { "compliment": "compliment.js" },
+"author": "Rob Dodson",
+"dependencies": {
+    "xml2json": "0.2.4"
+},
+"engines": { "node": "*" }
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Since we've changed our <code>package.json</code> we need to run <code>npm link</code> again to install the dependency. After that you should have a <code>node_modules/</code> folder in your project root.</p>
+
+<p>Let's put this baby under version control!</p>
+
+<p><code>
+git init
+echo node_modules/ &gt;&gt; .gitignore # node_modules should be installed by npm
+git add .
+git commit -am 'Initial commit'
+</code></p>
+
+<p>Final step: <code>npm publish</code></p>
+
+<h1>BOOMJAMS! We have us an npm module! - Rob</h1>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 11:06 pm</li>
+<li>Mood: Hyper</li>
+<li>Sleep: 5</li>
+<li>Hunger: 1</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to Run a Node Script from the Command Line]]></title>

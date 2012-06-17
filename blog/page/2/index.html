@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Click here for part 2. Yesterday I put together a very simple Node/Socket.io application and showed how to deploy it to Heroku. Today I&#8217;m going &hellip;">
+  <meta name="description" content="Continuing from yesterday&#8217;s post we started out with a rather crude timer and today I want to upgrade it to a full fledged model, Stopwatch, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,443 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/06/building-a-countdown-timer-with-socket-dot-io-pt-2/">Building a Countdown Timer With Socket.io Pt. 2</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-06T07:47:00-07:00" pubdate data-updated="true">Jun 6<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/">Continuing from yesterday&#8217;s post</a> we started out with a rather crude timer and today I want to upgrade it to a full fledged model, <code>Stopwatch</code>, which dispatches events for the view to hook on to.</p>
+
+<h3>Extend Node&#8217;s EventEmitter</h3>
+
+<p>We want to extend Node&#8217;s EventEmitter object in order for our Stopwatch to dispatch its tick events. <a href="http://elegantcode.com/2011/02/21/taking-baby-steps-with-node-js-implementing-events/">Following this great article by Jan Van Ryswyck</a> I&#8217;ve arrived at something that looks like this:</p>
+
+<figure class='code'><figcaption><span>models/stopwatch.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">util</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;util&#39;</span><span class="p">),</span>
+</span><span class='line'>    <span class="nx">events</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;events&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">Stopwatch</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="kc">false</span> <span class="o">===</span> <span class="p">(</span><span class="k">this</span> <span class="k">instanceof</span> <span class="nx">Stopwatch</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nx">Stopwatch</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>    <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">self</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;tick&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">util</span><span class="p">.</span><span class="nx">inherits</span><span class="p">(</span><span class="nx">Stopwatch</span><span class="p">,</span> <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">);</span>
+</span><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Stopwatch</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In our app.js we&#8217;ll need to <code>require</code> our new Stopwatch module, create an instance of it, and add a listener for the tick event. Here&#8217;s the abbreviated version:</p>
+
+<figure class='code'><figcaption><span>app.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">Stopwatch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./models/stopwatch&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">stopwatch</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Stopwatch</span><span class="p">();</span>
+</span><span class='line'><span class="nx">stopwatch</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;tick&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;stopwatch tick!&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If all goes well when you restart your server you should see &#8216;stopwatch tick!&#8217; arriving every second.</p>
+
+<h3>Add to the prototype the RIGHT way</h3>
+
+<p>This next part is what tripped me up the other night and since it was rather late in the evening I was too out of it to figure out what was going wrong.</p>
+
+<p>To recap, we&#8217;ve created a model called <code>Stopwatch</code>, we gave it a constructor function and we told it to extend <code>events.EventEmitter</code>.</p>
+
+<p>Now I want to add a new method to my stopwatch but here&#8217;s where you might run into a real gotcha. If you&#8217;re like me you&#8217;d probably add it like this:</p>
+
+<figure class='code'><figcaption><span>models/stopwatch.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">util</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;util&#39;</span><span class="p">),</span>
+</span><span class='line'>    <span class="nx">events</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;events&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">Stopwatch</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="kc">false</span> <span class="o">===</span> <span class="p">(</span><span class="k">this</span> <span class="k">instanceof</span> <span class="nx">Stopwatch</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nx">Stopwatch</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Stopwatch</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">foobar</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;foobar!&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">util</span><span class="p">.</span><span class="nx">inherits</span><span class="p">(</span><span class="nx">Stopwatch</span><span class="p">,</span> <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Stopwatch</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Aaaand your app would explode like this:</p>
+
+<figure class='code'><figcaption><span>models/stopwatch.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">[</span><span class="nx">ERROR</span><span class="p">]</span> <span class="nx">TypeError</span>
+</span><span class='line'><span class="nx">TypeError</span><span class="o">:</span> <span class="nb">Object</span> <span class="err">#</span><span class="o">&lt;</span><span class="nx">Stopwatch</span><span class="o">&gt;</span> <span class="nx">has</span> <span class="nx">no</span> <span class="nx">method</span> <span class="s1">&#39;foobar&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That&#8217;s because we can only add new methods <strong>after calling <code>util.inherits</code>.</strong> The proper way would look like this:</p>
+
+<figure class='code'><figcaption><span>models/stopwatch.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">util</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;util&#39;</span><span class="p">),</span>
+</span><span class='line'>    <span class="nx">events</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;events&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">Stopwatch</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="kc">false</span> <span class="o">===</span> <span class="p">(</span><span class="k">this</span> <span class="k">instanceof</span> <span class="nx">Stopwatch</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nx">Stopwatch</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">util</span><span class="p">.</span><span class="nx">inherits</span><span class="p">(</span><span class="nx">Stopwatch</span><span class="p">,</span> <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Stopwatch</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">foobar</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;foobar!&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Stopwatch</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is also the approach <a href="http://nodejs.org/api/util.html#util_util_inherits_constructor_superconstructor">taken in the documentation.</a> Guess it pays to rtfm :D</p>
+
+<p>Here&#8217;s what my final <code>Stopwatch</code> looks like:</p>
+
+<figure class='code'><figcaption><span>models/stopwatch.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">util</span>    <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;util&#39;</span><span class="p">),</span>
+</span><span class='line'>    <span class="nx">events</span>  <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;events&#39;</span><span class="p">)</span>
+</span><span class='line'>    <span class="nx">_</span>       <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;underscore&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// ---------------------------------------------</span>
+</span><span class='line'><span class="c1">// Constructor</span>
+</span><span class='line'><span class="c1">// ---------------------------------------------</span>
+</span><span class='line'><span class="kd">function</span> <span class="nx">Stopwatch</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="kc">false</span> <span class="o">===</span> <span class="p">(</span><span class="k">this</span> <span class="k">instanceof</span> <span class="nx">Stopwatch</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nx">Stopwatch</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">hour</span> <span class="o">=</span> <span class="mi">3600000</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">minute</span> <span class="o">=</span> <span class="mi">60000</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">second</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">time</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hour</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">interval</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Use Underscore to bind all of our methods</span>
+</span><span class='line'>    <span class="c1">// to the proper context</span>
+</span><span class='line'>    <span class="nx">_</span><span class="p">.</span><span class="nx">bindAll</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// ---------------------------------------------</span>
+</span><span class='line'><span class="c1">// Inherit from EventEmitter</span>
+</span><span class='line'><span class="c1">// ---------------------------------------------</span>
+</span><span class='line'><span class="nx">util</span><span class="p">.</span><span class="nx">inherits</span><span class="p">(</span><span class="nx">Stopwatch</span><span class="p">,</span> <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// ---------------------------------------------</span>
+</span><span class='line'><span class="c1">// Methods</span>
+</span><span class='line'><span class="c1">// ---------------------------------------------</span>
+</span><span class='line'><span class="nx">Stopwatch</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">start</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Starting Stopwatch!&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="c1">// note the use of _.bindAll in the constructor</span>
+</span><span class='line'>    <span class="c1">// with bindAll we can pass one of our methods to</span>
+</span><span class='line'>    <span class="c1">// setInterval and have it called with the proper &#39;this&#39; value</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">interval</span> <span class="o">=</span> <span class="nx">setInterval</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">onTick</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">second</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;start&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Stopwatch</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">stop</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Stopping Stopwatch!&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">interval</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">clearInterval</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">interval</span><span class="p">);</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;stop&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Stopwatch</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">reset</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Resetting Stopwatch!&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">time</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hour</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Stopwatch</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">onTick</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">remainder</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">time</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">numHours</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">numMinutes</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">numSeconds</span><span class="p">,</span>
+</span><span class='line'>        <span class="nx">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">time</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
+</span><span class='line'>        <span class="k">return</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">numHours</span> <span class="o">=</span> <span class="nb">String</span><span class="p">(</span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">remainder</span> <span class="o">/</span> <span class="k">this</span><span class="p">.</span><span class="nx">hour</span><span class="p">,</span> <span class="mi">10</span><span class="p">));</span>
+</span><span class='line'>    <span class="nx">remainder</span> <span class="o">-=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hour</span> <span class="o">*</span> <span class="nx">numHours</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">numMinutes</span> <span class="o">=</span> <span class="nb">String</span><span class="p">(</span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">remainder</span> <span class="o">/</span> <span class="k">this</span><span class="p">.</span><span class="nx">minute</span><span class="p">,</span> <span class="mi">10</span><span class="p">));</span>
+</span><span class='line'>    <span class="nx">remainder</span> <span class="o">-=</span> <span class="k">this</span><span class="p">.</span><span class="nx">minute</span> <span class="o">*</span> <span class="nx">numMinutes</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">numSeconds</span> <span class="o">=</span> <span class="nb">String</span><span class="p">(</span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">remainder</span> <span class="o">/</span> <span class="k">this</span><span class="p">.</span><span class="nx">second</span><span class="p">,</span> <span class="mi">10</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">output</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">([</span><span class="nx">numHours</span><span class="p">,</span> <span class="nx">numMinutes</span><span class="p">,</span> <span class="nx">numSeconds</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">str</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span> <span class="o">+</span> <span class="nx">str</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">str</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}).</span><span class="nx">join</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;tick&#39;</span><span class="p">,</span> <span class="nx">output</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">time</span> <span class="o">-=</span> <span class="k">this</span><span class="p">.</span><span class="nx">second</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// ---------------------------------------------</span>
+</span><span class='line'><span class="c1">// Export</span>
+</span><span class='line'><span class="c1">// ---------------------------------------------</span>
+</span><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Stopwatch</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And here&#8217;s how I&#8217;m using it in <code>app.js</code></p>
+
+<figure class='code'><figcaption><span>app.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">Stopwatch</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./models/stopwatch&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">stopwatch</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Stopwatch</span><span class="p">();</span>
+</span><span class='line'><span class="nx">stopwatch</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;tick&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">time</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;tick: &#39;</span> <span class="o">+</span> <span class="nx">time</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'><span class="nx">stopwatch</span><span class="p">.</span><span class="nx">start</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Running the above should give you something like this in your console:</p>
+
+<figure class='code'><figcaption><span>app.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">tick</span><span class="o">:</span> <span class="mi">01</span><span class="o">:</span><span class="mi">00</span><span class="o">:</span><span class="mi">00</span>
+</span><span class='line'><span class="nx">tick</span><span class="o">:</span> <span class="mi">00</span><span class="o">:</span><span class="mi">59</span><span class="o">:</span><span class="mi">59</span>
+</span><span class='line'><span class="nx">tick</span><span class="o">:</span> <span class="mi">00</span><span class="o">:</span><span class="mi">59</span><span class="o">:</span><span class="mi">58</span>
+</span><span class='line'><span class="nx">tick</span><span class="o">:</span> <span class="mi">00</span><span class="o">:</span><span class="mi">59</span><span class="o">:</span><span class="mi">57</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ok that&#8217;s it for today. Tomorrow we&#8217;ll connect all this goodness to a View. If you have questions or feedback feel free to leave a comment. Thanks! - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 7:50 am</li>
+<li>Mood: Tired</li>
+<li>Sleep: 6</li>
+<li>Hunger: 4</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -3292,344 +3729,6 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai/">Getting Started With Mocha and Chai</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-27T14:08:00-07:00" pubdate data-updated="true">May 27<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Since I was previously doing so much RSpec I want to try to bring some of that over to my JavaScript work. Lately I&#8217;ve been working with the Backbone Boilerplate which is a wonderful jump-start for folks who want to get up and running with AMD and Backbone. Today I&#8217;m going to see if I can get a working BDD setup going which will run some very basic tests. In a future post I&#8217;ll use this new setup to do some BDD with Backbone Boilerplate.</p>
-
-<h3>Setting up Mocha and Chai</h3>
-
-<p>I chose Mocha over Jasmine because I&#8217;ve already worked with Jasmine so there wasn&#8217;t much mystery there and also because I&#8217;ve heard really good things about Mocha. I think it&#8217;s cool that if I choose to do a Node.js project Mocha will be able to test both my server and client code.</p>
-
-<p>Unfortunately the documentation for both Mocha and Chai is rather terse when it comes to actually explaining how to get either library working for client side testing. I guess that&#8217;s understandable since their primary focus is Node but after over an hour of poking around both sites I still don&#8217;t have anything that functions&#8230;</p>
-
-<p>Copying over both the mocha and chai directories into my project I&#8217;ve noticed that each one has a test/browser folder which is refered to in the documentation. Seems like this is how I run my specs. Mocha has a failing set of specs on its opts.html file but otherwise everything seems to pass. Chai has failures in its spec regarding its deep equals operations&#8230; Let&#8217;s see if we can forge ahead and write a test in just mocha.</p>
-
-<p>Here&#8217;s my html runner setup:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;title&gt;</span>Mocha Tests<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href=</span><span class="s">&quot;mocha/mocha.css&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;../assets/js/libs/jquery.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;mocha/mocha.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script&gt;</span><span class="nx">mocha</span><span class="p">.</span><span class="nx">setup</span><span class="p">(</span><span class="s1">&#39;bdd&#39;</span><span class="p">)</span><span class="nt">&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;test.foobar.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script&gt;</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">mocha</span><span class="p">.</span><span class="nx">run</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;mocha&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And here&#8217;s my first failing test:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Foobar&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#sayHello()&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should return some text&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="kd">var</span> <span class="nx">foobar</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">sayHello</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>          <span class="k">return</span> <span class="s1">&#39;Hello World!&#39;</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>      <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="nx">assert</span><span class="p">(</span><span class="nx">foobar</span><span class="p">.</span><span class="nx">sayHello</span><span class="p">()</span> <span class="o">===</span> <span class="s1">&#39;funky chicken&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>  <span class="p">})</span>
-</span><span class='line'><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Using just the above I see the mocha runner fire up but then it immediately breaks saying that <code>assert</code> is not defined. Well&#8230;great. <a href="http://visionmedia.github.com/mocha/#browser-support">I&#8217;m basing my work on this example</a> but I realize now that I removed the line which included <code>expect.js</code>. Without expect.js we don&#8217;t have anything to do exceptions for us because Mocha doesn&#8217;t include any by default.</p>
-
-<p><img class="center" src="/images/no_assert.png" title="'Assert is not defined" ></p>
-
-<p>Looking at some other Mocha examples in the github repo I noticed that they explicitly define the <code>assert</code> method inside the runner. We&#8217;ll do the same to get things working. Here&#8217;s my updated runner which now functions as expected. Note the addition of <code>assert</code> after we call <code>mocha.setup('bdd')</code>.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="o">&lt;</span><span class="nx">html</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">head</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">meta</span> <span class="nx">charset</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">title</span><span class="o">&gt;</span><span class="nx">Mocha</span> <span class="nx">Tests</span><span class="o">&lt;</span><span class="err">/title&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;stylesheet&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;mocha/mocha.css&quot;</span> <span class="o">/&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;../assets/js/libs/jquery.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;mocha/mocha.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span><span class="nx">mocha</span><span class="p">.</span><span class="nx">setup</span><span class="p">(</span><span class="s1">&#39;bdd&#39;</span><span class="p">)</span><span class="o">&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="kd">function</span> <span class="nx">assert</span><span class="p">(</span><span class="nx">expr</span><span class="p">,</span> <span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">expr</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">msg</span> <span class="o">||</span> <span class="s1">&#39;failed&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;test.foobar.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">mocha</span><span class="p">.</span><span class="nx">run</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/head&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">body</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;mocha&quot;</span><span class="o">&gt;&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/body&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Since our <code>assert</code> method takes a <code>msg</code> param we can add that to our test so we get some useful feedback when it fails. Here&#8217;s the updated spec.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Foobar&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#sayHello()&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should return some text&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="kd">var</span> <span class="nx">foobar</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">sayHello</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>          <span class="k">return</span> <span class="s1">&#39;Hello World!&#39;</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>      <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="nx">assert</span><span class="p">(</span><span class="nx">foobar</span><span class="p">.</span><span class="nx">sayHello</span><span class="p">()</span> <span class="o">===</span> <span class="s1">&#39;funky chicken&#39;</span><span class="p">,</span> <span class="s1">&#39;Was expecting &quot;Hello World!&quot;&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>  <span class="p">})</span>
-</span><span class='line'><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>That should fail and give us the appropriate message. Changing &#8216;funky chicken&#8217; to &#8216;Hello World!&#8217; will make the test pass. Yay that only took a few hours&#8230;</p>
-
-<p>OK, let&#8217;s forge ahead and see if we can get chai working so we can use some nicer expectations than our weak <code>assert</code>. I&#8217;m including chai.js in place of our <code>assert</code> function.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="o">&lt;</span><span class="nx">html</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">head</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">meta</span> <span class="nx">charset</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">title</span><span class="o">&gt;</span><span class="nx">Mocha</span> <span class="nx">Tests</span><span class="o">&lt;</span><span class="err">/title&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;stylesheet&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;mocha/mocha.css&quot;</span> <span class="o">/&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;../assets/js/libs/jquery.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;chai/chai.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt; &lt;!-- added chai.js instead of assert --&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;mocha/mocha.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span><span class="nx">mocha</span><span class="p">.</span><span class="nx">setup</span><span class="p">(</span><span class="s1">&#39;bdd&#39;</span><span class="p">)</span><span class="o">&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;test.foobar.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">mocha</span><span class="p">.</span><span class="nx">run</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/head&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">body</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;mocha&quot;</span><span class="o">&gt;&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/body&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Next we need to update our spec. Chai has 3 different styles of assertions: <code>assert</code>, <code>expect</code> and <code>should</code>. I&#8217;ll show you how to use each in our foobar spec:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">assert</span> <span class="o">=</span> <span class="nx">chai</span><span class="p">.</span><span class="nx">assert</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">expect</span> <span class="o">=</span> <span class="nx">chai</span><span class="p">.</span><span class="nx">expect</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">should</span> <span class="o">=</span> <span class="nx">chai</span><span class="p">.</span><span class="nx">should</span><span class="p">();</span> <span class="c1">// Note that should has to be executed</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">foobar</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">sayHello</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="s1">&#39;Hello World!&#39;</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Foobar&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#sayHello()&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should work with assert&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">assert</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="nx">foobar</span><span class="p">.</span><span class="nx">sayHello</span><span class="p">(),</span> <span class="s1">&#39;funky chicken!&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should work with expect&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">expect</span><span class="p">(</span><span class="nx">foobar</span><span class="p">.</span><span class="nx">sayHello</span><span class="p">()).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">&#39;funky chicken!&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should work with should&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">foobar</span><span class="p">.</span><span class="nx">sayHello</span><span class="p">().</span><span class="nx">should</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">&#39;funky chicken!&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>  <span class="p">})</span>
-</span><span class='line'><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img class="center" src="/images/failing_chai_tests.png" title="'Our failing Chai tests'" ></p>
-
-<p>Changing all those funky chickens to &#8216;Hello World!&#8217; should get the tests passing again and now we can use any syntax we like.</p>
-
-<p><img class="center" src="/images/passing_chai_tests.png" title="'Finally some passing Chai tests!'" ></p>
-
-<p>Now all is well and good except the tests that come with Chai are failing in a few places. It looks like some of Chai&#8217;s methods are borked on my system.</p>
-
-<p><img class="center" src="/images/broken_chai_tests.png" title="'Chai failing its own tests'" ></p>
-
-<p>That does <em>not</em> fill me with confidence. I think there&#8217;s a very high probability that being a newbie I&#8217;m doing something wrong so <a href="https://twitter.com/rob_dodson/status/206893206435151872/photo/1">I&#8217;ve tweeted to Jake Luer, the author of Chai, to figure out if perhaps I&#8217;m missing something or if the tools are actually broken.</a> In the meantime I&#8217;m not comfortable using a testing framework that&#8217;s broken.</p>
-
-<p>Sigh&#8230; well tomorrow I&#8217;ll try to import some modules and if Jake hasn&#8217;t gotten back to me by then I&#8217;ll use Jasmine to do those tests. Till then!</p>
-
-<ul>
-<li>Update: Looks like I managed to clone Chai right as they were updating the repo. Pulling the latest fixed everything. See the comment thread below*</li>
-</ul>
-
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 2:09 pm</li>
-<li>Mood: Awake, Caffeinated, Curious</li>
-<li>Sleep: 7</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -3647,6 +3746,10 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/16/publish-your-node-library-to-npm/">Publish your Node Library to NPM</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/">How to Run a Node Script from the Command Line</a>
       </li>
     
@@ -3660,10 +3763,6 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
     
       <li class="post">
         <a href="/blog/2012/06/12/messing-around-with-gems/">Messing around with Gems</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/11/some-octopress-rake-tips/">Some Octopress Rake Tips</a>
       </li>
     
   </ul>

@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-15T20:06:32-07:00</updated>
+  <updated>2012-06-16T23:25:53-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,80 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Publish your Node Library to NPM]]></title>
+    <link href="http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm/"/>
+    <updated>2012-06-16T23:06:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm</id>
+    <content type="html"><![CDATA[<p>Alright, <a href="http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/">contuing from yesterday</a> we want to take our little Node module and make it available to the world as a really awesome command line tool.</p>
+
+<p>The first thing we need to do is register an NPM account.</p>
+
+<p><code>npm adduser</code></p>
+
+<p>Fill in your credentials and it should be ready to go.</p>
+
+<p>If we have any dependencies they should be added to our <code>package.json</code> file. Our simple <code>compliment</code> program doesn&#8217;t need any extra libraries but we&#8217;ll add <code>xml2json</code> just to demonstrate how it&#8217;s done.</p>
+
+<figure class='code'><figcaption><span>package.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;compliment&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;version&quot;</span><span class="o">:</span> <span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;description&quot;</span><span class="o">:</span> <span class="s2">&quot;Tell us how awesome we are.&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;preferGlobal&quot;</span><span class="o">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;bin&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;compliment&quot;</span><span class="o">:</span> <span class="s2">&quot;compliment.js&quot;</span> <span class="p">},</span>
+</span><span class='line'>    <span class="s2">&quot;author&quot;</span><span class="o">:</span> <span class="s2">&quot;Rob Dodson&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;dependencies&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="s2">&quot;xml2json&quot;</span><span class="o">:</span> <span class="s2">&quot;0.2.4&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="s2">&quot;engines&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;node&quot;</span><span class="o">:</span> <span class="s2">&quot;*&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since we&#8217;ve changed our <code>package.json</code> we need to run <code>npm link</code> again to install the dependency. After that you should have a <code>node_modules/</code> folder in your project root.</p>
+
+<p>Let&#8217;s put this baby under version control!</p>
+
+<figure class='code'><figcaption><span>package.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">git</span> <span class="nx">init</span>
+</span><span class='line'><span class="nx">echo</span> <span class="nx">node_modules</span><span class="o">/</span> <span class="o">&gt;&gt;</span> <span class="p">.</span><span class="nx">gitignore</span> <span class="err">#</span> <span class="nx">node_modules</span> <span class="nx">should</span> <span class="nx">be</span> <span class="nx">installed</span> <span class="nx">by</span> <span class="nx">npm</span>
+</span><span class='line'><span class="nx">git</span> <span class="nx">add</span> <span class="p">.</span>
+</span><span class='line'><span class="nx">git</span> <span class="nx">commit</span> <span class="o">-</span><span class="nx">am</span> <span class="s1">&#39;Initial commit&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Final step: <code>npm publish</code></p>
+
+<h1>BOOMJAMS! We have us an npm module! - Rob</h1>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 11:06 pm</li>
+<li>Mood: Hyper</li>
+<li>Sleep: 5</li>
+<li>Hunger: 1</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to Run a Node Script from the Command Line]]></title>
@@ -5313,317 +5387,6 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
 <li>Sleep: 8</li>
 <li>Hunger: 5</li>
 <li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Getting started with Mocha and Chai]]></title>
-    <link href="http://robdodson.me/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai/"/>
-    <updated>2012-05-27T14:08:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai</id>
-    <content type="html"><![CDATA[<p>Since I was previously doing so much RSpec I want to try to bring some of that over to my JavaScript work. Lately I&#8217;ve been working with the Backbone Boilerplate which is a wonderful jump-start for folks who want to get up and running with AMD and Backbone. Today I&#8217;m going to see if I can get a working BDD setup going which will run some very basic tests. In a future post I&#8217;ll use this new setup to do some BDD with Backbone Boilerplate.</p>
-
-<h3>Setting up Mocha and Chai</h3>
-
-<p>I chose Mocha over Jasmine because I&#8217;ve already worked with Jasmine so there wasn&#8217;t much mystery there and also because I&#8217;ve heard really good things about Mocha. I think it&#8217;s cool that if I choose to do a Node.js project Mocha will be able to test both my server and client code.</p>
-
-<p>Unfortunately the documentation for both Mocha and Chai is rather terse when it comes to actually explaining how to get either library working for client side testing. I guess that&#8217;s understandable since their primary focus is Node but after over an hour of poking around both sites I still don&#8217;t have anything that functions&#8230;</p>
-
-<p>Copying over both the mocha and chai directories into my project I&#8217;ve noticed that each one has a test/browser folder which is refered to in the documentation. Seems like this is how I run my specs. Mocha has a failing set of specs on its opts.html file but otherwise everything seems to pass. Chai has failures in its spec regarding its deep equals operations&#8230; Let&#8217;s see if we can forge ahead and write a test in just mocha.</p>
-
-<p>Here&#8217;s my html runner setup:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;title&gt;</span>Mocha Tests<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href=</span><span class="s">&quot;mocha/mocha.css&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;../assets/js/libs/jquery.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;mocha/mocha.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script&gt;</span><span class="nx">mocha</span><span class="p">.</span><span class="nx">setup</span><span class="p">(</span><span class="s1">&#39;bdd&#39;</span><span class="p">)</span><span class="nt">&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;test.foobar.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script&gt;</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">mocha</span><span class="p">.</span><span class="nx">run</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;mocha&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And here&#8217;s my first failing test:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Foobar&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#sayHello()&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should return some text&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="kd">var</span> <span class="nx">foobar</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">sayHello</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>          <span class="k">return</span> <span class="s1">&#39;Hello World!&#39;</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>      <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="nx">assert</span><span class="p">(</span><span class="nx">foobar</span><span class="p">.</span><span class="nx">sayHello</span><span class="p">()</span> <span class="o">===</span> <span class="s1">&#39;funky chicken&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>  <span class="p">})</span>
-</span><span class='line'><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Using just the above I see the mocha runner fire up but then it immediately breaks saying that <code>assert</code> is not defined. Well&#8230;great. <a href="http://visionmedia.github.com/mocha/#browser-support">I&#8217;m basing my work on this example</a> but I realize now that I removed the line which included <code>expect.js</code>. Without expect.js we don&#8217;t have anything to do exceptions for us because Mocha doesn&#8217;t include any by default.</p>
-
-<p><img class="center" src="http://robdodson.me/images/no_assert.png" title="'Assert is not defined" ></p>
-
-<p>Looking at some other Mocha examples in the github repo I noticed that they explicitly define the <code>assert</code> method inside the runner. We&#8217;ll do the same to get things working. Here&#8217;s my updated runner which now functions as expected. Note the addition of <code>assert</code> after we call <code>mocha.setup('bdd')</code>.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="o">&lt;</span><span class="nx">html</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">head</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">meta</span> <span class="nx">charset</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">title</span><span class="o">&gt;</span><span class="nx">Mocha</span> <span class="nx">Tests</span><span class="o">&lt;</span><span class="err">/title&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;stylesheet&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;mocha/mocha.css&quot;</span> <span class="o">/&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;../assets/js/libs/jquery.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;mocha/mocha.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span><span class="nx">mocha</span><span class="p">.</span><span class="nx">setup</span><span class="p">(</span><span class="s1">&#39;bdd&#39;</span><span class="p">)</span><span class="o">&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="kd">function</span> <span class="nx">assert</span><span class="p">(</span><span class="nx">expr</span><span class="p">,</span> <span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">expr</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">msg</span> <span class="o">||</span> <span class="s1">&#39;failed&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;test.foobar.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">mocha</span><span class="p">.</span><span class="nx">run</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/head&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">body</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;mocha&quot;</span><span class="o">&gt;&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/body&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Since our <code>assert</code> method takes a <code>msg</code> param we can add that to our test so we get some useful feedback when it fails. Here&#8217;s the updated spec.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Foobar&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#sayHello()&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should return some text&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="kd">var</span> <span class="nx">foobar</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">sayHello</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>          <span class="k">return</span> <span class="s1">&#39;Hello World!&#39;</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>      <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="nx">assert</span><span class="p">(</span><span class="nx">foobar</span><span class="p">.</span><span class="nx">sayHello</span><span class="p">()</span> <span class="o">===</span> <span class="s1">&#39;funky chicken&#39;</span><span class="p">,</span> <span class="s1">&#39;Was expecting &quot;Hello World!&quot;&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>  <span class="p">})</span>
-</span><span class='line'><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>That should fail and give us the appropriate message. Changing &#8216;funky chicken&#8217; to &#8216;Hello World!&#8217; will make the test pass. Yay that only took a few hours&#8230;</p>
-
-<p>OK, let&#8217;s forge ahead and see if we can get chai working so we can use some nicer expectations than our weak <code>assert</code>. I&#8217;m including chai.js in place of our <code>assert</code> function.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="o">&lt;</span><span class="nx">html</span><span class="o">&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">head</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">meta</span> <span class="nx">charset</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">title</span><span class="o">&gt;</span><span class="nx">Mocha</span> <span class="nx">Tests</span><span class="o">&lt;</span><span class="err">/title&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;stylesheet&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;mocha/mocha.css&quot;</span> <span class="o">/&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;../assets/js/libs/jquery.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;chai/chai.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt; &lt;!-- added chai.js instead of assert --&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;mocha/mocha.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span><span class="nx">mocha</span><span class="p">.</span><span class="nx">setup</span><span class="p">(</span><span class="s1">&#39;bdd&#39;</span><span class="p">)</span><span class="o">&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span> <span class="nx">src</span><span class="o">=</span><span class="s2">&quot;test.foobar.js&quot;</span><span class="o">&gt;&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">mocha</span><span class="p">.</span><span class="nx">run</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="err">/script&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/head&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="nx">body</span><span class="o">&gt;</span>
-</span><span class='line'>  <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;mocha&quot;</span><span class="o">&gt;&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/body&gt;</span>
-</span><span class='line'><span class="o">&lt;</span><span class="err">/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Next we need to update our spec. Chai has 3 different styles of assertions: <code>assert</code>, <code>expect</code> and <code>should</code>. I&#8217;ll show you how to use each in our foobar spec:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">assert</span> <span class="o">=</span> <span class="nx">chai</span><span class="p">.</span><span class="nx">assert</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">expect</span> <span class="o">=</span> <span class="nx">chai</span><span class="p">.</span><span class="nx">expect</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">should</span> <span class="o">=</span> <span class="nx">chai</span><span class="p">.</span><span class="nx">should</span><span class="p">();</span> <span class="c1">// Note that should has to be executed</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">foobar</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">sayHello</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="s1">&#39;Hello World!&#39;</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Foobar&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#sayHello()&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should work with assert&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">assert</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="nx">foobar</span><span class="p">.</span><span class="nx">sayHello</span><span class="p">(),</span> <span class="s1">&#39;funky chicken!&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should work with expect&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">expect</span><span class="p">(</span><span class="nx">foobar</span><span class="p">.</span><span class="nx">sayHello</span><span class="p">()).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">&#39;funky chicken!&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should work with should&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">foobar</span><span class="p">.</span><span class="nx">sayHello</span><span class="p">().</span><span class="nx">should</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">&#39;funky chicken!&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>  <span class="p">})</span>
-</span><span class='line'><span class="p">})</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img class="center" src="http://robdodson.me/images/failing_chai_tests.png" title="'Our failing Chai tests'" ></p>
-
-<p>Changing all those funky chickens to &#8216;Hello World!&#8217; should get the tests passing again and now we can use any syntax we like.</p>
-
-<p><img class="center" src="http://robdodson.me/images/passing_chai_tests.png" title="'Finally some passing Chai tests!'" ></p>
-
-<p>Now all is well and good except the tests that come with Chai are failing in a few places. It looks like some of Chai&#8217;s methods are borked on my system.</p>
-
-<p><img class="center" src="http://robdodson.me/images/broken_chai_tests.png" title="'Chai failing its own tests'" ></p>
-
-<p>That does <em>not</em> fill me with confidence. I think there&#8217;s a very high probability that being a newbie I&#8217;m doing something wrong so <a href="https://twitter.com/rob_dodson/status/206893206435151872/photo/1">I&#8217;ve tweeted to Jake Luer, the author of Chai, to figure out if perhaps I&#8217;m missing something or if the tools are actually broken.</a> In the meantime I&#8217;m not comfortable using a testing framework that&#8217;s broken.</p>
-
-<p>Sigh&#8230; well tomorrow I&#8217;ll try to import some modules and if Jake hasn&#8217;t gotten back to me by then I&#8217;ll use Jasmine to do those tests. Till then!</p>
-
-<ul>
-<li>Update: Looks like I managed to clone Chai right as they were updating the repo. Pulling the latest fixed everything. See the comment thread below*</li>
-</ul>
-
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 2:09 pm</li>
-<li>Mood: Awake, Caffeinated, Curious</li>
-<li>Sleep: 7</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
 </ul>
 
 ]]></content>
