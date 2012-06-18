@@ -4,7 +4,7 @@
   <title><![CDATA[Category: RSpec | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/rspec/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-16T23:26:38-07:00</updated>
+  <updated>2012-06-18T00:14:51-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,128 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Object Oriented Scraper Backed With Tests Pt...9?]]></title>
+    <link href="http://robdodson.me/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/"/>
+    <updated>2012-06-17T22:43:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9</id>
+    <content type="html"><![CDATA[<p>I just spent a few hours talking to my friend <a href="http://derekbradley.com/">Derek</a>(<a href="https://twitter.com/#!/derekebradley">@derekebradley</a>) about Ruby and it occured to me that I never finished this scraper project. We got awfully far with it but then it kind of died on the vine. <a href="http://robdodson.me/blog/2012/05/06/object-oriented-scraper-backed-with-tests/">Thankfully,</a> <a href="http://robdodson.me/blog/2012/05/07/object-oriented-scraper-backed-with-tests-pt-2/">I</a> <a href="http://robdodson.me/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/">wrote</a> <a href="http://robdodson.me/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4/">it</a> <a href="http://robdodson.me/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/">all</a> <a href="http://robdodson.me/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/">down.</a> <a href="http://robdodson.me/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7/">down.</a> <a href="http://robdodson.me/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8/">down.</a></p>
+
+<p>The fact of the matter is I didn't know where to take the data. I didn't have a design or a layout that I could put it all into. I want to change all that. I want to turn this into something useful. But first I have to make sense of all the code that was written so many weeks ago.</p>
+
+<h2>Tests as documentation...bullshit.</h2>
+
+<p>Ok ok. I should say it's <em>total</em> bullshit to call your tests the documentation because they are helpful. But the fact of the matter is you can get so crafty with RSpec that it makes the tests difficult to read in a useful way. I'm not saying they're illegible, it's just that they leverage features which adds to their thought deficit. Before you go off saying that I wrote them wrong and tests should be all the documentation you need...shutup. They're helpful but I would love it if I had written a bit of Markdown Readme to go with all this...</p>
+
+<h2>Explain yourself</h2>
+
+<p>Let's see if I can regurgitate what this thing currently does in plain English.</p>
+
+<ul>
+<li><p>There's a config.yml file. It says what page to scrape, what the CSS selector for a post looks like and what the CSS selector for metadata looks like. The metadata is the list at the bottom of every page listing the time, amount of sleep, coffee, etc.</p></li>
+<li><p>There's a command line object, <code>tentacles</code>. It initiates <code>runner.rb</code>. <code>Runner</code> creates an instance of <code>Options</code>. <code>Options</code> loads the config.yml file and parses it, turning its properties into members of the options object.</p></li>
+<li><p>It actually doesn't do anything else beyond that. <code>runner.rb</code> stops right there but we have Rspec tests which fake data and check to see if our other classes work. Those other classes are...</p></li>
+<li><p><code>crawler.rb</code> should be the real meat of our program. Funny, seeing as how I wrote all this, that I totally can't remember who does what...</p></li>
+<li><p><code>crawler.rb</code> has two primary methods: <code>words_by_selector</code> and <code>metadata_by_selector</code>.</p></li>
+<li><p><code>words_by_selector</code> returns an array of words and the number of times they've occurred. This array should be in order from most used to least used.</p></li>
+<li><p><code>metadata_by_selector</code> returns the content of one of our metadata lists.... I think.</p></li>
+</ul>
+
+
+<h2>Make it work</h2>
+
+<p>With Tim Gunn's mantra we're gonna make this thing work. The tests verify that everything should be at least somewhat functioning. Since I'm a little drunk I can't do a <em>super</em> deep dive but let's see if we can get our runner to write out the contents of <code>words_by_selector</code> to a text file.</p>
+
+<p>``` ruby runner.rb
+require 'yaml'
+require_relative 'options'
+require_relative 'crawler'</p>
+
+<p>module Tentacles
+  class Runner</p>
+
+<pre><code>def initialize(config)
+  @options = Tentacles::Options.new(config)
+end
+
+def run      
+  @crawler = Tentacles::Crawler.from_uri(@options.uri)
+  output = @crawler.words_by_selector(@options.post_selector, 'ul:last-child')
+  File.open("output.txt", "w") do |file|
+    output.each do |line|
+      file.puts line
+    end
+  end
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>To get this working I <code>cd</code> into the lib/ folder where all the code lives and do an <code>irb -I .</code> so I can require the local files.</p>
+
+<p><code>
+require 'runner'
+runner = Tentacles::Runner.new('config.yml')
+runner.run
+</code></p>
+
+<p>After doing that we <em>do</em> get a text file, with copy that looks somewhat correct...</p>
+
+<p><code>
+we: 8
+to: 8
+npm: 6
+should: 5
+package: 4
+our: 4
+compliment: 4
+git: 3
+0: 3
+4: 3
+need: 3
+2: 3
+it: 3
+node_modules: 3
+the: 3
+have: 3
+be: 3
+json: 2
+your: 2
+any: 2
+dependencies: 2
+module: 2
+and: 2
+node: 2
+add: 2
+xml2json: 2
+how: 2
+s: 2
+in: 2
+you: 2
+json1: 2
+an: 2
+3: 2
+awesome: 2
+version: 2
+</code></p>
+
+<p>It looks like the copy from my most recent blog post, plus or minus a few words. Horrible regex aside it <em>kinda</em> works and that's what we're after. Maybe tomorrow we can turn it into some JSON :D Till then. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 10:44 pm</li>
+<li>Mood: Drunk, Sleepy</li>
+<li>Sleep: 3</li>
+<li>Hunger: 4</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 8]]></title>
@@ -748,235 +870,6 @@ end
 <li>Mood: Alert, Awake, Anxious</li>
 <li>Sleep: 8</li>
 <li>Hunger: 3</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 4]]></title>
-    <link href="http://robdodson.me/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4/"/>
-    <updated>2012-05-11T07:20:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4</id>
-    <content type="html"><![CDATA[<p>Continuing from our <a href="http://robdodson.me/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/">previous post</a> we're going to keep working on our <code>Crawler</code> and our specs to see if we can start pulling real data from our site.</p>
-
-<p>The first thing I did this morning was to run my tests:
-```
-bundle exec rspec spec/</p>
-
-<p>..............</p>
-
-<p>Finished in 0.01271 seconds
-14 examples, 0 failures
-```
-As someone totally new to TDD/BDD this is kind of an awesome feeling. I left my code for a few days and now I can come back and verify that everything still works. We can take it even further and run rspec with a documentation formatter to get some pretty printed output:</p>
-
-<p>```ruby
-bundle exec rspec spec/ -cf d</p>
-
-<p>Tentacles::Crawler
-  constructors</p>
-
-<pre><code>#from_uri
-  should respond
-  should return an instance
-</code></pre>
-
-<p>  instances</p>
-
-<pre><code>should respond to #get_words_by_selector
-should respond to #get_metadata_by_selector
-</code></pre>
-
-<p>Tentacles::Options
-  should respond to #uri
-  should respond to #post_selector
-  should respond to #metadata_selector
-  #initialize</p>
-
-<pre><code>when parsing the URI
-  when URI is valid
-    should display the right URI
-  when URI is invalid
-    should raise an exception
-  when URI does not contain a scheme
-    should raise an IO exception
-  when URI does not contain a host
-    should raise an IO exception
-</code></pre>
-
-<p>Tentacles::Runner
-  should respond to #run
-  when parsing the config file</p>
-
-<pre><code>should raise an error if the config file is missing
-should raise an error if the config file is invalid
-</code></pre>
-
-<p>Finished in 0.01359 seconds
-14 examples, 0 failures
-```</p>
-
-<p>In rspec the <code>-c</code> flag enables color in the output. The <code>-f</code> flag sets a formatter and <code>d</code> specifies the documentation format.</p>
-
-<p>```bash
--f, --format FORMATTER           Choose a formatter.</p>
-
-<pre><code>                                   [p]rogress (default - dots)
-                                   [d]ocumentation (group and example names)
-                                   [h]tml
-                                   [t]extmate
-                                   custom formatter class name
-</code></pre>
-
-<p>```</p>
-
-<p>Neat.</p>
-
-<p>In <code>crawler_spec.rb</code> I'm going to add a test that checks to see if our instance has actually stored the content from our mocked web request.</p>
-
-<p>```ruby
-require_relative '../lib/tentacles/crawler'
-require 'fakeweb'</p>
-
-<p>describe Tentacles::Crawler do</p>
-
-<p>  before do</p>
-
-<pre><code># Create a mock options object
-@options = {
-  uri: 'http://robdodson.me', 
-  post_selector: '.entry-content',
-  metadata_selector: '.personal-metadata'
-}
-
-# Create a mock web request
-FakeWeb.register_uri(:get, @options[:uri], :body =&gt; "Hello World! Hello San Francisco!")
-</code></pre>
-
-<p>  end</p>
-
-<p>  describe "constructors" do</p>
-
-<pre><code>describe "#from_uri" do
-  it "should respond" do
-    Tentacles::Crawler.should respond_to(:from_uri)
-  end
-
-  it "should return an instance" do
-    crawler = Tentacles::Crawler.from_uri(@options[:uri])
-    crawler.should be_an_instance_of(Tentacles::Crawler)
-  end
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  describe "instances" do</p>
-
-<pre><code>before do
-  @crawler = Tentacles::Crawler.from_uri(@options[:uri])
-end
-
-subject { @crawler }
-
-it { should respond_to(:get_words_by_selector) }
-it { should respond_to(:get_metadata_by_selector) }
-
-context "post-construct" do
-  it "should have the right document" do
-    @crawler.doc.content.should =~ /Hello World! Hello San Francisco!/
-  end
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>I want to write a test to parse the content for keywords but I realize now that our FakeWeb request returns a string without any classes or id's. Gotta go back and wrap it in some HTML to match our selectors. So I'm changing the mock web request to look like this:</p>
-
-<p>```ruby</p>
-
-<h1>Create a mock web request</h1>
-
-<pre><code>FakeWeb.register_uri(:get, @options[:uri],
-                     :body =&gt; '&lt;div class="' + @options[:post_selector] + '"&gt;Hello World! Hello San Francisco!&lt;/div&gt;')
-</code></pre>
-
-<p>```</p>
-
-<h3>Hello Hello Hello World!</h3>
-
-<p>After a lot of back and forth I finally get my test to pass. I realize along the way that there are a bunch of things I need to change. For starters having most of my words be the same count doesn't really help me to validate that my keyword counting is working all that well. So I'm changing our FakeWeb request and the subsequent specs which test against it.</p>
-
-<p>```ruby</p>
-
-<h1>Create a mock web request</h1>
-
-<pre><code>FakeWeb.register_uri(:get, @options[:uri],
-                     :body =&gt; '&lt;div class="' + @options[:post_selector].delete(".") + '"&gt;Hello Hello Hello World World Foobar!&lt;/div&gt;')
-</code></pre>
-
-<p>```</p>
-
-<p>```ruby</p>
-
-<pre><code>context "post-construct" do
-  it "should have the right document" do
-    @crawler.doc.content.should =~ /Hello Hello Hello World World Foobar!/
-  end
-end
-</code></pre>
-
-<p>```</p>
-
-<p>Next I need to make sure that my <code>get_words_by_selector</code> method is accepting a selector.</p>
-
-<p>```ruby
-def get_words_by_selector(selector)</p>
-
-<pre><code>  entries = doc.css('div.entry-content')
-  entries.each do |entry|
-    words = words_from_string(entry.content)
-    count_frequency(words)
-  end
-
-  sorted = @counts.sort_by { |word, count| count }
-  sorted.reverse!
-  sorted.map { |word, count| "#{word}: #{count}"}
-end
-</code></pre>
-
-<p>```</p>
-
-<p>I also realize that I'd like my Array of keywords to be in desceding order so I <code>reverse</code> it after the initial sort.</p>
-
-<p>Next I'm going to write the test to verify that we've received a group of words, counted them up and tossed them into an Array in descending order:</p>
-
-<p>```ruby</p>
-
-<pre><code>describe "#get_words_by_selector" do
-  it "should produce an Array of keywords" do
-    expected_array = ['hello: 3', 'world: 2', 'foobar: 1']
-    actual_array = @crawler.get_words_by_selector(@options[:post_selector])
-    actual_array.should eq(expected_array)
-  end
-end
-</code></pre>
-
-<p>```</p>
-
-<p>I actually wrote the test first and did everything else to make it pass. But at this point it should all be passing and we can verify that given a request with the appropriate selector we should be able to build a basic word frequency list. Yay!</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:35 am</li>
-<li>Mood: Calm, Awake, Curious</li>
-<li>Sleep: 7</li>
-<li>Hunger: 4</li>
 <li>Coffee: 0</li>
 </ul>
 

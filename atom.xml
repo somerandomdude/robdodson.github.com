@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-16T23:26:38-07:00</updated>
+  <updated>2012-06-18T00:14:51-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,186 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Object Oriented Scraper Backed With Tests Pt...9?]]></title>
+    <link href="http://robdodson.me/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/"/>
+    <updated>2012-06-17T22:43:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9</id>
+    <content type="html"><![CDATA[<p>I just spent a few hours talking to my friend <a href="http://derekbradley.com/">Derek</a>(<a href="https://twitter.com/#!/derekebradley">@derekebradley</a>) about Ruby and it occured to me that I never finished this scraper project. We got awfully far with it but then it kind of died on the vine. <a href="http://robdodson.me/blog/2012/05/06/object-oriented-scraper-backed-with-tests/">Thankfully,</a> <a href="http://robdodson.me/blog/2012/05/07/object-oriented-scraper-backed-with-tests-pt-2/">I</a> <a href="http://robdodson.me/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/">wrote</a> <a href="http://robdodson.me/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4/">it</a> <a href="http://robdodson.me/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/">all</a> <a href="http://robdodson.me/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/">down.</a> <a href="http://robdodson.me/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7/">down.</a> <a href="http://robdodson.me/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8/">down.</a></p>
+
+<p>The fact of the matter is I didn&#8217;t know where to take the data. I didn&#8217;t have a design or a layout that I could put it all into. I want to change all that. I want to turn this into something useful. But first I have to make sense of all the code that was written so many weeks ago.</p>
+
+<h2>Tests as documentation&#8230;bullshit.</h2>
+
+<p>Ok ok. I should say it&#8217;s <em>total</em> bullshit to call your tests the documentation because they are helpful. But the fact of the matter is you can get so crafty with RSpec that it makes the tests difficult to read in a useful way. I&#8217;m not saying they&#8217;re illegible, it&#8217;s just that they leverage features which adds to their thought deficit. Before you go off saying that I wrote them wrong and tests should be all the documentation you need&#8230;shutup. They&#8217;re helpful but I would love it if I had written a bit of Markdown Readme to go with all this&#8230;</p>
+
+<h2>Explain yourself</h2>
+
+<p>Let&#8217;s see if I can regurgitate what this thing currently does in plain English.</p>
+
+<ul>
+<li><p>There&#8217;s a config.yml file. It says what page to scrape, what the CSS selector for a post looks like and what the CSS selector for metadata looks like. The metadata is the list at the bottom of every page listing the time, amount of sleep, coffee, etc.</p></li>
+<li><p>There&#8217;s a command line object, <code>tentacles</code>. It initiates <code>runner.rb</code>. <code>Runner</code> creates an instance of <code>Options</code>. <code>Options</code> loads the config.yml file and parses it, turning its properties into members of the options object.</p></li>
+<li><p>It actually doesn&#8217;t do anything else beyond that. <code>runner.rb</code> stops right there but we have Rspec tests which fake data and check to see if our other classes work. Those other classes are&#8230;</p></li>
+<li><p><code>crawler.rb</code> should be the real meat of our program. Funny, seeing as how I wrote all this, that I totally can&#8217;t remember who does what&#8230;</p></li>
+<li><p><code>crawler.rb</code> has two primary methods: <code>words_by_selector</code> and <code>metadata_by_selector</code>.</p></li>
+<li><p><code>words_by_selector</code> returns an array of words and the number of times they&#8217;ve occurred. This array should be in order from most used to least used.</p></li>
+<li><p><code>metadata_by_selector</code> returns the content of one of our metadata lists&#8230;. I think.</p></li>
+</ul>
+
+
+<h2>Make it work</h2>
+
+<p>With Tim Gunn&#8217;s mantra we&#8217;re gonna make this thing work. The tests verify that everything should be at least somewhat functioning. Since I&#8217;m a little drunk I can&#8217;t do a <em>super</em> deep dive but let&#8217;s see if we can get our runner to write out the contents of <code>words_by_selector</code> to a text file.</p>
+
+<figure class='code'><figcaption><span>runner.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;yaml&#39;</span>
+</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;options&#39;</span>
+</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;crawler&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Runner</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">run</span>
+</span><span class='line'>      <span class="vi">@crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">output</span> <span class="o">=</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">words_by_selector</span><span class="p">(</span><span class="vi">@options</span><span class="o">.</span><span class="n">post_selector</span><span class="p">,</span> <span class="s1">&#39;ul:last-child&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;output.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">file</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">output</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
+</span><span class='line'>          <span class="n">file</span><span class="o">.</span><span class="n">puts</span> <span class="n">line</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To get this working I <code>cd</code> into the lib/ folder where all the code lives and do an <code>irb -I .</code> so I can require the local files.</p>
+
+<figure class='code'><figcaption><span>runner.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;runner&#39;</span>
+</span><span class='line'><span class="n">runner</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Runner</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;config.yml&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="n">runner</span><span class="o">.</span><span class="n">run</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After doing that we <em>do</em> get a text file, with copy that looks somewhat correct&#8230;</p>
+
+<figure class='code'><figcaption><span>runner.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">we</span><span class="p">:</span> <span class="mi">8</span>
+</span><span class='line'><span class="n">to</span><span class="p">:</span> <span class="mi">8</span>
+</span><span class='line'><span class="n">npm</span><span class="p">:</span> <span class="mi">6</span>
+</span><span class='line'><span class="n">should</span><span class="p">:</span> <span class="mi">5</span>
+</span><span class='line'><span class="n">package</span><span class="p">:</span> <span class="mi">4</span>
+</span><span class='line'><span class="n">our</span><span class="p">:</span> <span class="mi">4</span>
+</span><span class='line'><span class="n">compliment</span><span class="p">:</span> <span class="mi">4</span>
+</span><span class='line'><span class="n">git</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="mi">0</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="mi">4</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="n">need</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="mi">2</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="n">it</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="n">node_modules</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="n">the</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="n">have</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="n">be</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="n">json</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">your</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">any</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">dependencies</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">module</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="ow">and</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">node</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">add</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">xml2json</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">how</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">s</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="k">in</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">you</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">json1</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">an</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="mi">3</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">awesome</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">version</span><span class="p">:</span> <span class="mi">2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It looks like the copy from my most recent blog post, plus or minus a few words. Horrible regex aside it <em>kinda</em> works and that&#8217;s what we&#8217;re after. Maybe tomorrow we can turn it into some JSON :D Till then. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 10:44 pm</li>
+<li>Mood: Drunk, Sleepy</li>
+<li>Sleep: 3</li>
+<li>Hunger: 4</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Publish your Node Library to NPM]]></title>
@@ -4762,630 +4942,6 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
 <li>Mood: Awake, Antsy</li>
 <li>Sleep: 6</li>
 <li>Hunger: 3</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Mocking Requests with Mocha, Chai and Sinon]]></title>
-    <link href="http://robdodson.me/blog/2012/05/28/mocking-requests-with-mocha-chai-and-sinon/"/>
-    <updated>2012-05-28T11:20:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/28/mocking-requests-with-mocha-chai-and-sinon</id>
-    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai/">After a bit of a rocky start yesterday</a> I&#8217;ve finally got Mocha and Chai running in the browser which is great. Today I&#8217;d like to test out some of the async functionality of Mocha. This seems to be the big selling point for most people so we&#8217;ll kick the tires a bit.</p>
-
-<h3>Basic Async Tests with Mocha and Chai</h3>
-
-<p>I wrote a little Node service that we&#8217;ll consume for testing purposes. This is my first <a href="http://nodejs.org/">Node</a> and <a href="http://expressjs.com/">Express</a> app so apologies if it&#8217;s lamesauce. I used the <code>express</code> command to boilerplate a project called <code>pickles</code> with some very basic routes:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Routes</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">count</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s1">&#39;Welcome to the Pickle Store!&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/pickles&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">count</span><span class="o">:</span> <span class="nx">count</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;oh boy, &#39;</span> <span class="o">+</span> <span class="nx">count</span> <span class="o">+</span> <span class="s1">&#39; pickles!&#39;</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/pickles/add/:num&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">req</span><span class="p">,</span> <span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">count</span> <span class="o">+=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">num</span><span class="p">);</span>
-</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">add</span><span class="o">:</span> <span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">num</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;you added &#39;</span> <span class="o">+</span> <span class="nx">req</span><span class="p">.</span><span class="nx">params</span><span class="p">.</span><span class="nx">num</span> <span class="o">+</span> <span class="s1">&#39; pickles to the pickle barrel!&#39;</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">3000</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span>
-</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Express server listening on port %d in %s mode&quot;</span><span class="p">,</span> <span class="nx">app</span><span class="p">.</span><span class="nx">address</span><span class="p">().</span><span class="nx">port</span><span class="p">,</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">env</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We&#8217;ll need to make sure our node service is running for our tests to work and all of our URLs will point at localhost:3000. Obviously you wouldn&#8217;t want this for a production setting but it&#8217;ll be fine for demonstration purposes.</p>
-
-<p>Here is our really simple Mocha spec. We&#8217;re actually creating a <code>pickelStore</code> object in the spec file itself so we can test against it.</p>
-
-<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">expect</span> <span class="o">=</span> <span class="nx">chai</span><span class="p">.</span><span class="nx">expect</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">pickleStore</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">pickles</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
-</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">add</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">num</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
-</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles/add/&#39;</span> <span class="o">+</span> <span class="nx">num</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Pickle Store&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#pickles&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">pickles</span><span class="p">();</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I just want to see if the ajax methods will run and hit our Node service but I&#8217;m running into the following issue in Chrome:</p>
-
-<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">XMLHttpRequest</span> <span class="nx">cannot</span> <span class="nx">load</span> <span class="nx">http</span><span class="o">:</span><span class="c1">//localhost:3000/pickles. Origin null is not allowed by Access-Control-Allow-Origin.</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Bummer&#8230; :(</p>
-
-<p>OK, what&#8217;s going on here&#8230; To StackOverflow! <a href="http://stackoverflow.com/questions/8456538/origin-null-is-not-allowed-by-access-control-allow-origin/8456586#8456586">Aaaand we have our response.</a> After a bit of googling I came across <a href="http://www.stoimen.com/blog/2010/11/19/diving-into-node-js-very-first-app/">this post</a> which mentions adding <code>res.header('Access-Control-Allow-Origin', '*');</code> to my Node responses. That does the trick. I also found <a href="http://www.stoimen.com/blog/2010/11/19/diving-into-node-js-very-first-app/">this post</a> which describes setting up <a href="https://developer.mozilla.org/en/http_access_control">CORS</a> with Express.</p>
-
-<p>OK hopefully we&#8217;re done with Node for now. I don&#8217;t want this to turn into a node tutorial&#8230; Let&#8217;s see if we can get the tests to perform using Mocha. We&#8217;ll need some way to mock and spy on the ajax because I don&#8217;t want to test the data coming from the actual service. I&#8217;ve realized I want to <em>simulate</em> the service for client-side Mocha tests. In a future tutorial I&#8217;ll test the service itself using the Node aspect of Mocha. Kind of silly to lead off this way but whatever, moving on!</p>
-
-<h3>Enter Sinon.js</h3>
-
-<p>I&#8217;m going to use <a href="http://sinonjs.org/">Sinon.js</a> to help me mock, stub, fake, spy and do whatever the heck else I need to make sure my client code is solid. After downloading the js file for Sinon you can just add it to our test/index.html under the line where we added mocha.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;html&gt;</span>
-</span><span class='line'><span class="nt">&lt;head&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;title&gt;</span>Mocha Tests<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href=</span><span class="s">&quot;mocha/mocha.css&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;../assets/js/libs/jquery.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;chai/chai.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;mocha/mocha.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;sinon/sinon.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script&gt;</span><span class="nx">mocha</span><span class="p">.</span><span class="nx">setup</span><span class="p">(</span><span class="s1">&#39;bdd&#39;</span><span class="p">);</span><span class="nt">&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;test.pickles.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;script&gt;</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">mocha</span><span class="p">.</span><span class="nx">run</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
-</span><span class='line'><span class="nt">&lt;/head&gt;</span>
-</span><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;mocha&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now we can use Sinon in our <code>test.pickles.js</code> file to get a handled on our ajax. Let&#8217;s first test that an ajax call is made when we run the <code>pickles()</code> method of the <code>pickleStore</code> object. We&#8217;ll make sure this first test fails, then we&#8217;ll change the spec to make it pass.</p>
-
-<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">expect</span> <span class="o">=</span> <span class="nx">chai</span><span class="p">.</span><span class="nx">expect</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">pickleStore</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">pickles</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
-</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">add</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">num</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
-</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles/add/&#39;</span> <span class="o">+</span> <span class="nx">num</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Pickle Store&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#pickles&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Use Sinon to replace jQuery&#39;s ajax method</span>
-</span><span class='line'>    <span class="c1">// with a spy.</span>
-</span><span class='line'>    <span class="nx">beforeEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">sinon</span><span class="p">.</span><span class="nx">spy</span><span class="p">(</span><span class="nx">$</span><span class="p">,</span> <span class="s1">&#39;ajax&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Restor jQuery&#39;s ajax method to its</span>
-</span><span class='line'>    <span class="c1">// original state</span>
-</span><span class='line'>    <span class="nx">afterEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">.</span><span class="nx">restore</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should make an ajax call&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">pickles</span><span class="p">();</span>
-</span><span class='line'>      <span class="nx">expect</span><span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">.</span><span class="nx">calledOnce</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">be</span><span class="p">.</span><span class="kc">false</span><span class="p">;</span> <span class="c1">// see if the spy WASN&#39;T called</span>
-</span><span class='line'>      <span class="nx">done</span><span class="p">();</span> <span class="c1">// let Mocha know we&#39;re done async testing</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/first_failing_ajax_test.png" title="'Our first failing test with Mocha, Chai and Sinon. Yay!'" ></p>
-
-<p>Changing this line <code>expect($.ajax.calledOnce).to.be.false;</code> from <code>false</code> to <code>true</code> should make our test pass. Yay, first async test in the bag! Next let&#8217;s try to fake a response from the server. But I&#8217;m realizing that the succesful server response should <em>do</em> something to my pickleStore object, otherwise why do I care about the data? So I&#8217;m going to update pickelStore with the following success callback on its pickles method:</p>
-
-<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">pickleStore</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">count</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
-</span><span class='line'>  <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-</span><span class='line'>  <span class="nx">pickles</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
-</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">self</span><span class="p">.</span><span class="nx">count</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">count</span><span class="p">);</span>
-</span><span class='line'>        <span class="nx">self</span><span class="p">.</span><span class="nx">status</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">status</span><span class="p">;</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">add</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">num</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
-</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles/add/&#39;</span> <span class="o">+</span> <span class="nx">num</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">...</span> <span class="p">.</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now we can test what happens after the server sends a succesful response. But how do we get that response and how do we force the success callback? For that we&#8217;ll need to use Sinon&#8217;s <code>stub.yieldsTo</code> method. It&#8217;s mentioned in <a href="http://sinonjs.org/docs/#stubs">the docs on this page</a> if you scroll down. <code>yieldsTo</code> lets us direct the path of our spy so it will not only pretend to be jQuery&#8217;s <code>ajax</code> method, but it will also force itself into the <code>success</code> callback with an optional hash of parameters which simulate our service response. Sweet! We&#8217;ll have to revise the <code>beforeEach</code> in our spec though otherwise Sinon will complain that we&#8217;re wrapping <code>ajax</code> twice. The updated spec should look like this. Again, take note that we&#8217;re going to make it fail first by expecting a count of 99 pickles instead of 100.</p>
-
-<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">...</span> <span class="p">.</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Pickle Store&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#pickles&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Use Sinon to replace jQuery&#39;s ajax method</span>
-</span><span class='line'>    <span class="c1">// with a spy. This spy will also come with</span>
-</span><span class='line'>    <span class="c1">// some success data.</span>
-</span><span class='line'>    <span class="nx">beforeEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">sinon</span><span class="p">.</span><span class="nx">stub</span><span class="p">(</span><span class="nx">$</span><span class="p">,</span> <span class="s1">&#39;ajax&#39;</span><span class="p">).</span><span class="nx">yieldsTo</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">count</span><span class="o">:</span> <span class="s1">&#39;100&#39;</span><span class="p">,</span>
-</span><span class='line'>        <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;oh boy, 100 pickles!&#39;</span>
-</span><span class='line'>      <span class="p">});</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Restor jQuery&#39;s ajax method to its</span>
-</span><span class='line'>    <span class="c1">// original state</span>
-</span><span class='line'>    <span class="nx">afterEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">.</span><span class="nx">restore</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should make an ajax call&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">pickles</span><span class="p">();</span>
-</span><span class='line'>      <span class="nx">expect</span><span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">.</span><span class="nx">calledOnce</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">be</span><span class="p">.</span><span class="kc">true</span><span class="p">;</span>
-</span><span class='line'>      <span class="nx">done</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should update the count&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">pickles</span><span class="p">();</span>
-</span><span class='line'>      <span class="nx">expect</span><span class="p">(</span><span class="nx">pickleStore</span><span class="p">.</span><span class="nx">count</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="mi">99</span><span class="p">);</span>
-</span><span class='line'>      <span class="nx">done</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Failing as expected. Aaaaand we change the expected count to 100, voila! Passing tests again!</p>
-
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/passing_yield_test.png" title="'Passing test with Sinon's yieldTo'" ></p>
-
-<p>I&#8217;m adding the test for the status update as well so our final <code>#pickles</code> spec should look like this:</p>
-
-<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Pickle Store&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#pickles&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Use Sinon to replace jQuery&#39;s ajax method</span>
-</span><span class='line'>    <span class="c1">// with a spy. This spy will also come with</span>
-</span><span class='line'>    <span class="c1">// some success data.</span>
-</span><span class='line'>    <span class="nx">beforeEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">sinon</span><span class="p">.</span><span class="nx">stub</span><span class="p">(</span><span class="nx">$</span><span class="p">,</span> <span class="s1">&#39;ajax&#39;</span><span class="p">).</span><span class="nx">yieldsTo</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">count</span><span class="o">:</span> <span class="s1">&#39;100&#39;</span><span class="p">,</span>
-</span><span class='line'>        <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;oh boy, 100 pickles!&#39;</span>
-</span><span class='line'>      <span class="p">});</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Restor jQuery&#39;s ajax method to its</span>
-</span><span class='line'>    <span class="c1">// original state</span>
-</span><span class='line'>    <span class="nx">afterEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">.</span><span class="nx">restore</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">})</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should make an ajax call&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">pickles</span><span class="p">();</span>
-</span><span class='line'>      <span class="nx">expect</span><span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">.</span><span class="nx">calledOnce</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">be</span><span class="p">.</span><span class="kc">true</span><span class="p">;</span>
-</span><span class='line'>      <span class="nx">done</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should update the count&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">pickles</span><span class="p">();</span>
-</span><span class='line'>      <span class="nx">expect</span><span class="p">(</span><span class="nx">pickleStore</span><span class="p">.</span><span class="nx">count</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="mi">100</span><span class="p">);</span>
-</span><span class='line'>      <span class="nx">done</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should update the status&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">pickles</span><span class="p">();</span>
-</span><span class='line'>      <span class="nx">expect</span><span class="p">(</span><span class="nx">pickleStore</span><span class="p">.</span><span class="nx">status</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">&#39;oh boy, 100 pickles!&#39;</span><span class="p">);</span>
-</span><span class='line'>      <span class="nx">done</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now let&#8217;s test the <code>#add</code> method before calling it a day. This method is interesting because all it can really do is update our status message. However, once it&#8217;s called the value returned by <code>pickles()</code> should have incremented by whatever amount was passed to <code>add()</code>. Let&#8217;s start by updating our <code>pickleStore</code> so it properly updates the status message after we&#8217;ve called add.</p>
-
-<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">pickleStore</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">count</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
-</span><span class='line'>  <span class="nx">status</span><span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-</span><span class='line'>  <span class="nx">pickles</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
-</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">self</span><span class="p">.</span><span class="nx">count</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">count</span><span class="p">);</span>
-</span><span class='line'>        <span class="nx">self</span><span class="p">.</span><span class="nx">status</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">message</span><span class="p">;</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">add</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">num</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
-</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;http://localhost:3000/pickles/add/&#39;</span> <span class="o">+</span> <span class="nx">num</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">dataType</span><span class="o">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">self</span><span class="p">.</span><span class="nx">status</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">message</span><span class="p">;</span> <span class="c1">// &lt;-- update the status message!</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now that that&#8217;s in there we&#8217;ll write a failing spec.</p>
-
-<figure class='code'><figcaption><span>test.pickles.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;#add&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">amount</span> <span class="o">=</span> <span class="mi">11</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">beforeEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">sinon</span><span class="p">.</span><span class="nx">stub</span><span class="p">(</span><span class="nx">$</span><span class="p">,</span> <span class="s1">&#39;ajax&#39;</span><span class="p">).</span><span class="nx">yieldsTo</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">add</span><span class="o">:</span> <span class="nx">amount</span><span class="p">,</span>
-</span><span class='line'>      <span class="nx">message</span><span class="o">:</span> <span class="s1">&#39;you added &#39;</span> <span class="o">+</span> <span class="nx">amount</span> <span class="o">+</span> <span class="s1">&#39; pickles to the pickle barrel!&#39;</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">afterEach</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">.</span><span class="nx">restore</span><span class="p">();</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should update the status with the correct amount&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">pickleStore</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">amount</span><span class="p">);</span>
-</span><span class='line'>    <span class="nx">expect</span><span class="p">(</span><span class="nx">pickleStore</span><span class="p">.</span><span class="nx">status</span><span class="p">).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">&#39;you added &#39;</span> <span class="o">+</span> <span class="mi">99</span> <span class="o">+</span> <span class="s1">&#39; pickles to the pickle barrel!&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="nx">done</span><span class="p">();</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This is not unlike our previous spec, in fact it does even less since we&#8217;re not checking count.</p>
-
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/failing_add_test.png" title="'Another failing test.'" ></p>
-
-<p>To make the test pass we change the 99 to <code>amount</code>. I originally wrote the add method thinking I would go back and check the total number of pickles but I&#8217;ve realized now that really that&#8217;s more of a test for the service and not the front end. The front end shouldn&#8217;t care if that arithmetic is happening properly, it should just consume data and update its UI. For tomorrow&#8217;s post I&#8217;ll try to get an AMD module in here so we can start playing with Backbone again. Thanks!</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 11:21 am</li>
-<li>Mood: Irritated, Antsy</li>
-<li>Sleep: 8</li>
-<li>Hunger: 5</li>
 <li>Coffee: 0</li>
 </ul>
 
