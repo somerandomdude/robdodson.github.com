@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="I just spent a few hours talking to my friend Derek(@derekebradley) about Ruby and it occured to me that I never finished this scraper project. We &hellip;">
+  <meta name="description" content="Last night I got the scraper to write an output.txt file which listed all the contents of words_by_selector. Today I want to make it write to JSON &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,214 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/18/outputting-json-from-ruby/">Outputting JSON From Ruby</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-18T08:19:00-07:00" pubdate data-updated="true">Jun 18<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://robdodson.me/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/">Last night</a> I got the scraper to write an output.txt file which listed all the contents of <code>words_by_selector</code>. Today I want to make it write to JSON instead of plain text and I want to back it with some tests.</p>
+
+<h2>Updating our tests</h2>
+
+<p>Our current test for <code>words_by_selector</code> looks like this:</p>
+
+<figure class='code'><figcaption><span>spec/crawler_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">it</span> <span class="s2">&quot;should produce the correct Array of keywords&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">expected_array</span> <span class="o">=</span> <span class="o">[</span><span class="s1">&#39;hello: 3&#39;</span><span class="p">,</span> <span class="s1">&#39;world: 2&#39;</span><span class="p">,</span> <span class="s1">&#39;foobar: 1&#39;</span><span class="o">]</span>
+</span><span class='line'>  <span class="n">actual_array</span> <span class="o">=</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">words_by_selector</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">]</span><span class="p">,</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:ignored_post_selector</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">actual_array</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="n">expected_array</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&#8217;re going to need to break that sucker so it&#8217;ll produce something more like this:</p>
+
+<figure class='code'><figcaption><span>spec/crawler_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">it</span> <span class="s2">&quot;should produce the correct Hash of keywords&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">expected_hash</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">word_count</span><span class="p">:</span> <span class="o">[</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>          <span class="n">word</span><span class="p">:</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span>
+</span><span class='line'>          <span class="n">count</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>          <span class="n">word</span><span class="p">:</span> <span class="s1">&#39;world&#39;</span><span class="p">,</span>
+</span><span class='line'>          <span class="n">count</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="p">{</span>
+</span><span class='line'>          <span class="n">word</span><span class="p">:</span> <span class="s1">&#39;foobar&#39;</span><span class="p">,</span>
+</span><span class='line'>          <span class="n">count</span><span class="p">:</span> <span class="mi">1</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>      <span class="o">]</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">actual_hash</span> <span class="o">=</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">words_by_selector</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">]</span><span class="p">,</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:ignored_post_selector</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">actual_hash</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="n">expected_hash</span><span class="p">)</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And we update <code>words_by_selector</code> to look like this:</p>
+
+<figure class='code'><figcaption><span>tentacles/lib/tentacles/crawler.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">words_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="n">ignored_selector</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">node</span> <span class="o">=</span> <span class="n">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span><span class="o">.</span><span class="n">first</span>
+</span><span class='line'>  <span class="k">if</span> <span class="n">ignored_selector</span>
+</span><span class='line'>    <span class="n">ignored</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="n">ignored_selector</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">ignored</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="n">words</span> <span class="o">=</span> <span class="n">words_from_string</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">count_frequency</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">sorted</span> <span class="o">=</span> <span class="vi">@counts</span><span class="o">.</span><span class="n">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="n">count</span> <span class="p">}</span>
+</span><span class='line'>  <span class="n">sorted</span><span class="o">.</span><span class="n">reverse!</span>
+</span><span class='line'>  <span class="n">sorted</span><span class="o">.</span><span class="n">map!</span> <span class="k">do</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span>
+</span><span class='line'>    <span class="p">{</span> <span class="n">word</span><span class="p">:</span> <span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="n">count</span> <span class="p">}</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>  <span class="p">{</span> <span class="n">word_count</span><span class="p">:</span> <span class="n">sorted</span> <span class="p">}</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Our new test should pass. Feel free to flip one of the numbers in the expected_hash to 99 or something to see it fail.</p>
+
+<p>Now let&#8217;s make sure the runner takes the content out of the crawler and writes it to a JSON file.</p>
+
+<figure class='code'><figcaption><span>spec/runner_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">it</span> <span class="s2">&quot;should create a directory for our output&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="vi">@runner</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>  <span class="no">Dir</span><span class="o">.</span><span class="n">exists?</span><span class="p">(</span><span class="s1">&#39;../../output&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">should</span> <span class="n">be_true</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">it</span> <span class="s2">&quot;should output the correct JSON&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="vi">@runner</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>  <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;../../output/word_count.json&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">file</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">file</span><span class="o">.</span><span class="n">each_line</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
+</span><span class='line'>      <span class="nb">puts</span> <span class="n">line</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And in runner.rb&#8230;</p>
+
+<figure class='code'><figcaption><span>tentacles/lib/tentacles/runner.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">run</span>
+</span><span class='line'>  <span class="vi">@crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">output</span> <span class="o">=</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">words_by_selector</span><span class="p">(</span><span class="vi">@options</span><span class="o">.</span><span class="n">post_selector</span><span class="p">,</span> <span class="s1">&#39;ul:last-child&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="no">Dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s1">&#39;../../output&#39;</span><span class="p">)</span> <span class="k">unless</span> <span class="no">Dir</span><span class="o">.</span><span class="n">exists?</span><span class="p">(</span><span class="s1">&#39;../../output&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;../../output/word_count.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">file</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">file</span><span class="o">.</span><span class="n">puts</span> <span class="no">JSON</span><span class="o">.</span><span class="n">pretty_generate</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And there we go. Our first decent output from the crawler :D -Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 8:20 am</li>
+<li>Mood: Awake</li>
+<li>Sleep: 6</li>
+<li>Hunger: 4</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1892,129 +2100,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/09/css-semantics/">CSS Semantics: Best Practices</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-09T07:19:00-07:00" pubdate data-updated="true">Jun 9<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>CSS is, for me, one of the most challenging and nerve wracking aspects of my job. With most programming languages there are frameworks and guides and heuristics that all make up a suite of best practices. CSS doesn&#8217;t <em>really</em> have anything like this and as a result it&#8217;s kind of a mish-mash of good rules to follow, definite don&#8217;ts, and lots and lots of grey area. Since I&#8217;m starting a new CSS heavy project, and because I want to further my own understanding in this realm, I&#8217;m going to spend a few posts exploring the topic of what makes good, maintainable CSS. Along the way I&#8217;m also going to point out a few frameworks that I&#8217;ve been looking at, in particular <a href="http://oocss.org/">OOCSS</a> and <a href="http://smacss.com/">SMACSS.</a> But lets kick things off with a discussion of what it means to write good, semantic CSS selectors and we&#8217;ll follow up with frameworks in our next post.</p>
-
-<h2>Define Semantic</h2>
-
-<p>When I was trolling the interwebs for talks on writing large-scale maintainable CSS I somehow managed to come across <a href="http://css-tricks.com/semantic-class-names/">this article on css-tricks comparing the semantics of various css selectors.</a> After reading it I had this weird feeling like maybe I haven&#8217;t been putting as much thought into my css selectors as I should. My selectors need to be highly semantic, but what does that really <em>mean?</em></p>
-
-<p>Trying to look up the definition of &#8220;semantic&#8221; is kind of a fun, albeit a slightly annoying task since most definitions look like this:</p>
-
-<p><em>Of, relating to, or according to the science of semantics.</em></p>
-
-<p>Well&#8230;thanks. <a href="http://www.wordnik.com/words/semantic">The wonderful Wordnik site has a great list of definitions</a> the most useful of which is probably this:</p>
-
-<p><em>Reflecting intended structure and meaning.</em></p>
-
-<p>So a semantic CSS selector should reflect the intended structure or meaning of the element it is applied to. Hmm&#8230;that&#8217;s still a rather broad definition but at least we have a starting point. If I have a <code>div</code> that holds a bunch of news articles there&#8217;s probably a gradient of increasingly more semantic names I could use for it.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;container&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;article-box&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;newsstand&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>On the far end of the spectrum, <code>container</code> is about as generic as you can get and basically restates that something is a <code>div</code>. While I&#8217;ve been guilty of doing this in the past, if you&#8217;re saying a containing HTML Element is a &#8216;container&#8217; you&#8217;re restating the obvious and should probably work on improving the name.</p>
-
-<p><code>article-box</code> is much more descriptive than just <code>container</code> so I&#8217;d say it has a higher semantic &#8220;score&#8221;. But there is the potential for some semantic weirdness here, for instance, if we decide at a later date that we want our articles to be contained in a horizontal list it might make less sense to call it an &#8220;article-<em>box</em>&#8221;. So maybe <code>article-container</code> is semantically similar but also a bit more flexible?</p>
-
-<p>Finally we have <code>newsstand</code> which is highly semantic and probably my favorite of the bunch. <code>newsstand</code> describes what our element <em>is</em> but it doesn&#8217;t bother delving into how our element works. As a result <code>newsstand</code> can work however we want, it can be list like, or grid like, tabular, etc and it won&#8217;t matter. You might argue that this would be a good place to use an ID instead of a class but that decision should be weighed carefully. You have to make sure that 3 months or a year from now there isn&#8217;t the potential of having two newsstands on the same page.</p>
-
-<h3>If we only worked on contived examples&#8230;</h3>
-
-<p>Of course there&#8217;s a litany of cases where highly semantic naming just doesn&#8217;t quite cut it. Often times we&#8217;re given a layout which has a few primary areas (columns, headers, footer) and the designer is putting all sorts of content into those divisions. On one page it could be news articles, then a list of search results, then a directory of users, and so on. I would argue that for major layout elements it&#8217;s ok to use less semantic names, and in fact this is probably a good idea. So things like <code>column_1</code>, <code>flex-box</code>, <code>constrained-container</code>, are all specifying, at varying degrees, what the element is doing. They are less semantically rich than, say, <code>rolodex</code> or <code>id-badge</code>, but that&#8217;s because their very intention is to be generic.</p>
-
-<h3>What about helpers?</h3>
-
-<p><em>Preface: I know about SASS and LESS. Let&#8217;s pretend they don&#8217;t exist for a moment :D</em></p>
-
-<p>Here is an area where I recently got very tripped up and I&#8217;m still not entirely sure what the best approach might be. Let&#8217;s say you have a brand color, something like Facebook&#8217;s blue, and you need to apply it to all sorts of different and unrelated elements. If you&#8217;re like me then your brain starts thinking, &#8220;Well, that blue value is essentially a variable that I&#8217;d like to reuse. Maybe I should just make a helper style for it&#8230;&#8221; and so you produce something like this in a helpers.css file:</p>
-
-<figure class='code'><figcaption><span>helpers.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.light-blue</span> <span class="p">{</span>
-</span><span class='line'>    <span class="m">#00C</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now our HTML has little <code>light-blue</code>s sprinkled on top of it and we don&#8217;t have to worry about declaring that same blue value over and over again in our styles. But what happens when our company decides to rebrand and now our primary color is a bright red? Uh oh&#8230;You definitely don&#8217;t want to have to change HTML <em>and</em> CSS just to update a color.</p>
-
-<p><a href="http://css-tricks.com/semantic-class-names/#comment-102571">Neal G on CSS-Tricks made a very good comment regarding this scenario:</a></p>
-
-<blockquote><p>Perhaps an easier way to explain semantic CSS is simply, don’t name your classes or ids anything related to a CSS property. A property could be color, font-family, float, border, background etc.</p></blockquote>
-
-<p><a href="http://www.webdesignerdepot.com/2009/05/10-best-css-practices-to-improve-your-code/">Also from the Web Designer Depot</a></p>
-
-<blockquote><p>Name your elements based on what they are, not what they look like. For example, .comment-blue is much less versatile than .comment-beta, and .post-largefont is more limiting than .post-title.</p></blockquote>
-
-<p>Perhaps a better helper would have been <code>.brand-color</code> but again this is a contrived example. What about all the <em>other</em> colors on the site. And what about helpers that wrap commonly used styles like <code>float: left</code> and <code>clear: both</code>?</p>
-
-<p>The debate is pretty hot and heavy <a href="http://css-tricks.com/semantic-class-names">on the css-tricks article.</a> Just seach for the word &#8216;float&#8217; and you&#8217;ll see some pretty interesting discussions on it. My opinion is that you probably don&#8217;t want to tack a bunch of <code>.bright-red</code> or <code>.larger</code> classes everywhere but at the same time something like <code>.float-right</code> can be extremely useful and <a href="http://css-tricks.com/semantic-class-names/#comment-102906">in some cases forcing semantics into a design can actually make things worse</a> especially for <a href="http://css-tricks.com/semantic-class-names/#comment-103076">less technically inclined clients.</a></p>
-
-<p>As a bit of a homework assignment I would recommend looking into a few of the resources I&#8217;m posting below. Obviouslyl take everything with a grain of salt, there isn&#8217;t any true gospel for CSS so do what works best for you. I&#8217;ll cover OOCSS and SMACSS in my next post, till then, thanks for reading! - Rob</p>
-
-<p><a href="http://css-tricks.com/semantic-class-names/">What Makes For a Semantic Class Name?</a></p>
-
-<p><a href="http://www.stubbornella.org/content/2011/04/28/our-best-practices-are-killing-us/">Our Best Practices Are Killing Us</a></p>
-
-<p><a href="https://github.com/styleguide/css">Github CSS Style Guide</a></p>
-
-<p><a href="https://github.com/csswizardry/CSS-Guidelines/blob/master/CSS%20Guidelines.md">CSS Wizardry: CSS Guidelines</a></p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:23 am</li>
-<li>Mood: Awake, Annoyed</li>
-<li>Sleep: 7</li>
-<li>Hunger: 0</li>
-<li>Coffee: 0</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -2030,6 +2115,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/18/outputting-json-from-ruby/">Outputting JSON from Ruby</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/">Object Oriented Scraper Backed With Tests Pt&#8230;9?</a>
       </li>
     
@@ -2043,10 +2132,6 @@
     
       <li class="post">
         <a href="/blog/2012/06/14/how-to-write-a-command-line-ruby-gem/">How To Write a Command Line Ruby Gem</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/13/writing-a-command-line-tool-in-ruby/">Writing a Command Line Tool in Ruby</a>
       </li>
     
   </ul>

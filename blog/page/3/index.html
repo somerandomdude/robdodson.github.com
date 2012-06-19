@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="After a bit of a rocky start yesterday I&#8217;ve finally got Mocha and Chai running in the browser which is great. Today I&#8217;d like to test out &hellip;">
+  <meta name="description" content="Continuing from yesterday&#8217;s post I&#8217;m going to start to incorporate Backbone into my BDD setup. I&#8217;m going to use the Backbone &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,373 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/29/testing-backbone-modules/">Testing AMD Backbone Modules</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-29T08:03:00-07:00" pubdate data-updated="true">May 29<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Continuing from <a href="http://robdodson.me/blog/2012/05/28/mocking-requests-with-mocha-chai-and-sinon/">yesterday&#8217;s post</a> I&#8217;m going to start to incorporate Backbone into my BDD setup. I&#8217;m going to use the <a href="https://github.com/tbranyen/backbone-boilerplate">Backbone Boilerplate</a> and <a href="https://github.com/backbone-boilerplate/grunt-bbb">grunt-bbb</a> to setup a new project. If you&#8217;re new to the boilerplate or grunt-bbb <a href="http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/">checkout my previous post on getting started.</a></p>
+
+<h3>Shiny and new</h3>
+
+<p>I&#8217;ve created a new directory called <code>amd-tests</code> and once I <code>cd</code> inside I run <code>bbb init</code> to template out a new project. By default the boilerplate uses Require.js and AMD modules and we have a little example one already created for us. It&#8217;s called, well, Example :) We&#8217;ll use this to create our model for testing since I know that everyone should be on the same page with this module.</p>
+
+<p>I&#8217;m going to change our model&#8217;s name from Example.Model to Example.Photo so our terminalogy won&#8217;t get muddy. We&#8217;ll give it some default properties for <code>src</code> and <code>caption</code>. Later on we&#8217;ll test that a freshly created model has these same defaults. When we&#8217;re done setting up our <code>/app/example.js</code> file should look like this. Keep in mind that the boilerplate adds a lot of stuff to get us started so you can ignore everything that isn&#8217;t Example.Photo</p>
+
+<figure class='code'><figcaption><span>/app/example.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">define</span><span class="p">([</span>
+</span><span class='line'>  <span class="s2">&quot;namespace&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Libs</span>
+</span><span class='line'>  <span class="s2">&quot;use!backbone&quot;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Modules</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Plugins</span>
+</span><span class='line'><span class="p">],</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span><span class="p">(</span><span class="nx">namespace</span><span class="p">,</span> <span class="nx">Backbone</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Create a new module</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">Example</span> <span class="o">=</span> <span class="nx">namespace</span><span class="p">.</span><span class="nx">module</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// !!! Our awesome new model !!!</span>
+</span><span class='line'>  <span class="nx">Example</span><span class="p">.</span><span class="nx">Photo</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">defaults</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">src</span><span class="o">:</span> <span class="s1">&#39;/images/placeholder.jpg&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">caption</span><span class="o">:</span> <span class="s1">&#39;Waiting for content...&#39;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">Example</span><span class="p">.</span><span class="nx">Collection</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Collection</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span> <span class="cm">/* ... */</span> <span class="p">});</span>
+</span><span class='line'>  <span class="nx">Example</span><span class="p">.</span><span class="nx">Router</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span> <span class="cm">/* ... */</span> <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// This will fetch the tutorial template and render it.</span>
+</span><span class='line'>  <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Tutorial</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">template</span><span class="o">:</span> <span class="s2">&quot;app/templates/example.html&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">view</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// Fetch the template, render it to the View element and call done.</span>
+</span><span class='line'>      <span class="nx">namespace</span><span class="p">.</span><span class="nx">fetchTemplate</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">template</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">tmpl</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">view</span><span class="p">.</span><span class="nx">el</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">tmpl</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="c1">// If a done function is passed, call it with the element</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">done</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">done</span><span class="p">(</span><span class="nx">view</span><span class="p">.</span><span class="nx">el</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>      <span class="p">});</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Required, return the module for AMD compliance</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">Example</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now comes the rather tricky part. We need to create a test runner HTML file that can incorporate mocha, chai and sinon. It also has to load our Example module and maintain all of that module&#8217;s dependencies. I spent a <em>ton</em> of time on IRC today sorting this out so here is my current best stab at things based on some <a href="https://gist.github.com/2655876">VERY generous gists</a> from <a href="https://github.com/kmiyashiro">Kelly Miyashiro.</a></p>
+
+<p>Let&#8217;s start with the index.html file that&#8217;ll be our test runner:</p>
+
+<figure class='code'><figcaption><span>test/index.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;html&gt;</span>
+</span><span class='line'><span class="nt">&lt;head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;title&gt;</span>Mocha Tests<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href=</span><span class="s">&quot;mocha/mocha.css&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;../assets/js/libs/require.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;mocha/mocha.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;sinon/sinon.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;config.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'><span class="nt">&lt;/head&gt;</span>
+</span><span class='line'><span class="nt">&lt;body&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script&gt;</span>
+</span><span class='line'>    <span class="nx">require</span><span class="p">([</span>
+</span><span class='line'>      <span class="s1">&#39;../test/test.example&#39;</span>
+</span><span class='line'>    <span class="p">],</span> <span class="nx">runMocha</span><span class="p">);</span>
+</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;mocha&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The first thing we do is add require.js, then mocha and sinon. Why no Chai? Good question. Kelly didn&#8217;t do it so I didn&#8217;t do it. If anyone wants to cite the pros and cons of this approach I&#8217;m all ears. Next we add our own config.js that is specific to our tests. We might have a config.js somewhere else that runs our main app but we&#8217;ll also need this one to run our tests. Finally we have a script block sitting on top of our <code>#mocha</code> div. The script block loads in our specs (in this case I&#8217;ve only written one but you can do multiple specs here). A final argument to the require call is <code>runMocha</code>. Essentially this is the function that is executed <em>AFTER</em> the modules have finished loading. In our case runMocha is located inside the new config.js we&#8217;ve defined just for our tests. Let&#8217;s take a look at it now.</p>
+
+<figure class='code'><figcaption><span>test/config.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">require</span><span class="p">.</span><span class="nx">config</span><span class="p">({</span>
+</span><span class='line'>    <span class="c1">// Base URL relative to the test runner</span>
+</span><span class='line'>    <span class="c1">// Paths are relative to this</span>
+</span><span class='line'>    <span class="nx">baseUrl</span><span class="o">:</span> <span class="s1">&#39;../app&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">paths</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="c1">// Testing libs</span>
+</span><span class='line'>        <span class="s1">&#39;chai&#39;</span>          <span class="o">:</span> <span class="s1">&#39;../test/chai/chai&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;common&#39;</span>        <span class="o">:</span> <span class="s1">&#39;../test/common&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;jquery&#39;</span>        <span class="o">:</span> <span class="s1">&#39;../assets/js/libs/jquery&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;underscore&#39;</span>    <span class="o">:</span> <span class="s1">&#39;../assets/js/libs/underscore&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;backbone&#39;</span>      <span class="o">:</span> <span class="s1">&#39;../assets/js/libs/backbone&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;use&#39;</span>           <span class="o">:</span> <span class="s1">&#39;../assets/js/plugins/use&#39;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">use</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">backbone</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;use!underscore&#39;</span><span class="p">,</span> <span class="s1">&#39;jquery&#39;</span><span class="p">],</span>
+</span><span class='line'>            <span class="nx">attach</span><span class="o">:</span> <span class="s1">&#39;Backbone&#39;</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="nx">underscore</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">attach</span><span class="o">:</span> <span class="s1">&#39;_&#39;</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="nx">mocha</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">attach</span><span class="o">:</span> <span class="s1">&#39;mocha&#39;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">priority</span><span class="o">:</span> <span class="p">[</span>
+</span><span class='line'>        <span class="s1">&#39;jquery&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;underscore&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;common&#39;</span>
+</span><span class='line'>    <span class="p">]</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">mocha</span><span class="p">.</span><span class="nx">setup</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">ui</span><span class="o">:</span> <span class="s1">&#39;bdd&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">ignoreLeaks</span><span class="o">:</span> <span class="kc">true</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Protect from barfs</span>
+</span><span class='line'><span class="nx">console</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">console</span> <span class="o">||</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">runMocha</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">mocha</span><span class="p">.</span><span class="nx">run</span><span class="p">();</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Lots of stuff here but nothing to get alarmed about. <a href="http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/">If you&#8217;ve read my previous getting started post you&#8217;ll know all about the config.js file.</a> Go back and read the previous post if none of this makes sense to you. The thing to take note of is the <code>priority</code> array and the <code>runMocha</code> function at the bottom of the page. I don&#8217;t have much experience with the priority array and I didn&#8217;t find much documentation on it but Kelly uses it <a href="https://gist.github.com/2655876">in the gists</a> to make sure that jQuery, chai and any chai plugins are properly setup on the page.</p>
+
+<figure class='code'><figcaption><span>test/common.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Include and setup all the stuff for testing</span>
+</span><span class='line'><span class="nx">define</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">require</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nb">window</span><span class="p">.</span><span class="nx">$</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">jQuery</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;jquery&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nb">window</span><span class="p">.</span><span class="nx">chai</span>         <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;chai&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nb">window</span><span class="p">.</span><span class="nx">expect</span>       <span class="o">=</span> <span class="nx">chai</span><span class="p">.</span><span class="nx">expect</span><span class="p">;</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Good practice? Bad practice? I&#8217;m not sure and I would love comments if anyone has a take on things. Underneath the priority array is a setup function which sends some configuration parameters to mocha. <code>ignoreLeaks</code> is useful because it&#8217;s easy for mocha to see jQuery or any other global variable as a good reason to abort a test. IMO that&#8217;s what JSLint/Hint is for, and bailing everytime you see a global is going to make testing 3rd party code especially difficult. My advice, leave it off. Finally we call <code>mocha.run()</code> via the <code>runMocha</code> function. Remember that this function is executed inside our test runner after all the specs are loaded, like so:</p>
+
+<figure class='code'><figcaption><span>test/index.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script&gt;</span>
+</span><span class='line'>    <span class="nx">require</span><span class="p">([</span>
+</span><span class='line'>      <span class="s1">&#39;../test/test.example&#39;</span>
+</span><span class='line'>    <span class="p">],</span> <span class="nx">runMocha</span><span class="p">);</span>
+</span><span class='line'>  <span class="nt">&lt;/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Doing it this way guarantees that all the dependencies our module needs will be loaded before we start running our tests.</p>
+
+<h3>Oh right, the tests!</h3>
+
+<p>Wow! OK so hopefully you&#8217;re still with me because after all of that we <em>still</em> need to generate some tests. Since it&#8217;s getting late I&#8217;m just going to put together a really simple spec to make sure our default values are being set on the model.</p>
+
+<p>I&#8217;ve created a file called <code>test.example.js</code> which will test our <code>Example</code> module.</p>
+
+<figure class='code'><figcaption><span>test/test.example.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">define</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">require</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">Example</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;modules/example&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Example&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;Photo&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">photo</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Photo</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">it</span><span class="p">(</span><span class="s1">&#39;should have proper defaults&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">expect</span><span class="p">(</span><span class="nx">photo</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;src&#39;</span><span class="p">)).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">&#39;/images/placeholder.jpg&#39;</span><span class="p">);</span>
+</span><span class='line'>          <span class="nx">expect</span><span class="p">(</span><span class="nx">photo</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;caption&#39;</span><span class="p">)).</span><span class="nx">to</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="s1">&#39;Waiting for content...&#39;</span><span class="p">);</span>
+</span><span class='line'>          <span class="nx">done</span><span class="p">();</span>
+</span><span class='line'>      <span class="p">});</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It isn&#8217;t amazing but it gets us started testing our module. I&#8217;m explicitly calling <code>done()</code> at the end of our test because I saw mention on StackOverflow that you should do this when testing AMD modules in the browser with mocha otherwise you can get false passing tests. Not sure if it&#8217;s absolutely necessary but I guess better safe than sorry!</p>
+
+<p>At this point I&#8217;m exhausted and hopefully you have a decent head start on your tests. I know that this post jumps around a lot so please take a moment <a href="https://github.com/robdodson/backbone-boilerplate-mocha">to grab the repo I&#8217;ve posted which contains all the source code.</a> Again. Caveat. I&#8217;m learning along with you so there are lots of newbie mistakes being made, I&#8217;m sure. I really want to hear your feedback if you have any. Good luck!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here</a></p>
+
+<ul>
+<li>Time: 8:04 am</li>
+<li>Mood: Awake, Antsy</li>
+<li>Sleep: 6</li>
+<li>Hunger: 3</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -3129,74 +3496,6 @@ The last few bits prevent the link from completely refreshing the page—<code>e
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/19/my-first-chain/">My First Chain</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-19T22:53:00-07:00" pubdate data-updated="true">May 19<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Back in April I was reading hacker news when I came across a blog posted titled <a href="http://japhr.blogspot.com/2012/04/366-or-how-i-tricked-myself-into-being.html">&#8216;366 or How I Tricked Myself into Being Awesome&#8217;</a>. It was written by a fellow named Chris Strom. It was written on blogspot. It was mostly unstyled.</p>
-
-<p>Chris wrote every single day for 366 days and in so doing self-published three books on programming languages that he knew nothing about. His post was to champion that milestone. At the time I read it and thought, &#8220;I can totally do this,&#8221; meaning if I follow the steps that Chris has outlined I can potentially trick myself into becoming a blogger.</p>
-
-<p>That probably seems rather silly to say but it&#8217;s true. Every developer I know Googles for answers when they&#8217;re stuck or trying to learn something new. <a href="http://css-tricks.com/">And it seems like</a>, <a href="http://www.alistapart.com/">over and</a> <a href="http://www.leebrimelow.com/">over again</a>, <a href="http://devblog.avdi.org/">we end up</a> <a href="http://yehudakatz.com/">in the same places.</a> And if you&#8217;re a developer, or maybe if you&#8217;re just me, you totally revere these people. They are guides in what is a truly unfamiliar world and they do it without asking anything in return.</p>
-
-<p>So I set out to try to do my own chain. I have to write until I go to Europe on June 27th. At this moment I have 22 blog posts that I&#8217;ve written as a result of the chain. Prior to that I&#8217;d written 3 in an entire year. At first I found the whole process exhilarating, until it started to get in the way of my personal activities. Now I have to figure out how to write something of substance while still balancing my job and my home life. This is not easy. It requires setting boundaries and self-discipline. I try to write in the mornings, usually between the hours of 7 to 9. Frequently I don&#8217;t finish and my posts have to be resumed in the evening. But working like this interferes with the time I can spend with my girlfriend and that breaks one of the unspoken rules I have which is that writing should not disturb my normal social life. Getting to the first 10 posts this was not a problem but now that I&#8217;m passing 20 it is. I&#8217;ve changed my writing style from full blown tutorials to more of a play-by-play as I code. I&#8217;m always striving to be more succinct in what I write but usually the challenge is disappearing down a rabbit hole while I research something new only to realize that I&#8217;ve blown half an hour of my writing time googling minutia. I&#8217;m going to try to associate googling minutia with some guy getting in between me and my girlfriend. As a result I will want to stab googling minutia.</p>
-
-<p>Anyway, if you find this post and you are thinking about writing let me tell you that I <strong>highly</strong> recommend it. Here is some quick advice:</p>
-
-<h3>Don&#8217;t worry about what your blog looks like.</h3>
-
-<p>I&#8217;m 100% serious on this point. If you spend any time designing your blog before you write your first 5 articles then you&#8217;re doing it wrong. I have fallen into this trap innumerable times. Just accept this challenge: Make it to 10 blog posts, then you can redesign the thing.</p>
-
-<p>I think we fall in love with the idea of having a beautiful blog and get lost in design and programming how everything will look. This is a mistake. Blogging is supposed to just be a journal of what you&#8217;re currently working on and thinking. Assume no one will read it (this is probably true). After you have a few readers then work on the look and feel if you choose. Personally I&#8217;ve found that not worrying about the design at all has been incredibly freeing. Again, look at <a href="http://japhr.blogspot.com/2012/04/366-or-how-i-tricked-myself-into-being.html">Chris Strom&#8217;s blog</a>. He has a ton of readers, is a published author, and is running the default blogspot theme.</p>
-
-<h3>Try to write at the same time every day</h3>
-
-<p>I find it easiest to focus in the morning especially when everyone else is asleep. I think Chris works late at night. Figure out what times suits you and do your best to stick to it. When I finish a post in the morning I feel free for the whole rest of the day. It&#8217;s kind of cool to have that sense of accomplishment before arriving at work :D</p>
-
-<h3>Use the best tools you can</h3>
-
-<p>I tried writing in Wordpress on several different occasions. I&#8217;ve also tried Tumblr and Posterous. I find writing in shitty WYSIWYG editors drives me totally crazy. There are apps out there that let you write in more of a desktop setting but I&#8217;m not sure if they are still subject to Wordpress or Tumblr&#8217;s weird formatting. Basically if you&#8217;re writing a code blog it fucking sucks to use a WYSIWYG because they&#8217;ll try to wrap all of your funky syntax in weird markup. I found <a href="http://octopress.org/">Octopress</a> and it&#8217;s been the best tool I&#8217;ve ever used for writing. I also <a href="http://robdodson.me/blog/2012/04/30/custom-domain-with-octopress-and-github-pages/">wrote a little article</a> on it if you&#8217;re trying to get it setup for your personal domain. Octopress is great because it uses <a href="http://daringfireball.net/projects/markdown/">Markdown</a>, the same language that&#8217;s used to generate most of the pages on Github, there&#8217;s no database and you can write in any text editor. I do all of my blogging in <a href="http://www.sublimetext.com/2">Sublime Text 2</a>, often times with my blog in one cell with my code in the other. Here&#8217;s a screenshot of what this can look like.</p>
-
-<p><img class="center" src="/images/side_by_side_blogging.png" title="'Awesome splits!'" ></p>
-
-<h3>Don&#8217;t worry when no one reads it</h3>
-
-<p>Finally, don&#8217;t get too hung up on who is (or isn&#8217;t) reading your blog. I know that pretty much all of the visits I see in my google analytics are actually just me checking the site on my phone or laptop. Definitely <em>do</em> add analytics so you can see which parts are successful and which are not but don&#8217;t expect to be <a href="http://daringfireball.net/">Daring Fireball</a> overnight. In fact, don&#8217;t ever expect to be Daring Fireball. Keep in mind that what you&#8217;re doing is a personal journal. It may not seem like blogs are framed in that context but that&#8217;s what they&#8217;re best at. I often times find this really interesting flow where I write down what I think I should build before I build it, then I write a test, then I write the implementation. Often times I work out what I&#8217;m doing in the blog post well before I&#8217;ve even written the test. This is like a whole other kind of BDD, Blog Driven Development :) Use it for what it&#8217;s best at and you&#8217;ll find it rewarding.</p>
-
-<p>Ok that&#8217;s it for now. Goodnight!</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -3214,6 +3513,10 @@ The last few bits prevent the link from completely refreshing the page—<code>e
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/18/outputting-json-from-ruby/">Outputting JSON from Ruby</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/">Object Oriented Scraper Backed With Tests Pt&#8230;9?</a>
       </li>
     
@@ -3227,10 +3530,6 @@ The last few bits prevent the link from completely refreshing the page—<code>e
     
       <li class="post">
         <a href="/blog/2012/06/14/how-to-write-a-command-line-ruby-gem/">How To Write a Command Line Ruby Gem</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/13/writing-a-command-line-tool-in-ruby/">Writing a Command Line Tool in Ruby</a>
       </li>
     
   </ul>

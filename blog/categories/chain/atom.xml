@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-18T00:14:51-07:00</updated>
+  <updated>2012-06-18T22:16:32-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,134 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Outputting JSON from Ruby]]></title>
+    <link href="http://robdodson.me/blog/2012/06/18/outputting-json-from-ruby/"/>
+    <updated>2012-06-18T08:19:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/18/outputting-json-from-ruby</id>
+    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/">Last night</a> I got the scraper to write an output.txt file which listed all the contents of <code>words_by_selector</code>. Today I want to make it write to JSON instead of plain text and I want to back it with some tests.</p>
+
+<h2>Updating our tests</h2>
+
+<p>Our current test for <code>words_by_selector</code> looks like this:</p>
+
+<p><code>ruby spec/crawler_spec.rb
+it "should produce the correct Array of keywords" do
+  expected_array = ['hello: 3', 'world: 2', 'foobar: 1']
+  actual_array = @crawler.words_by_selector(@options[:post_selector], @options[:ignored_post_selector])
+  actual_array.should eq(expected_array)
+end
+</code>
+We're going to need to break that sucker so it'll produce something more like this:</p>
+
+<p>``` ruby spec/crawler_spec.rb
+it "should produce the correct Hash of keywords" do
+  expected_hash = {</p>
+
+<pre><code>  word_count: [
+    {
+      word: 'hello',
+      count: 3
+    },
+    {
+      word: 'world',
+      count: 2
+    },
+    {
+      word: 'foobar',
+      count: 1
+    },
+  ]
+}
+</code></pre>
+
+<p>  actual_hash = @crawler.words_by_selector(@options[:post_selector], @options[:ignored_post_selector])
+  actual_hash.should eq(expected_hash)
+end
+```</p>
+
+<p>And we update <code>words_by_selector</code> to look like this:</p>
+
+<p>``` ruby tentacles/lib/tentacles/crawler.rb
+def words_by_selector(selector, ignored_selector = nil)
+  node = nodes_by_selector(selector).first
+  if ignored_selector</p>
+
+<pre><code>ignored = node.css(ignored_selector)
+ignored.remove()
+</code></pre>
+
+<p>  end
+  words = words_from_string(node.content)
+  count_frequency(words)</p>
+
+<p>  sorted = @counts.sort_by { |word, count| count }
+  sorted.reverse!
+  sorted.map! do |word, count|</p>
+
+<pre><code>{ word: word, count: count }
+</code></pre>
+
+<p>  end
+  { word_count: sorted }
+end
+```</p>
+
+<p>Our new test should pass. Feel free to flip one of the numbers in the expected_hash to 99 or something to see it fail.</p>
+
+<p>Now let's make sure the runner takes the content out of the crawler and writes it to a JSON file.</p>
+
+<p>``` ruby spec/runner_spec.rb
+it "should create a directory for our output" do
+  @runner.run
+  Dir.exists?('../../output').should be_true
+end</p>
+
+<p>it "should output the correct JSON" do
+  @runner.run
+  File.open("../../output/word_count.json") do |file|</p>
+
+<pre><code>file.each_line do |line|
+  puts line
+end
+</code></pre>
+
+<p>  end
+end
+```
+And in runner.rb...</p>
+
+<p>``` ruby tentacles/lib/tentacles/runner.rb
+def run    <br/>
+  @crawler = Tentacles::Crawler.from_uri(@options.uri)
+  output = @crawler.words_by_selector(@options.post_selector, 'ul:last-child')</p>
+
+<p>  Dir.mkdir('../../output') unless Dir.exists?('../../output')</p>
+
+<p>  File.open("../../output/word_count.json", "w") do |file|</p>
+
+<pre><code>file.puts JSON.pretty_generate(output)
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>And there we go. Our first decent output from the crawler :D -Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 8:20 am</li>
+<li>Mood: Awake</li>
+<li>Sleep: 6</li>
+<li>Hunger: 4</li>
+<li>Coffee: 0</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Object Oriented Scraper Backed With Tests Pt...9?]]></title>
@@ -402,111 +530,6 @@ gem.executables   = ["zerp"]
 <li>Mood: Awake, Antsy</li>
 <li>Sleep: 6</li>
 <li>Hunger: 2</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Writing a Command Line Tool in Ruby]]></title>
-    <link href="http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby/"/>
-    <updated>2012-06-13T07:29:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby</id>
-    <content type="html"><![CDATA[<p>Yesterday I tried to do a post on creating your first Ruby Gem as a command line tool. <a href="http://robdodson.me/blog/2012/06/12/messing-around-with-gems/">It didn't go very well.</a> In an effort to better understand what goes on with command line tools I'm going to start from the most basic, a ruby script that is in our <code>PATH</code>.</p>
-
-<p>I've previously added the folder <code>~/bin</code> to my PATH so I know that if I drop an executable script in there I should be able to run it by just typing its name. Let's give that a shot. First we'll make a new file just called <code>sherp</code> without any file extension. Make sure to <code>chmod 755 sherpa</code> so that it's executable. Then we'll add the following:</p>
-
-<p>``` ruby ~/bin/sherpa</p>
-
-<h1>!/usr/bin/env ruby</h1>
-
-<p>puts 'I am the sherpa!!!'
-```</p>
-
-<p>If I now type <code>sherpa</code> into the command line, it should fire back <code>I am the sherpa!!!</code></p>
-
-<p>Ok cool so we've got that part working. Now let's see if we can get some arguments in there. We'll iterate the <code>ARGV</code> object to see what comes in.</p>
-
-<p>``` ruby ~/bin/sherpa</p>
-
-<h1>!/usr/bin/env ruby</h1>
-
-<p>ARGV.each do |arg|</p>
-
-<pre><code>puts arg
-</code></pre>
-
-<p>end
-```</p>
-
-<p>With that little bit of code we should be able to pass just about anything to our command and have it echoed back.</p>
-
-<p>```
-sherpa foo bar baz</p>
-
-<p> => foo
- => bar
- => baz
-```</p>
-
-<p>Ok cool. Now let's step this up a notch or two. Let's say we want to send in commands and options. For that we'll use the built-in <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/optparse/rdoc/OptionParser.html">OptionParser</a>. Here's <a href="http://rubylearning.com/blog/2011/01/03/how-do-i-make-a-command-line-tool-in-ruby/">a link to the article I've been following which details how to use the OptionParser.</a> In my case, I'm going to tell <code>sherpa</code> to either <code>say_hello</code> or <code>say_goodbye</code>. When I pass in the <code>-n</code> flag it should accept a name, otherwise it will use the name 'Master'. So the line <code>sherpa say_hello -n Rob</code> should produce <code>Hello Rob</code> and likewise if I left off the option and just used <code>sherpa say_hello</code> it should produce <code>Hello Master</code>.</p>
-
-<p>Here's the code to accomplish this:</p>
-
-<p>``` ruby ~/bin</p>
-
-<h1>!/usr/bin/env ruby</h1>
-
-<p>require 'optparse'</p>
-
-<p>options = {}</p>
-
-<p>opt_parser = OptionParser.new do |opt|
-  opt.banner = "Usage: opt_parser COMMAND [OPTIONS]"
-  opt.separator  ""
-  opt.separator  "Commands"
-  opt.separator  "     name: the name the sherpa should use when addressing you"
-  opt.separator  ""
-  opt.separator  "Options"</p>
-
-<p>  opt.on("-n","--name NAME","tell the sherpa what to call you") do |name|</p>
-
-<pre><code>options[:name] = name
-</code></pre>
-
-<p>  end</p>
-
-<p>  opt.on("-h","--help","help") do</p>
-
-<pre><code>puts opt_parser
-</code></pre>
-
-<p>  end
-end</p>
-
-<p>opt_parser.parse!
-name = options[:name] || 'Master'</p>
-
-<p>case ARGV[0]
-when "say_hello"
-  puts "Hello #{name}"
-when "say_goodbye"
-  puts "Goodbye #{name}"
-else
-  puts opt_parser
-end
-```</p>
-
-<p>And there we go, our first command line Ruby tool. I'll pick it up tomorrow to try to improve upon it. We're starting small but at least we have something that works!</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:31 am</li>
-<li>Mood: Tired, Patient</li>
-<li>Sleep: 6</li>
-<li>Hunger: 1</li>
 <li>Coffee: 0</li>
 </ul>
 
