@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-18T22:16:32-07:00</updated>
+  <updated>2012-06-20T00:32:03-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Crawling pages with Mechanize and Nokogiri]]></title>
+    <link href="http://robdodson.me/blog/2012/06/20/crawling-pages-with-mechanize-and-nokogiri/"/>
+    <updated>2012-06-20T00:09:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/20/crawling-pages-with-mechanize-and-nokogiri</id>
+    <content type="html"><![CDATA[<p>Short post tonight because I spent so much time figuring out the code. It's late and my brain is firing on about 1 cylinder so it took longer than I expected to get everything working.</p>
+
+<p>The scraper that I'm building is supposed to work like a spider and crawl of the pages of my blog. I wasn't sure what the best way to do that was so I started Googling and came up with <a href="http://mechanize.rubyforge.org/">Mechanize.</a> There are other tools built on top of Mechanize, like <a href="https://github.com/felipecsl/wombat">Wombat</a>, but since my task is so simple I figured I could just write everything I needed with Mechanize and Nokogiri. It's usually a better idea to work with simple tools when you're first grasping concepts so you don't get lost in the weeds of some high powered framework.</p>
+
+<p>Since it's late I'll let the code do the talking:</p>
+
+<p>``` ruby crawler.rb
+require 'mechanize'</p>
+
+<h1>Create a new instance of Mechanize and grab our page</h1>
+
+<p>agent = Mechanize.new
+page = agent.get('http://robdodson.me/blog/archives/')</p>
+
+<h1>Find all the links on the page that are contained within</h1>
+
+<h1>h1 tags.</h1>
+
+<p>post_links = page.links.find_all { |l| l.attributes.parent.name == 'h1' }</p>
+
+<h1>Click on one of our post links and store the response</h1>
+
+<p>post = post_links[1].click
+doc = page.parser # Same as Nokogiri::HTML(page.body)
+p doc
+```</p>
+
+<p>This code is hopefully easy enough to digest. After I get the page I find all of the links which are wrapped inside of an <code>h1</code>. Just as an example I <code>click</code> a link from the list using Array syntax and store the response in another var. You <em>could</em> click all of the links by iterating through the post_links object, and that's what we'll tackle tomorrow. For now I just follow 1 link and use a convenience method to parse the page with Nokogiri. After that we have a Nokogiri <code>doc</code> ready to be manipulated however we see fit.</p>
+
+<p><a href="https://gist.github.com/2958538">Here's a link to the Gist</a> if you'd like to tweak or play with the code. Pop it into <code>irb</code> and give it a shot. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 12:10 am</li>
+<li>Mood: Tired, Introspective</li>
+<li>Sleep: 4.5</li>
+<li>Hunger: 2</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Outputting JSON from Ruby]]></title>
@@ -509,37 +558,6 @@ end
 <li>Mood: Tired, Patient</li>
 <li>Sleep: 6</li>
 <li>Hunger: 1</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Messing around with Gems]]></title>
-    <link href="http://robdodson.me/blog/2012/06/12/messing-around-with-gems/"/>
-    <updated>2012-06-12T22:22:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/12/messing-around-with-gems</id>
-    <content type="html"><![CDATA[<p>I want to work on a code generation tool, similar to the one offered up by Rails. However my Ruby-fu is a bit rusty at the moment so this might be an interesting struggle.</p>
-
-<p>The first thing I'm going to do is create a new gemset with rvm. Our gem is going to be called <code>r2</code> after the much beloved R2D2 so we'll also call our gemset <code>r2</code>.</p>
-
-<p><code>
-rvm gemset create r2
-rvm use 1.9.3@r2
-</code></p>
-
-<p>Ugh after spending about an 2 hours fucking around with bundler I'm getting nowhere. I'll have to pick this up tomorrow. :\ #WorstPostEver</p>
-
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/sadness.jpg" title="'sadness'" ></p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 10:28 pm</li>
-<li>Mood: Tired, Cranky</li>
-<li>Sleep: 6</li>
-<li>Hunger: 8</li>
 <li>Coffee: 0</li>
 </ul>
 
