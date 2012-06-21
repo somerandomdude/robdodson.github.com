@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-20T00:32:03-07:00</updated>
+  <updated>2012-06-21T01:30:17-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,54 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Quick Spider Example]]></title>
+    <link href="http://robdodson.me/blog/2012/06/21/quick-spider-example/"/>
+    <updated>2012-06-21T01:27:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/21/quick-spider-example</id>
+    <content type="html"><![CDATA[<p>``` ruby
+require 'mechanize'</p>
+
+<h1>Create a new instance of Mechanize and grab our page</h1>
+
+<p>agent = Mechanize.new
+page = agent.get('http://robdodson.me/blog/archives/')</p>
+
+<h1>Find all the links on the page that are contained within</h1>
+
+<h1>h1 tags.</h1>
+
+<p>post_links = page.links.find_all { |l| l.attributes.parent.name == 'h1' }
+post_links.shift</p>
+
+<h1>Follow each link and print out its title</h1>
+
+<p>post_links.each do |link|</p>
+
+<pre><code>post = link.click
+doc = post.parser
+p doc.css('.entry-title').text
+</code></pre>
+
+<p>end
+```
+Having a horrible time getting anything to run tonight. The code from above is a continuation from yesterday's post except this time we're finding every link on the page, then following that link and spitting out its title. Using this formula you could build something entirely recursive which acts as a full blown spider.</p>
+
+<p>Unfortunately getting this to integrate into the existing app is not working for me tonight. Coding anything after 11 pm is usually a bad call, so I'm going to shut it down and try again in the morning.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 1:28 am</li>
+<li>Mood: Tired, Annoyed</li>
+<li>Sleep: 6</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Crawling pages with Mechanize and Nokogiri]]></title>
@@ -453,111 +501,6 @@ gem.executables   = ["zerp"]
 <li>Mood: Awake, Antsy</li>
 <li>Sleep: 6</li>
 <li>Hunger: 2</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Writing a Command Line Tool in Ruby]]></title>
-    <link href="http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby/"/>
-    <updated>2012-06-13T07:29:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby</id>
-    <content type="html"><![CDATA[<p>Yesterday I tried to do a post on creating your first Ruby Gem as a command line tool. <a href="http://robdodson.me/blog/2012/06/12/messing-around-with-gems/">It didn't go very well.</a> In an effort to better understand what goes on with command line tools I'm going to start from the most basic, a ruby script that is in our <code>PATH</code>.</p>
-
-<p>I've previously added the folder <code>~/bin</code> to my PATH so I know that if I drop an executable script in there I should be able to run it by just typing its name. Let's give that a shot. First we'll make a new file just called <code>sherp</code> without any file extension. Make sure to <code>chmod 755 sherpa</code> so that it's executable. Then we'll add the following:</p>
-
-<p>``` ruby ~/bin/sherpa</p>
-
-<h1>!/usr/bin/env ruby</h1>
-
-<p>puts 'I am the sherpa!!!'
-```</p>
-
-<p>If I now type <code>sherpa</code> into the command line, it should fire back <code>I am the sherpa!!!</code></p>
-
-<p>Ok cool so we've got that part working. Now let's see if we can get some arguments in there. We'll iterate the <code>ARGV</code> object to see what comes in.</p>
-
-<p>``` ruby ~/bin/sherpa</p>
-
-<h1>!/usr/bin/env ruby</h1>
-
-<p>ARGV.each do |arg|</p>
-
-<pre><code>puts arg
-</code></pre>
-
-<p>end
-```</p>
-
-<p>With that little bit of code we should be able to pass just about anything to our command and have it echoed back.</p>
-
-<p>```
-sherpa foo bar baz</p>
-
-<p> => foo
- => bar
- => baz
-```</p>
-
-<p>Ok cool. Now let's step this up a notch or two. Let's say we want to send in commands and options. For that we'll use the built-in <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/optparse/rdoc/OptionParser.html">OptionParser</a>. Here's <a href="http://rubylearning.com/blog/2011/01/03/how-do-i-make-a-command-line-tool-in-ruby/">a link to the article I've been following which details how to use the OptionParser.</a> In my case, I'm going to tell <code>sherpa</code> to either <code>say_hello</code> or <code>say_goodbye</code>. When I pass in the <code>-n</code> flag it should accept a name, otherwise it will use the name 'Master'. So the line <code>sherpa say_hello -n Rob</code> should produce <code>Hello Rob</code> and likewise if I left off the option and just used <code>sherpa say_hello</code> it should produce <code>Hello Master</code>.</p>
-
-<p>Here's the code to accomplish this:</p>
-
-<p>``` ruby ~/bin</p>
-
-<h1>!/usr/bin/env ruby</h1>
-
-<p>require 'optparse'</p>
-
-<p>options = {}</p>
-
-<p>opt_parser = OptionParser.new do |opt|
-  opt.banner = "Usage: opt_parser COMMAND [OPTIONS]"
-  opt.separator  ""
-  opt.separator  "Commands"
-  opt.separator  "     name: the name the sherpa should use when addressing you"
-  opt.separator  ""
-  opt.separator  "Options"</p>
-
-<p>  opt.on("-n","--name NAME","tell the sherpa what to call you") do |name|</p>
-
-<pre><code>options[:name] = name
-</code></pre>
-
-<p>  end</p>
-
-<p>  opt.on("-h","--help","help") do</p>
-
-<pre><code>puts opt_parser
-</code></pre>
-
-<p>  end
-end</p>
-
-<p>opt_parser.parse!
-name = options[:name] || 'Master'</p>
-
-<p>case ARGV[0]
-when "say_hello"
-  puts "Hello #{name}"
-when "say_goodbye"
-  puts "Goodbye #{name}"
-else
-  puts opt_parser
-end
-```</p>
-
-<p>And there we go, our first command line Ruby tool. I'll pick it up tomorrow to try to improve upon it. We're starting small but at least we have something that works!</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:31 am</li>
-<li>Mood: Tired, Patient</li>
-<li>Sleep: 6</li>
-<li>Hunger: 1</li>
 <li>Coffee: 0</li>
 </ul>
 

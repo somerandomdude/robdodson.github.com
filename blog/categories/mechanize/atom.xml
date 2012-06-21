@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Mechanize | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/mechanize/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-20T00:32:03-07:00</updated>
+  <updated>2012-06-21T01:30:17-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,54 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Quick Spider Example]]></title>
+    <link href="http://robdodson.me/blog/2012/06/21/quick-spider-example/"/>
+    <updated>2012-06-21T01:27:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/21/quick-spider-example</id>
+    <content type="html"><![CDATA[<p>``` ruby
+require 'mechanize'</p>
+
+<h1>Create a new instance of Mechanize and grab our page</h1>
+
+<p>agent = Mechanize.new
+page = agent.get('http://robdodson.me/blog/archives/')</p>
+
+<h1>Find all the links on the page that are contained within</h1>
+
+<h1>h1 tags.</h1>
+
+<p>post_links = page.links.find_all { |l| l.attributes.parent.name == 'h1' }
+post_links.shift</p>
+
+<h1>Follow each link and print out its title</h1>
+
+<p>post_links.each do |link|</p>
+
+<pre><code>post = link.click
+doc = post.parser
+p doc.css('.entry-title').text
+</code></pre>
+
+<p>end
+```
+Having a horrible time getting anything to run tonight. The code from above is a continuation from yesterday's post except this time we're finding every link on the page, then following that link and spitting out its title. Using this formula you could build something entirely recursive which acts as a full blown spider.</p>
+
+<p>Unfortunately getting this to integrate into the existing app is not working for me tonight. Coding anything after 11 pm is usually a bad call, so I'm going to shut it down and try again in the morning.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 1:28 am</li>
+<li>Mood: Tired, Annoyed</li>
+<li>Sleep: 6</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Crawling pages with Mechanize and Nokogiri]]></title>

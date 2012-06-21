@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="What is design by configuration? As an experienced developer if you find that you are performing the same actions over and over naturally your brain &hellip;">
+  <meta name="description" content="Continuing from our previous post we&#8217;re going to keep working on our Crawler and our specs to see if we can start pulling real data from our &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,349 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4/">Object Oriented Scraper Backed With Tests Pt. 4</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-11T07:20:00-07:00" pubdate data-updated="true">May 11<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Continuing from our <a href="http://robdodson.me/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/">previous post</a> we&#8217;re going to keep working on our <code>Crawler</code> and our specs to see if we can start pulling real data from our site.</p>
+
+<p>The first thing I did this morning was to run my tests:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>bundle exec rspec spec/
+</span><span class='line'>
+</span><span class='line'>..............
+</span><span class='line'>
+</span><span class='line'>Finished in 0.01271 seconds
+</span><span class='line'>14 examples, 0 failures</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As someone totally new to TDD/BDD this is kind of an awesome feeling. I left my code for a few days and now I can come back and verify that everything still works. We can take it even further and run rspec with a documentation formatter to get some pretty printed output:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">bundle</span> <span class="nb">exec</span> <span class="n">rspec</span> <span class="n">spec</span><span class="o">/</span> <span class="o">-</span><span class="n">cf</span> <span class="n">d</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span>
+</span><span class='line'>  <span class="n">constructors</span>
+</span><span class='line'>    <span class="c1">#from_uri</span>
+</span><span class='line'>      <span class="n">should</span> <span class="n">respond</span>
+</span><span class='line'>      <span class="n">should</span> <span class="k">return</span> <span class="n">an</span> <span class="n">instance</span>
+</span><span class='line'>  <span class="n">instances</span>
+</span><span class='line'>    <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#get_words_by_selector</span>
+</span><span class='line'>    <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#get_metadata_by_selector</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span>
+</span><span class='line'>  <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#uri</span>
+</span><span class='line'>  <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#post_selector</span>
+</span><span class='line'>  <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#metadata_selector</span>
+</span><span class='line'>  <span class="c1">#initialize</span>
+</span><span class='line'>    <span class="k">when</span> <span class="n">parsing</span> <span class="n">the</span> <span class="no">URI</span>
+</span><span class='line'>      <span class="k">when</span> <span class="no">URI</span> <span class="n">is</span> <span class="n">valid</span>
+</span><span class='line'>        <span class="n">should</span> <span class="nb">display</span> <span class="n">the</span> <span class="n">right</span> <span class="no">URI</span>
+</span><span class='line'>      <span class="k">when</span> <span class="no">URI</span> <span class="n">is</span> <span class="n">invalid</span>
+</span><span class='line'>        <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="n">exception</span>
+</span><span class='line'>      <span class="k">when</span> <span class="no">URI</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">contain</span> <span class="n">a</span> <span class="n">scheme</span>
+</span><span class='line'>        <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="no">IO</span> <span class="n">exception</span>
+</span><span class='line'>      <span class="k">when</span> <span class="no">URI</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">contain</span> <span class="n">a</span> <span class="n">host</span>
+</span><span class='line'>        <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="no">IO</span> <span class="n">exception</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Tentacles</span><span class="o">::</span><span class="no">Runner</span>
+</span><span class='line'>  <span class="n">should</span> <span class="n">respond</span> <span class="n">to</span> <span class="c1">#run</span>
+</span><span class='line'>  <span class="k">when</span> <span class="n">parsing</span> <span class="n">the</span> <span class="n">config</span> <span class="n">file</span>
+</span><span class='line'>    <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="n">error</span> <span class="k">if</span> <span class="n">the</span> <span class="n">config</span> <span class="n">file</span> <span class="n">is</span> <span class="n">missing</span>
+</span><span class='line'>    <span class="n">should</span> <span class="k">raise</span> <span class="n">an</span> <span class="n">error</span> <span class="k">if</span> <span class="n">the</span> <span class="n">config</span> <span class="n">file</span> <span class="n">is</span> <span class="n">invalid</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Finished</span> <span class="k">in</span> <span class="mi">0</span><span class="o">.</span><span class="mo">0135</span><span class="mi">9</span> <span class="n">seconds</span>
+</span><span class='line'><span class="mi">14</span> <span class="n">examples</span><span class="p">,</span> <span class="mi">0</span> <span class="n">failures</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In rspec the <code>-c</code> flag enables color in the output. The <code>-f</code> flag sets a formatter and <code>d</code> specifies the documentation format.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>-f, --format FORMATTER           Choose a formatter.
+</span><span class='line'>                                       <span class="o">[</span>p<span class="o">]</span>rogress <span class="o">(</span>default - dots<span class="o">)</span>
+</span><span class='line'>                                       <span class="o">[</span>d<span class="o">]</span>ocumentation <span class="o">(</span>group and example names<span class="o">)</span>
+</span><span class='line'>                                       <span class="o">[</span>h<span class="o">]</span>tml
+</span><span class='line'>                                       <span class="o">[</span>t<span class="o">]</span>extmate
+</span><span class='line'>                                       custom formatter class name
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Neat.</p>
+
+<p>In <code>crawler_spec.rb</code> I&#8217;m going to add a test that checks to see if our instance has actually stored the content from our mocked web request.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;../lib/tentacles/crawler&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;fakeweb&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span> <span class="k">do</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">before</span> <span class="k">do</span>
+</span><span class='line'>    <span class="c1"># Create a mock options object</span>
+</span><span class='line'>    <span class="vi">@options</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">uri</span><span class="p">:</span> <span class="s1">&#39;http://robdodson.me&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">post_selector</span><span class="p">:</span> <span class="s1">&#39;.entry-content&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">metadata_selector</span><span class="p">:</span> <span class="s1">&#39;.personal-metadata&#39;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># Create a mock web request</span>
+</span><span class='line'>    <span class="no">FakeWeb</span><span class="o">.</span><span class="n">register_uri</span><span class="p">(</span><span class="ss">:get</span><span class="p">,</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">,</span> <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="s2">&quot;Hello World! Hello San Francisco!&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;constructors&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">describe</span> <span class="s2">&quot;#from_uri&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should respond&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:from_uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should return an instance&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="n">crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">crawler</span><span class="o">.</span><span class="n">should</span> <span class="n">be_an_instance_of</span><span class="p">(</span><span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;instances&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">before</span> <span class="k">do</span>
+</span><span class='line'>      <span class="vi">@crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">subject</span> <span class="p">{</span> <span class="vi">@crawler</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:get_words_by_selector</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:get_metadata_by_selector</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">context</span> <span class="s2">&quot;post-construct&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">it</span> <span class="s2">&quot;should have the right document&quot;</span> <span class="k">do</span>
+</span><span class='line'>        <span class="vi">@crawler</span><span class="o">.</span><span class="n">doc</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">should</span> <span class="o">=~</span> <span class="sr">/Hello World! Hello San Francisco!/</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I want to write a test to parse the content for keywords but I realize now that our FakeWeb request returns a string without any classes or id&#8217;s. Gotta go back and wrap it in some HTML to match our selectors. So I&#8217;m changing the mock web request to look like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Create a mock web request</span>
+</span><span class='line'>    <span class="no">FakeWeb</span><span class="o">.</span><span class="n">register_uri</span><span class="p">(</span><span class="ss">:get</span><span class="p">,</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>                         <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="s1">&#39;&lt;div class=&quot;&#39;</span> <span class="o">+</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">]</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;Hello World! Hello San Francisco!&lt;/div&gt;&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Hello Hello Hello World!</h3>
+
+<p>After a lot of back and forth I finally get my test to pass. I realize along the way that there are a bunch of things I need to change. For starters having most of my words be the same count doesn&#8217;t really help me to validate that my keyword counting is working all that well. So I&#8217;m changing our FakeWeb request and the subsequent specs which test against it.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Create a mock web request</span>
+</span><span class='line'>    <span class="no">FakeWeb</span><span class="o">.</span><span class="n">register_uri</span><span class="p">(</span><span class="ss">:get</span><span class="p">,</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">,</span>
+</span><span class='line'>                         <span class="ss">:body</span> <span class="o">=&gt;</span> <span class="s1">&#39;&lt;div class=&quot;&#39;</span> <span class="o">+</span> <span class="vi">@options</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">].</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&quot;&gt;Hello Hello Hello World World Foobar!&lt;/div&gt;&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">context</span> <span class="s2">&quot;post-construct&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">it</span> <span class="s2">&quot;should have the right document&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="vi">@crawler</span><span class="o">.</span><span class="n">doc</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">should</span> <span class="o">=~</span> <span class="sr">/Hello Hello Hello World World Foobar!/</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next I need to make sure that my <code>get_words_by_selector</code> method is accepting a selector.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">def</span> <span class="nf">get_words_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">entries</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="s1">&#39;div.entry-content&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">entries</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">entry</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">words</span> <span class="o">=</span> <span class="n">words_from_string</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">count_frequency</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">sorted</span> <span class="o">=</span> <span class="vi">@counts</span><span class="o">.</span><span class="n">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="n">count</span> <span class="p">}</span>
+</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">reverse!</span>
+</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="s2">&quot;</span><span class="si">#{</span><span class="n">word</span><span class="si">}</span><span class="s2">: </span><span class="si">#{</span><span class="n">count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+</span><span class='line'>    <span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I also realize that I&#8217;d like my Array of keywords to be in desceding order so I <code>reverse</code> it after the initial sort.</p>
+
+<p>Next I&#8217;m going to write the test to verify that we&#8217;ve received a group of words, counted them up and tossed them into an Array in descending order:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">describe</span> <span class="s2">&quot;#get_words_by_selector&quot;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">it</span> <span class="s2">&quot;should produce an Array of keywords&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">expected_array</span> <span class="o">=</span> <span class="o">[</span><span class="s1">&#39;hello: 3&#39;</span><span class="p">,</span> <span class="s1">&#39;world: 2&#39;</span><span class="p">,</span> <span class="s1">&#39;foobar: 1&#39;</span><span class="o">]</span>
+</span><span class='line'>    <span class="n">actual_array</span> <span class="o">=</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">get_words_by_selector</span><span class="p">(</span><span class="vi">@options</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">]</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">actual_array</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="n">expected_array</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I actually wrote the test first and did everything else to make it pass. But at this point it should all be passing and we can verify that given a request with the appropriate selector we should be able to build a basic word frequency list. Yay!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 7:35 am</li>
+<li>Mood: Calm, Awake, Curious</li>
+<li>Sleep: 7</li>
+<li>Hunger: 4</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2768,296 +3111,6 @@ var x = d3.scale.linear()
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/01/ruby-objects-and-dot-syntax/">Ruby Objects and Dot Syntax</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-01T07:37:00-07:00" pubdate data-updated="true">May 1<span>st</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Coming from JavaScript I&#8217;m very accustomed to doing something like this:</p>
-
-<figure class='code'><figcaption><span>Javascript</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">person</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="nx">city</span><span class="o">:</span> <span class="s1">&#39;San Francisco&#39;</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">person</span><span class="p">.</span><span class="nx">city</span> <span class="p">);</span>   <span class="c1">// &#39;San Francisco&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Using dot syntax to access a <code>Hash</code> is second nature to me. That&#8217;s why I was surprised when I ran into the following error yesterday while writing some Ruby.</p>
-
-<figure class='code'><figcaption><span>Ruby</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">person</span> <span class="o">=</span> <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="n">city</span><span class="p">:</span> <span class="s1">&#39;San Francisco&#39;</span><span class="p">}</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="p">{</span><span class="ss">:name</span><span class="o">=&gt;</span><span class="s2">&quot;Rob&quot;</span><span class="p">,</span> <span class="ss">:city</span><span class="o">=&gt;</span><span class="s2">&quot;San Francisco&quot;</span><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">puts</span> <span class="n">person</span><span class="o">.</span><span class="n">city</span>
-</span><span class='line'>
-</span><span class='line'><span class="no">NoMethodError</span><span class="p">:</span> <span class="n">undefined</span> <span class="nb">method</span> <span class="sb">`city&#39; for {:name=&gt;&quot;Rob&quot;, :city=&gt;&quot;San Francisco&quot;}:Hash</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>&#8220;Hmm, weird,&#8221; I thought. I know I&#8217;ve seen dot syntax used in Ruby before..what gives?</p>
-
-<h3>Dot Syntax and the Ruby Hash Object</h3>
-
-<p>As it turns out Ruby does not support dot syntax for the <code>Hash</code> object. If I had wanted to access the <code>city</code> property from my previous example I should have done it using the symbol key like so:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">person</span><span class="o">[</span><span class="ss">:city</span><span class="o">]</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;San Francisco&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>There are a few data structures that are very similar to <code>Hashes</code> and seeing those used in the wild perhaps threw me off. So I figured I&#8217;d write a post about the do&#8217;s and dont&#8217;s of dot syntax and how different object types react to it.</p>
-
-<h4>Class</h4>
-
-<p>The first and most obvious one is the <code>Class</code> object. Really I&#8217;m talking about instances of a <code>Class</code> here, for example an instance of class <code>Person</code> might have a <code>city</code> attribute. Here&#8217;s what that would look like.</p>
-
-<figure class='code'><figcaption><span>Person: Long Version</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Person</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">city</span><span class="p">)</span>
-</span><span class='line'>    <span class="vi">@name</span> <span class="o">=</span> <span class="nb">name</span>
-</span><span class='line'>    <span class="vi">@city</span> <span class="o">=</span> <span class="n">city</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">name</span>
-</span><span class='line'>    <span class="vi">@name</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">city</span>
-</span><span class='line'>    <span class="vi">@city</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">person</span> <span class="o">=</span> <span class="no">Person</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="s1">&#39;San Francisco&#39;</span><span class="p">)</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;Person:0x007ff15412a8c0 @name=&quot;Rob&quot;, @city=&quot;San Francisco&quot;&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">city</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;San Francisco&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Since I&#8217;ve defined methods for both <code>name</code> and <code>city</code>, using dot syntax to access those properties basically means we&#8217;re calling those methods. The methods just return the instance variables, acting as getters. You can shorten this by using <code>attr_reader</code> or <code>attr_accessor</code>.</p>
-
-<figure class='code'><figcaption><span>Person: Short Version</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">Person</span>
-</span><span class='line'>  <span class="kp">attr_accessor</span> <span class="ss">:name</span><span class="p">,</span> <span class="ss">:city</span>
-</span><span class='line'>  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="nb">name</span><span class="p">,</span> <span class="n">city</span><span class="p">)</span>
-</span><span class='line'>    <span class="vi">@name</span> <span class="o">=</span> <span class="nb">name</span>
-</span><span class='line'>    <span class="vi">@city</span> <span class="o">=</span> <span class="n">city</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">person</span> <span class="o">=</span> <span class="no">Person</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="s1">&#39;San Francisco&#39;</span><span class="p">)</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;Person:0x007ff15412a8c0 @name=&quot;Rob&quot;, @city=&quot;San Francisco&quot;&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">city</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;San Francisco&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>Struct</h4>
-
-<p>The <code>Struct</code> object is another commonly used element which allows dot access to its attributes. Quoting from <a href="http://www.ruby-doc.org/core-1.9.3/Struct.html">the documentation</a>:</p>
-
-<blockquote><p>A Struct is a convenient way to bundle a number of attributes together, using accessor methods, without having to write an explicit class.</p></blockquote>
-
-<p>Examples speak louder than words so here&#8217;s our <code>Person</code> again.</p>
-
-<figure class='code'><figcaption><span>Person Struct</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Person</span> <span class="o">=</span> <span class="no">Struct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="ss">:name</span><span class="p">,</span> <span class="ss">:city</span><span class="p">)</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="no">Person</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">person</span> <span class="o">=</span> <span class="no">Person</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="s1">&#39;San Francisco&#39;</span><span class="p">)</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;struct Person name=&quot;Rob&quot;, city=&quot;San Francisco&quot;&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">city</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;San Francisco&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>As I understand it a <code>Struct</code> is basically sealed after you&#8217;ve given it an initial definition. This means that you can&#8217;t keep tacking on properties like you can with a <code>Hash</code></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># Continuing from above...</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="mi">28</span>
-</span><span class='line'><span class="no">NoMethodError</span><span class="p">:</span> <span class="n">undefined</span> <span class="nb">method</span> <span class="sb">`age=&#39; for #&lt;struct Person name=&quot;Rob&quot;, city=&quot;San Francisco&quot;&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="sb">person[:age] = 28</span>
-</span><span class='line'><span class="sb">NameError: no member &#39;age&#39; in struct</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>OpenStruct</h4>
-
-<p>Finally we come to the <code>OpenStruct</code> which has both dynamic attributes and dot syntax. <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/ostruct/rdoc/OpenStruct.html">The documentation describes it like so</a>:</p>
-
-<blockquote><p>An OpenStruct is a data structure, similar to a Hash, that allows the definition of arbitrary attributes with their accompanying values.</p></blockquote>
-
-<p>And again here is our <code>Person</code> from before. Note that <code>OpenStruct</code> needs you to <code>require</code> it.</p>
-
-<figure class='code'><figcaption><span>Person OpenStruct</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;ostruct&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">person</span> <span class="o">=</span> <span class="no">OpenStruct</span><span class="o">.</span><span class="n">new</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;OpenStruct&gt; </span>
-</span><span class='line'>
-</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Rob&#39;</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;Rob&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">city</span> <span class="o">=</span> <span class="s1">&#39;San Francisco&#39;</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;San Francisco&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">city</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;San Francisco&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you noticed, we didn&#8217;t need to define the attributes of our <code>Person</code> before creating an instance of it. This means we could keep adding attributes indefinitely. Want your person to respond to <code>age</code>? Just tack it on.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">age</span> <span class="o">=</span> <span class="mi">28</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="mi">28</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">age</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="mi">28</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>For the sake of brevity you can pass in a <code>Hash</code> and <code>OpenStruct</code> will covert it for you.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;ostruct&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">person</span> <span class="o">=</span> <span class="no">OpenStruct</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="n">city</span><span class="p">:</span> <span class="s1">&#39;San Francisco&#39;</span><span class="p">)</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="c1">#&lt;OpenStruct name=&quot;Rob&quot;, city=&quot;San Francisco&quot;&gt; </span>
-</span><span class='line'>
-</span><span class='line'><span class="n">person</span><span class="o">.</span><span class="n">city</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="s2">&quot;San Francisco&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This all seems wonderful but there&#8217;s one huge caveat which comes from the way <code>OpenStruct</code> finds all of these dynamic attributes. As <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/ostruct/rdoc/OpenStruct.html">the documentation describes it</a>:</p>
-
-<blockquote><p>An OpenStruct utilizes Ruby’s method lookup structure to and find and define the necessary methods for properties. This is accomplished through the method method_missing and define_method.</p>
-
-<p>This should be a consideration if there is a concern about the performance of the objects that are created, as there is much more overhead in the setting of these properties compared to using a Hash or a Struct.</p></blockquote>
-
-<p>Definitely keep that in mind if you&#8217;re writing time sensitive code. In those situations you&#8217;ll want to use a <code>Hash</code> or a <code>Struct</code> instead.</p>
-
-<p><small>Source:<br />
-<a href="http://www.ruby-doc.org/core-1.9.3/Class.html">http://www.ruby-doc.org/core-1.9.3/Class.html</a><br />
-<a href="http://www.ruby-doc.org/core-1.9.3/Struct.html">http://www.ruby-doc.org/core-1.9.3/Struct.html</a><br />
-<a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/ostruct/rdoc/OpenStruct.html">http://ruby-doc.org/stdlib-1.9.3/libdoc/ostruct/rdoc/OpenStruct.html</a><br />
-<a href="http://stackoverflow.com/questions/9356704/unable-to-use-dot-syntax-for-ruby-hash">http://stackoverflow.com/questions/9356704/unable-to-use-dot-syntax-for-ruby-hash</a><br />
-<a href="http://www.rubyist.net/~slagell/ruby/accessors.html">http://www.rubyist.net/~slagell/ruby/accessors.html</a>
-</small></p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; Older</a>
@@ -3075,6 +3128,10 @@ var x = d3.scale.linear()
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/21/quick-spider-example/">Quick Spider Example</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/20/crawling-pages-with-mechanize-and-nokogiri/">Crawling pages with Mechanize and Nokogiri</a>
       </li>
     
@@ -3088,10 +3145,6 @@ var x = d3.scale.linear()
     
       <li class="post">
         <a href="/blog/2012/06/16/publish-your-node-library-to-npm/">Publish your Node Library to NPM</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/">How to Run a Node Script from the Command Line</a>
       </li>
     
   </ul>

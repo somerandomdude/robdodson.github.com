@@ -5,11 +5,33 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Publish your Node Library to NPM - Rob Dodson talks internets</title>
+  <title>Quick Spider Example - Rob Dodson talks internets</title>
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Alright, contuing from yesterday we want to take our little Node module and make it available to the world as a really awesome command line tool. The &hellip;">
+  <meta name="description" content="1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+require &#39;mechanize&#39; # Create a new instance of Mechanize and grab our page
+agent = &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +40,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm">
+  <link rel="canonical" href="http://robdodson.me/blog/2012/06/21/quick-spider-example">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -77,7 +99,7 @@
   
   <header>
     
-      <h1 class="entry-title">Publish Your Node Library to NPM</h1>
+      <h1 class="entry-title">Quick Spider Example</h1>
     
     
       <p class="meta">
@@ -93,24 +115,14 @@
   
 
 
-<time datetime="2012-06-16T23:06:00-07:00" pubdate data-updated="true">Jun 16<span>th</span>, 2012</time>
+<time datetime="2012-06-21T01:27:00-07:00" pubdate data-updated="true">Jun 21<span>st</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>Alright, <a href="http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/">contuing from yesterday</a> we want to take our little Node module and make it available to the world as a really awesome command line tool.</p>
-
-<p>The first thing we need to do is register an NPM account.</p>
-
-<p><code>npm adduser</code></p>
-
-<p>Fill in your credentials and it should be ready to go.</p>
-
-<p>If we have any dependencies they should be added to our <code>package.json</code> file. Our simple <code>compliment</code> program doesn&#8217;t need any extra libraries but we&#8217;ll add <code>xml2json</code> just to demonstrate how it&#8217;s done.</p>
-
-<figure class='code'><figcaption><span>package.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<div class="entry-content"><figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -122,47 +134,50 @@
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;compliment&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;version&quot;</span><span class="o">:</span> <span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;description&quot;</span><span class="o">:</span> <span class="s2">&quot;Tell us how awesome we are.&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;preferGlobal&quot;</span><span class="o">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;bin&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;compliment&quot;</span><span class="o">:</span> <span class="s2">&quot;compliment.js&quot;</span> <span class="p">},</span>
-</span><span class='line'>    <span class="s2">&quot;author&quot;</span><span class="o">:</span> <span class="s2">&quot;Rob Dodson&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;dependencies&quot;</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>        <span class="s2">&quot;xml2json&quot;</span><span class="o">:</span> <span class="s2">&quot;0.2.4&quot;</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="s2">&quot;engines&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;node&quot;</span><span class="o">:</span> <span class="s2">&quot;*&quot;</span> <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;mechanize&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Create a new instance of Mechanize and grab our page</span>
+</span><span class='line'><span class="n">agent</span> <span class="o">=</span> <span class="no">Mechanize</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'><span class="n">page</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://robdodson.me/blog/archives/&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Find all the links on the page that are contained within</span>
+</span><span class='line'><span class="c1"># h1 tags.</span>
+</span><span class='line'><span class="n">post_links</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">find_all</span> <span class="p">{</span> <span class="o">|</span><span class="n">l</span><span class="o">|</span> <span class="n">l</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;h1&#39;</span> <span class="p">}</span>
+</span><span class='line'><span class="n">post_links</span><span class="o">.</span><span class="n">shift</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Follow each link and print out its title</span>
+</span><span class='line'><span class="n">post_links</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">link</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">post</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">click</span>
+</span><span class='line'>    <span class="n">doc</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">parser</span>
+</span><span class='line'>    <span class="nb">p</span> <span class="n">doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="s1">&#39;.entry-title&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+</span><span class='line'><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Since we&#8217;ve changed our <code>package.json</code> we need to run <code>npm link</code> again to install the dependency. After that you should have a <code>node_modules/</code> folder in your project root.</p>
+<p>Having a horrible time getting anything to run tonight. The code from above is a continuation from yesterday&#8217;s post except this time we&#8217;re finding every link on the page, then following that link and spitting out its title. Using this formula you could build something entirely recursive which acts as a full blown spider.</p>
 
-<p>Let&#8217;s put this baby under version control!</p>
-
-<figure class='code'><figcaption><span>package.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">git</span> <span class="nx">init</span>
-</span><span class='line'><span class="nx">echo</span> <span class="nx">node_modules</span><span class="o">/</span> <span class="o">&gt;&gt;</span> <span class="p">.</span><span class="nx">gitignore</span> <span class="err">#</span> <span class="nx">node_modules</span> <span class="nx">should</span> <span class="nx">be</span> <span class="nx">installed</span> <span class="nx">by</span> <span class="nx">npm</span>
-</span><span class='line'><span class="nx">git</span> <span class="nx">add</span> <span class="p">.</span>
-</span><span class='line'><span class="nx">git</span> <span class="nx">commit</span> <span class="o">-</span><span class="nx">am</span> <span class="s1">&#39;Initial commit&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Final step: <code>npm publish</code></p>
-
-<h1>BOOMJAMS! We have us an npm module! - Rob</h1>
+<p>Unfortunately getting this to integrate into the existing app is not working for me tonight. Coding anything after 11 pm is usually a bad call, so I&#8217;m going to shut it down and try again in the morning.</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
 <ul>
-<li>Time: 11:06 pm</li>
-<li>Mood: Hyper</li>
-<li>Sleep: 5</li>
-<li>Hunger: 1</li>
+<li>Time: 1:28 am</li>
+<li>Mood: Tired, Annoyed</li>
+<li>Sleep: 6</li>
+<li>Hunger: 0</li>
 <li>Coffee: 1</li>
 </ul>
 
@@ -188,12 +203,12 @@
   
 
 
-<time datetime="2012-06-16T23:06:00-07:00" pubdate data-updated="true">Jun 16<span>th</span>, 2012</time>
+<time datetime="2012-06-21T01:27:00-07:00" pubdate data-updated="true">Jun 21<span>st</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/cli/'>CLI</a>, <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/npm/'>NPM</a>, <a class='category' href='/blog/categories/node/'>Node</a>
+    <a class='category' href='/blog/categories/chain/'>Chain</a>, <a class='category' href='/blog/categories/mechanize/'>Mechanize</a>, <a class='category' href='/blog/categories/nokogiri/'>Nokogiri</a>, <a class='category' href='/blog/categories/ruby/'>Ruby</a>
   
 </span>
 
@@ -202,7 +217,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2012/06/21/quick-spider-example/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2012/06/21/quick-spider-example/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -215,10 +230,8 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/" title="Previous Post: How to Run a Node Script from the Command Line">&laquo; How to Run a Node Script from the Command Line</a>
+        <a class="basic-alignment left" href="/blog/2012/06/20/crawling-pages-with-mechanize-and-nokogiri/" title="Previous Post: Crawling pages with Mechanize and Nokogiri">&laquo; Crawling pages with Mechanize and Nokogiri</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/" title="Next Post: Object Oriented Scraper Backed With Tests Pt...9?">Object Oriented Scraper Backed With Tests Pt...9? &raquo;</a>
       
     </p>
   </footer>
@@ -348,8 +361,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm/';
-        var disqus_url = 'http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm/';
+        var disqus_identifier = 'http://robdodson.me/blog/2012/06/21/quick-spider-example/';
+        var disqus_url = 'http://robdodson.me/blog/2012/06/21/quick-spider-example/';
         var disqus_script = 'embed.js';
       
     (function () {
