@@ -9,29 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-require &#39;mechanize&#39; # Create a new instance of Mechanize and grab our page
-agent = &hellip;">
+  <meta name="description" content="Yeesh, I gotta stop writing so late at night&#8230; Last night I was trying to get my spider to follow all the links on the blog&#8217;s archive page &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -96,6 +74,475 @@ agent = &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/22/wrapping-up-the-word-count-spider/">Wrapping Up the Word Count Spider</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-22T00:31:00-07:00" pubdate data-updated="true">Jun 22<span>nd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Yeesh, I gotta stop writing so late at night&#8230; Last night I was trying to get my spider to follow all the links on the blog&#8217;s archive page and then sum up all the words from every post. Unfortunately I was way too tired to get that to actually work. Tonight I finished that step of the process but it required some ugly code and refactoring our unit tests. Without further adieu&#8230;</p>
+
+<figure class='code'><figcaption><span>tentacles/lib/tentacles/runner.b</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;yaml&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;json&#39;</span>
+</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;options&#39;</span>
+</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;crawler&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Runner</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@path</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/../../output/&#39;</span>
+</span><span class='line'>      <span class="vi">@filename</span> <span class="o">=</span> <span class="s1">&#39;word_count.json&#39;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">run</span>
+</span><span class='line'>      <span class="vi">@crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">output</span> <span class="o">=</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">words_by_selector</span><span class="p">(</span><span class="vi">@options</span><span class="o">.</span><span class="n">post_selector</span><span class="p">,</span> <span class="vi">@options</span><span class="o">.</span><span class="n">ignored_post_selector</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="no">Dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="vi">@path</span><span class="p">)</span> <span class="k">unless</span> <span class="no">Dir</span><span class="o">.</span><span class="n">exists?</span><span class="p">(</span><span class="vi">@path</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="vi">@path</span> <span class="o">+</span> <span class="vi">@filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">file</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">file</span><span class="o">.</span><span class="n">puts</span> <span class="no">JSON</span><span class="o">.</span><span class="n">pretty_generate</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>tentacles/lib/tentacles/crawler.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;open-uri&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;nokogiri&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;mechanize&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Crawler</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:doc</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="kp">new</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="c1"># Create a new instance of Mechanize and grab our page</span>
+</span><span class='line'>      <span class="vi">@agent</span> <span class="o">=</span> <span class="no">Mechanize</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="vi">@uri</span> <span class="o">=</span> <span class="n">uri</span>
+</span><span class='line'>      <span class="vi">@page</span> <span class="o">=</span> <span class="vi">@agent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="vi">@uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@counts</span> <span class="o">=</span> <span class="no">Hash</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">words_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="n">ignored_selector</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>      <span class="c1"># Get all the links on the page</span>
+</span><span class='line'>      <span class="n">post_links</span> <span class="o">=</span> <span class="vi">@page</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">find_all</span> <span class="p">{</span> <span class="o">|</span><span class="n">l</span><span class="o">|</span> <span class="n">l</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;h1&#39;</span> <span class="p">}</span>
+</span><span class='line'>      <span class="n">post_links</span><span class="o">.</span><span class="n">shift</span> <span class="c1"># Get rid of the first anchor since it&#39;s the site header</span>
+</span><span class='line'>      <span class="n">post_links</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">link</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">post</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">click</span>
+</span><span class='line'>        <span class="vi">@doc</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">parser</span>
+</span><span class='line'>        <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">nodes</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">node</span><span class="o">|</span>
+</span><span class='line'>          <span class="k">if</span> <span class="n">ignored_selector</span>
+</span><span class='line'>            <span class="n">ignored</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="n">ignored_selector</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">ignored</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+</span><span class='line'>          <span class="k">end</span>
+</span><span class='line'>          <span class="n">words</span> <span class="o">=</span> <span class="n">words_from_string</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span><span class='line'>          <span class="n">count_frequency</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">sorted</span> <span class="o">=</span> <span class="vi">@counts</span><span class="o">.</span><span class="n">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="n">count</span> <span class="p">}</span>
+</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">reverse!</span>
+</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">map!</span> <span class="k">do</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span>
+</span><span class='line'>        <span class="p">{</span> <span class="n">word</span><span class="p">:</span> <span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="n">count</span> <span class="p">}</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>      <span class="p">{</span> <span class="n">word_count</span><span class="p">:</span> <span class="n">sorted</span> <span class="p">}</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">metadata_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">node</span> <span class="o">=</span> <span class="n">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span><span class="o">.</span><span class="n">first</span>
+</span><span class='line'>      <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span class='line'>      <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">child</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">child</span><span class="o">.</span><span class="n">content</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kp">private</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">nodes</span> <span class="o">=</span> <span class="vi">@doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">raise</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;The selector did not return an results!&#39;</span> <span class="k">if</span> <span class="n">nodes</span><span class="o">.</span><span class="n">empty?</span>
+</span><span class='line'>      <span class="n">nodes</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">words_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">string</span><span class="o">.</span><span class="n">downcase</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="sr">/[\w&#39;]+/</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">count_frequency</span><span class="p">(</span><span class="n">word_list</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">for</span> <span class="n">word</span> <span class="k">in</span> <span class="n">word_list</span>
+</span><span class='line'>        <span class="vi">@counts</span><span class="o">[</span><span class="n">word</span><span class="o">]</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>      <span class="vi">@counts</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>One of the first things I realized what that my paths to the output folder were getting all weird depending on the context in which I was running my tests. So I switched to using Ruby&#8217;s <code>__FILE__</code> to create paths relative to our crawler. <code>words_by_selector</code> is kind of gross with some nested iterators but whatever, it works. We will probably need to refactor it when we get the metadata spider working. For now I&#8217;m just glad that it actually visits all the pages and produces the right output.</p>
+
+<figure class='code'><figcaption><span>spec/runner_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;../lib/tentacles/runner&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;helpers&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;fakeweb&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">describe</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Runner</span> <span class="k">do</span>
+</span><span class='line'>  <span class="kp">include</span> <span class="no">Helpers</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">before</span> <span class="k">do</span>
+</span><span class='line'>    <span class="vi">@runner</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Runner</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">relative_path</span> <span class="o">+</span> <span class="s1">&#39;/../lib/tentacles/config.yml&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># Create a mock options object</span>
+</span><span class='line'>    <span class="vi">@options</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>      <span class="n">uri</span><span class="p">:</span> <span class="s1">&#39;http://robdodson.me/blog/archives&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">post_selector</span><span class="p">:</span> <span class="s1">&#39;.entry-content&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">ignored_post_selector</span><span class="p">:</span> <span class="s1">&#39;ul:last-child&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">metadata_selector</span><span class="p">:</span> <span class="s1">&#39;.entry-content ul:last-child&#39;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="vi">@path</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">__FILE__</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/../output/&#39;</span>
+</span><span class='line'>    <span class="vi">@filename</span> <span class="o">=</span> <span class="s1">&#39;word_count.json&#39;</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">subject</span> <span class="p">{</span> <span class="vi">@runner</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:run</span><span class="p">)</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;when parsing the config file&quot;</span> <span class="k">do</span>
+</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an error if the config file is missing&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">runner</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Runner</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Errno</span><span class="o">::</span><span class="no">ENOENT</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">runner</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Runner</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="kp">nil</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">TypeError</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an error if the config file is invalid&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">runner</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Runner</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">relative_path</span> <span class="o">+</span> <span class="s1">&#39;/mocks/invalid_yaml.yml&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Psych</span><span class="o">::</span><span class="no">SyntaxError</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should create a directory for our output&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="vi">@runner</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>      <span class="no">Dir</span><span class="o">.</span><span class="n">exists?</span><span class="p">(</span><span class="vi">@path</span><span class="p">)</span><span class="o">.</span><span class="n">should</span> <span class="n">be_true</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should output the correct JSON&quot;</span> <span class="k">do</span>
+</span><span class='line'>      <span class="vi">@runner</span><span class="o">.</span><span class="n">run</span>
+</span><span class='line'>      <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="vi">@path</span> <span class="o">+</span> <span class="vi">@filename</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">file</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">file</span><span class="o">.</span><span class="n">each_line</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
+</span><span class='line'>          <span class="nb">puts</span> <span class="n">line</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Our spec also needed updating so it could find the output directory properly. One downside to our current hacked-together setup is that I haven&#8217;t produced a proper mock for things so the test takes FOREVER to run. Something like 30+ seconds because it&#8217;s actually crawling our site instead of just hitting a dummy file. Definitely need to fix that at some point :)</p>
+
+<p>But once we get it all working the output from robdodson.me ends up looking like this:</p>
+
+<figure class='code'><figcaption><span>spec/runner_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="s2">&quot;word_count&quot;</span><span class="p">:</span> <span class="o">[</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="s2">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;the&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">1678</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="s2">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;to&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">1548</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="s2">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">1023</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="s2">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;i&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">792</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="s2">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;it&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">730</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="s2">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;and&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">718</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="s2">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;this&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">661</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="s2">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;of&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">658</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="s2">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;you&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">640</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="s2">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;that&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">585</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="s2">&quot;word&quot;</span><span class="p">:</span> <span class="s2">&quot;we&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">569</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="o">.</span><span class="n">.</span><span class="o">.</span> <span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can use that JSON to start graphing which I&#8217;ll hopefully have time to get into before going to Europe. We shall seeeeee. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 12:31 am</li>
+<li>Mood: Tired</li>
+<li>Sleep: 6</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1332,133 +1779,6 @@ agent = &hellip;">
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/11/some-octopress-rake-tips/">Some Octopress Rake Tips</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-11T19:04:00-07:00" pubdate data-updated="true">Jun 11<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This is a quick post just to scratch one of my own itches. I&#8217;ve been using Octopress every single day for around two months now and the generation time for my blog is slowly starting to creep up. I&#8217;d heard that you could isolate a post and just preview/generate it instead of doing the whole blog every time but it wasn&#8217;t until today that I finally decided to look into it.</p>
-
-<p>Turns out it&#8217;s really simple. Let&#8217;s say we are going through our usual steps of creating a new post:</p>
-
-<p><code>rake new_post["Today is a Wonderful Day"]</code></p>
-
-<p>Now that we have our post ready we can isolate it from all the others:</p>
-
-<p><code>rake isolate[wonderful-day]</code></p>
-
-<p>Notice I didn&#8217;t pass in the entire filename? That&#8217;s because the Rake task inspects each of our posts and stashes anything that doesn&#8217;t include the String &#8216;wonderful-day&#8217; in the filename.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">#{</span><span class="n">source_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="n">posts_dir</span><span class="si">}</span><span class="s2">/*.*&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">post</span><span class="o">|</span>
-</span><span class='line'>    <span class="no">FileUtils</span><span class="o">.</span><span class="n">mv</span> <span class="n">post</span><span class="p">,</span> <span class="n">stash_dir</span> <span class="k">unless</span> <span class="n">post</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now that our post is isolated we can preview it, like we always do:</p>
-
-<p><code>rake preview</code></p>
-
-<p>Write a little bit, save, and hit <code>localhost:4000</code> to see your super speedy blog post!</p>
-
-<p>When we&#8217;re all done we integrate the post back in with the rest of our blog.</p>
-
-<p><code>rake integrate</code></p>
-
-<p>And finally we generate and deploy it, which can be done in a single command:</p>
-
-<p><code>rake gen_deploy</code></p>
-
-<p>There are a few other useful rake tasks, you can see the whole list by running:</p>
-
-<p><code>rake -T</code></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="n">clean</span>                     <span class="c1"># Clean out caches: .pygments-cache, .gist-cache, .sass-cache</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">copydot</span><span class="o">[</span><span class="n">source</span><span class="p">,</span><span class="n">dest</span><span class="o">]</span>      <span class="c1"># copy dot files for deployment</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">deploy</span>                    <span class="c1"># Default deploy task</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">gen_deploy</span>                <span class="c1"># Generate website and deploy</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">generate</span>                  <span class="c1"># Generate jekyll site</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">install</span><span class="o">[</span><span class="n">theme</span><span class="o">]</span>            <span class="c1"># Initial setup for Octopress: copies the default theme into the path of Jekyll&#39;s generator.</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">integrate</span>                 <span class="c1"># Move all stashed posts back into the posts directory, ready for site generation.</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">isolate</span><span class="o">[</span><span class="n">filename</span><span class="o">]</span>         <span class="c1"># Move all other posts than the one currently being worked on to a temporary stash location (stas...</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">list</span>                      <span class="c1"># list tasks</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">new_page</span><span class="o">[</span><span class="n">filename</span><span class="o">]</span>        <span class="c1"># Create a new page in source/(filename)/index.markdown</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">new_post</span><span class="o">[</span><span class="n">title</span><span class="o">]</span>           <span class="c1"># Begin a new post in source/_posts</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">preview</span>                   <span class="c1"># preview the site in a web browser</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">push</span>                      <span class="c1"># deploy public directory to github pages</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">rsync</span>                     <span class="c1"># Deploy website via rsync</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">set_root_dir</span><span class="o">[</span><span class="n">dir</span><span class="o">]</span>         <span class="c1"># Update configurations to support publishing to root or sub directory</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">setup_github_pages</span><span class="o">[</span><span class="n">repo</span><span class="o">]</span>  <span class="c1"># Set up _deploy folder and deploy branch for Github Pages deployment</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">update_source</span><span class="o">[</span><span class="n">theme</span><span class="o">]</span>      <span class="c1"># Move source to source.old, install source theme updates, replace source/_includes/navigation.ht...</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">update_style</span><span class="o">[</span><span class="n">theme</span><span class="o">]</span>       <span class="c1"># Move sass to sass.old, install sass theme updates, replace sass/custom with sass.old/custom</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">watch</span>                     <span class="c1"># Watch the site and regenerate when it changes</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I&#8217;m looking forward to trying out Octopress 2.1 as it includes <a href="https://github.com/imathis/octopress/pull/207">a more streamlined generate task</a> as well as some other nifty features. - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:18 pm</li>
-<li>Mood: Caffeinated</li>
-<li>Sleep: 7</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -1474,6 +1794,10 @@ agent = &hellip;">
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/22/wrapping-up-the-word-count-spider/">Wrapping up the Word Count Spider</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/21/quick-spider-example/">Quick Spider Example</a>
       </li>
     
@@ -1487,10 +1811,6 @@ agent = &hellip;">
     
       <li class="post">
         <a href="/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/">Object Oriented Scraper Backed With Tests Pt&#8230;9?</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/16/publish-your-node-library-to-npm/">Publish your Node Library to NPM</a>
       </li>
     
   </ul>
