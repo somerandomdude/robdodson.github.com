@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Nokogiri | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/nokogiri/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-22T00:42:32-07:00</updated>
+  <updated>2012-06-23T01:39:34-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,286 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Failing at Ruby]]></title>
+    <link href="http://robdodson.me/blog/2012/06/23/failing-at-ruby/"/>
+    <updated>2012-06-23T01:08:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/23/failing-at-ruby</id>
+    <content type="html"><![CDATA[<p>I'm just getting my ass kicked by Ruby tonight so I don't have much to show. Trying to just get my metadata scraping to output something currently looks like this:</p>
+
+<p>``` ruby
+require 'open-uri'
+require 'nokogiri'
+require 'mechanize'
+require_relative 'selection_error'</p>
+
+<p>module Tentacles
+  class Crawler</p>
+
+<pre><code>attr_reader :doc
+
+def self.from_uri(uri)
+  new(uri)
+end
+
+def initialize(uri)
+  # Create a new instance of Mechanize and grab our page
+  @agent = Mechanize.new
+
+  @uri = uri
+  @page = @agent.get(@uri)
+  @counts = Hash.new(0)
+end
+
+def words_by_selector(selector, ignored_selector = nil)
+  # Get all the links on the page
+  post_links = @page.links.find_all { |l| l.attributes.parent.name == 'h1' }
+  # Get rid of the first anchor since it's the site header
+  post_links.shift 
+  post_links.each do |link|
+    post = link.click
+    @doc = post.parser
+    nodes = nodes_by_selector(selector)
+    nodes.each do |node|
+      if ignored_selector
+        ignored = node.css(ignored_selector)
+        ignored.remove()
+      end
+      words = words_from_string(node.content)
+      count_frequency(words)
+    end
+  end
+
+  sorted = @counts.sort_by { |word, count| count }
+  sorted.reverse!
+  sorted.map! do |word, count|
+    { word: word, count: count }
+  end
+  { word_count: sorted }
+end
+
+def metadata_by_selector(selector)
+  metadata = { posts: [] }
+
+  # Get all the links on the page
+  post_links = @page.links.find_all { |l| l.attributes.parent.name == 'h1' }
+  # Get rid of the first anchor since it's the site header
+  post_links.shift
+  post_links.each do |link|
+    post = link.click
+    @doc = post.parser
+    time = @doc.css('time')[0]
+    post_data = {}
+    post_data[:date] = { date: time['datetime'] }
+    post_data[:stats] = []
+    nodes = nodes_by_selector(selector)
+    nodes.each do |node|
+      node.children.each do |child|
+        post_data[:stats].push(child.content)
+      end                
+    end
+    metadata[:posts].push(post_data)
+  end
+  p metadata
+end
+</code></pre>
+
+<p>  private</p>
+
+<pre><code>def nodes_by_selector(selector)
+  nodes = @doc.css(selector)
+  raise Tentacles::SelectionError, 
+    'The selector did not return an results!' if nodes.empty?
+  nodes
+end 
+
+def words_from_string(string)
+  string.downcase.scan(/[\w']+/)
+end
+
+def count_frequency(word_list)
+  for word in word_list
+    @counts[word] += 1
+  end
+  @counts
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Really ugly code that still doesn't work. My biggest problem with Ruby is that I don't have very good debugging tools and that frustrates the shit out of me. I'm so used to the visual debuggers in the Chrome Dev tools that doing everything with <code>p</code> or <code>puts</code> is just soul-crushing.</p>
+
+<p>Right now my biggest problem is that data isn't being returned from the spider for whatever reason. This is especially annoying because the operation takes a while to run... I should slim it down but my brain is too tired to re-write the code. I'm kind of hoping for a lucky break. Advice to anyone just starting out in programming, do not do exactly what I'm doing right now.</p>
+
+<p>Ok so after getting my ass totally handed to me by Ruby here's a working version of the spider that grabs the proper metadata.</p>
+
+<p>``` ruby
+require 'open-uri'
+require 'nokogiri'
+require 'mechanize'
+require_relative 'selection_error'</p>
+
+<p>module Tentacles
+  class Crawler</p>
+
+<pre><code>attr_reader :doc
+
+def self.from_uri(uri)
+  new(uri)
+end
+
+def initialize(uri)
+  # Create a new instance of Mechanize and grab our page
+  @agent = Mechanize.new
+
+  @uri = uri
+  @page = @agent.get(@uri)
+  @counts = Hash.new(0)
+end
+
+def words_by_selector(selector, ignored_selector = nil)
+  # # Get all the links on the page
+  # post_links = @page.links.find_all { |l| l.attributes.parent.name == 'h1' }
+  # # Get rid of the first anchor since it's the site header
+  # post_links.shift 
+  # post_links.each do |link|
+  #   post = link.click
+  #   @doc = post.parser
+  #   nodes = nodes_by_selector(selector)
+  #   nodes.each do |node|
+  #     if ignored_selector
+  #       ignored = node.css(ignored_selector)
+  #       ignored.remove()
+  #     end
+  #     words = words_from_string(node.content)
+  #     count_frequency(words)
+  #   end
+  # end
+
+  # sorted = @counts.sort_by { |word, count| count }
+  # sorted.reverse!
+  # sorted.map! do |word, count|
+  #   { word: word, count: count }
+  # end
+  # { word_count: sorted }
+end
+
+def metadata_by_selector(selector)
+  metadata = { posts: [] }
+  puts 'starting'
+  p metadata
+  # Get all the links on the page
+  post_links = @page.links.find_all { |l| l.attributes.parent.name == 'h1' }
+  # Get rid of the first anchor since it's the site header
+  post_links.shift
+  post_links.each do |link|
+    post = link.click
+    @doc = post.parser
+    time = @doc.css('time')[0]
+    post_data = {}
+    post_data[:date] = time['datetime']
+    post_data[:stats] = []
+    nodes = nodes_by_selector(selector)
+    nodes.each do |node|
+      node.children.each do |child|
+        unless child.content.chomp.empty?
+          post_data[:stats].push(child.content)
+        end
+      end                
+    end
+    metadata[:posts].push(post_data)
+    puts 'post added'
+    p metadata
+  end
+  puts 'returning'
+  p metadata
+  metadata
+end
+</code></pre>
+
+<p>  private</p>
+
+<pre><code>def nodes_by_selector(selector)
+  nodes = @doc.css(selector)
+  # raise Tentacles::SelectionError, 
+  #   'The selector did not return an results!' if nodes.empty?
+  nodes
+end 
+
+def words_from_string(string)
+  string.downcase.scan(/[\w']+/)
+end
+
+def count_frequency(word_list)
+  for word in word_list
+    @counts[word] += 1
+  end
+  @counts
+end
+</code></pre>
+
+<p>  end
+end
+<code>``
+I had to comment out the</code>Tentacles::SelectionError` because it was throwing and saying it wasn't getting any content with a selector even though it was. Not sure wtf is going on there but I'm sure it has to do with the fact that it's 1:30 a.m. I have a rule that nothing good happens after 11pm when it comes to coding. Tonight has lived up to that. Anyway the above should put out a hash which when converted to JSON looks like this:</p>
+
+<p>``` json
+{
+  "posts": [</p>
+
+<pre><code>{
+  "date": "2012-06-22T00:31:00-07:00",
+  "stats": [
+    "Time: 12:31 am",
+    "Mood: Tired",
+    "Sleep: 6",
+    "Hunger: 0",
+    "Coffee: 1"
+  ]
+},
+{
+  "date": "2012-06-21T01:27:00-07:00",
+  "stats": [
+    "Time: 1:28 am",
+    "Mood: Tired, Annoyed",
+    "Sleep: 6",
+    "Hunger: 0",
+    "Coffee: 1"
+  ]
+},
+{
+  "date": "2012-06-20T00:09:00-07:00",
+  "stats": [
+    "Time: 12:10 am",
+    "Mood: Tired, Introspective",
+    "Sleep: 4.5",
+    "Hunger: 2",
+    "Coffee: 1"
+  ]
+},
+</code></pre>
+
+<p>... .
+```
+I'm pretty certain I could have done this with Node in a fraction of the time if only because Node is much easier to debug with Chrome Dev tools using node-inspector. While I love the Ruby language I definitely do not like debugging it...</p>
+
+<p>Tomorrow I might write some JS to give my brain a break. I'm thoroughly pissed off at Ruby for the evening. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 1:08 am</li>
+<li>Mood: Tired, Pissed</li>
+<li>Sleep: 6</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Quick Spider Example]]></title>
@@ -407,272 +687,6 @@ Coffee: [" 0"]
 <li>Sleep: 6</li>
 <li>Hunger: 0</li>
 <li>Coffee: 1</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Object Oriented Scraper Backed with Tests Pt. 6]]></title>
-    <link href="http://robdodson.me/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/"/>
-    <updated>2012-05-13T07:52:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6</id>
-    <content type="html"><![CDATA[<p>Yesterday we verified that our <code>Crawler</code> was able to hit a document and, given the right selector, pull down a list of words and their frequency on the page. We also created a custom exception to be used whenever the selector fails to pull down the right content. I'm going to repeat this process today with the <code>get_metadata_by_selector</code>. If there's time we'll try to output another file with our data, otherwise that'll be tomorrow's homeworkd :D</p>
-
-<p>Let's take a moment to look at today's metadata to figure out what we'd like our output to reflect.</p>
-
-<p><code>
-- Time: 8:03 am
-- Mood: Happy, Drowsy, Peaceful
-- Sleep: 5.5
-- Hunger: 3
-- Coffee: 0
-</code></p>
-
-<p>That's the actual markdown that goes into the editor but it gets converted into a <code>ul</code>. I don't <em>think</em> you can pass a CSS class to markdown syntax otherwise I'd use one here. We could go back and wrap everything in regular HTML tags but since we know that our metadata is going to be the last ul per entry we'll just use that knowledge to build our selector. Obviously a more robust solution would use a CSS class so that might be a good refactoring for the future.</p>
-
-<p>I figure for now we'll just parse the metadata into a Hash that'll look something like this:</p>
-
-<p><code>
-{
-  datetime: 2012-05-13T08:03:00-07:00,
-  mood: ['Happy', 'Drowsy', 'Peaceful'],
-  sleep: 5.5,
-  hunger: 3.0,
-  coffee: 0.0
-}
-</code>
-In the final iteration we'll toss all of our Metadata Hashes into an ordered Array so we can visualize them over time.</p>
-
-<h3>Red, Green, Refactor</h3>
-
-<p>Ok, time for a failing test. Let's make sure that our selector pulls something down and if it doesn't we should raise the custom <code>SelectionError</code> we defined yesterday. I'm already seeing some repetitive code in our Crawler so I'm refactoring it. Where we need to get a group of XML nodes from the document via selector I've created a private helper called <code>nodes_by_selector</code>. This is also where we'll raise our exception if nothing came back. I'm also cleaning up some of the word cruff from our public API so instead of <code>get_words_by_selector</code> it's not just <code>words_by_selector</code>. The same goes for our metadata method.</p>
-
-<p>```ruby tentacles/lib/tentacles/crawler_rb
-require 'open-uri'
-require 'nokogiri'
-require_relative 'selection_error'</p>
-
-<p>module Tentacles
-  class Crawler</p>
-
-<pre><code>attr_reader :doc
-
-def self.from_uri(uri)
-  new(uri)
-end
-
-def initialize(uri)
-  @uri = uri
-  @doc = Nokogiri::HTML(open(@uri))
-  @counts = Hash.new(0)
-end
-
-def words_by_selector(selector)
-  nodes = nodes_by_selector(selector)
-  nodes.each do |node|
-    words = words_from_string(node.content)
-    count_frequency(words)
-  end
-
-  sorted = @counts.sort_by { |word, count| count }
-  sorted.reverse!
-  sorted.map { |word, count| "#{word}: #{count}"}
-end
-
-def metadata_by_selector(selector)
-  nodes = nodes_by_selector(selector)
-end
-</code></pre>
-
-<p>  private</p>
-
-<pre><code>def nodes_by_selector(selector)
-  nodes = doc.css(selector)
-  raise Tentacles::SelectionError, 
-    'The selector did not return an results!' if nodes.empty?
-  nodes
-end 
-
-def words_from_string(string)
-  string.downcase.scan(/[\w']+/)
-end
-
-def count_frequency(word_list)
-  for word in word_list
-    @counts[word] += 1
-  end
-  @counts
-end
-</code></pre>
-
-<p>  end
-end
-<code>
-Going back to the tests we need to refactor a bit for any place that's been broken. Immediately I saw that my `nodes_by_selector` method was not initially returning the nodes so I added that back in. The tests brought that to my attention before I had to do any potentially painful debugging. Beyond that we just need to fix up our method names:
-</code>ruby tentacles/spec/crawler_spec.rb
-require_relative '../lib/tentacles/crawler'
-require 'fakeweb'</p>
-
-<p>describe Tentacles::Crawler do</p>
-
-<p>  before do</p>
-
-<pre><code># Create a mock options object
-@options = {
-  uri: 'http://robdodson.me', 
-  post_selector: '.entry-content',
-  metadata_selector: '.personal-metadata'
-}
-
-# Create a mock web request
-FakeWeb.register_uri(:get, @options[:uri],
-                     :body =&gt; '&lt;div class="' + @options[:post_selector].delete(".") + 
-                     '"&gt;Hello Hello Hello World World Foobar!&lt;/div&gt;')
-</code></pre>
-
-<p>  end</p>
-
-<p>  describe "constructors" do</p>
-
-<pre><code>describe "#from_uri" do
-  it "should respond" do
-    Tentacles::Crawler.should respond_to(:from_uri)
-  end
-
-  it "should return an instance" do
-    crawler = Tentacles::Crawler.from_uri(@options[:uri])
-    crawler.should be_an_instance_of(Tentacles::Crawler)
-  end
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  describe "instances" do</p>
-
-<pre><code>before do
-  @crawler = Tentacles::Crawler.from_uri(@options[:uri])
-end
-
-subject { @crawler }
-
-it { should respond_to(:words_by_selector) }
-it { should respond_to(:metadata_by_selector) }
-
-context "post-construct" do
-  it "should have the right document" do
-    @crawler.doc.content.should =~ /Hello Hello Hello World World Foobar!/
-  end
-end
-
-describe "#words_by_selector" do
-  it "should produce an Array of keywords" do
-    expected_array = ['hello: 3', 'world: 2', 'foobar: 1']
-    actual_array = @crawler.words_by_selector(@options[:post_selector])
-    actual_array.should eq(expected_array)
-  end
-
-  it "should raise an exception if nothing was returned" do
-    expect { @crawler.words_by_selector('some-gibberish-selector') }.to raise_error(Tentacles::SelectionError, 'The selector did not return an results!')  
-  end
-end
-
-describe "#metadata_by_selector" do
-  it "should raise an exception if nothing was returned" do
-    expect { @crawler.metadata_by_selector('some-gibberish-selector') }.to raise_error(Tentacles::SelectionError, 'The selector did not return an results!')  
-  end
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>We've got a duplicate test in there where both <code>#words_by_selector</code> and <code>#metadata_by_selector</code> are checking that they both raise an exception if nothing comes down. Let's see if we can refactor those into an RSpec shared example. I'm not sure if this is a best practice or not but here's my implementation:</p>
-
-<p>```ruby tentacles/spec/crawler_spec.rb
-shared_examples_for "all selector methods" do
-  describe "when selection has no nodes" do</p>
-
-<pre><code>it "should raise an exception" do
-  expect { @crawler.send(selector_method, 'some-gibberish-selector') }.to raise_error(Tentacles::SelectionError, 'The selector did not return an results!')  
-end
-</code></pre>
-
-<p>  end
-end</p>
-
-<h3>...</h3>
-
-<p>describe "#words_by_selector" do
-  it_behaves_like "all selector methods" do</p>
-
-<pre><code>let(:selector_method) { :words_by_selector }
-</code></pre>
-
-<p>  end</p>
-
-<h1>...</h1>
-
-<p>end</p>
-
-<p>describe "#metadata_by_selector" do
-  it_behaves_like "all selector methods" do</p>
-
-<pre><code>let(:selector_method) { :metadata_by_selector }
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Basically we're putting our method name as a symbol into a variable using <code>let</code> and then calling that method in the shared_examples_for block. Notice how we're using <code>@crawler.send(selector_method, ...)</code>? In this case <code>selector_method</code> refers to our method name symbol.</p>
-
-<p>If you run this in RSpec's nested mode it looks pretty cool:</p>
-
-<p>```ruby
-Tentacles::Crawler
-  constructors</p>
-
-<pre><code>#from_uri
-  should respond
-  should return an instance
-</code></pre>
-
-<p>  instances</p>
-
-<pre><code>should respond to #words_by_selector
-should respond to #metadata_by_selector
-post-construct
-  should have the right document
-#words_by_selector
-  should produce an Array of keywords
-  behaves like all selector methods
-    when selection has no nodes
-      should raise an exception
-#metadata_by_selector
-  behaves like all selector methods
-    when selection has no nodes
-      should raise an exception
-</code></pre>
-
-<p>```</p>
-
-<p>Ok, so we know that all of our selector methods raise the proper exception if they are called with a bunk selector. Now let's make sure we can get our metadata downloaded and structured.</p>
-
-<p>Unfortunately I'm realizing that if the <code>ul</code> for our metadata is part of the post then those words get counted along with everything else, which is not what I want. I need to figure out how to exclude that content...</p>
-
-<p>I could either tell my crawler to explicitly ignore that content or wrap my blog entry in an even more specific class and just select that. I guess that'll be an exercise for tomorrow :\</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 8:03 am</li>
-<li>Mood: Happy, Drowsy, Peaceful</li>
-<li>Sleep: 5.5</li>
-<li>Hunger: 3</li>
-<li>Coffee: 0</li>
 </ul>
 
 ]]></content>

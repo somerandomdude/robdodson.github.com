@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Yeesh, I gotta stop writing so late at night&#8230; Last night I was trying to get my spider to follow all the links on the blog&#8217;s archive page &hellip;">
+  <meta name="description" content="I&#8217;m just getting my ass kicked by Ruby tonight so I don&#8217;t have much to show. Trying to just get my metadata scraping to output something &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,538 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/23/failing-at-ruby/">Failing at Ruby</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-23T01:08:00-07:00" pubdate data-updated="true">Jun 23<span>rd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&#8217;m just getting my ass kicked by Ruby tonight so I don&#8217;t have much to show. Trying to just get my metadata scraping to output something currently looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;open-uri&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;nokogiri&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;mechanize&#39;</span>
+</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;selection_error&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Crawler</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:doc</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="kp">new</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="c1"># Create a new instance of Mechanize and grab our page</span>
+</span><span class='line'>      <span class="vi">@agent</span> <span class="o">=</span> <span class="no">Mechanize</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="vi">@uri</span> <span class="o">=</span> <span class="n">uri</span>
+</span><span class='line'>      <span class="vi">@page</span> <span class="o">=</span> <span class="vi">@agent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="vi">@uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@counts</span> <span class="o">=</span> <span class="no">Hash</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">words_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="n">ignored_selector</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>      <span class="c1"># Get all the links on the page</span>
+</span><span class='line'>      <span class="n">post_links</span> <span class="o">=</span> <span class="vi">@page</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">find_all</span> <span class="p">{</span> <span class="o">|</span><span class="n">l</span><span class="o">|</span> <span class="n">l</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;h1&#39;</span> <span class="p">}</span>
+</span><span class='line'>      <span class="c1"># Get rid of the first anchor since it&#39;s the site header</span>
+</span><span class='line'>      <span class="n">post_links</span><span class="o">.</span><span class="n">shift</span>
+</span><span class='line'>      <span class="n">post_links</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">link</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">post</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">click</span>
+</span><span class='line'>        <span class="vi">@doc</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">parser</span>
+</span><span class='line'>        <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">nodes</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">node</span><span class="o">|</span>
+</span><span class='line'>          <span class="k">if</span> <span class="n">ignored_selector</span>
+</span><span class='line'>            <span class="n">ignored</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="n">ignored_selector</span><span class="p">)</span>
+</span><span class='line'>            <span class="n">ignored</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+</span><span class='line'>          <span class="k">end</span>
+</span><span class='line'>          <span class="n">words</span> <span class="o">=</span> <span class="n">words_from_string</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span><span class='line'>          <span class="n">count_frequency</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">sorted</span> <span class="o">=</span> <span class="vi">@counts</span><span class="o">.</span><span class="n">sort_by</span> <span class="p">{</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span> <span class="n">count</span> <span class="p">}</span>
+</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">reverse!</span>
+</span><span class='line'>      <span class="n">sorted</span><span class="o">.</span><span class="n">map!</span> <span class="k">do</span> <span class="o">|</span><span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="o">|</span>
+</span><span class='line'>        <span class="p">{</span> <span class="n">word</span><span class="p">:</span> <span class="n">word</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="n">count</span> <span class="p">}</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>      <span class="p">{</span> <span class="n">word_count</span><span class="p">:</span> <span class="n">sorted</span> <span class="p">}</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">metadata_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span> <span class="n">posts</span><span class="p">:</span> <span class="o">[]</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1"># Get all the links on the page</span>
+</span><span class='line'>      <span class="n">post_links</span> <span class="o">=</span> <span class="vi">@page</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">find_all</span> <span class="p">{</span> <span class="o">|</span><span class="n">l</span><span class="o">|</span> <span class="n">l</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;h1&#39;</span> <span class="p">}</span>
+</span><span class='line'>      <span class="c1"># Get rid of the first anchor since it&#39;s the site header</span>
+</span><span class='line'>      <span class="n">post_links</span><span class="o">.</span><span class="n">shift</span>
+</span><span class='line'>      <span class="n">post_links</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">link</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">post</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">click</span>
+</span><span class='line'>        <span class="vi">@doc</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">parser</span>
+</span><span class='line'>        <span class="n">time</span> <span class="o">=</span> <span class="vi">@doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
+</span><span class='line'>        <span class="n">post_data</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span class='line'>        <span class="n">post_data</span><span class="o">[</span><span class="ss">:date</span><span class="o">]</span> <span class="o">=</span> <span class="p">{</span> <span class="n">date</span><span class="p">:</span> <span class="n">time</span><span class="o">[</span><span class="s1">&#39;datetime&#39;</span><span class="o">]</span> <span class="p">}</span>
+</span><span class='line'>        <span class="n">post_data</span><span class="o">[</span><span class="ss">:stats</span><span class="o">]</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>        <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">nodes</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">node</span><span class="o">|</span>
+</span><span class='line'>          <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">child</span><span class="o">|</span>
+</span><span class='line'>            <span class="n">post_data</span><span class="o">[</span><span class="ss">:stats</span><span class="o">].</span><span class="n">push</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span><span class='line'>          <span class="k">end</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="n">metadata</span><span class="o">[</span><span class="ss">:posts</span><span class="o">].</span><span class="n">push</span><span class="p">(</span><span class="n">post_data</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>      <span class="nb">p</span> <span class="n">metadata</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kp">private</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">nodes</span> <span class="o">=</span> <span class="vi">@doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">raise</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">SelectionError</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;The selector did not return an results!&#39;</span> <span class="k">if</span> <span class="n">nodes</span><span class="o">.</span><span class="n">empty?</span>
+</span><span class='line'>      <span class="n">nodes</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">words_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">string</span><span class="o">.</span><span class="n">downcase</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="sr">/[\w&#39;]+/</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">count_frequency</span><span class="p">(</span><span class="n">word_list</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">for</span> <span class="n">word</span> <span class="k">in</span> <span class="n">word_list</span>
+</span><span class='line'>        <span class="vi">@counts</span><span class="o">[</span><span class="n">word</span><span class="o">]</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>      <span class="vi">@counts</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Really ugly code that still doesn&#8217;t work. My biggest problem with Ruby is that I don&#8217;t have very good debugging tools and that frustrates the shit out of me. I&#8217;m so used to the visual debuggers in the Chrome Dev tools that doing everything with <code>p</code> or <code>puts</code> is just soul-crushing.</p>
+
+<p>Right now my biggest problem is that data isn&#8217;t being returned from the spider for whatever reason. This is especially annoying because the operation takes a while to run&#8230; I should slim it down but my brain is too tired to re-write the code. I&#8217;m kind of hoping for a lucky break. Advice to anyone just starting out in programming, do not do exactly what I&#8217;m doing right now.</p>
+
+<p>Ok so after getting my ass totally handed to me by Ruby here&#8217;s a working version of the spider that grabs the proper metadata.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;open-uri&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;nokogiri&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;mechanize&#39;</span>
+</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;selection_error&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Crawler</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:doc</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">from_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="kp">new</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="c1"># Create a new instance of Mechanize and grab our page</span>
+</span><span class='line'>      <span class="vi">@agent</span> <span class="o">=</span> <span class="no">Mechanize</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="vi">@uri</span> <span class="o">=</span> <span class="n">uri</span>
+</span><span class='line'>      <span class="vi">@page</span> <span class="o">=</span> <span class="vi">@agent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="vi">@uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@counts</span> <span class="o">=</span> <span class="no">Hash</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">words_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="n">ignored_selector</span> <span class="o">=</span> <span class="kp">nil</span><span class="p">)</span>
+</span><span class='line'>      <span class="c1"># # Get all the links on the page</span>
+</span><span class='line'>      <span class="c1"># post_links = @page.links.find_all { |l| l.attributes.parent.name == &#39;h1&#39; }</span>
+</span><span class='line'>      <span class="c1"># # Get rid of the first anchor since it&#39;s the site header</span>
+</span><span class='line'>      <span class="c1"># post_links.shift </span>
+</span><span class='line'>      <span class="c1"># post_links.each do |link|</span>
+</span><span class='line'>      <span class="c1">#   post = link.click</span>
+</span><span class='line'>      <span class="c1">#   @doc = post.parser</span>
+</span><span class='line'>      <span class="c1">#   nodes = nodes_by_selector(selector)</span>
+</span><span class='line'>      <span class="c1">#   nodes.each do |node|</span>
+</span><span class='line'>      <span class="c1">#     if ignored_selector</span>
+</span><span class='line'>      <span class="c1">#       ignored = node.css(ignored_selector)</span>
+</span><span class='line'>      <span class="c1">#       ignored.remove()</span>
+</span><span class='line'>      <span class="c1">#     end</span>
+</span><span class='line'>      <span class="c1">#     words = words_from_string(node.content)</span>
+</span><span class='line'>      <span class="c1">#     count_frequency(words)</span>
+</span><span class='line'>      <span class="c1">#   end</span>
+</span><span class='line'>      <span class="c1"># end</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1"># sorted = @counts.sort_by { |word, count| count }</span>
+</span><span class='line'>      <span class="c1"># sorted.reverse!</span>
+</span><span class='line'>      <span class="c1"># sorted.map! do |word, count|</span>
+</span><span class='line'>      <span class="c1">#   { word: word, count: count }</span>
+</span><span class='line'>      <span class="c1"># end</span>
+</span><span class='line'>      <span class="c1"># { word_count: sorted }</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">metadata_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span> <span class="n">posts</span><span class="p">:</span> <span class="o">[]</span> <span class="p">}</span>
+</span><span class='line'>      <span class="nb">puts</span> <span class="s1">&#39;starting&#39;</span>
+</span><span class='line'>      <span class="nb">p</span> <span class="n">metadata</span>
+</span><span class='line'>      <span class="c1"># Get all the links on the page</span>
+</span><span class='line'>      <span class="n">post_links</span> <span class="o">=</span> <span class="vi">@page</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">find_all</span> <span class="p">{</span> <span class="o">|</span><span class="n">l</span><span class="o">|</span> <span class="n">l</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;h1&#39;</span> <span class="p">}</span>
+</span><span class='line'>      <span class="c1"># Get rid of the first anchor since it&#39;s the site header</span>
+</span><span class='line'>      <span class="n">post_links</span><span class="o">.</span><span class="n">shift</span>
+</span><span class='line'>      <span class="n">post_links</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">link</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">post</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">click</span>
+</span><span class='line'>        <span class="vi">@doc</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">parser</span>
+</span><span class='line'>        <span class="n">time</span> <span class="o">=</span> <span class="vi">@doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
+</span><span class='line'>        <span class="n">post_data</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span class='line'>        <span class="n">post_data</span><span class="o">[</span><span class="ss">:date</span><span class="o">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">[</span><span class="s1">&#39;datetime&#39;</span><span class="o">]</span>
+</span><span class='line'>        <span class="n">post_data</span><span class="o">[</span><span class="ss">:stats</span><span class="o">]</span> <span class="o">=</span> <span class="o">[]</span>
+</span><span class='line'>        <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>        <span class="n">nodes</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">node</span><span class="o">|</span>
+</span><span class='line'>          <span class="n">node</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">child</span><span class="o">|</span>
+</span><span class='line'>            <span class="k">unless</span> <span class="n">child</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">chomp</span><span class="o">.</span><span class="n">empty?</span>
+</span><span class='line'>              <span class="n">post_data</span><span class="o">[</span><span class="ss">:stats</span><span class="o">].</span><span class="n">push</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</span><span class='line'>            <span class="k">end</span>
+</span><span class='line'>          <span class="k">end</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>        <span class="n">metadata</span><span class="o">[</span><span class="ss">:posts</span><span class="o">].</span><span class="n">push</span><span class="p">(</span><span class="n">post_data</span><span class="p">)</span>
+</span><span class='line'>        <span class="nb">puts</span> <span class="s1">&#39;post added&#39;</span>
+</span><span class='line'>        <span class="nb">p</span> <span class="n">metadata</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>      <span class="nb">puts</span> <span class="s1">&#39;returning&#39;</span>
+</span><span class='line'>      <span class="nb">p</span> <span class="n">metadata</span>
+</span><span class='line'>      <span class="n">metadata</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kp">private</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">nodes_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">nodes</span> <span class="o">=</span> <span class="vi">@doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</span><span class='line'>      <span class="c1"># raise Tentacles::SelectionError, </span>
+</span><span class='line'>      <span class="c1">#   &#39;The selector did not return an results!&#39; if nodes.empty?</span>
+</span><span class='line'>      <span class="n">nodes</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">words_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">string</span><span class="o">.</span><span class="n">downcase</span><span class="o">.</span><span class="n">scan</span><span class="p">(</span><span class="sr">/[\w&#39;]+/</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">count_frequency</span><span class="p">(</span><span class="n">word_list</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">for</span> <span class="n">word</span> <span class="k">in</span> <span class="n">word_list</span>
+</span><span class='line'>        <span class="vi">@counts</span><span class="o">[</span><span class="n">word</span><span class="o">]</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>      <span class="vi">@counts</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I had to comment out the <code>Tentacles::SelectionError</code> because it was throwing and saying it wasn&#8217;t getting any content with a selector even though it was. Not sure wtf is going on there but I&#8217;m sure it has to do with the fact that it&#8217;s 1:30 a.m. I have a rule that nothing good happens after 11pm when it comes to coding. Tonight has lived up to that. Anyway the above should put out a hash which when converted to JSON looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='json'><span class='line'><span class="p">{</span>
+</span><span class='line'>  <span class="nt">&quot;posts&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;date&quot;</span><span class="p">:</span> <span class="s2">&quot;2012-06-22T00:31:00-07:00&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;stats&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>        <span class="s2">&quot;Time: 12:31 am&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;Mood: Tired&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;Sleep: 6&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;Hunger: 0&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;Coffee: 1&quot;</span>
+</span><span class='line'>      <span class="p">]</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;date&quot;</span><span class="p">:</span> <span class="s2">&quot;2012-06-21T01:27:00-07:00&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;stats&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>        <span class="s2">&quot;Time: 1:28 am&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;Mood: Tired, Annoyed&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;Sleep: 6&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;Hunger: 0&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;Coffee: 1&quot;</span>
+</span><span class='line'>      <span class="p">]</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nt">&quot;date&quot;</span><span class="p">:</span> <span class="s2">&quot;2012-06-20T00:09:00-07:00&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nt">&quot;stats&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class='line'>        <span class="s2">&quot;Time: 12:10 am&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;Mood: Tired, Introspective&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;Sleep: 4.5&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;Hunger: 2&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s2">&quot;Coffee: 1&quot;</span>
+</span><span class='line'>      <span class="p">]</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'><span class="err">...</span> <span class="err">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I&#8217;m pretty certain I could have done this with Node in a fraction of the time if only because Node is much easier to debug with Chrome Dev tools using node-inspector. While I love the Ruby language I definitely do not like debugging it&#8230;</p>
+
+<p>Tomorrow I might write some JS to give my brain a break. I&#8217;m thoroughly pissed off at Ruby for the evening. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 1:08 am</li>
+<li>Mood: Tired, Pissed</li>
+<li>Sleep: 6</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1720,65 +2252,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/12/messing-around-with-gems/">Messing Around With Gems</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-12T22:22:00-07:00" pubdate data-updated="true">Jun 12<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I want to work on a code generation tool, similar to the one offered up by Rails. However my Ruby-fu is a bit rusty at the moment so this might be an interesting struggle.</p>
-
-<p>The first thing I&#8217;m going to do is create a new gemset with rvm. Our gem is going to be called <code>r2</code> after the much beloved R2D2 so we&#8217;ll also call our gemset <code>r2</code>.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>rvm gemset create r2
-</span><span class='line'>rvm use 1.9.3@r2</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Ugh after spending about an 2 hours fucking around with bundler I&#8217;m getting nowhere. I&#8217;ll have to pick this up tomorrow. :\ #WorstPostEver</p>
-
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/sadness.jpg" title="'sadness'" ></p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 10:28 pm</li>
-<li>Mood: Tired, Cranky</li>
-<li>Sleep: 6</li>
-<li>Hunger: 8</li>
-<li>Coffee: 0</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -1794,6 +2267,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/23/failing-at-ruby/">Failing at Ruby</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/22/wrapping-up-the-word-count-spider/">Wrapping up the Word Count Spider</a>
       </li>
     
@@ -1807,10 +2284,6 @@
     
       <li class="post">
         <a href="/blog/2012/06/18/outputting-json-from-ruby/">Outputting JSON from Ruby</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/">Object Oriented Scraper Backed With Tests Pt&#8230;9?</a>
       </li>
     
   </ul>

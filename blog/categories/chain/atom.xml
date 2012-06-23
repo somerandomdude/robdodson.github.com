@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-22T00:42:32-07:00</updated>
+  <updated>2012-06-23T01:39:34-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,286 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Failing at Ruby]]></title>
+    <link href="http://robdodson.me/blog/2012/06/23/failing-at-ruby/"/>
+    <updated>2012-06-23T01:08:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/23/failing-at-ruby</id>
+    <content type="html"><![CDATA[<p>I'm just getting my ass kicked by Ruby tonight so I don't have much to show. Trying to just get my metadata scraping to output something currently looks like this:</p>
+
+<p>``` ruby
+require 'open-uri'
+require 'nokogiri'
+require 'mechanize'
+require_relative 'selection_error'</p>
+
+<p>module Tentacles
+  class Crawler</p>
+
+<pre><code>attr_reader :doc
+
+def self.from_uri(uri)
+  new(uri)
+end
+
+def initialize(uri)
+  # Create a new instance of Mechanize and grab our page
+  @agent = Mechanize.new
+
+  @uri = uri
+  @page = @agent.get(@uri)
+  @counts = Hash.new(0)
+end
+
+def words_by_selector(selector, ignored_selector = nil)
+  # Get all the links on the page
+  post_links = @page.links.find_all { |l| l.attributes.parent.name == 'h1' }
+  # Get rid of the first anchor since it's the site header
+  post_links.shift 
+  post_links.each do |link|
+    post = link.click
+    @doc = post.parser
+    nodes = nodes_by_selector(selector)
+    nodes.each do |node|
+      if ignored_selector
+        ignored = node.css(ignored_selector)
+        ignored.remove()
+      end
+      words = words_from_string(node.content)
+      count_frequency(words)
+    end
+  end
+
+  sorted = @counts.sort_by { |word, count| count }
+  sorted.reverse!
+  sorted.map! do |word, count|
+    { word: word, count: count }
+  end
+  { word_count: sorted }
+end
+
+def metadata_by_selector(selector)
+  metadata = { posts: [] }
+
+  # Get all the links on the page
+  post_links = @page.links.find_all { |l| l.attributes.parent.name == 'h1' }
+  # Get rid of the first anchor since it's the site header
+  post_links.shift
+  post_links.each do |link|
+    post = link.click
+    @doc = post.parser
+    time = @doc.css('time')[0]
+    post_data = {}
+    post_data[:date] = { date: time['datetime'] }
+    post_data[:stats] = []
+    nodes = nodes_by_selector(selector)
+    nodes.each do |node|
+      node.children.each do |child|
+        post_data[:stats].push(child.content)
+      end                
+    end
+    metadata[:posts].push(post_data)
+  end
+  p metadata
+end
+</code></pre>
+
+<p>  private</p>
+
+<pre><code>def nodes_by_selector(selector)
+  nodes = @doc.css(selector)
+  raise Tentacles::SelectionError, 
+    'The selector did not return an results!' if nodes.empty?
+  nodes
+end 
+
+def words_from_string(string)
+  string.downcase.scan(/[\w']+/)
+end
+
+def count_frequency(word_list)
+  for word in word_list
+    @counts[word] += 1
+  end
+  @counts
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Really ugly code that still doesn't work. My biggest problem with Ruby is that I don't have very good debugging tools and that frustrates the shit out of me. I'm so used to the visual debuggers in the Chrome Dev tools that doing everything with <code>p</code> or <code>puts</code> is just soul-crushing.</p>
+
+<p>Right now my biggest problem is that data isn't being returned from the spider for whatever reason. This is especially annoying because the operation takes a while to run... I should slim it down but my brain is too tired to re-write the code. I'm kind of hoping for a lucky break. Advice to anyone just starting out in programming, do not do exactly what I'm doing right now.</p>
+
+<p>Ok so after getting my ass totally handed to me by Ruby here's a working version of the spider that grabs the proper metadata.</p>
+
+<p>``` ruby
+require 'open-uri'
+require 'nokogiri'
+require 'mechanize'
+require_relative 'selection_error'</p>
+
+<p>module Tentacles
+  class Crawler</p>
+
+<pre><code>attr_reader :doc
+
+def self.from_uri(uri)
+  new(uri)
+end
+
+def initialize(uri)
+  # Create a new instance of Mechanize and grab our page
+  @agent = Mechanize.new
+
+  @uri = uri
+  @page = @agent.get(@uri)
+  @counts = Hash.new(0)
+end
+
+def words_by_selector(selector, ignored_selector = nil)
+  # # Get all the links on the page
+  # post_links = @page.links.find_all { |l| l.attributes.parent.name == 'h1' }
+  # # Get rid of the first anchor since it's the site header
+  # post_links.shift 
+  # post_links.each do |link|
+  #   post = link.click
+  #   @doc = post.parser
+  #   nodes = nodes_by_selector(selector)
+  #   nodes.each do |node|
+  #     if ignored_selector
+  #       ignored = node.css(ignored_selector)
+  #       ignored.remove()
+  #     end
+  #     words = words_from_string(node.content)
+  #     count_frequency(words)
+  #   end
+  # end
+
+  # sorted = @counts.sort_by { |word, count| count }
+  # sorted.reverse!
+  # sorted.map! do |word, count|
+  #   { word: word, count: count }
+  # end
+  # { word_count: sorted }
+end
+
+def metadata_by_selector(selector)
+  metadata = { posts: [] }
+  puts 'starting'
+  p metadata
+  # Get all the links on the page
+  post_links = @page.links.find_all { |l| l.attributes.parent.name == 'h1' }
+  # Get rid of the first anchor since it's the site header
+  post_links.shift
+  post_links.each do |link|
+    post = link.click
+    @doc = post.parser
+    time = @doc.css('time')[0]
+    post_data = {}
+    post_data[:date] = time['datetime']
+    post_data[:stats] = []
+    nodes = nodes_by_selector(selector)
+    nodes.each do |node|
+      node.children.each do |child|
+        unless child.content.chomp.empty?
+          post_data[:stats].push(child.content)
+        end
+      end                
+    end
+    metadata[:posts].push(post_data)
+    puts 'post added'
+    p metadata
+  end
+  puts 'returning'
+  p metadata
+  metadata
+end
+</code></pre>
+
+<p>  private</p>
+
+<pre><code>def nodes_by_selector(selector)
+  nodes = @doc.css(selector)
+  # raise Tentacles::SelectionError, 
+  #   'The selector did not return an results!' if nodes.empty?
+  nodes
+end 
+
+def words_from_string(string)
+  string.downcase.scan(/[\w']+/)
+end
+
+def count_frequency(word_list)
+  for word in word_list
+    @counts[word] += 1
+  end
+  @counts
+end
+</code></pre>
+
+<p>  end
+end
+<code>``
+I had to comment out the</code>Tentacles::SelectionError` because it was throwing and saying it wasn't getting any content with a selector even though it was. Not sure wtf is going on there but I'm sure it has to do with the fact that it's 1:30 a.m. I have a rule that nothing good happens after 11pm when it comes to coding. Tonight has lived up to that. Anyway the above should put out a hash which when converted to JSON looks like this:</p>
+
+<p>``` json
+{
+  "posts": [</p>
+
+<pre><code>{
+  "date": "2012-06-22T00:31:00-07:00",
+  "stats": [
+    "Time: 12:31 am",
+    "Mood: Tired",
+    "Sleep: 6",
+    "Hunger: 0",
+    "Coffee: 1"
+  ]
+},
+{
+  "date": "2012-06-21T01:27:00-07:00",
+  "stats": [
+    "Time: 1:28 am",
+    "Mood: Tired, Annoyed",
+    "Sleep: 6",
+    "Hunger: 0",
+    "Coffee: 1"
+  ]
+},
+{
+  "date": "2012-06-20T00:09:00-07:00",
+  "stats": [
+    "Time: 12:10 am",
+    "Mood: Tired, Introspective",
+    "Sleep: 4.5",
+    "Hunger: 2",
+    "Coffee: 1"
+  ]
+},
+</code></pre>
+
+<p>... .
+```
+I'm pretty certain I could have done this with Node in a fraction of the time if only because Node is much easier to debug with Chrome Dev tools using node-inspector. While I love the Ruby language I definitely do not like debugging it...</p>
+
+<p>Tomorrow I might write some JS to give my brain a break. I'm thoroughly pissed off at Ruby for the evening. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 1:08 am</li>
+<li>Mood: Tired, Pissed</li>
+<li>Sleep: 6</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Wrapping up the Word Count Spider]]></title>
@@ -486,128 +766,6 @@ end
 <li>Sleep: 6</li>
 <li>Hunger: 4</li>
 <li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Object Oriented Scraper Backed With Tests Pt...9?]]></title>
-    <link href="http://robdodson.me/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/"/>
-    <updated>2012-06-17T22:43:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9</id>
-    <content type="html"><![CDATA[<p>I just spent a few hours talking to my friend <a href="http://derekbradley.com/">Derek</a>(<a href="https://twitter.com/#!/derekebradley">@derekebradley</a>) about Ruby and it occured to me that I never finished this scraper project. We got awfully far with it but then it kind of died on the vine. <a href="http://robdodson.me/blog/2012/05/06/object-oriented-scraper-backed-with-tests/">Thankfully,</a> <a href="http://robdodson.me/blog/2012/05/07/object-oriented-scraper-backed-with-tests-pt-2/">I</a> <a href="http://robdodson.me/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/">wrote</a> <a href="http://robdodson.me/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4/">it</a> <a href="http://robdodson.me/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/">all</a> <a href="http://robdodson.me/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/">down.</a> <a href="http://robdodson.me/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7/">down.</a> <a href="http://robdodson.me/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8/">down.</a></p>
-
-<p>The fact of the matter is I didn't know where to take the data. I didn't have a design or a layout that I could put it all into. I want to change all that. I want to turn this into something useful. But first I have to make sense of all the code that was written so many weeks ago.</p>
-
-<h2>Tests as documentation...bullshit.</h2>
-
-<p>Ok ok. I should say it's <em>total</em> bullshit to call your tests the documentation because they are helpful. But the fact of the matter is you can get so crafty with RSpec that it makes the tests difficult to read in a useful way. I'm not saying they're illegible, it's just that they leverage features which adds to their thought deficit. Before you go off saying that I wrote them wrong and tests should be all the documentation you need...shutup. They're helpful but I would love it if I had written a bit of Markdown Readme to go with all this...</p>
-
-<h2>Explain yourself</h2>
-
-<p>Let's see if I can regurgitate what this thing currently does in plain English.</p>
-
-<ul>
-<li><p>There's a config.yml file. It says what page to scrape, what the CSS selector for a post looks like and what the CSS selector for metadata looks like. The metadata is the list at the bottom of every page listing the time, amount of sleep, coffee, etc.</p></li>
-<li><p>There's a command line object, <code>tentacles</code>. It initiates <code>runner.rb</code>. <code>Runner</code> creates an instance of <code>Options</code>. <code>Options</code> loads the config.yml file and parses it, turning its properties into members of the options object.</p></li>
-<li><p>It actually doesn't do anything else beyond that. <code>runner.rb</code> stops right there but we have Rspec tests which fake data and check to see if our other classes work. Those other classes are...</p></li>
-<li><p><code>crawler.rb</code> should be the real meat of our program. Funny, seeing as how I wrote all this, that I totally can't remember who does what...</p></li>
-<li><p><code>crawler.rb</code> has two primary methods: <code>words_by_selector</code> and <code>metadata_by_selector</code>.</p></li>
-<li><p><code>words_by_selector</code> returns an array of words and the number of times they've occurred. This array should be in order from most used to least used.</p></li>
-<li><p><code>metadata_by_selector</code> returns the content of one of our metadata lists.... I think.</p></li>
-</ul>
-
-
-<h2>Make it work</h2>
-
-<p>With Tim Gunn's mantra we're gonna make this thing work. The tests verify that everything should be at least somewhat functioning. Since I'm a little drunk I can't do a <em>super</em> deep dive but let's see if we can get our runner to write out the contents of <code>words_by_selector</code> to a text file.</p>
-
-<p>``` ruby runner.rb
-require 'yaml'
-require_relative 'options'
-require_relative 'crawler'</p>
-
-<p>module Tentacles
-  class Runner</p>
-
-<pre><code>def initialize(config)
-  @options = Tentacles::Options.new(config)
-end
-
-def run      
-  @crawler = Tentacles::Crawler.from_uri(@options.uri)
-  output = @crawler.words_by_selector(@options.post_selector, 'ul:last-child')
-  File.open("output.txt", "w") do |file|
-    output.each do |line|
-      file.puts line
-    end
-  end
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>To get this working I <code>cd</code> into the lib/ folder where all the code lives and do an <code>irb -I .</code> so I can require the local files.</p>
-
-<p><code>
-require 'runner'
-runner = Tentacles::Runner.new('config.yml')
-runner.run
-</code></p>
-
-<p>After doing that we <em>do</em> get a text file, with copy that looks somewhat correct...</p>
-
-<p><code>
-we: 8
-to: 8
-npm: 6
-should: 5
-package: 4
-our: 4
-compliment: 4
-git: 3
-0: 3
-4: 3
-need: 3
-2: 3
-it: 3
-node_modules: 3
-the: 3
-have: 3
-be: 3
-json: 2
-your: 2
-any: 2
-dependencies: 2
-module: 2
-and: 2
-node: 2
-add: 2
-xml2json: 2
-how: 2
-s: 2
-in: 2
-you: 2
-json1: 2
-an: 2
-3: 2
-awesome: 2
-version: 2
-</code></p>
-
-<p>It looks like the copy from my most recent blog post, plus or minus a few words. Horrible regex aside it <em>kinda</em> works and that's what we're after. Maybe tomorrow we can turn it into some JSON :D Till then. - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 10:44 pm</li>
-<li>Mood: Drunk, Sleepy</li>
-<li>Sleep: 3</li>
-<li>Hunger: 4</li>
-<li>Coffee: 1</li>
 </ul>
 
 ]]></content>
