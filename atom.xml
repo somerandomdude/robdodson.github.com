@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-23T01:39:34-07:00</updated>
+  <updated>2012-06-24T01:02:30-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,190 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Sublime Text 2 Tips and Shortcuts]]></title>
+    <link href="http://robdodson.me/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/"/>
+    <updated>2012-06-23T22:28:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/23/sublime-text-2-tips-and-shortcuts</id>
+    <content type="html"><![CDATA[<p>I&#8217;ve been using Sublime Text 2 for probably two months now and in that time I&#8217;ve discovered tons of useful tricks. I figured I should start writing them down for anyone who might be interested. I&#8217;ll try to explain the bits that seem esoteric because there are a lot of cool commands which only work in certain contexts.</p>
+
+<h2>Finding your preferences</h2>
+
+<p>One of the first things you want to do with Sublime is to find your User key bindings. They&#8217;re located under <code>Sublime Text 2 &gt; Preferences &gt; Key Bindings - User</code></p>
+
+<p>Sublime Text is very DIY so there isn&#8217;t a fancy GUI to help you change keyboard shortcuts. Instead you use the preference file to override the default shortcuts. Like a lot of things in Sublime, this can at first seem annoying and non-intuitive. That is, until you realize that by doing it this way Sublime has actually given you the power to make <em>extremely</em> awesome key bindings. Take some time to look around in this file. I still only understand a fraction of what all it does but the little bits I learn here and there give me all sorts of ideas for new shortcuts. Just remember, if you want to change a keyboard shortcut you should do it in the User&#8217;s key bindings and not the Default key bindings.</p>
+
+<p><strong>Pro Tip:</strong> If you ever want to change a keyboard shortcut but can&#8217;t figure out what command is currently running open up Sublime&#8217;s built in terminal with <code>ctrl+`</code> then type <code>sublime.log_commands(True)</code>. Now when you execute your command from the menu you should see its name show up in the console. Just remember to turn logging off when you&#8217;re done :)</p>
+
+<h2>Sublime Package Control</h2>
+
+<p>If you only follow one piece of my advice make it this: <a href="http://wbond.net/sublime_packages/package_control">Install Sublime Package Control.</a></p>
+
+<p>Package Control makes it extremely easy to manage your Sublime plugins. It also helps with discovering new ones, which is nice. Just install it if you haven&#8217;t already, it&#8217;s impossible to live without.</p>
+
+<h2>Setting up a command line shortcut</h2>
+
+<p>I highly recommend setting up a symlink so you can easily open things with Sublime. <a href="http://www.sublimetext.com/docs/2/osx_command_line.html">This article details how to go about it on OSX.</a></p>
+
+<p>CLI FTW!</p>
+
+<h2>The Command Palette</h2>
+
+<p>OK, so hopefully you&#8217;ve setup Sublime Package Control. Maybe you&#8217;ve even installed some plugins. It&#8217;s time for you to meet the Command Palette then. <code>cmd+shift+p</code> will open up the window and from here you can execute just about any command either native to Sublime or part of a plugin. It is super useful for all those things you don&#8217;t run often enough to turn into full blown keyboard shortcuts. It&#8217;s also useful if you know the name of a command but can&#8217;t remember what section of the menu it lives under.</p>
+
+<h2>Goto Anything&#8230;</h2>
+
+<p>So you want to fly around your project like a ninja on methamphetamines, eh? Then the shortcut you want is <code>cmd+p</code>. Once you&#8217;ve opened the dialog try typing a filename. Useful right? But wait, there&#8217;s more&#8230;</p>
+
+<p>If you preface what you&#8217;re typing with a <code>@</code> it will look for &#8220;symbols&#8221; in the current file. Ex: <code>@foobar</code>. But just typing <code>@</code> will give you a nice file outline. The definition of what a symbol is depends on the file-type. In a Markdown file, for instance, it will list every header. In a JavaScript or Ruby file it will list every method of an object.</p>
+
+<p>One last trick. If instead of an <code>@</code> you preface things with an <code>:</code> you can type a line number instead and hit enter to jump to that point. Ex: <code>:415</code></p>
+
+<p>There are other keyboard shortcuts for jumping to a line and going to a symbol but why bother when you can just use <code>cmd+p</code> and some easy prefixing.</p>
+
+<h2>Splitting the editor windows</h2>
+
+<p>OK this one is also important and I can&#8217;t recommend it enough. <strong>Learn to split your editor windows.</strong> I never used this feature in previous IDEs and now I wonder how I ever lived without it. Whether you have a unit test in one window and an implementation in the other, or some HTML and CSS, this feature is just always handy.</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/sublime-split-panes.png" title="'Split windows in Sublime'" ></p>
+
+<p>I <em>live</em> in split panes. They&#8217;ve changed my workflow significantly for the better. Less time switching between files and finding your place is an incredible advantage. You can access them through <code>View &gt; Layouts</code>. It will behoove you to learn these keyboard shortcuts. Also learn the shortcuts for <code>View &gt; Focus Group</code> and <code>View &gt; Move File to Group</code>.</p>
+
+<h2>Selections</h2>
+
+<p>There are some neat selections which come in handy depending on your context. Personally I use Expand Selection to Tag, <code>cmd+shift+a</code> quite frequently when writing HTML. I also use Expand Selection to Line, <code>cmd+L</code> and Expand Selection to Word, <code>cmd+D</code> a lot.</p>
+
+<h2>Selections with Multiple Cursors</h2>
+
+<p>Multiple cursors&#8230; It&#8217;s one of those things you didn&#8217;t realize you needed until suddenly you had it and you were all like &#8220;WHAAAAAAAAT!&#8221;</p>
+
+<p>There are a handful of ways to activate multiple cursors in Sublime. Hitting <code>cmd+D</code> to select multiples of the same word will put us into a multi-cursor context.</p>
+
+<p>Another way to go about it is to highlight a block of text and hit <code>cmd+shift+L</code> which will split each line into its own selection. This is extremely useful when editing HTML where often times you have repeating elements and you want to tweak a class name on all of them.</p>
+
+<p>You can also just hold <code>cmd</code> and click around your file to add more cursors. Or you can hold <code>ctrl+shift</code> and tap either the up or down arrows to add a new cursor in that direction.</p>
+
+<h2>Moving Lines</h2>
+
+<p><code>Edit &gt; Line &gt; Swap Line Up</code></p>
+
+<p><code>Edit &gt; Line &gt; Swap Line Down</code></p>
+
+<p><code>Edit &gt; Line &gt; Duplicate Line</code></p>
+
+<p>Learn em. Love em. I changed my keyboard shortcut for these so I can&#8217;t recall what it is by default. Regardless I think I use these three commands more than any other so I would say if you only learn three shortcuts, make it these three.</p>
+
+<p><strong>Pro Tip:</strong> If you want to duplicate a block of code highlight it and hit <code>cmd+L</code> to select the new line before you hit <code>cmd+shift+D</code>. This way your duplicated block will appear on a new line, rather than next to the previous block of code.</p>
+
+<h2>Wrap your lines</h2>
+
+<p>If you&#8217;ve installed the <a href="https://github.com/SublimeText/Tag">Tag plugin</a> you should have some extra line wrapping methods. I would also recommend you install <a href="https://bitbucket.org/sublimator/sublime-2-zencoding">ZenCoding</a>. I&#8217;m suggesting this for two reasons:</p>
+
+<ol>
+<li>You get awesome new features&#8230;</li>
+<li>I can&#8217;t remember if what I&#8217;m about to say is native to Sublime or part of a plugin.</li>
+</ol>
+
+
+<p>OK with that out of the way&#8230;</p>
+
+<p>Let&#8217;s say you&#8217;re working on some HTML and you have a block of text that you&#8217;d like to wrap in a <code>p</code> tag. No problemo! Highlight the text and hit <code>ctrl+shift+w</code> or <code>Edit &gt; Tag &gt; Wrap Selection in Tag</code>. There&#8217;s a more advanced versions that comes with the ZenCoding plugin which lets you do really elaborate wrappings. I believe the keyboard shortcut for that is <code>ctrl+alt+w</code>. Personally I dislike using the <code>ctrl</code> key on my Mac laptop so I changed both of those keyboard shortcuts to the following:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>{ "keys": ["super+shift+r"], "command": "insert_snippet", "args": { "name": "Packages/XML/long-tag.sublime-snippet" } },
+</span><span class='line'>{ "keys": ["alt+shift+r"], "command": "wrap_zen_as_you_type",
+</span><span class='line'>"context": [
+</span><span class='line'>    {
+</span><span class='line'>      "operand": "text.html, text.xml",
+</span><span class='line'>      "operator": "equal",
+</span><span class='line'>      "match_all": true,
+</span><span class='line'>      "key": "selector"
+</span><span class='line'>    }
+</span><span class='line'>  ]
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You&#8217;ll notice that instead of just using a <code>wrap_in_tag</code> command name the first entry actually calls another command, <code>insert_snippet</code> and passes it an argument: <code>Packages/XML/long-tag.sublime.snippet</code> which is the location of a snippet file. Pretty cool trick!</p>
+
+<p>Also note that Sublime uses the term &#8220;super&#8221; to refer to the command</p>
+
+<h2>Bookmarks!</h2>
+
+<p>If you&#8217;re like me then you lose your place in large files. That&#8217;s where bookmarks can be a big help. <code>cmd+F2</code> will add a new bookmark on the page. The bookmark is tied to the line so if you use the move line up/down commands it will move the bookmark as well (nice). To cycle through your bookmarks just hit F2. The rest of the bookmark commands are located in <code>Goto &gt; Bookmarks</code>. Take note of the one that says <code>Select All Bookmarks</code> which will basically let you do a multi-selection on all of the lines you&#8217;ve already bookmarked.</p>
+
+<h2>Marks</h2>
+
+<p>Marks are very similar to bookmarks but they serve a different purpose. They&#8217;re located in <code>Edit &gt; Mark</code> and their keyboard shortcuts are a little weird because you need to hit <code>cmd+K</code> and then a secondary shortcut like <code>cmd+space</code>. I find myself using Marks a few times a day to do large selections. For instance if you have a big block of HTML it can be very tricky to stay inside the proper scope if you&#8217;re trying to delete all the contents of a very high level container. With Marks you can just put a mark on the opening line of the container, hit <code>cmd+shift+a</code> to select down to the bottom of the tag, and then hit <code>cmd+K, cmd+a</code> to select everything back to your previous mark. Marks can also be used to swap lines of text but I&#8217;ve never needed to do that in practice.</p>
+
+<h2>Hide the Sidebar</h2>
+
+<p>To hide the sidebar hit <code>cmd+K, cmd+B</code>. Since I work on a laptop I often hide the sidebar to give myself that extra 100px of reading space.</p>
+
+<h2>Turn off Minimap</h2>
+
+<p>Do you guys use that minimap thing in the top corner of the editor windows? I find it <em>incredibly</em> distracting and it also takes up screen space. To disable it go to <code>View &gt; Hide Minimap</code>.</p>
+
+<h2>Saving a project</h2>
+
+<p>This one might be obvious for many of you but it wasn&#8217;t something I was really taking advantage of until recently. Once you have a folder open it can be beneficial to save it as a project via the <code>Project &gt; Save Project As...</code> command. Save the project files in the root of your app and then whenever you do <code>Project &gt; Recent Projects...</code> it will open everything up with all your windows just as you left them.</p>
+
+<p>To switch between projects use <code>ctrl+cmd+p</code>.</p>
+
+<h2>Some awesome plugins</h2>
+
+<p>Sublime is all about plugins so here&#8217;s a list of some of my favorites. Once you have Package Control installed you can just hit <code>cmd+shift+p</code> and type <code>discover</code>, then hit enter which will take you to a page listing tons of plugins. Try out some (or all) of the ones below. They&#8217;re great :D</p>
+
+<ul>
+<li>AdvancedNewFile</li>
+<li>HtmlTidy</li>
+<li>Nettuts+ Fetch</li>
+<li>Prefixr</li>
+<li>RubyTest</li>
+<li>Shell Turtlestein</li>
+<li>SideBarEnhancements</li>
+<li>sublime-github</li>
+<li>Sublime-JSHint</li>
+<li>SublimeCodeIntel</li>
+<li>Tag</li>
+<li>ZenCoding</li>
+</ul>
+
+
+<h2>Convert Case</h2>
+
+<p>If you highlight some text you can use <code>cmd+K, cmd+U</code> to uppercase it. Likewise you can use <code>cmd+K, cmd+L</code> to lowercase it.</p>
+
+<h2>Spell Check :)</h2>
+
+<p>Finally I wouldn&#8217;t be much of a blogger if I didn&#8217;t point out the spell check feature. Hit <code>F6</code> to check your current file. Once you&#8217;ve turned it on the spell checker will stay on until you hit <code>F6</code> again.</p>
+
+<h2>Hack the Planet!</h2>
+
+<p>We&#8217;ve only really scratched the surface of what Sublime is capable of. In the future I&#8217;d like to write more about its awesome Macros, Snippets and Plugin architecture. Till then, have fun hacking. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 10:34 pm</li>
+<li>Mood: Tired, Lazy</li>
+<li>Sleep: 5</li>
+<li>Hunger: 5</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Failing at Ruby]]></title>
@@ -4357,263 +4541,6 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
 <li>Sleep: 5</li>
 <li>Hunger: 0</li>
 <li>Coffee: 1</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Make Your Own jQuery Deferreds and Promises]]></title>
-    <link href="http://robdodson.me/blog/2012/06/03/make-your-own-jquery-deferreds-and-promises/"/>
-    <updated>2012-06-03T20:33:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/03/make-your-own-jquery-deferreds-and-promises</id>
-    <content type="html"><![CDATA[<p>Last week <a href="http://robdodson.me/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/">I did a post on how to load an Underscore template using jQuery&#8217;s Deferred method</a>. I got some great feedback from folks and decided I should do a follow up showing how to create your own Deferreds.</p>
-
-<h3>What&#8217;s a Deferred again&#8230;?</h3>
-
-<p>So, quick summary time. jQuery has a neat little Object called a <code>Deferred</code> which is basically a wrapper around a function or a group of functions. Let&#8217;s say that you want to load 3 different json files via ajax and when all that&#8217;s done you want to let the rest of the world know. Using jQuery&#8217;s <code>Deferred</code> Object we can actually put a wrapper around those 3 ajax functions and fire off a callback when they&#8217;ve all finished. <a href="http://robdodson.me/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/">Refer back to my previous post (toward the bottom) where I explain some of these callbacks.</a></p>
-
-<p><code>Deferred</code> isn&#8217;t limited to ajax calls, it can work in just about any environment. Let&#8217;s do an example using jQuery&#8217;s animate function. We&#8217;ll fade an item and when it&#8217;s finished animating we&#8217;ll resolve our <code>Deferred</code> object.</p>
-
-<h3>Our First Deferred</h3>
-
-<p>Here&#8217;s the code we&#8217;ll be using in our index.html file:</p>
-
-<figure class='code'><figcaption><span>index.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
-</span><span class='line'><span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">&quot;en&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Deferred Sandbox<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;style </span><span class="na">type=</span><span class="s">&quot;text/css&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>      <span class="nf">#container</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">width</span><span class="o">:</span> <span class="m">100px</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">height</span><span class="o">:</span> <span class="m">100px</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">background</span><span class="o">:</span> <span class="m">#CCC</span><span class="p">;</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="nt">&lt;/style&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;jquery.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;main.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;main&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;container&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Take note of the fact that I&#8217;ve included jquery.js and main.js in the same folder as index.html. If you run the above you should get a simple little grey square in the top left of your screen. Now let&#8217;s dive into the JavaScript.</p>
-
-<figure class='code'><figcaption><span>main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">container</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$el</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// Store a reference to our element</span>
-</span><span class='line'>        <span class="c1">// on the page</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span> <span class="o">=</span> <span class="nx">$el</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">fadeOut</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// Create a new Deferred.</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">dfd</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span>
-</span><span class='line'>            <span class="nx">opacity</span><span class="o">:</span> <span class="mi">0</span>
-</span><span class='line'>        <span class="p">},</span> <span class="mi">2000</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>            <span class="c1">// When we&#39;re done animating</span>
-</span><span class='line'>            <span class="c1">// we&#39;ll resolve our Deferred.</span>
-</span><span class='line'>            <span class="c1">// This will call any done() callbacks</span>
-</span><span class='line'>            <span class="c1">// attached to either our Deferred or</span>
-</span><span class='line'>            <span class="c1">// one of its promises.</span>
-</span><span class='line'>            <span class="nx">dfd</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s2">&quot;Finished fading out!&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="c1">// Return an immutable promise object.</span>
-</span><span class='line'>        <span class="c1">// Clients can listen for its done or fail</span>
-</span><span class='line'>        <span class="c1">// callbacks but they can&#39;t resolve it themselves</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">dfd</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Hook the container object up to the #container div</span>
-</span><span class='line'>    <span class="nx">container</span><span class="p">.</span><span class="nx">initialize</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#container&#39;</span><span class="p">));</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Instruct the container to fade out. When we call</span>
-</span><span class='line'>    <span class="c1">// fadeOut we should get a promise back as a return value</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">promise</span> <span class="o">=</span> <span class="nx">container</span><span class="p">.</span><span class="nx">fadeOut</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Now that we have a promise we can hook a done callback</span>
-</span><span class='line'>    <span class="c1">// onto it. The done() method will fire once the promise</span>
-</span><span class='line'>    <span class="c1">// is resolved.</span>
-</span><span class='line'>    <span class="nx">promise</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>That&#8217;s a fair bit of code so let&#8217;s walk through it bit by bit. We start off by creating an object called <code>container</code> which is going to wrap the <code>#container</code> div already on the page. The real guts of container happens in the <code>fadeOut</code> method:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">fadeOut</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// Create a new Deferred.</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">dfd</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span>
-</span><span class='line'>        <span class="nx">opacity</span><span class="o">:</span> <span class="mi">0</span>
-</span><span class='line'>    <span class="p">},</span> <span class="mi">2000</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// When we&#39;re done animating</span>
-</span><span class='line'>        <span class="c1">// we&#39;ll resolve our Deferred.</span>
-</span><span class='line'>        <span class="c1">// This will call any done() callbacks</span>
-</span><span class='line'>        <span class="c1">// attached to either our Deferred or</span>
-</span><span class='line'>        <span class="c1">// one of its promises.</span>
-</span><span class='line'>        <span class="nx">dfd</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s2">&quot;Finished fading out!&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Return an immutable promise object.</span>
-</span><span class='line'>    <span class="c1">// Clients can listen for its done or fail</span>
-</span><span class='line'>    <span class="c1">// callbacks but they can&#39;t resolve it themselves</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nx">dfd</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The first thing we do is to create a new <code>Deferred</code> using jQuery&#8217;s Deferred constructor. Ignore the animation function for a moment and look at the bottom of this method. See how we&#8217;re returning <code>dfd.promise()</code>? A promise is a dynamically generated object which lets clients hook onto our <code>done</code> and <code>fail</code> callbacks but it doesn&#8217;t let them do anything to change our original <code>Deferred</code> object. A promise is an <code>immutable</code> object, meaning clients can listen to it but they can&#8217;t really do anything to change it. We want this functionality because we don&#8217;t want someone else to come along and accidentally resolve our <code>Deferred</code>. So instead of returning the <code>Deferred</code> we just created, we only return its <code>promise</code>.</p>
-
-<p>OK back to the animation function:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">opacity</span><span class="o">:</span> <span class="mi">0</span>
-</span><span class='line'><span class="p">},</span> <span class="mi">2000</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// When we&#39;re done animating</span>
-</span><span class='line'>    <span class="c1">// we&#39;ll resolve our Deferred.</span>
-</span><span class='line'>    <span class="c1">// This will call any done() callbacks</span>
-</span><span class='line'>    <span class="c1">// attached to either our Deferred or</span>
-</span><span class='line'>    <span class="c1">// one of its promises.</span>
-</span><span class='line'>    <span class="nx">dfd</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s2">&quot;Finished fading out!&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you&#8217;ve used <code>jQuery.animate</code> before this should look pretty straightforward to you. At the end of our animation we pass in an anonymouse function which will be run when the animation completes. In this function we tell our <code>Deferred</code> to resolve. Resolving the <code>Deferred</code> causes any <code>done</code> callbacks to fire. In this case we&#8217;re also passing along a little snippet of text. When you resolve a <code>Deferred</code> you can give it an optional payload object which will be passed to all the <code>done</code> callbacks. This is extremely useful if you&#8217;re using ajax to pass along the final data value. In this case we&#8217;re just going to log the message into the console:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">promise</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>There are more cool things you can do with <code>Deferreds</code> I highly recommend you <a href="http://api.jquery.com/category/deferred-object/">spend some time with the documentation</a> and trying out some of the other methods like <code>pipe</code> or <code>resolveWith</code>. Also as a side note <a href="http://api.jquery.com/promise/">checkout this page</a> which shows how to extract a <code>promise</code> by type. It will actually let you do everything we&#8217;ve done in our animation example but with fewer lines of code.</p>
-
-<p>Let me know if this is helpful or if you have any questions. Till tomorrow! - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 8:35 pm</li>
-<li>Mood: Silly, Lazy</li>
-<li>Sleep: 7</li>
-<li>Hunger: 5</li>
-<li>Coffee: 0</li>
 </ul>
 
 ]]></content>

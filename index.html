@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="I&#8217;m just getting my ass kicked by Ruby tonight so I don&#8217;t have much to show. Trying to just get my metadata scraping to output something &hellip;">
+  <meta name="description" content="I&#8217;ve been using Sublime Text 2 for probably two months now and in that time I&#8217;ve discovered tons of useful tricks. I figured I should &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,217 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/">Sublime Text 2 Tips and Shortcuts</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-23T22:28:00-07:00" pubdate data-updated="true">Jun 23<span>rd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&#8217;ve been using Sublime Text 2 for probably two months now and in that time I&#8217;ve discovered tons of useful tricks. I figured I should start writing them down for anyone who might be interested. I&#8217;ll try to explain the bits that seem esoteric because there are a lot of cool commands which only work in certain contexts.</p>
+
+<h2>Finding your preferences</h2>
+
+<p>One of the first things you want to do with Sublime is to find your User key bindings. They&#8217;re located under <code>Sublime Text 2 &gt; Preferences &gt; Key Bindings - User</code></p>
+
+<p>Sublime Text is very DIY so there isn&#8217;t a fancy GUI to help you change keyboard shortcuts. Instead you use the preference file to override the default shortcuts. Like a lot of things in Sublime, this can at first seem annoying and non-intuitive. That is, until you realize that by doing it this way Sublime has actually given you the power to make <em>extremely</em> awesome key bindings. Take some time to look around in this file. I still only understand a fraction of what all it does but the little bits I learn here and there give me all sorts of ideas for new shortcuts. Just remember, if you want to change a keyboard shortcut you should do it in the User&#8217;s key bindings and not the Default key bindings.</p>
+
+<p><strong>Pro Tip:</strong> If you ever want to change a keyboard shortcut but can&#8217;t figure out what command is currently running open up Sublime&#8217;s built in terminal with <code>ctrl+`</code> then type <code>sublime.log_commands(True)</code>. Now when you execute your command from the menu you should see its name show up in the console. Just remember to turn logging off when you&#8217;re done :)</p>
+
+<h2>Sublime Package Control</h2>
+
+<p>If you only follow one piece of my advice make it this: <a href="http://wbond.net/sublime_packages/package_control">Install Sublime Package Control.</a></p>
+
+<p>Package Control makes it extremely easy to manage your Sublime plugins. It also helps with discovering new ones, which is nice. Just install it if you haven&#8217;t already, it&#8217;s impossible to live without.</p>
+
+<h2>Setting up a command line shortcut</h2>
+
+<p>I highly recommend setting up a symlink so you can easily open things with Sublime. <a href="http://www.sublimetext.com/docs/2/osx_command_line.html">This article details how to go about it on OSX.</a></p>
+
+<p>CLI FTW!</p>
+
+<h2>The Command Palette</h2>
+
+<p>OK, so hopefully you&#8217;ve setup Sublime Package Control. Maybe you&#8217;ve even installed some plugins. It&#8217;s time for you to meet the Command Palette then. <code>cmd+shift+p</code> will open up the window and from here you can execute just about any command either native to Sublime or part of a plugin. It is super useful for all those things you don&#8217;t run often enough to turn into full blown keyboard shortcuts. It&#8217;s also useful if you know the name of a command but can&#8217;t remember what section of the menu it lives under.</p>
+
+<h2>Goto Anything&#8230;</h2>
+
+<p>So you want to fly around your project like a ninja on methamphetamines, eh? Then the shortcut you want is <code>cmd+p</code>. Once you&#8217;ve opened the dialog try typing a filename. Useful right? But wait, there&#8217;s more&#8230;</p>
+
+<p>If you preface what you&#8217;re typing with a <code>@</code> it will look for &#8220;symbols&#8221; in the current file. Ex: <code>@foobar</code>. But just typing <code>@</code> will give you a nice file outline. The definition of what a symbol is depends on the file-type. In a Markdown file, for instance, it will list every header. In a JavaScript or Ruby file it will list every method of an object.</p>
+
+<p>One last trick. If instead of an <code>@</code> you preface things with an <code>:</code> you can type a line number instead and hit enter to jump to that point. Ex: <code>:415</code></p>
+
+<p>There are other keyboard shortcuts for jumping to a line and going to a symbol but why bother when you can just use <code>cmd+p</code> and some easy prefixing.</p>
+
+<h2>Splitting the editor windows</h2>
+
+<p>OK this one is also important and I can&#8217;t recommend it enough. <strong>Learn to split your editor windows.</strong> I never used this feature in previous IDEs and now I wonder how I ever lived without it. Whether you have a unit test in one window and an implementation in the other, or some HTML and CSS, this feature is just always handy.</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/sublime-split-panes.png" title="'Split windows in Sublime'" ></p>
+
+<p>I <em>live</em> in split panes. They&#8217;ve changed my workflow significantly for the better. Less time switching between files and finding your place is an incredible advantage. You can access them through <code>View &gt; Layouts</code>. It will behoove you to learn these keyboard shortcuts. Also learn the shortcuts for <code>View &gt; Focus Group</code> and <code>View &gt; Move File to Group</code>.</p>
+
+<h2>Selections</h2>
+
+<p>There are some neat selections which come in handy depending on your context. Personally I use Expand Selection to Tag, <code>cmd+shift+a</code> quite frequently when writing HTML. I also use Expand Selection to Line, <code>cmd+L</code> and Expand Selection to Word, <code>cmd+D</code> a lot.</p>
+
+<h2>Selections with Multiple Cursors</h2>
+
+<p>Multiple cursors&#8230; It&#8217;s one of those things you didn&#8217;t realize you needed until suddenly you had it and you were all like &#8220;WHAAAAAAAAT!&#8221;</p>
+
+<p>There are a handful of ways to activate multiple cursors in Sublime. Hitting <code>cmd+D</code> to select multiples of the same word will put us into a multi-cursor context.</p>
+
+<p>Another way to go about it is to highlight a block of text and hit <code>cmd+shift+L</code> which will split each line into its own selection. This is extremely useful when editing HTML where often times you have repeating elements and you want to tweak a class name on all of them.</p>
+
+<p>You can also just hold <code>cmd</code> and click around your file to add more cursors. Or you can hold <code>ctrl+shift</code> and tap either the up or down arrows to add a new cursor in that direction.</p>
+
+<h2>Moving Lines</h2>
+
+<p><code>Edit &gt; Line &gt; Swap Line Up</code></p>
+
+<p><code>Edit &gt; Line &gt; Swap Line Down</code></p>
+
+<p><code>Edit &gt; Line &gt; Duplicate Line</code></p>
+
+<p>Learn em. Love em. I changed my keyboard shortcut for these so I can&#8217;t recall what it is by default. Regardless I think I use these three commands more than any other so I would say if you only learn three shortcuts, make it these three.</p>
+
+<p><strong>Pro Tip:</strong> If you want to duplicate a block of code highlight it and hit <code>cmd+L</code> to select the new line before you hit <code>cmd+shift+D</code>. This way your duplicated block will appear on a new line, rather than next to the previous block of code.</p>
+
+<h2>Wrap your lines</h2>
+
+<p>If you&#8217;ve installed the <a href="https://github.com/SublimeText/Tag">Tag plugin</a> you should have some extra line wrapping methods. I would also recommend you install <a href="https://bitbucket.org/sublimator/sublime-2-zencoding">ZenCoding</a>. I&#8217;m suggesting this for two reasons:</p>
+
+<ol>
+<li>You get awesome new features&#8230;</li>
+<li>I can&#8217;t remember if what I&#8217;m about to say is native to Sublime or part of a plugin.</li>
+</ol>
+
+
+<p>OK with that out of the way&#8230;</p>
+
+<p>Let&#8217;s say you&#8217;re working on some HTML and you have a block of text that you&#8217;d like to wrap in a <code>p</code> tag. No problemo! Highlight the text and hit <code>ctrl+shift+w</code> or <code>Edit &gt; Tag &gt; Wrap Selection in Tag</code>. There&#8217;s a more advanced versions that comes with the ZenCoding plugin which lets you do really elaborate wrappings. I believe the keyboard shortcut for that is <code>ctrl+alt+w</code>. Personally I dislike using the <code>ctrl</code> key on my Mac laptop so I changed both of those keyboard shortcuts to the following:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>{ "keys": ["super+shift+r"], "command": "insert_snippet", "args": { "name": "Packages/XML/long-tag.sublime-snippet" } },
+</span><span class='line'>{ "keys": ["alt+shift+r"], "command": "wrap_zen_as_you_type",
+</span><span class='line'>"context": [
+</span><span class='line'>    {
+</span><span class='line'>      "operand": "text.html, text.xml",
+</span><span class='line'>      "operator": "equal",
+</span><span class='line'>      "match_all": true,
+</span><span class='line'>      "key": "selector"
+</span><span class='line'>    }
+</span><span class='line'>  ]
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You&#8217;ll notice that instead of just using a <code>wrap_in_tag</code> command name the first entry actually calls another command, <code>insert_snippet</code> and passes it an argument: <code>Packages/XML/long-tag.sublime.snippet</code> which is the location of a snippet file. Pretty cool trick!</p>
+
+<p>Also note that Sublime uses the term &#8220;super&#8221; to refer to the command</p>
+
+<h2>Bookmarks!</h2>
+
+<p>If you&#8217;re like me then you lose your place in large files. That&#8217;s where bookmarks can be a big help. <code>cmd+F2</code> will add a new bookmark on the page. The bookmark is tied to the line so if you use the move line up/down commands it will move the bookmark as well (nice). To cycle through your bookmarks just hit F2. The rest of the bookmark commands are located in <code>Goto &gt; Bookmarks</code>. Take note of the one that says <code>Select All Bookmarks</code> which will basically let you do a multi-selection on all of the lines you&#8217;ve already bookmarked.</p>
+
+<h2>Marks</h2>
+
+<p>Marks are very similar to bookmarks but they serve a different purpose. They&#8217;re located in <code>Edit &gt; Mark</code> and their keyboard shortcuts are a little weird because you need to hit <code>cmd+K</code> and then a secondary shortcut like <code>cmd+space</code>. I find myself using Marks a few times a day to do large selections. For instance if you have a big block of HTML it can be very tricky to stay inside the proper scope if you&#8217;re trying to delete all the contents of a very high level container. With Marks you can just put a mark on the opening line of the container, hit <code>cmd+shift+a</code> to select down to the bottom of the tag, and then hit <code>cmd+K, cmd+a</code> to select everything back to your previous mark. Marks can also be used to swap lines of text but I&#8217;ve never needed to do that in practice.</p>
+
+<h2>Hide the Sidebar</h2>
+
+<p>To hide the sidebar hit <code>cmd+K, cmd+B</code>. Since I work on a laptop I often hide the sidebar to give myself that extra 100px of reading space.</p>
+
+<h2>Turn off Minimap</h2>
+
+<p>Do you guys use that minimap thing in the top corner of the editor windows? I find it <em>incredibly</em> distracting and it also takes up screen space. To disable it go to <code>View &gt; Hide Minimap</code>.</p>
+
+<h2>Saving a project</h2>
+
+<p>This one might be obvious for many of you but it wasn&#8217;t something I was really taking advantage of until recently. Once you have a folder open it can be beneficial to save it as a project via the <code>Project &gt; Save Project As...</code> command. Save the project files in the root of your app and then whenever you do <code>Project &gt; Recent Projects...</code> it will open everything up with all your windows just as you left them.</p>
+
+<p>To switch between projects use <code>ctrl+cmd+p</code>.</p>
+
+<h2>Some awesome plugins</h2>
+
+<p>Sublime is all about plugins so here&#8217;s a list of some of my favorites. Once you have Package Control installed you can just hit <code>cmd+shift+p</code> and type <code>discover</code>, then hit enter which will take you to a page listing tons of plugins. Try out some (or all) of the ones below. They&#8217;re great :D</p>
+
+<ul>
+<li>AdvancedNewFile</li>
+<li>HtmlTidy</li>
+<li>Nettuts+ Fetch</li>
+<li>Prefixr</li>
+<li>RubyTest</li>
+<li>Shell Turtlestein</li>
+<li>SideBarEnhancements</li>
+<li>sublime-github</li>
+<li>Sublime-JSHint</li>
+<li>SublimeCodeIntel</li>
+<li>Tag</li>
+<li>ZenCoding</li>
+</ul>
+
+
+<h2>Convert Case</h2>
+
+<p>If you highlight some text you can use <code>cmd+K, cmd+U</code> to uppercase it. Likewise you can use <code>cmd+K, cmd+L</code> to lowercase it.</p>
+
+<h2>Spell Check :)</h2>
+
+<p>Finally I wouldn&#8217;t be much of a blogger if I didn&#8217;t point out the spell check feature. Hit <code>F6</code> to check your current file. Once you&#8217;ve turned it on the spell checker will stay on until you hit <code>F6</code> again.</p>
+
+<h2>Hack the Planet!</h2>
+
+<p>We&#8217;ve only really scratched the surface of what Sublime is capable of. In the future I&#8217;d like to write more about its awesome Macros, Snippets and Plugin architecture. Till then, have fun hacking. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 10:34 pm</li>
+<li>Mood: Tired, Lazy</li>
+<li>Sleep: 5</li>
+<li>Hunger: 5</li>
+<li>Coffee: 1</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2085,173 +2296,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/13/writing-a-command-line-tool-in-ruby/">Writing a Command Line Tool in Ruby</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-13T07:29:00-07:00" pubdate data-updated="true">Jun 13<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Yesterday I tried to do a post on creating your first Ruby Gem as a command line tool. <a href="http://robdodson.me/blog/2012/06/12/messing-around-with-gems/">It didn&#8217;t go very well.</a> In an effort to better understand what goes on with command line tools I&#8217;m going to start from the most basic, a ruby script that is in our <code>PATH</code>.</p>
-
-<p>I&#8217;ve previously added the folder <code>~/bin</code> to my PATH so I know that if I drop an executable script in there I should be able to run it by just typing its name. Let&#8217;s give that a shot. First we&#8217;ll make a new file just called <code>sherp</code> without any file extension. Make sure to <code>chmod 755 sherpa</code> so that it&#8217;s executable. Then we&#8217;ll add the following:</p>
-
-<figure class='code'><figcaption><span>~/bin/sherpa</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">puts</span> <span class="s1">&#39;I am the sherpa!!!&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If I now type <code>sherpa</code> into the command line, it should fire back <code>I am the sherpa!!!</code></p>
-
-<p>Ok cool so we&#8217;ve got that part working. Now let&#8217;s see if we can get some arguments in there. We&#8217;ll iterate the <code>ARGV</code> object to see what comes in.</p>
-
-<figure class='code'><figcaption><span>~/bin/sherpa</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
-</span><span class='line'>
-</span><span class='line'><span class="no">ARGV</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">arg</span><span class="o">|</span>
-</span><span class='line'>    <span class="nb">puts</span> <span class="n">arg</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>With that little bit of code we should be able to pass just about anything to our command and have it echoed back.</p>
-
-<figure class='code'><figcaption><span>~/bin/sherpa</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">sherpa</span> <span class="n">foo</span> <span class="n">bar</span> <span class="n">baz</span>
-</span><span class='line'>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="n">foo</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="n">bar</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="n">baz</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Ok cool. Now let&#8217;s step this up a notch or two. Let&#8217;s say we want to send in commands and options. For that we&#8217;ll use the built-in <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/optparse/rdoc/OptionParser.html">OptionParser</a>. Here&#8217;s <a href="http://rubylearning.com/blog/2011/01/03/how-do-i-make-a-command-line-tool-in-ruby/">a link to the article I&#8217;ve been following which details how to use the OptionParser.</a> In my case, I&#8217;m going to tell <code>sherpa</code> to either <code>say_hello</code> or <code>say_goodbye</code>. When I pass in the <code>-n</code> flag it should accept a name, otherwise it will use the name &#8216;Master&#8217;. So the line <code>sherpa say_hello -n Rob</code> should produce <code>Hello Rob</code> and likewise if I left off the option and just used <code>sherpa say_hello</code> it should produce <code>Hello Master</code>.</p>
-
-<p>Here&#8217;s the code to accomplish this:</p>
-
-<figure class='code'><figcaption><span>~/bin</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;optparse&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">opt_parser</span> <span class="o">=</span> <span class="no">OptionParser</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">opt</span><span class="o">|</span>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">banner</span> <span class="o">=</span> <span class="s2">&quot;Usage: opt_parser COMMAND [OPTIONS]&quot;</span>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;&quot;</span>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;Commands&quot;</span>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;     name: the name the sherpa should use when addressing you&quot;</span>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;&quot;</span>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;Options&quot;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">&quot;-n&quot;</span><span class="p">,</span><span class="s2">&quot;--name NAME&quot;</span><span class="p">,</span><span class="s2">&quot;tell the sherpa what to call you&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="nb">name</span><span class="o">|</span>
-</span><span class='line'>    <span class="n">options</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span> <span class="o">=</span> <span class="nb">name</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">&quot;-h&quot;</span><span class="p">,</span><span class="s2">&quot;--help&quot;</span><span class="p">,</span><span class="s2">&quot;help&quot;</span><span class="p">)</span> <span class="k">do</span>
-</span><span class='line'>    <span class="nb">puts</span> <span class="n">opt_parser</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">opt_parser</span><span class="o">.</span><span class="n">parse!</span>
-</span><span class='line'><span class="nb">name</span> <span class="o">=</span> <span class="n">options</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span> <span class="o">||</span> <span class="s1">&#39;Master&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">case</span> <span class="no">ARGV</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
-</span><span class='line'><span class="k">when</span> <span class="s2">&quot;say_hello&quot;</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;Hello </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="k">when</span> <span class="s2">&quot;say_goodbye&quot;</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;Goodbye </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="n">opt_parser</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And there we go, our first command line Ruby tool. I&#8217;ll pick it up tomorrow to try to improve upon it. We&#8217;re starting small but at least we have something that works!</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:31 am</li>
-<li>Mood: Tired, Patient</li>
-<li>Sleep: 6</li>
-<li>Hunger: 1</li>
-<li>Coffee: 0</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -2267,6 +2311,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/">Sublime Text 2 Tips and Shortcuts</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/23/failing-at-ruby/">Failing at Ruby</a>
       </li>
     
@@ -2280,10 +2328,6 @@
     
       <li class="post">
         <a href="/blog/2012/06/20/crawling-pages-with-mechanize-and-nokogiri/">Crawling pages with Mechanize and Nokogiri</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/18/outputting-json-from-ruby/">Outputting JSON from Ruby</a>
       </li>
     
   </ul>

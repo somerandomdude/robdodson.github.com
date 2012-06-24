@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="I want to work on a code generation tool, similar to the one offered up by Rails. However my Ruby-fu is a bit rusty at the moment so this might be an &hellip;">
+  <meta name="description" content="Yesterday I tried to do a post on creating your first Ruby Gem as a command line tool. It didn&#8217;t go very well. In an effort to better &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,173 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/13/writing-a-command-line-tool-in-ruby/">Writing a Command Line Tool in Ruby</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-13T07:29:00-07:00" pubdate data-updated="true">Jun 13<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Yesterday I tried to do a post on creating your first Ruby Gem as a command line tool. <a href="http://robdodson.me/blog/2012/06/12/messing-around-with-gems/">It didn&#8217;t go very well.</a> In an effort to better understand what goes on with command line tools I&#8217;m going to start from the most basic, a ruby script that is in our <code>PATH</code>.</p>
+
+<p>I&#8217;ve previously added the folder <code>~/bin</code> to my PATH so I know that if I drop an executable script in there I should be able to run it by just typing its name. Let&#8217;s give that a shot. First we&#8217;ll make a new file just called <code>sherp</code> without any file extension. Make sure to <code>chmod 755 sherpa</code> so that it&#8217;s executable. Then we&#8217;ll add the following:</p>
+
+<figure class='code'><figcaption><span>~/bin/sherpa</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">puts</span> <span class="s1">&#39;I am the sherpa!!!&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If I now type <code>sherpa</code> into the command line, it should fire back <code>I am the sherpa!!!</code></p>
+
+<p>Ok cool so we&#8217;ve got that part working. Now let&#8217;s see if we can get some arguments in there. We&#8217;ll iterate the <code>ARGV</code> object to see what comes in.</p>
+
+<figure class='code'><figcaption><span>~/bin/sherpa</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">ARGV</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">arg</span><span class="o">|</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="n">arg</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With that little bit of code we should be able to pass just about anything to our command and have it echoed back.</p>
+
+<figure class='code'><figcaption><span>~/bin/sherpa</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">sherpa</span> <span class="n">foo</span> <span class="n">bar</span> <span class="n">baz</span>
+</span><span class='line'>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="n">foo</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="n">bar</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="n">baz</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Ok cool. Now let&#8217;s step this up a notch or two. Let&#8217;s say we want to send in commands and options. For that we&#8217;ll use the built-in <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/optparse/rdoc/OptionParser.html">OptionParser</a>. Here&#8217;s <a href="http://rubylearning.com/blog/2011/01/03/how-do-i-make-a-command-line-tool-in-ruby/">a link to the article I&#8217;ve been following which details how to use the OptionParser.</a> In my case, I&#8217;m going to tell <code>sherpa</code> to either <code>say_hello</code> or <code>say_goodbye</code>. When I pass in the <code>-n</code> flag it should accept a name, otherwise it will use the name &#8216;Master&#8217;. So the line <code>sherpa say_hello -n Rob</code> should produce <code>Hello Rob</code> and likewise if I left off the option and just used <code>sherpa say_hello</code> it should produce <code>Hello Master</code>.</p>
+
+<p>Here&#8217;s the code to accomplish this:</p>
+
+<figure class='code'><figcaption><span>~/bin</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;optparse&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">opt_parser</span> <span class="o">=</span> <span class="no">OptionParser</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">opt</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">banner</span> <span class="o">=</span> <span class="s2">&quot;Usage: opt_parser COMMAND [OPTIONS]&quot;</span>
+</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;&quot;</span>
+</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;Commands&quot;</span>
+</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;     name: the name the sherpa should use when addressing you&quot;</span>
+</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;&quot;</span>
+</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;Options&quot;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">&quot;-n&quot;</span><span class="p">,</span><span class="s2">&quot;--name NAME&quot;</span><span class="p">,</span><span class="s2">&quot;tell the sherpa what to call you&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="nb">name</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">options</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span> <span class="o">=</span> <span class="nb">name</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">&quot;-h&quot;</span><span class="p">,</span><span class="s2">&quot;--help&quot;</span><span class="p">,</span><span class="s2">&quot;help&quot;</span><span class="p">)</span> <span class="k">do</span>
+</span><span class='line'>    <span class="nb">puts</span> <span class="n">opt_parser</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">opt_parser</span><span class="o">.</span><span class="n">parse!</span>
+</span><span class='line'><span class="nb">name</span> <span class="o">=</span> <span class="n">options</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span> <span class="o">||</span> <span class="s1">&#39;Master&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">case</span> <span class="no">ARGV</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
+</span><span class='line'><span class="k">when</span> <span class="s2">&quot;say_hello&quot;</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;Hello </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="k">when</span> <span class="s2">&quot;say_goodbye&quot;</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;Goodbye </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">opt_parser</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And there we go, our first command line Ruby tool. I&#8217;ll pick it up tomorrow to try to improve upon it. We&#8217;re starting small but at least we have something that works!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 7:31 am</li>
+<li>Mood: Tired, Patient</li>
+<li>Sleep: 6</li>
+<li>Hunger: 1</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2760,290 +2927,6 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/03/make-your-own-jquery-deferreds-and-promises/">Make Your Own jQuery Deferreds and Promises</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-03T20:33:00-07:00" pubdate data-updated="true">Jun 3<span>rd</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Last week <a href="http://robdodson.me/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/">I did a post on how to load an Underscore template using jQuery&#8217;s Deferred method</a>. I got some great feedback from folks and decided I should do a follow up showing how to create your own Deferreds.</p>
-
-<h3>What&#8217;s a Deferred again&#8230;?</h3>
-
-<p>So, quick summary time. jQuery has a neat little Object called a <code>Deferred</code> which is basically a wrapper around a function or a group of functions. Let&#8217;s say that you want to load 3 different json files via ajax and when all that&#8217;s done you want to let the rest of the world know. Using jQuery&#8217;s <code>Deferred</code> Object we can actually put a wrapper around those 3 ajax functions and fire off a callback when they&#8217;ve all finished. <a href="http://robdodson.me/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/">Refer back to my previous post (toward the bottom) where I explain some of these callbacks.</a></p>
-
-<p><code>Deferred</code> isn&#8217;t limited to ajax calls, it can work in just about any environment. Let&#8217;s do an example using jQuery&#8217;s animate function. We&#8217;ll fade an item and when it&#8217;s finished animating we&#8217;ll resolve our <code>Deferred</code> object.</p>
-
-<h3>Our First Deferred</h3>
-
-<p>Here&#8217;s the code we&#8217;ll be using in our index.html file:</p>
-
-<figure class='code'><figcaption><span>index.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
-</span><span class='line'><span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">&quot;en&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Deferred Sandbox<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;style </span><span class="na">type=</span><span class="s">&quot;text/css&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>      <span class="nf">#container</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">width</span><span class="o">:</span> <span class="m">100px</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">height</span><span class="o">:</span> <span class="m">100px</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">background</span><span class="o">:</span> <span class="m">#CCC</span><span class="p">;</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="nt">&lt;/style&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;jquery.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;main.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;main&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>      <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;container&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Take note of the fact that I&#8217;ve included jquery.js and main.js in the same folder as index.html. If you run the above you should get a simple little grey square in the top left of your screen. Now let&#8217;s dive into the JavaScript.</p>
-
-<figure class='code'><figcaption><span>main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">container</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$el</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// Store a reference to our element</span>
-</span><span class='line'>        <span class="c1">// on the page</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span> <span class="o">=</span> <span class="nx">$el</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">fadeOut</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// Create a new Deferred.</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">dfd</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span>
-</span><span class='line'>            <span class="nx">opacity</span><span class="o">:</span> <span class="mi">0</span>
-</span><span class='line'>        <span class="p">},</span> <span class="mi">2000</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>            <span class="c1">// When we&#39;re done animating</span>
-</span><span class='line'>            <span class="c1">// we&#39;ll resolve our Deferred.</span>
-</span><span class='line'>            <span class="c1">// This will call any done() callbacks</span>
-</span><span class='line'>            <span class="c1">// attached to either our Deferred or</span>
-</span><span class='line'>            <span class="c1">// one of its promises.</span>
-</span><span class='line'>            <span class="nx">dfd</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s2">&quot;Finished fading out!&quot;</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="c1">// Return an immutable promise object.</span>
-</span><span class='line'>        <span class="c1">// Clients can listen for its done or fail</span>
-</span><span class='line'>        <span class="c1">// callbacks but they can&#39;t resolve it themselves</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">dfd</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Hook the container object up to the #container div</span>
-</span><span class='line'>    <span class="nx">container</span><span class="p">.</span><span class="nx">initialize</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#container&#39;</span><span class="p">));</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Instruct the container to fade out. When we call</span>
-</span><span class='line'>    <span class="c1">// fadeOut we should get a promise back as a return value</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">promise</span> <span class="o">=</span> <span class="nx">container</span><span class="p">.</span><span class="nx">fadeOut</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Now that we have a promise we can hook a done callback</span>
-</span><span class='line'>    <span class="c1">// onto it. The done() method will fire once the promise</span>
-</span><span class='line'>    <span class="c1">// is resolved.</span>
-</span><span class='line'>    <span class="nx">promise</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>That&#8217;s a fair bit of code so let&#8217;s walk through it bit by bit. We start off by creating an object called <code>container</code> which is going to wrap the <code>#container</code> div already on the page. The real guts of container happens in the <code>fadeOut</code> method:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">fadeOut</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// Create a new Deferred.</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">dfd</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span>
-</span><span class='line'>        <span class="nx">opacity</span><span class="o">:</span> <span class="mi">0</span>
-</span><span class='line'>    <span class="p">},</span> <span class="mi">2000</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// When we&#39;re done animating</span>
-</span><span class='line'>        <span class="c1">// we&#39;ll resolve our Deferred.</span>
-</span><span class='line'>        <span class="c1">// This will call any done() callbacks</span>
-</span><span class='line'>        <span class="c1">// attached to either our Deferred or</span>
-</span><span class='line'>        <span class="c1">// one of its promises.</span>
-</span><span class='line'>        <span class="nx">dfd</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s2">&quot;Finished fading out!&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Return an immutable promise object.</span>
-</span><span class='line'>    <span class="c1">// Clients can listen for its done or fail</span>
-</span><span class='line'>    <span class="c1">// callbacks but they can&#39;t resolve it themselves</span>
-</span><span class='line'>    <span class="k">return</span> <span class="nx">dfd</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The first thing we do is to create a new <code>Deferred</code> using jQuery&#8217;s Deferred constructor. Ignore the animation function for a moment and look at the bottom of this method. See how we&#8217;re returning <code>dfd.promise()</code>? A promise is a dynamically generated object which lets clients hook onto our <code>done</code> and <code>fail</code> callbacks but it doesn&#8217;t let them do anything to change our original <code>Deferred</code> object. A promise is an <code>immutable</code> object, meaning clients can listen to it but they can&#8217;t really do anything to change it. We want this functionality because we don&#8217;t want someone else to come along and accidentally resolve our <code>Deferred</code>. So instead of returning the <code>Deferred</code> we just created, we only return its <code>promise</code>.</p>
-
-<p>OK back to the animation function:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">animate</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">opacity</span><span class="o">:</span> <span class="mi">0</span>
-</span><span class='line'><span class="p">},</span> <span class="mi">2000</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="c1">// When we&#39;re done animating</span>
-</span><span class='line'>    <span class="c1">// we&#39;ll resolve our Deferred.</span>
-</span><span class='line'>    <span class="c1">// This will call any done() callbacks</span>
-</span><span class='line'>    <span class="c1">// attached to either our Deferred or</span>
-</span><span class='line'>    <span class="c1">// one of its promises.</span>
-</span><span class='line'>    <span class="nx">dfd</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s2">&quot;Finished fading out!&quot;</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you&#8217;ve used <code>jQuery.animate</code> before this should look pretty straightforward to you. At the end of our animation we pass in an anonymouse function which will be run when the animation completes. In this function we tell our <code>Deferred</code> to resolve. Resolving the <code>Deferred</code> causes any <code>done</code> callbacks to fire. In this case we&#8217;re also passing along a little snippet of text. When you resolve a <code>Deferred</code> you can give it an optional payload object which will be passed to all the <code>done</code> callbacks. This is extremely useful if you&#8217;re using ajax to pass along the final data value. In this case we&#8217;re just going to log the message into the console:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">promise</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>There are more cool things you can do with <code>Deferreds</code> I highly recommend you <a href="http://api.jquery.com/category/deferred-object/">spend some time with the documentation</a> and trying out some of the other methods like <code>pipe</code> or <code>resolveWith</code>. Also as a side note <a href="http://api.jquery.com/promise/">checkout this page</a> which shows how to extract a <code>promise</code> by type. It will actually let you do everything we&#8217;ve done in our animation example but with fewer lines of code.</p>
-
-<p>Let me know if this is helpful or if you have any questions. Till tomorrow! - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 8:35 pm</li>
-<li>Mood: Silly, Lazy</li>
-<li>Sleep: 7</li>
-<li>Hunger: 5</li>
-<li>Coffee: 0</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -3061,6 +2944,10 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/">Sublime Text 2 Tips and Shortcuts</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/23/failing-at-ruby/">Failing at Ruby</a>
       </li>
     
@@ -3074,10 +2961,6 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
     
       <li class="post">
         <a href="/blog/2012/06/20/crawling-pages-with-mechanize-and-nokogiri/">Crawling pages with Mechanize and Nokogiri</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/18/outputting-json-from-ruby/">Outputting JSON from Ruby</a>
       </li>
     
   </ul>
