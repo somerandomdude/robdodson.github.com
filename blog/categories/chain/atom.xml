@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-24T01:02:30-07:00</updated>
+  <updated>2012-06-25T00:01:14-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,112 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Sublime Snippet Basics]]></title>
+    <link href="http://robdodson.me/blog/2012/06/24/sublime-snippet-basics/"/>
+    <updated>2012-06-24T22:48:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/24/sublime-snippet-basics</id>
+    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/">Yesterday I covered some tips and tricks</a> I've learned over the past few months of using Sublime. Something I didn't touch on is Sublime's Snippet architecture. Essentially a snippet is a little piece of code that gets executed when you type some characters and hit the <code>tab</code> key. For instance I have a snippet that spits out <code>console.log()</code> whenever I type <code>lg</code> and press <code>tab</code>. One clever feature of snippets is that they can be bound to a keyboard shortcut if the key binding calls the <code>insert_snippet</code> command and passes the path to the snippet file as an argument. For example:</p>
+
+<p>```json
+{</p>
+
+<pre><code>"keys": ["super+shift+r"], 
+"command": "insert_snippet", 
+"args": { 
+    "name": "Packages/XML/long-tag.sublime-snippet" 
+} 
+</code></pre>
+
+<p>}
+<code>``
+That will tell Sublime that when I press</code>cmd+shift+r<code>it should act as if I triggered the long-tag snippet for XML files. Basically that will let me highlight some text, hit</code>cmd+shift+r` and then I can type some HTML or XML tags to wrap my text. Cool. So let's go about writing our own snippet to learn a bit more about this process.</p>
+
+<h2>Getting Started</h2>
+
+<p>The previously mentioned snippet is great for wrapping an item in HTML/XML tags but it totally breaks if we need to wrap our selection in anything not existing within brackets: <code>&lt;/&gt;</code>. Since I write a lot of Markdown I'm always wrapping text in some kind of markdown syntax, <code>*like this*</code>, but there's no easy way to do this. The aforementioned snippet is close so we're going to copy it and tweak it to do what we need.</p>
+
+<p><a href="http://docs.sublimetext.info/en/latest/reference/snippets.html">The documentation on snippets for Sublime is short and full of good information. I suggest you read it before continuing on.</a></p>
+
+<p>We're going to copy the file located at <code>/Library/Application\ Support/Sublime\ Text\ 2/Packages/XML</code> and move it into our <code>/Packages/User</code> directory. I chose to rename the file to <code>wrap-anything.sublime-snippet</code>. The original snippet looks like this:</p>
+
+<p>```xml
+<snippet></p>
+
+<pre><code>&lt;content&gt;&lt;![CDATA[&lt;${1:p}&gt;${2:$SELECTION}&lt;/${1/([^ ]+).*/$1/}&gt;]]&gt;&lt;/content&gt;
+&lt;tabTrigger&gt;&amp;lt;&lt;/tabTrigger&gt;
+&lt;scope&gt;text.xml&lt;/scope&gt;
+&lt;description&gt;Long Tag&lt;/description&gt;
+</code></pre>
+
+<p></snippet>
+```</p>
+
+<p><code>&lt;content&gt;</code> is where we put everything that's going to be spit out by our snippet when it's executed. Items are wrapped in a <code>CDATA</code> tag so they don't interfere with the rest of the XML.</p>
+
+<p>The first part <code>&lt;${1:p}&gt;</code> outputs a <code>&lt;</code> followed by a variable, <code>$1</code> which has a default value of the letter "p" and it closes with a <code>&gt;</code>. If our snippet only contained this bit of code then when we ran it the output would be <code>&lt;p&gt;</code>.</p>
+
+<p>The second part uses one of the environment variables <a href="http://docs.sublimetext.info/en/latest/reference/snippets.html">talked about in the snippet documentation.</a> <code>$SELECTION</code> will take whatever we've highlighted and make it part of the snippet output. You'll notice this variable is prefixed with a <code>2:</code> meaning it's our second variable and it's default output is going to be whatever was highlighted. The 2 also indicates that if the user hits <code>tab</code> this is the second place they'll go.</p>
+
+<p>The third part contains a block of regex which, I think, just matches whatever the user types after the snippet has executed. My regex sucks so correct me if I'm wrong.</p>
+
+<p><code>&lt;tabTrigger&gt;</code> indicates what character should be typed before hitting <code>tab</code> to fire off the snippet. In this case it's a <code>&lt;</code></p>
+
+<p><code>&lt;scope&gt;</code> defines where the snippet should run I believe.. But I'm not entirely sure. The documentation just says "Scope selector to activate this snippet." I didn't see a text.xml file anywhere in the <code>Packages/XML/</code> folder and I know this snippet works in non-xml files so...yeah...<em>shrug</em></p>
+
+<p><code>&lt;description&gt;</code> lets you describe the thing. duh.</p>
+
+<p>OK let's make our own simplified snippet:</p>
+
+<p>```xml
+<snippet></p>
+
+<pre><code>&lt;content&gt;&lt;![CDATA[${1:`}${2:$SELECTION}${1}]]&gt;&lt;/content&gt;
+&lt;tabTrigger&gt;&lt;/tabTrigger&gt;
+&lt;scope&gt;&lt;/scope&gt;
+&lt;description&gt;Wrap any block of text&lt;/description&gt;
+</code></pre>
+
+<p></snippet>
+```</p>
+
+<p>Our snippet is less sophisticated than the previous one since we've excluded the regex. With the above snippet located in our <code>Packages/User/</code> folder we can tie it to a keyboard shortcut like so:</p>
+
+<p><code>json
+{ "keys": ["super+r"], "command": "insert_snippet", "args": { "name": "Packages/User/wrap-anything.sublime-snippet" } },
+</code></p>
+
+<p>Now when we hit <code>cmd+r</code> it will let us wrap our current selection in whatever we want :)</p>
+
+<p>For good measure here's a really useful console.log snippet that's triggered by typing <code>lg</code> and then pressing <code>tab</code>.</p>
+
+<p>```xml
+<snippet></p>
+
+<pre><code>&lt;content&gt;&lt;![CDATA[console.log(${1});]]&gt;&lt;/content&gt;
+&lt;tabTrigger&gt;lg&lt;/tabTrigger&gt;
+&lt;scope&gt;source.js&lt;/scope&gt;
+&lt;description&gt;console.log()&lt;/description&gt;
+</code></pre>
+
+<p></snippet>
+```</p>
+
+<p>No need to bind this to a keyboard shortcut (unless you want to) because it defines a tab trigger. I know this wasn't super in-depth but hopefully it gives you a little bit of a start. <a href="http://docs.sublimetext.info/en/latest/reference/snippets.html">Read the documentation on snippets</a> and tighten up your regex! - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 10:48 pm</li>
+<li>Mood: Tired, Lazy</li>
+<li>Sleep: 5</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Sublime Text 2 Tips and Shortcuts]]></title>
@@ -764,55 +870,6 @@ Having a horrible time getting anything to run tonight. The code from above is a
 <li>Mood: Tired, Annoyed</li>
 <li>Sleep: 6</li>
 <li>Hunger: 0</li>
-<li>Coffee: 1</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Crawling pages with Mechanize and Nokogiri]]></title>
-    <link href="http://robdodson.me/blog/2012/06/20/crawling-pages-with-mechanize-and-nokogiri/"/>
-    <updated>2012-06-20T00:09:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/20/crawling-pages-with-mechanize-and-nokogiri</id>
-    <content type="html"><![CDATA[<p>Short post tonight because I spent so much time figuring out the code. It's late and my brain is firing on about 1 cylinder so it took longer than I expected to get everything working.</p>
-
-<p>The scraper that I'm building is supposed to work like a spider and crawl of the pages of my blog. I wasn't sure what the best way to do that was so I started Googling and came up with <a href="http://mechanize.rubyforge.org/">Mechanize.</a> There are other tools built on top of Mechanize, like <a href="https://github.com/felipecsl/wombat">Wombat</a>, but since my task is so simple I figured I could just write everything I needed with Mechanize and Nokogiri. It's usually a better idea to work with simple tools when you're first grasping concepts so you don't get lost in the weeds of some high powered framework.</p>
-
-<p>Since it's late I'll let the code do the talking:</p>
-
-<p>``` ruby crawler.rb
-require 'mechanize'</p>
-
-<h1>Create a new instance of Mechanize and grab our page</h1>
-
-<p>agent = Mechanize.new
-page = agent.get('http://robdodson.me/blog/archives/')</p>
-
-<h1>Find all the links on the page that are contained within</h1>
-
-<h1>h1 tags.</h1>
-
-<p>post_links = page.links.find_all { |l| l.attributes.parent.name == 'h1' }</p>
-
-<h1>Click on one of our post links and store the response</h1>
-
-<p>post = post_links[1].click
-doc = page.parser # Same as Nokogiri::HTML(page.body)
-p doc
-```</p>
-
-<p>This code is hopefully easy enough to digest. After I get the page I find all of the links which are wrapped inside of an <code>h1</code>. Just as an example I <code>click</code> a link from the list using Array syntax and store the response in another var. You <em>could</em> click all of the links by iterating through the post_links object, and that's what we'll tackle tomorrow. For now I just follow 1 link and use a convenience method to parse the page with Nokogiri. After that we have a Nokogiri <code>doc</code> ready to be manipulated however we see fit.</p>
-
-<p><a href="https://gist.github.com/2958538">Here's a link to the Gist</a> if you'd like to tweak or play with the code. Pop it into <code>irb</code> and give it a shot. - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 12:10 am</li>
-<li>Mood: Tired, Introspective</li>
-<li>Sleep: 4.5</li>
-<li>Hunger: 2</li>
 <li>Coffee: 1</li>
 </ul>
 

@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Yesterday I tried to do a post on creating your first Ruby Gem as a command line tool. It didn&#8217;t go very well. In an effort to better &hellip;">
+  <meta name="description" content="So yesterday we saw how to setup and run ruby scripts as executables from the command line. While this is pretty rad, it definitely has its &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,219 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/14/how-to-write-a-command-line-ruby-gem/">How to Write a Command Line Ruby Gem</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-14T08:17:00-07:00" pubdate data-updated="true">Jun 14<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>So <a href="http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby/">yesterday we saw how to setup and run ruby scripts as executables from the command line.</a> While this is pretty rad, it definitely has its limitations. For one, it&#8217;s not very portable and secondly it just isn&#8217;t very flexible or powerful. If we stuck with this approach we&#8217;d need to write our own semantic versioning, we&#8217;d have to setup a way to make sure that all of our required 3rd party gems get installed properly&#8230; really it&#8217;ll just be a big mess if we try to hand-roll it.</p>
+
+<p>Instead we&#8217;re going to turn to Bundler to help us manage our files and turn our command line tool into a ruby gem. I&#8217;m going to start fresh and create a totally new tool, called <code>zerp</code>. I don&#8217;t know what <code>zerp</code>&#8217;s purpose will be in the long run, but today we&#8217;re going to make it print some text to verify everything is working.</p>
+
+<h2>New RVM Gemset</h2>
+
+<p>Before I do anything with gems I want to make sure I have a cleanroom of sorts. So if anything goes horribly wrong I can just throw everything away and start over. To do this we&#8217;ll use RVM to create a new gemset.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>rvm gemset create zerp
+</span><span class='line'>rvm gemset use zerp</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you run <code>rvm current</code> you should see something like this: <code>ruby-1.9.3-p125@zerp</code></p>
+
+<p>Now that we have our cleanroom we can template out a new gem.</p>
+
+<h2>Bundle Gem</h2>
+
+<p>If bundler is not one of our global gems we can go ahead and install it with <code>gem install bundler</code>. You can do <code>gem list</code> to see what gems are in your global set.</p>
+
+<p>With Bundler in hand we will generate the boilerplate for our new gem:</p>
+
+<p><code>bundle gem zerp</code></p>
+
+<p>This will create a new folder called <code>zerp/</code> and fill it with several files. <code>cd</code> into <code>zerp/</code> and take a look around.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>drwxr-xr-x  10 Rob  staff   340B Jun 14 08:38 .
+</span><span class='line'>drwxr-xr-x  21 Rob  staff   714B Jun 14 08:38 ..
+</span><span class='line'>drwxr-xr-x  11 Rob  staff   374B Jun 14 08:38 .git
+</span><span class='line'>-rw-r--r--   1 Rob  staff   154B Jun 14 08:38 .gitignore
+</span><span class='line'>-rw-r--r--   1 Rob  staff    89B Jun 14 08:38 Gemfile
+</span><span class='line'>-rw-r--r--   1 Rob  staff   1.0K Jun 14 08:38 LICENSE
+</span><span class='line'>-rw-r--r--   1 Rob  staff   490B Jun 14 08:38 README.md
+</span><span class='line'>-rw-r--r--   1 Rob  staff    48B Jun 14 08:38 Rakefile
+</span><span class='line'>drwxr-xr-x   4 Rob  staff   136B Jun 14 08:38 lib
+</span><span class='line'>-rw-r--r--   1 Rob  staff   626B Jun 14 08:38 zerp.gemspec</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Bundler has already setup a git project for us, as well as including a folder structure for our library. <a href="http://rails-bestpractices.com/blog/posts/8-using-bundler-and-rvm-to-build-a-rubygem">This article from rails-bestpractices.com does a great job of explaining what everything in the boilerplate is.</a></p>
+
+<h2>Zee Codez!</h2>
+
+<p>Our project contains a folder called <code>lib</code> which is where we&#8217;ll store our Ruby code. Open up <code>lib/zerp.rb</code>. We&#8217;ll populate it with an example class called <code>Chatter</code> which&#8217;ll spit out our version of Hello World.</p>
+
+<figure class='code'><figcaption><span>lib/zerp.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s2">&quot;zerp/version&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">module</span> <span class="nn">Zerp</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Chatter</span>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">say_hello</span>
+</span><span class='line'>      <span class="nb">puts</span> <span class="s1">&#39;This is zerp. Coming in loud and clear. Over.&#39;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Executable</h2>
+
+<p>It wouldn&#8217;t be much of a CLI without an executable. For that we&#8217;ll need to create a folder called <code>bin</code> in the root of our project. Next create a file called <code>zerp</code> without any kind of file extension. We&#8217;re going to require our <code>Chatter</code> class and tell it to <code>say_hello</code>.</p>
+
+<figure class='code'><figcaption><span>bin/zerp</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;zerp&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">chatter</span> <span class="o">=</span> <span class="no">Zerp</span><span class="o">::</span><span class="no">Chatter</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'><span class="n">chatter</span><span class="o">.</span><span class="n">say_hello</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The shebang <code>#!/usr/bin/env ruby</code> tells the system that it should use Ruby to execute our code. After that we require our &#8216;zerp&#8217; module defined previously. Finally we instantiate <code>Zerp::Chatter</code> and tell it to <code>say_hello</code>. If all goes well it should respond with</p>
+
+<figure class='code'><figcaption><span>bin/zerp</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">This</span> <span class="n">is</span> <span class="n">zerp</span><span class="o">.</span> <span class="no">Coming</span> <span class="k">in</span> <span class="n">loud</span> <span class="ow">and</span> <span class="n">clear</span><span class="o">.</span> <span class="no">Over</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&#8217;s see if we can make that happen.</p>
+
+<h2>Gemspec</h2>
+
+<p>We&#8217;re going to open the <code>zerp.gemspec</code> and make it look like so:</p>
+
+<figure class='code'><figcaption><span>zerp.gemspec</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># -*- encoding: utf-8 -*-</span>
+</span><span class='line'><span class="nb">require</span> <span class="no">File</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="s1">&#39;../lib/zerp/version&#39;</span><span class="p">,</span> <span class="bp">__FILE__</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Gem</span><span class="o">::</span><span class="no">Specification</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">gem</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">gem</span><span class="o">.</span><span class="n">authors</span>       <span class="o">=</span> <span class="o">[</span><span class="s2">&quot;Rob Dodson&quot;</span><span class="o">]</span>
+</span><span class='line'>  <span class="n">gem</span><span class="o">.</span><span class="n">email</span>         <span class="o">=</span> <span class="o">[</span><span class="s2">&quot;lets.email.rob@theawesomegmails.com&quot;</span><span class="o">]</span>
+</span><span class='line'>  <span class="n">gem</span><span class="o">.</span><span class="n">description</span>   <span class="o">=</span> <span class="sx">%q{When a problem comes along..You must zerp it}</span>
+</span><span class='line'>  <span class="n">gem</span><span class="o">.</span><span class="n">summary</span>       <span class="o">=</span> <span class="sx">%q{Now zerp it..Into shape}</span>
+</span><span class='line'>  <span class="n">gem</span><span class="o">.</span><span class="n">homepage</span>      <span class="o">=</span> <span class="s2">&quot;http://robdodson.me&quot;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">gem</span><span class="o">.</span><span class="n">files</span>         <span class="o">=</span> <span class="sb">`git ls-files`</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="vg">$\</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">gem</span><span class="o">.</span><span class="n">executables</span>   <span class="o">=</span> <span class="o">[</span><span class="s2">&quot;zerp&quot;</span><span class="o">]</span>
+</span><span class='line'>  <span class="n">gem</span><span class="o">.</span><span class="n">test_files</span>    <span class="o">=</span> <span class="n">gem</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">grep</span><span class="p">(</span><span class="sr">%r{^(test|spec|features)/}</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">gem</span><span class="o">.</span><span class="n">name</span>          <span class="o">=</span> <span class="s2">&quot;zerp&quot;</span>
+</span><span class='line'>  <span class="n">gem</span><span class="o">.</span><span class="n">require_paths</span> <span class="o">=</span> <span class="o">[</span><span class="s2">&quot;lib&quot;</span><span class="o">]</span>
+</span><span class='line'>  <span class="n">gem</span><span class="o">.</span><span class="n">version</span>       <span class="o">=</span> <span class="no">Zerp</span><span class="o">::</span><span class="no">VERSION</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The main thing I did was to correct the two &#8216;TODO&#8217; entries, and to change the <code>gem.executables</code> line from</p>
+
+<figure class='code'><figcaption><span>zerp.gemspec</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">grep</span><span class="p">(</span><span class="sr">%r{^bin/}</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">{</span> <span class="o">|</span><span class="n">f</span><span class="o">|</span> <span class="no">File</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>to</p>
+
+<figure class='code'><figcaption><span>zerp.gemspec</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">gem</span><span class="o">.</span><span class="n">executables</span>   <span class="o">=</span> <span class="o">[</span><span class="s2">&quot;zerp&quot;</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>For reaons unknown to me the previous code wasn&#8217;t picking up my executable properly so I replaced it with <code>["zerp"]</code>. I got the idea from <a href="https://github.com/lukebayes/project-sprouts/blob/master/sprout.gemspec">Project Sprouts which also uses this technique and seems to work fine on my system.</a></p>
+
+<p>Alright we&#8217;re done! Let&#8217;s test this thing!</p>
+
+<h2>Cross your fingers</h2>
+
+<p>To install the Gem we&#8217;ll use Rake&#8217;s <code>install</code> task. Go ahead and run <code>rake install</code> from the root of the project. It should create a <code>pkg</code> directory and notify us via the terminal that our gem was installed succesfully. Moment of truth time&#8230;type <code>zerp</code> into the terminal. If you see <code>This is zerp. Coming in loud and clear. Over.</code> then you&#8217;re good to go. After you&#8217;ve committed everything to Github and setup a RubyGems account you should be able to run <code>rake release</code> to send your gem out into the world where it can wow the jaded masses and delight with all its wonders. Good Luck! - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 8:18 am</li>
+<li>Mood: Awake, Antsy</li>
+<li>Sleep: 6</li>
+<li>Hunger: 2</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2481,452 +2694,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">Deploying Your First Node.js and Socket.io App to Heroku</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-04T22:01:00-07:00" pubdate data-updated="true">Jun 4<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>At my office we like to shoot each other from across the room with Nerf guns. In an effort to actually remain productive we&#8217;ve implemented a rule that whenever you get shot you&#8217;re dead for 1 hour. But that hour can be a little tricky to keep track of between players. Who&#8217;s dead and who isn&#8217;t? Am I about to be shot right now??</p>
-
-<p>In an effort to keep track of things (and also because I need to write a blog post) I decided to start working on a little <a href="http://nodejs.org/">Node.js</a> and <a href="http://socket.io/">Socket.io</a> app. In this first post I&#8217;m just going to get things setup and deploy them to Heroku. Hopefully tomorrow we can work on implementing the actual timers. If you&#8217;ve never worked with Heroku before <a href="https://devcenter.heroku.com/articles/quickstart">you&#8217;ll need to follow their getting started guide</a> to make sure you have all the proper command line tools. Don&#8217;t worry, it&#8217;s really easy and their documentation is <strong>awesome</strong>.</p>
-
-<h3>Express it!</h3>
-
-<p>To start us off we&#8217;ll use <a href="http://expressjs.com/">Express</a> since it provides a nice, <a href="http://www.sinatrarb.com/">Sinatra</a> like layer on top of Node. If you haven&#8217;t installed Node yet you can do it from the <a href="http://nodejs.org/">Node.js</a> site. The installer will also include <code>npm</code> which is Node&#8217;s package manager. Following the instructions on the <a href="http://expressjs.com/">Express</a> site you should be able to just type:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>npm install -g express</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now that you have Express installed you can use it to create a new project.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>express defcon</span></code></pre></td></tr></table></div></figure>
-
-
-<p>
-I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://en.wikipedia.org/wiki/WarGames">WarGames</a>. You can call yours whatever you&#8217;d like :)</p>
-
-<p>Next we need to <code>cd</code> into the defcon folder so we can install Socket.io and our other dependencies. There&#8217;s a version of Socket.io designed to work with Express so we&#8217;ll install that one.</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>npm install -d  # install Express dependencies
-</span><span class='line'>npm install socket.io express</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We&#8217;ll also need to add socket.io to our <code>package.json</code> which is similar to a <code>Gemfile</code> if you&#8217;re coming from Ruby, or just a big list of file dependencies if you&#8217;re coming from something else :D When you distribute your app other developers can just run &#8216;npm install -d&#8217; and it will add all of the modules listed to their project. Heroku will also use our <code>package.json</code> when we push our app to their servers. I&#8217;m also going to replace the <a href="http://jade-lang.com/">Jade</a> rendering engine with <a href="http://embeddedjs.com/">EJS</a> since it&#8217;s easier for me to work with.</p>
-
-<figure class='code'><figcaption><span>package.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;defcon&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;version&quot;</span><span class="o">:</span> <span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;private&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;dependencies&quot;</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>      <span class="s2">&quot;express&quot;</span><span class="o">:</span> <span class="s2">&quot;~2.5.8&quot;</span><span class="p">,</span>
-</span><span class='line'>      <span class="s2">&quot;ejs&quot;</span><span class="o">:</span> <span class="s2">&quot;~0.7.1&quot;</span><span class="p">,</span>
-</span><span class='line'>      <span class="s2">&quot;socket.io&quot;</span><span class="o">:</span> <span class="s2">&quot;~0.9.6&quot;</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="s2">&quot;engines&quot;</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;node&quot;</span><span class="o">:</span> <span class="s2">&quot;0.6.x&quot;</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The tilde <code>~</code> character tells NPM that it&#8217;s ok to install this version of our module, or anything less than the next highest version number. So the following are equivalent: <code>"~1.2" = "&gt;=1.2.0 &lt;2.0.0"</code>. This is typically a good practice with modules because you&#8217;d like to receive bug fixes and patches but you don&#8217;t want to let your app potentially download a v2 of some library which breaks the API.</p>
-
-<p>Run <code>npm install -d</code> again to make sure that <code>ejs</code> and anything else you&#8217;ve added are properly installed. Open up your app.js file that Express provided for you. We&#8217;ll need to change a lot of stuff so it&#8217;s probably easiest for you to just copy and paste this one that I&#8217;ve already prepared. Paste it into a new file if you&#8217;d like so you can compare all the differences.</p>
-
-<figure class='code'><figcaption><span>app.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;express&#39;</span><span class="p">),</span>
-</span><span class='line'>    <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="nx">logger</span><span class="p">()),</span>
-</span><span class='line'>    <span class="nx">io</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;socket.io&#39;</span><span class="p">).</span><span class="nx">listen</span><span class="p">(</span><span class="nx">app</span><span class="p">),</span>
-</span><span class='line'>    <span class="nx">routes</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./routes&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Configuration</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">configure</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">app</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;views&#39;</span><span class="p">,</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/views&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="nx">app</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;view engine&#39;</span><span class="p">,</span> <span class="s1">&#39;ejs&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="nx">bodyParser</span><span class="p">());</span>
-</span><span class='line'>  <span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="nx">methodOverride</span><span class="p">());</span>
-</span><span class='line'>  <span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">app</span><span class="p">.</span><span class="nx">router</span><span class="p">);</span>
-</span><span class='line'>  <span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="kr">static</span><span class="p">(</span><span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;/public&#39;</span><span class="p">));</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">configure</span><span class="p">(</span><span class="s1">&#39;development&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="nx">errorHandler</span><span class="p">({</span> <span class="nx">dumpExceptions</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">showStack</span><span class="o">:</span> <span class="kc">true</span> <span class="p">}));</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">configure</span><span class="p">(</span><span class="s1">&#39;production&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="nx">errorHandler</span><span class="p">());</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Heroku won&#39;t actually allow us to use WebSockets</span>
-</span><span class='line'><span class="c1">// so we have to setup polling instead.</span>
-</span><span class='line'><span class="c1">// https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku</span>
-</span><span class='line'><span class="nx">io</span><span class="p">.</span><span class="nx">configure</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">io</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;transports&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;xhr-polling&quot;</span><span class="p">]);</span>
-</span><span class='line'>  <span class="nx">io</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s2">&quot;polling duration&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Routes</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">port</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">5000</span><span class="p">;</span> <span class="c1">// Use the port that Heroku provides or default to 5000</span>
-</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">port</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Express server listening on port %d in %s mode&quot;</span><span class="p">,</span> <span class="nx">app</span><span class="p">.</span><span class="nx">address</span><span class="p">().</span><span class="nx">port</span><span class="p">,</span> <span class="nx">app</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">env</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="nx">routes</span><span class="p">.</span><span class="nx">index</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">status</span> <span class="o">=</span> <span class="s2">&quot;All is well.&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">status</span><span class="o">:</span> <span class="nx">status</span> <span class="p">});</span> <span class="c1">// note the use of io.sockets to emit but socket.on to listen</span>
-</span><span class='line'>  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">status</span> <span class="o">=</span> <span class="s2">&quot;War is imminent!&quot;</span><span class="p">;</span>
-</span><span class='line'>    <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">status</span><span class="o">:</span> <span class="nx">status</span> <span class="p">});</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In my views folder I&#8217;ve created a <code>layout.ejs</code>&#8230;</p>
-
-<figure class='code'><figcaption><span>views/layout.ejs </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
-</span><span class='line'><span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">&quot;en&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Title<span class="nt">&lt;/title&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;description&quot;</span> <span class="na">content=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;author&quot;</span> <span class="na">content=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c">&lt;!-- HTML5 shim, for IE6-8 support of HTML elements --&gt;</span>
-</span><span class='line'>    <span class="c">&lt;!--[if lt IE 9]&gt;</span>
-</span><span class='line'><span class="c">      &lt;script src=&quot;http://html5shim.googlecode.com/svn/trunk/html5.js&quot;&gt;&lt;/script&gt;</span>
-</span><span class='line'><span class="c">    &lt;![endif]--&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c">&lt;!-- styles --&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">&quot;/css/main.css&quot;</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
-</span><span class='line'>    <span class="err">&lt;</span>%- body %&gt;
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;/socket.io/socket.io.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;/js/libs/jquery.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;/js/main.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
-</span><span class='line'><span class="nt">&lt;/html&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>and an <code>index.ejs</code>.</p>
-
-<figure class='code'><figcaption><span>views/index.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;status&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;button</span> <span class="na">id=</span><span class="s">&quot;reset&quot;</span><span class="nt">&gt;</span>Reset!<span class="nt">&lt;/button&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you&#8217;d like you can open up <code>routes/index.js</code> and look around but you don&#8217;t need to. It should render <code>layout.ejs</code> and <code>index.ejs</code> by default.</p>
-
-<p>A few more items to go&#8230;We need to add a copy of <a href="http://jquery.com/">jQuery</a> to our <code>public</code> folder and also a <code>main.js</code> file. I&#8217;ve renamed the structure to look like this:</p>
-
-<figure class='code'><figcaption><span>views/index.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>public
-</span><span class='line'>|
-</span><span class='line'>|_ css
-</span><span class='line'>|_ img
-</span><span class='line'>|_ js
-</span><span class='line'>    |_ libs
-</span><span class='line'>        |_ jquery.js
-</span><span class='line'>    |_ plugins
-</span><span class='line'>    |_ main.js
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I guess that&#8217;s just a habit of using Backbone Boilerplate all the time :) Here&#8217;s what <code>main.js</code> should look like:</p>
-
-<figure class='code'><figcaption><span>public/js/main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">socket</span> <span class="o">=</span> <span class="nx">io</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#status&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">status</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#reset&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>It&#8217;s important to note the line that says <code>var socket = io.connect(window.location.hostname);</code>. In the socket.io docs they usually tell you to connect to <code>localhost</code> but since we&#8217;re on heroku we&#8217;ll need to instead connect to whatever our custom domain is.</p>
-
-<h3>Cross your fingers</h3>
-
-<p>At this point we should be ready to test everything. From the root of your project run <code>node app.js</code>. If all goes well you should see something like this:</p>
-
-<figure class='code'><figcaption><span>public/js/main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'>   <span class="nx">info</span>  <span class="o">-</span> <span class="nx">socket</span><span class="p">.</span><span class="nx">io</span> <span class="nx">started</span>
-</span><span class='line'><span class="nx">Express</span> <span class="nx">server</span> <span class="nx">listening</span> <span class="nx">on</span> <span class="nx">port</span> <span class="mi">5000</span> <span class="k">in</span> <span class="nx">development</span> <span class="nx">mode</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If not leave me a comment and I&#8217;ll see if I can help you debug it. However let&#8217;s assume that everything DID go well for you and now you&#8217;re ready to connect to the local version of your app. Point your browser to http://localhost:5000 and you should see something like this:</p>
-
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/all_is_well_with_sockets.png" title="'All is well with Socket.io'" ></p>
-
-<p>Now open another browser window and also point it at localhost:5000. In one of the windows click the button that says <code>Reset</code> which should change the copy in <em>both</em> windows to &#8216;War is imminent!&#8217;</p>
-
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/war_is_imminent_sockets.png" title="'War is Immentin with Socket.io'" ></p>
-
-<h3>Git&#8217;er done!</h3>
-
-<p>Alright we should have a functioning app at this point so let&#8217;s put this baby into Git.</p>
-
-<figure class='code'><figcaption><span>public/js/main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">git</span> <span class="nx">init</span>
-</span><span class='line'><span class="nx">echo</span> <span class="s1">&#39;node_modules&#39;</span> <span class="o">&gt;&gt;</span> <span class="p">.</span><span class="nx">gitignore</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We&#8217;ll ignore the node_modules directory so Heroku can create its own version. Heroku requires that we deploy our app from Git which is kind of an awesome practice. We&#8217;ll also need to define a <code>Procfile</code> which will list the processes that our app can run.</p>
-
-<figure class='code'><figcaption><span>public/js/main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">touch</span> <span class="nx">Procfile</span>
-</span><span class='line'><span class="nx">echo</span> <span class="s1">&#39;web: node app.js&#39;</span> <span class="o">&gt;&gt;</span> <span class="nx">Procfile</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>To verify that our <code>Procfile</code> is working we can use Heroku&#8217;s built in utility called <code>foreman</code>.</p>
-
-<figure class='code'><figcaption><span>public/js/main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">$</span> <span class="nx">foreman</span> <span class="nx">start</span>
-</span><span class='line'>
-</span><span class='line'><span class="mi">23</span><span class="o">:</span><span class="mi">47</span><span class="o">:</span><span class="mi">32</span> <span class="nx">web</span><span class="p">.</span><span class="mi">1</span>     <span class="o">|</span> <span class="nx">started</span> <span class="kd">with</span> <span class="nx">pid</span> <span class="mi">53197</span>
-</span><span class='line'><span class="mi">23</span><span class="o">:</span><span class="mi">47</span><span class="o">:</span><span class="mi">32</span> <span class="nx">web</span><span class="p">.</span><span class="mi">1</span>     <span class="o">|</span> <span class="nx">info</span><span class="o">:</span> <span class="nx">socket</span><span class="p">.</span><span class="nx">io</span> <span class="nx">started</span>
-</span><span class='line'><span class="mi">23</span><span class="o">:</span><span class="mi">47</span><span class="o">:</span><span class="mi">32</span> <span class="nx">web</span><span class="p">.</span><span class="mi">1</span>     <span class="o">|</span> <span class="nx">Express</span> <span class="nx">server</span> <span class="nx">listening</span> <span class="nx">on</span> <span class="nx">port</span> <span class="mi">5000</span> <span class="k">in</span> <span class="nx">development</span> <span class="nx">mode</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Point your browser to <code>localhost:5000</code> to verify that things are still working. If everything looks good we&#8217;re ready to commit to git.</p>
-
-<figure class='code'><figcaption><span>public/js/main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">git</span> <span class="nx">add</span> <span class="p">.</span>
-</span><span class='line'><span class="nx">git</span> <span class="nx">commit</span> <span class="o">-</span><span class="nx">m</span> <span class="s1">&#39;initial commit&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Deploy to Heroku</h3>
-
-<p>Now that our app is safely tucked away in git it&#8217;s time to fire up a new Heroku instance.</p>
-
-<figure class='code'><figcaption><span>public/js/main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">$</span> <span class="nx">heroku</span> <span class="nx">create</span> <span class="o">--</span><span class="nx">stack</span> <span class="nx">cedar</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Heroku will do the work of setting up a new <code>git remote</code> for us to push our app to.</p>
-
-<figure class='code'><figcaption><span>public/js/main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">$</span> <span class="nx">git</span> <span class="nx">push</span> <span class="nx">heroku</span> <span class="nx">master</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We&#8217;ll need to scale our web process before we can use the app.</p>
-
-<figure class='code'><figcaption><span>public/js/main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">$</span> <span class="nx">heroku</span> <span class="nx">ps</span><span class="o">:</span><span class="nx">scale</span> <span class="nx">web</span><span class="o">=</span><span class="mi">1</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>To see which processes are running on Heroku you can use the <code>heroku ps</code> command.</p>
-
-<figure class='code'><figcaption><span>public/js/main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">$</span> <span class="nx">heroku</span> <span class="nx">ps</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">Process</span>       <span class="nx">State</span>               <span class="nx">Command</span>
-</span><span class='line'><span class="o">------------</span>  <span class="o">------------------</span>  <span class="o">--------------------------------------------</span>
-</span><span class='line'><span class="nx">web</span><span class="p">.</span><span class="mi">1</span>         <span class="nx">up</span> <span class="k">for</span> <span class="mi">10</span><span class="nx">s</span>          <span class="nx">node</span> <span class="nx">app</span><span class="p">.</span><span class="nx">js</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>With everything setup we should be able to run <code>heroku open</code> which will fire up our browser and direct it to an instance of our app. There seems to be a fair bit of latency so it can take several seconds for the initial status of &#8216;All is well&#8217; to show up. If you see the Reset button with nothing above it give it around 10 seconds to see if it eventually updates. Open another browser window and point it at the Heroku domain in the address bar. If you press the Reset button in one window it should immediately update in the next one.</p>
-
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/heroku_war_is_imminent.png" title="'Heroku: War is Imminent'" ></p>
-
-<h3>Wrapping up</h3>
-
-<p>Well I hope you enjoyed this brief tour of Socket.io and Heroku. Before we sign off let&#8217;s make sure to turn off the running process on our Heroku instance:</p>
-
-<figure class='code'><figcaption><span>public/js/main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">$</span> <span class="nx">heroku</span> <span class="nx">ps</span><span class="o">:</span><span class="nx">scale</span> <span class="nx">web</span><span class="o">=</span><span class="mi">0</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If all went well you should have a decent starting point to build your own Socket.io app. If you&#8217;re still having trouble checkout some of the great documentation from Heroku and/or leave a comment:</p>
-
-<p><a href="https://devcenter.heroku.com/articles/nodejs">https://devcenter.heroku.com/articles/nodejs</a></p>
-
-<p><a href="https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku">https://devcenter.heroku.com/articles/using-socket-io-with-node-js-on-heroku</a></p>
-
-<p>Good Luck! - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 10:02 pm</li>
-<li>Mood: Tired, Antsy</li>
-<li>Sleep: 5</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -2944,6 +2711,10 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/24/sublime-snippet-basics/">Sublime Snippet Basics</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/">Sublime Text 2 Tips and Shortcuts</a>
       </li>
     
@@ -2957,10 +2728,6 @@ I&#8217;m calling my project <code>defcon</code> because I luvz <a href="http://
     
       <li class="post">
         <a href="/blog/2012/06/21/quick-spider-example/">Quick Spider Example</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/20/crawling-pages-with-mechanize-and-nokogiri/">Crawling pages with Mechanize and Nokogiri</a>
       </li>
     
   </ul>
