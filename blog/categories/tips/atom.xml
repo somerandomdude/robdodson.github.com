@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Tips | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/tips/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-25T00:01:14-07:00</updated>
+  <updated>2012-06-25T10:54:59-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -120,7 +120,7 @@
 <code>``
 You'll notice that instead of just using a</code>wrap_in_tag<code>command name the first entry actually calls another command,</code>insert_snippet<code>and passes it an argument:</code>Packages/XML/long-tag.sublime.snippet` which is the location of a snippet file. Pretty cool trick!</p>
 
-<p>Also note that Sublime uses the term "super" to refer to the command</p>
+<p>Also note that Sublime uses the term "super" to refer to the command key</p>
 
 <h2>Bookmarks!</h2>
 
