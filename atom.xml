@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-25T10:54:59-07:00</updated>
+  <updated>2012-06-26T00:47:56-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,54 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Ending My First Chain]]></title>
+    <link href="http://robdodson.me/blog/2012/06/25/ending-my-first-chain/"/>
+    <updated>2012-06-25T22:58:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/06/25/ending-my-first-chain</id>
+    <content type="html"><![CDATA[<p>On April 28th, <a href="http://www.facebook.com/photo.php?fbid=964312982287&amp;set=a.616835240467.2181266.39601696&amp;type=1">I vowed to write a blog post a day until I had to go to Europe.</a> Of course the real threat was that if I failed to do so I would have to give 500 dollars to the Republican party, most likely to John Boehner. In my original post I said I would write till the 27th but I&#8217;ve moved that date up so I can spend tomorrow night packing and wrapping things up in the city before I head out on my trip. So tonight&#8217;s post will mark the end of my first chain which means it&#8217;s time for a little post-mortem.</p>
+
+<h2>Why Did I Do It?</h2>
+
+<p>Everything started because of a <a href="http://japhr.blogspot.com/2012/04/366-or-how-i-tricked-myself-into-being.html">blog post written by a fellow named Christ Strom.</a> Chris wrote every single day, for a year, and in that time he managed to self publish 3 books. I think many people would be happy to publish a book in like a couple years. At Chris&#8217; rate he was cranking one out nearly every 3-4 months. Amazing.</p>
+
+<p>I started thinking&#8230; this whole writing thing has got to be like exercise. If you just will yourself to do it, it&#8217;ll be hard at first but after a while <em>surely</em> it becomes a habit. And who doesn&#8217;t want to be in the habit of exercising more?</p>
+
+<p>Writing, self-reflection, discovery&#8230; these are <em>really</em> important. I get by in my career by reading the stuff that other people have been generous enough to put down on the page (or blog, as the case may be). If I have a problem I just type it into the little magical Google box and out pops an answer.</p>
+
+<h1>That&#8217;s fucking incredible!</h1>
+
+<p>But that system doesn&#8217;t exist unless some of us pay back into it. None of this information that we take for granted is being churned out by some machine. It&#8217;s churned out by people! And do you know how hard it is to churn out meaningful, useful information with depth and substance and ethos?</p>
+
+<h1>It&#8217;s fucking hard!</h1>
+
+<p>And because it&#8217;s hard, like exercise, most of us don&#8217;t do it. Well I say, fuck that! We can all be better at what we do, especially if it&#8217;s going to be our life&#8217;s work. For me that means setting aside some time to work a little extra and write about my successes and failures. It means willing myself to push beyond what I normally think I can do and hoping that if I stick with it, eventually pieces will fall into place, doors will unlock, and the heavens will rain cheeseburgers and High West rye whiskey.</p>
+
+<h2>What Did I Learn?</h2>
+
+<p>In the process of writing every day, for 60 days, I learned a ton. My posts were at times very scattershot, Ruby one day, D3.js the next, random Sublime tips after that, etc etc etc. I get frustrated and I need to switch gears. This is something I have to work on.</p>
+
+<p>There was a part of me that didn&#8217;t think I would be able to go all 60 days. I have been a total quitter more times than I&#8217;d like to admit and the older I get the more I realize what a massive disservice that is to one&#8217;s self. Finishing isn&#8217;t the most important thing, it&#8217;s the <em>only</em> thing. It doesn&#8217;t matter if you finish in a fucked up death race mobile covered in sinew and tree branches&#8230; just finish!</p>
+
+<h2>What&#8217;s Next?</h2>
+
+<p>So what now?</p>
+
+<p>Well I&#8217;ve got two ideas kicking around. One is to keep following in Chris&#8217; steps and to self publish a book. I was dead set on this until a very fateful evening when I watched <a href="http://buy.indiegamethemovie.com/">Indie Game: The Movie.</a> Now I can&#8217;t get the idea of self-publishing a <em>very</em> tiny game out of my mind&#8230; Thankfully I have 3 weeks in Europe to think it over :D - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 10:58 pm</li>
+<li>Mood: Tired, Relaxed</li>
+<li>Sleep: 6</li>
+<li>Hunger: 8</li>
+<li>Coffee: 1</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Sublime Snippet Basics]]></title>
@@ -4150,97 +4198,6 @@
 <li>Time: 7:50 am</li>
 <li>Mood: Tired</li>
 <li>Sleep: 6</li>
-<li>Hunger: 4</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Building a Countdown Timer with Socket.io]]></title>
-    <link href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/"/>
-    <updated>2012-06-05T08:07:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io</id>
-    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io-pt-2/">Click here for part 2.</a></p>
-
-<p>Yesterday I put together a very simple Node/Socket.io application and showed how to deploy it to Heroku. Today I&#8217;m going to keep going with that app to see if I can get the functionality that I want. The app is a basic stopwatch so that shouldn&#8217;t be too hard. If you want to catch up <a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">checkout yesterday&#8217;s article</a> which explains setting everything up.</p>
-
-<h3>Countdown</h3>
-
-<p>Just to get the ball rolling I&#8217;m going to write a little code in my <code>app.js</code> file right at the bottom to setup a very crude counter.</p>
-
-<figure class='code'><figcaption><span>app.js  </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">countdown</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
-</span><span class='line'><span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">countdown</span><span class="o">--</span><span class="p">;</span>
-</span><span class='line'>  <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;timer&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">countdown</span><span class="o">:</span> <span class="nx">countdown</span> <span class="p">});</span>
-</span><span class='line'><span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">countdown</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
-</span><span class='line'>    <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;timer&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">countdown</span><span class="o">:</span> <span class="nx">countdown</span> <span class="p">});</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Elsewhere in my client-side js I&#8217;m going to listen for the <code>timer</code> event and update my DOM elements.</p>
-
-<figure class='code'><figcaption><span>main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">socket</span> <span class="o">=</span> <span class="nx">io</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;timer&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#counter&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">countdown</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#reset&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You&#8217;ll also need to update your index.ejs file so it reads like this:</p>
-
-<figure class='code'><figcaption><span>views/index.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;counter&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;button</span> <span class="na">id=</span><span class="s">&quot;reset&quot;</span><span class="nt">&gt;</span>Reset!<span class="nt">&lt;/button&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Every second we&#8217;ll decrement our countdown variable and broadcast its new value. If a client sends us a <code>reset</code> event we&#8217;ll restart the timer and immediately broadcast the update to anyone connected. I noticed that since I&#8217;m using <code>xhr-polling</code> it can sometimes take a while for the timer to show up in my browser so keep that in mind.</p>
-
-<p>While this implementation isn&#8217;t pretty it does get us a little bit further down the road. Unfortunately I&#8217;ve been tripped up by a bunch of Node&#8217;s module issues so I have to cut tonight&#8217;s post short :\</p>
-
-<p>Hopefully better luck tomorrow. - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 8:08 am</li>
-<li>Mood: Sedate, Sleepy</li>
-<li>Sleep: 5</li>
 <li>Hunger: 4</li>
 <li>Coffee: 0</li>
 </ul>

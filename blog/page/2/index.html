@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="So yesterday we saw how to setup and run ruby scripts as executables from the command line. While this is pretty rad, it definitely has its &hellip;">
+  <meta name="description" content="This post is going to be short and sweet because I have to help my lady pack for her big trip to Germany. Over the past few days I&#8217;ve been &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,106 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/">How to Run a Node Script From the Command Line</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-15T19:46:00-07:00" pubdate data-updated="true">Jun 15<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This post is going to be short and sweet because I have to help my lady pack for her big trip to Germany. Over the past few days I&#8217;ve been messing around with command line tools written in Ruby so today I decided to give it a shot in Node.</p>
+
+<p>We&#8217;re going to start small in this first post and just get a little script running. After that we&#8217;ll step it up so it can be distributed using NPM, <a href="http://robdodson.me/blog/2012/06/14/how-to-write-a-command-line-ruby-gem/">just like we did with our previous Ruby gem.</a></p>
+
+<h2>First write some codez</h2>
+
+<p>Make a new directory called <code>compliment</code> and create two files inside of it: <code>comliment.js</code> and <code>package.json</code>.</p>
+
+<p>In <code>compliment.js</code> we&#8217;re just going to print out some kind words.</p>
+
+<figure class='code'><figcaption><span>compliment/compliment.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="err">#</span><span class="o">!</span> <span class="err">/usr/bin/env node</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;you. are. AWESOME!&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Simple enough right? Just make sure you include that shebang up at the top which directs the system to use Node to execute our script.</p>
+
+<h2>Package it up</h2>
+
+<p>Ok now that we have our little script we&#8217;ll give its <code>package.json</code> some love.</p>
+
+<figure class='code'><figcaption><span>compliment/package.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;compliment&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;version&quot;</span><span class="o">:</span> <span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;description&quot;</span><span class="o">:</span> <span class="s2">&quot;Tell us how awesome we are.&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;preferGlobal&quot;</span><span class="o">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;bin&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;compliment&quot;</span><span class="o">:</span> <span class="s2">&quot;compliment.js&quot;</span> <span class="p">},</span>
+</span><span class='line'>    <span class="s2">&quot;author&quot;</span><span class="o">:</span> <span class="s2">&quot;Rob Dodson&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;engines&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;node&quot;</span><span class="o">:</span> <span class="s2">&quot;*&quot;</span> <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Most of that should be self explanatory. The key aspect is the <code>bin</code> section where you tell it to translate <code>compliment</code> into <code>compliment.js</code>. To install it all we have to do is run <code>npm link</code>. After you&#8217;ve done that you should be able to type <code>compliment</code> and hear how awesome you are!</p>
+
+<p>Keep in mind this isn&#8217;t distributable just yet, we&#8217;ll work on that tomorrow. Till then have fun playing with your new powers :D</p>
+
+<ul>
+<li>Rob</li>
+</ul>
+
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 8:18 am</li>
+<li>Mood: Awake, Antsy</li>
+<li>Sleep: 6</li>
+<li>Hunger: 2</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2576,124 +2676,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/">Building a Countdown Timer With Socket.io</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-05T08:07:00-07:00" pubdate data-updated="true">Jun 5<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io-pt-2/">Click here for part 2.</a></p>
-
-<p>Yesterday I put together a very simple Node/Socket.io application and showed how to deploy it to Heroku. Today I&#8217;m going to keep going with that app to see if I can get the functionality that I want. The app is a basic stopwatch so that shouldn&#8217;t be too hard. If you want to catch up <a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">checkout yesterday&#8217;s article</a> which explains setting everything up.</p>
-
-<h3>Countdown</h3>
-
-<p>Just to get the ball rolling I&#8217;m going to write a little code in my <code>app.js</code> file right at the bottom to setup a very crude counter.</p>
-
-<figure class='code'><figcaption><span>app.js  </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">countdown</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
-</span><span class='line'><span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">countdown</span><span class="o">--</span><span class="p">;</span>
-</span><span class='line'>  <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;timer&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">countdown</span><span class="o">:</span> <span class="nx">countdown</span> <span class="p">});</span>
-</span><span class='line'><span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">countdown</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
-</span><span class='line'>    <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;timer&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">countdown</span><span class="o">:</span> <span class="nx">countdown</span> <span class="p">});</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Elsewhere in my client-side js I&#8217;m going to listen for the <code>timer</code> event and update my DOM elements.</p>
-
-<figure class='code'><figcaption><span>main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">socket</span> <span class="o">=</span> <span class="nx">io</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;timer&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#counter&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">countdown</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#reset&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;reset&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You&#8217;ll also need to update your index.ejs file so it reads like this:</p>
-
-<figure class='code'><figcaption><span>views/index.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;counter&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;button</span> <span class="na">id=</span><span class="s">&quot;reset&quot;</span><span class="nt">&gt;</span>Reset!<span class="nt">&lt;/button&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Every second we&#8217;ll decrement our countdown variable and broadcast its new value. If a client sends us a <code>reset</code> event we&#8217;ll restart the timer and immediately broadcast the update to anyone connected. I noticed that since I&#8217;m using <code>xhr-polling</code> it can sometimes take a while for the timer to show up in my browser so keep that in mind.</p>
-
-<p>While this implementation isn&#8217;t pretty it does get us a little bit further down the road. Unfortunately I&#8217;ve been tripped up by a bunch of Node&#8217;s module issues so I have to cut tonight&#8217;s post short :\</p>
-
-<p>Hopefully better luck tomorrow. - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 8:08 am</li>
-<li>Mood: Sedate, Sleepy</li>
-<li>Sleep: 5</li>
-<li>Hunger: 4</li>
-<li>Coffee: 0</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -2711,6 +2693,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/06/25/ending-my-first-chain/">Ending My First Chain</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/24/sublime-snippet-basics/">Sublime Snippet Basics</a>
       </li>
     
@@ -2724,10 +2710,6 @@
     
       <li class="post">
         <a href="/blog/2012/06/22/wrapping-up-the-word-count-spider/">Wrapping up the Word Count Spider</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/21/quick-spider-example/">Quick Spider Example</a>
       </li>
     
   </ul>
