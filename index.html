@@ -115,39 +115,55 @@ Decorator &hellip;">
 
 <h3>Creational</h3>
 
-<p>Abstract Factory
-Builder
-Factory Method
-Object Pool
-Prototype
-Singleton</p>
+<ul>
+<li>Abstract Factory</li>
+<li>Builder</li>
+<li>Factory Method</li>
+<li>Object Pool</li>
+<li>Prototype</li>
+<li>Singleton</li>
+</ul>
+
 
 <h3>Structural</h3>
 
-<p>Adapter
-Bridge
-Composite
-Decorator
-Facade
-Flyweight
-Private Class Data
-Proxy</p>
+<ul>
+<li>Adapter</li>
+<li>Bridge</li>
+<li>Composite</li>
+<li>Decorator</li>
+<li>Facade</li>
+<li>Flyweight</li>
+<li>Private Class Data</li>
+<li>Proxy</li>
+</ul>
+
 
 <h3>Behavioral</h3>
 
-<p>Chain of Responsibility
-Command
-Interpreter
-Iterator
-Mediator
-Memento
-Null Object
-Observer
-State
-Strategy
-Template Method
-Visitor
-Monad Pattern / Promises / History</p>
+<ul>
+<li>Chain of Responsibility</li>
+<li>Command</li>
+<li>Interpreter</li>
+<li>Iterator</li>
+<li>Mediator</li>
+<li>Memento</li>
+<li>Null Object</li>
+<li>Observer</li>
+<li>State</li>
+<li>Strategy</li>
+<li>Template Method</li>
+<li>Visitor</li>
+<li>Monad Pattern / Promises</li>
+</ul>
+
+
+<p>I&#8217;ve been trying to think up <a href="http://robdodson.me/blog/2012/06/25/ending-my-first-chain/">a new chain</a> since coming back from Europe but nothing was enticing me. Then a few days ago I had a conversation with one of my friends in which we discussed using Promises in JavaScript. And later on we discussed Builders. I was doing my best to explain the two but really wished that I had a resource where I could just show some simple code examples. It occurred to me that I&#8217;ve always wanted to go through the <a href="http://www.amazon.com/Design-Patterns-Elements-Reusable-Object-Oriented/dp/0201633612/ref=sr_1_1?ie=UTF8&amp;qid=1344014497&amp;sr=8-1&amp;keywords=design+patterns">Gang of Four book</a> and just write my own interpretation of each pattern. Since I&#8217;m currently working primarily in JavaScript I thought it might be an interesting challenge to convert their examples, often in strongly typed languages, to something as dynamic and loosey-goosey as JS.</p>
+
+<p>I know there are a lot of people out there who <a href="http://www.codinghorror.com/blog/2005/09/head-first-design-patterns.html">aren&#8217;t too</a> <a href="http://thinkrelevance.com/blog/2007/05/17/design-patterns-are-code-smells">keen on</a> design patterns but that&#8217;s not to say that they shouldn&#8217;t be used or studied. There&#8217;s a lot of code out there that starts with <code>jQuery.click()</code> or <code>addEventListener</code> or <code>.on()</code> and all of them are implementations of the Observer pattern. Finding this reusable approach is the main point of patterns and along with it comes a shared vocabulary that can be passed on to other developers. Rather than saying &#8220;Let&#8217;s defer the methods of our object that are subject to change to well encapsulated algorithms.&#8221; We can just say &#8220;A Strategy pattern might be nice here.&#8221;</p>
+
+<p>Patterns should be used with caution as not everything fits so neatly into their paradigms. It&#8217;s often said that a beginner never met a pattern he didn&#8217;t like. In my experiences I&#8217;ve been burned by pattern overuse and at other times they have legitimately saved my ass. It&#8217;s also true that many patterns don&#8217;t really work or aren&#8217;t appropriate for particular languages. For instance, the GoF book was written <em>primarily for languages which shared features of C++ and SmallTalk</em>. I totally agree with this sentiment but I feel like along the way we&#8217;ll discover what does and doesn&#8217;t make sense in a dynamic language like JS and hopefully we can toss in some new patterns of our own. Already to the list I&#8217;ve added Promises which I use quite frequently and find to be a wonderful alternative to JavaScript&#8217;s oft seen pyramid of callbacks.
+Again, this is all about learning and experimenting. In my opinion a good understanding of design patterns is a threshold that needs to be crossed at some point in your career. I&#8217;m committed to doing this every single day for the next few weeks so hopefully by the end of it we&#8217;ll have a useful resource that others can benefit from. Stay tuned!</p>
 </div>
   
   
