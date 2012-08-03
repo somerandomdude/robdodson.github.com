@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Design Patterns | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/design-patterns/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-06-26T14:50:15-07:00</updated>
+  <updated>2012-08-03T11:15:24-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,51 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript Design Patterns]]></title>
+    <link href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/"/>
+    <updated>2012-08-03T09:39:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/08/03/javascript-design-patterns</id>
+    <content type="html"><![CDATA[<h2>Table of Contents</h2>
+
+<h3>Creational</h3>
+
+<p>Abstract Factory
+Builder
+Factory Method
+Object Pool
+Prototype
+Singleton</p>
+
+<h3>Structural</h3>
+
+<p>Adapter
+Bridge
+Composite
+Decorator
+Facade
+Flyweight
+Private Class Data
+Proxy</p>
+
+<h3>Behavioral</h3>
+
+<p>Chain of Responsibility
+Command
+Interpreter
+Iterator
+Mediator
+Memento
+Null Object
+Observer
+State
+Strategy
+Template Method
+Visitor
+Monad Pattern / Promises / History</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Managing Your Backbone Views with the State Pattern]]></title>

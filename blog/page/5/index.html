@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Yesterday&#8217;s I refactored my specs and crawler to support ignoring selections. While I started parsing the metadata I quickly realized that &hellip;">
+  <meta name="description" content="I have an upcoming project which uses Backbone and Node.js so I thought it would be good to blog about the topics (particularly Backbone) for a while &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,263 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/">Getting Familiar With Backbone Boilerplate</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-17T07:47:00-07:00" pubdate data-updated="true">May 17<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I have an upcoming project which uses <a href="http://documentcloud.github.com/backbone/">Backbone</a> and <a href="http://nodejs.org/">Node.js</a> so I thought it would be good to blog about the topics (particularly Backbone) for a while to make sure I&#8217;m well up to speed.</p>
+
+<p>We&#8217;re using the <a href="https://github.com/tbranyen/backbone-boilerplate">Backbone Boilerplate</a> to get us started since it includes a bit of file structure and a build process. As they mention in the docs you have to install <a href="https://github.com/cowboy/grunt">Grunt</a> if you want to use the build process they&#8217;ve stubbed out. Grunt is a javascript build tool which uses Node (think Rake in JS).</p>
+
+<p>As a refresher course I&#8217;m going to dig into the open-source <a href="http://addyosmani.github.com/backbone-fundamentals/">Backbone Fundamentals book</a> by <a href="http://addyosmani.github.com/backbone-fundamentals/">Addy Osmani</a>.</p>
+
+<p>First thing&#8217;s first though, after we have nodejs and grunt installed we need to also install the bbb (backbone boilerplate build, I guess?) tool. You can <a href="https://github.com/backbone-boilerplate/grunt-bbb">grab it here.</a></p>
+
+<p>We&#8217;ll create a new folder for our project and run <code>bbb init</code>. If all goes well it should stub out some project directories and files for us.</p>
+
+<h3>The Backbone Boilerplate templates</h3>
+
+<p>I&#8217;ll start with the index.html file. It seems like your standard HTML5 doc with the noteable exception that it includes <a href="http://requirejs.org/">require.js</a> at the bottom of the page.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!doctype html&gt;</span>
+</span><span class='line'><span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">&quot;en&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'><span class="nt">&lt;head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">http-equiv=</span><span class="s">&quot;X-UA-Compatible&quot;</span> <span class="na">content=</span><span class="s">&quot;IE=edge,chrome=1&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">&quot;viewport&quot;</span> <span class="na">content=</span><span class="s">&quot;width=device-width,initial-scale=1&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nt">&lt;title&gt;</span>Backbone Boilerplate<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c">&lt;!-- Application styles --&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href=</span><span class="s">&quot;/assets/css/index.css&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'><span class="nt">&lt;/head&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;body&gt;</span>
+</span><span class='line'>  <span class="c">&lt;!-- Main container --&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;div</span> <span class="na">role=</span><span class="s">&quot;main&quot;</span> <span class="na">id=</span><span class="s">&quot;main&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c">&lt;!-- Application source --&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">data-main=</span><span class="s">&quot;app/config&quot;</span> <span class="na">src=</span><span class="s">&quot;/assets/js/libs/require.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'><span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Require.js is a module and file loader which will help us manage our AMD modules. AMD (which stands for Asynchronous Module Definition) is a specification which details how to break JS down into modules that are loaded in, as needed, at runtime. <a href="http://addyosmani.com/writing-modular-js/">Again we turn to Addy Osmani for a good explanation.</a></p>
+
+<p>If you notice this block:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="c">&lt;!-- Application source --&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;script </span><span class="na">data-main=</span><span class="s">&quot;app/config&quot;</span> <span class="na">src=</span><span class="s">&quot;/assets/js/libs/require.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>the <code>data-main</code> attribute in the script tag is telling require.js what to load first. In this case it&#8217;s the <code>app/config.js</code> file. If you omit the <code>js</code> require will add it for you. If you add the <code>.js</code> require will respect the path exactly as it was given. This distinction seems kind of trivial here but later on when you start configuring require with baseUrls and whatnot, it becomes more important.</p>
+
+<p>Let&#8217;s look at that confg file, shall we?</p>
+
+<figure class='code'><figcaption><span>app/config.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// Set the require.js configuration for your application.</span>
+</span><span class='line'><span class="nx">require</span><span class="p">.</span><span class="nx">config</span><span class="p">({</span>
+</span><span class='line'>  <span class="c1">// Initialize the application with the main application file</span>
+</span><span class='line'>  <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;main&quot;</span><span class="p">],</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">paths</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// JavaScript folders</span>
+</span><span class='line'>    <span class="nx">libs</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">plugins</span><span class="o">:</span> <span class="s2">&quot;../assets/js/plugins&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Libraries</span>
+</span><span class='line'>    <span class="nx">jquery</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/jquery&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">underscore</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/underscore&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">backbone</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/backbone&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Shim Plugin</span>
+</span><span class='line'>    <span class="nx">use</span><span class="o">:</span> <span class="s2">&quot;../assets/js/plugins/use&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">use</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">backbone</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;use!underscore&quot;</span><span class="p">,</span> <span class="s2">&quot;jquery&quot;</span><span class="p">],</span>
+</span><span class='line'>      <span class="nx">attach</span><span class="o">:</span> <span class="s2">&quot;Backbone&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">underscore</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">attach</span><span class="o">:</span> <span class="s2">&quot;_&quot;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>One of the first things you can do with Require is to pass it a configuration object. The config object <a href="http://requirejs.org/docs/api.html#config">can be used for a ton of bootstrap options</a> like setting paths, requiring other scripts, setting timeouts, etc. The first option we see here is <code>deps: ["main"]</code>. We can infer this is telling require to load our main.js file first. But how does it get the path to main.js? From the docs we see that since we haven&#8217;t defined a <code>baseUrl</code> property require is using the path from our <code>data-main</code> attribute.</p>
+
+<blockquote><p>If no baseUrl is explicitly set in the configuration, the default value will be the location of the HTML page that loads require.js. If a data-main attribute is used, that path will become the baseUrl.</p></blockquote>
+
+<p>So we know that our baseUrl is <code>app/</code> and anything we require will be relative to that.</p>
+
+<p>Next up we have this block:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">paths</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="c1">// JavaScript folders</span>
+</span><span class='line'>    <span class="nx">libs</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">plugins</span><span class="o">:</span> <span class="s2">&quot;../assets/js/plugins&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Libraries</span>
+</span><span class='line'>    <span class="nx">jquery</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/jquery&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">underscore</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/underscore&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">backbone</span><span class="o">:</span> <span class="s2">&quot;../assets/js/libs/backbone&quot;</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Shim Plugin</span>
+</span><span class='line'>    <span class="nx">use</span><span class="o">:</span> <span class="s2">&quot;../assets/js/plugins/use&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The paths property defines paths relative to <code>baseUrl</code>. If we say</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">require</span><span class="p">([</span><span class="s2">&quot;libs/module&quot;</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>require.js will look for this <code>libs</code> path and find it in our config file. Most of these make sense till we hit the last line which creates a path for the <code>use</code> plugin.</p>
+
+<p><a href="http://tbranyen.com/post/amdrequirejs-shim-plugin-for-loading-incompatible-javascript">It seems like <code>use</code> was created by Tim Branyen, the author of the Backbone Boilerplate, to help with loading libraries that are non-AMD compliant.</a> Most of the big libraries are currently not AMD compliant (underscore and backbone itself) so this makes sense. So instead of creating a shim for each of those libraries the <code>use</code> plugin <em>should</em> take care of things for us. We can see how it&#8217;s used further in the config file:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">use</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">backbone</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">deps</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;use!underscore&quot;</span><span class="p">,</span> <span class="s2">&quot;jquery&quot;</span><span class="p">],</span>
+</span><span class='line'>      <span class="nx">attach</span><span class="o">:</span> <span class="s2">&quot;Backbone&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">underscore</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">attach</span><span class="o">:</span> <span class="s2">&quot;_&quot;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&#8217;s start at the bottom so we can see that underscore is defined and mapped to &#8220;_&#8221;. <code>attach</code> is going to take whatever library we&#8217;re defining and attach it to <code>window</code>. So underscore will be attached as <code>window._</code>. Next we see that backbone is defined and depends on our version of underscore and jquery. Since jquery is AMD compliant we don&#8217;t need the call to <code>use!</code> but we will need it for underscore. Finally backbone is attached to the window as <code>window.Backbone</code>.</p>
+
+<p>That covers the configuration file. I&#8217;ll move on to main.js in the next post.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 7:49 am</li>
+<li>Mood: Awake, Tired, Lazy</li>
+<li>Sleep: 7</li>
+<li>Hunger: 4</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2560,411 +2817,6 @@ Initially the test fails so now we need to update our <code>Crawler</code> to ch
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/07/object-oriented-scraper-backed-with-tests-pt-2/">Object Oriented Scraper Backed With Tests Pt. 2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-07T18:48:00-07:00" pubdate data-updated="true">May 7<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I&#8217;m picking up from where I left off last night. If you look back at the <a href="/blog/2012/05/06/object-oriented-scraper-backed-with-tests/">previous post</a> we ended with a spec&#8217;d out <code>Runner</code> object. Now we need to build our <code>Crawler</code> which will slurp up all the content from our posts and return them as meaningful data.</p>
-
-<p>Our Crawler will have 2 main responsibilities. First it will iterate over a post and return a Hash of words and their usage count. Second, it will iterate over a post and pull out any metadata and associate that with a Date. These are rather simple goals and if you remember from our original scraper we were actually hitting every post on the main page. I think I&#8217;d like to nail down these simple functions and then refactor the Crawler to accept a corpus page full of links—<a href="http://robdodson.me/blog/archives/">like our archives page</a>—which it will follow and parse. Right now I want to start small.</p>
-
-<p>Here&#8217;s a list of what I <em>think</em> would be good tests for our <code>Crawler</code>.</p>
-
-<ul>
-<li>It should return an instance in exchange for a valid URI. Since the URI comes from the Runner and that&#8217;s already being tested we&#8217;ll assume that the URI we&#8217;re given is valid.</li>
-<li>It should respond to a <code>get_word_counts</code> method.</li>
-<li>The get_word_counts method should accept a selector <code>String</code> and return a <code>Hash</code> of words and their counts. Since the selector will be coming from the Runner we&#8217;ll assume it&#8217;s valid too but first we&#8217;ll need to put another test in our <code>runner_spec.rb</code>.</li>
-<li>It should respond to a <code>get_metadata</code> method.</li>
-<li>The get_metadata method should also accept a selector <code>String</code> and return a <code>Hash</code> with a valid <code>Date</code> and each piece of metadata categorized. Let&#8217;s see how far we can take this by converting strings related to time into <code>Time</code> objects and any categories with multiple entries into <code>Arrays</code>.</li>
-</ul>
-
-
-<p>I&#8217;m actually going to copy and paste the above list into my specs and start buliding from there.</p>
-
-<p>&#8230;.</p>
-
-<p>Hmm&#8230; actually I&#8217;m not. Something about this doesn&#8217;t feel right. <code>Runner</code> has accrued too much responsibility. It&#8217;s supposed to validate 3 different strings parsed from a YAML file which it loads and then it also has to deal with creating and running the <code>Crawler</code>. I think it&#8217;s time for another object. Which we&#8217;ll call <code>Options</code>. Options will be in charge of loading our YAML and verifying that all the values are valid. <code>Runner</code> will create both an Options and a Crawler object and pass the values from Options to Crawler. This is actaully also in line with the Pickaxe book&#8217;s Anagrams example, so we have a nice guide to follow in that.</p>
-
-<p>OK so <code>Options</code>, eh? Well we&#8217;ll need to spec out its responsibilities. I think we can just take the tests we wrote for Runner and move them over to Options.</p>
-
-<p>After doing this for while I&#8217;ve ended up with a TON of tests&#8230;only to validate 3 variables.</p>
-
-<figure class='code'><figcaption><span>tentacles/spec/options_spec.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;../lib/tentacles/options&#39;</span>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;yaml&#39;</span>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;uri&#39;</span>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;helpers&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">describe</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span> <span class="k">do</span>
-</span><span class='line'>  <span class="kp">include</span> <span class="no">Helpers</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">before</span> <span class="k">do</span>
-</span><span class='line'>    <span class="vi">@options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">relative_path</span> <span class="o">+</span> <span class="s1">&#39;/../lib/tentacles/config.yml&#39;</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">subject</span> <span class="p">{</span> <span class="vi">@options</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:uri</span><span class="p">)</span> <span class="p">}</span>
-</span><span class='line'>  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:post_selector</span><span class="p">)</span> <span class="p">}</span>
-</span><span class='line'>  <span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:metadata_selector</span><span class="p">)</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;when parsing the config file&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an exception if the config file is missing&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Errno</span><span class="o">::</span><span class="no">ENOENT</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="kp">nil</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">TypeError</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an exception if the config file is invalid&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">relative_path</span> <span class="o">+</span> <span class="s1">&#39;/mocks/invalid_yaml.yml&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Psych</span><span class="o">::</span><span class="no">SyntaxError</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;when parsing the URI&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should display the right URI&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">uri</span> <span class="o">=</span> <span class="no">URI</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s1">&#39;http://robdodson.me&#39;</span><span class="p">)</span>
-</span><span class='line'>      <span class="vi">@options</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an exception if uri is empty&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">relative_path</span> <span class="o">+</span> <span class="s1">&#39;/mocks/blank_uri.yml&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Psych</span><span class="o">::</span><span class="no">SyntaxError</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an exception if uri is invalid&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">relative_path</span> <span class="o">+</span> <span class="s1">&#39;/mocks/invalid_uri.yml&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Psych</span><span class="o">::</span><span class="no">SyntaxError</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;when parsing the post selector&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should have a post_selector&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="vi">@options</span><span class="o">.</span><span class="n">post_selector</span><span class="o">.</span><span class="n">should</span> <span class="n">be</span><span class="p">(</span><span class="s1">&#39;.entry-content&#39;</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an exception if the post selector is empty&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">relative_path</span> <span class="o">+</span> <span class="s1">&#39;/mocks/blank_uri.yml&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Psych</span><span class="o">::</span><span class="no">SyntaxError</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;when parsing the metadata selector&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should have a metadata_selector&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="vi">@options</span><span class="o">.</span><span class="n">metadata_selector</span><span class="o">.</span><span class="n">should</span> <span class="n">be</span><span class="p">(</span><span class="s1">&#39;.personal-metadata&#39;</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an exception if the metadata selector is empty&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">relative_path</span> <span class="o">+</span> <span class="s1">&#39;/mocks/blank_uri.yml&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Psych</span><span class="o">::</span><span class="no">SyntaxError</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Here&#8217;s my implementation of <code>options.rb</code></p>
-
-<figure class='code'><figcaption><span>tentacles/lib/tentacles/options.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;yaml&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Options</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:uri</span>
-</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:post_selector</span>
-</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:metadata_selector</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-</span><span class='line'>      <span class="vi">@config</span> <span class="o">=</span> <span class="no">YAML</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="vi">@uri</span> <span class="o">=</span> <span class="no">URI</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="vi">@config</span><span class="o">[</span><span class="ss">:uri</span><span class="o">]</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">raise</span> <span class="no">IOError</span><span class="p">,</span> <span class="s1">&#39;invalid uri!&#39;</span> <span class="k">if</span> <span class="vi">@uri</span><span class="o">.</span><span class="n">scheme</span><span class="o">.</span><span class="n">nil?</span> <span class="o">||</span> <span class="vi">@uri</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">nil?</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="vi">@post_selector</span> <span class="o">=</span> <span class="vi">@config</span><span class="o">[</span><span class="ss">:post_selector</span><span class="o">]</span>
-</span><span class='line'>      <span class="k">raise</span> <span class="no">IOError</span><span class="p">,</span> <span class="s1">&#39;post_selector is not defined&#39;</span> <span class="k">if</span> <span class="vi">@post_selector</span><span class="o">.</span><span class="n">empty?</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="vi">@metadata_selector</span> <span class="o">=</span> <span class="vi">@config</span><span class="o">[</span><span class="ss">:metadata_selector</span><span class="o">]</span>
-</span><span class='line'>      <span class="k">raise</span> <span class="no">IOError</span><span class="p">,</span> <span class="s1">&#39;metadata_selector is not defined&#39;</span> <span class="k">if</span> <span class="vi">@metadata_selector</span><span class="o">.</span><span class="n">empty?</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Seems like now might be a good time to pause for a bit. When I look at those tests I see a lot of places where I&#8217;m testing Classes that have probably already been tested. I feel like you can safely assume that if you pass <code>YAML.load</code> a bunch of junk it&#8217;s going to throw an error. Is there any value in testing something like that for my own implementation? I&#8217;m guessing not. However I do think it&#8217;s important that I test the 3 exceptions that I wrote. I&#8217;ll get all the tests to pass and then I&#8217;ll go back and clean it up.</p>
-
-<h3>Making the Tests Pass</h3>
-
-<p>I like to comment out my spec file and go line by line making each test pass as I go. I&#8217;m pretty good at writing failing tests (heh) so this approach adheres well to the red, green, refactor mantra.</p>
-
-<p>Starting out I have a problem in the first block which checks my <code>attr_readers</code>:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:uri</span><span class="p">)</span> <span class="p">}</span>
-</span><span class='line'><span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:post_selector</span><span class="p">)</span> <span class="p">}</span>
-</span><span class='line'><span class="n">it</span> <span class="p">{</span> <span class="n">should</span> <span class="n">respond_to</span><span class="p">(</span><span class="ss">:metadata_selector</span><span class="p">)</span> <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Let&#8217;s see if I can get just the first test to pass&#8230; I comment out everything inside of Options and notice that YAML does not use symbols for keys. It seems like loaded YAML uses Strings for keys. After changing my symbol keys to strings my first block of tests pass.</p>
-
-<figure class='code'><figcaption><span>tentacles/lib/tentacles/options.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;yaml&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Options</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:uri</span>
-</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:post_selector</span>
-</span><span class='line'>    <span class="kp">attr_reader</span> <span class="ss">:metadata_selector</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-</span><span class='line'>      <span class="vi">@config</span> <span class="o">=</span> <span class="no">YAML</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">config</span><span class="p">))</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="vi">@uri</span> <span class="o">=</span> <span class="no">URI</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="vi">@config</span><span class="o">[</span><span class="s2">&quot;uri&quot;</span><span class="o">]</span><span class="p">)</span>
-</span><span class='line'>      <span class="k">raise</span> <span class="no">IOError</span><span class="p">,</span> <span class="s1">&#39;invalid uri!&#39;</span> <span class="k">if</span> <span class="vi">@uri</span><span class="o">.</span><span class="n">scheme</span><span class="o">.</span><span class="n">nil?</span> <span class="o">||</span> <span class="vi">@uri</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="n">nil?</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="vi">@post_selector</span> <span class="o">=</span> <span class="vi">@config</span><span class="o">[</span><span class="s2">&quot;post_selector&quot;</span><span class="o">]</span>
-</span><span class='line'>      <span class="k">raise</span> <span class="no">IOError</span><span class="p">,</span> <span class="s1">&#39;post_selector is not defined&#39;</span> <span class="k">if</span> <span class="vi">@post_selector</span><span class="o">.</span><span class="n">empty?</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="vi">@metadata_selector</span> <span class="o">=</span> <span class="vi">@config</span><span class="o">[</span><span class="s2">&quot;metadata_selector&quot;</span><span class="o">]</span>
-</span><span class='line'>      <span class="k">raise</span> <span class="no">IOError</span><span class="p">,</span> <span class="s1">&#39;metadata_selector is not defined&#39;</span> <span class="k">if</span> <span class="vi">@metadata_selector</span><span class="o">.</span><span class="n">empty?</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The next block passes quite easily because it&#8217;s ported over from the <code>Runner</code> class</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">describe</span> <span class="s2">&quot;when parsing the config file&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an exception if the config file is missing&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Errno</span><span class="o">::</span><span class="no">ENOENT</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="kp">nil</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">TypeError</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an exception if the config file is invalid&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">relative_path</span> <span class="o">+</span> <span class="s1">&#39;/mocks/invalid_yaml.yml&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Psych</span><span class="o">::</span><span class="no">SyntaxError</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>After that we run into some issues because our next set of tested exceptions have the wrong class.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'>  <span class="n">describe</span> <span class="s2">&quot;when parsing the URI&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should display the right URI&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">uri</span> <span class="o">=</span> <span class="no">URI</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s1">&#39;http://robdodson.me&#39;</span><span class="p">)</span>
-</span><span class='line'>      <span class="vi">@options</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an exception if uri is empty&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">relative_path</span> <span class="o">+</span> <span class="s1">&#39;/mocks/blank_uri.yml&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Psych</span><span class="o">::</span><span class="no">SyntaxError</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an exception if uri is invalid&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">relative_path</span> <span class="o">+</span> <span class="s1">&#39;/mocks/invalid_uri.yml&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Psych</span><span class="o">::</span><span class="no">SyntaxError</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Changing the last two exceptions to expect <code>Errno::ENOENT</code> and <code>URI::InvalidURIError</code> in that order fixes things and we&#8217;re all green again.</p>
-
-<p>In the next block we have 2 failing tests because the first one is using improper syntax. Instead of <code>be</code> we should be using <code>eq</code>. Seems like in RSpec <code>be</code> is equivalent to === and not ==. Also we have another PSYCH::SyntaxError that needs to be replaced with <code>Errno::ENOENT</code>. Here&#8217;s what we end up with after making those changes:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">describe</span> <span class="s2">&quot;when parsing the post selector&quot;</span> <span class="k">do</span>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should have a post_selector&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="vi">@options</span><span class="o">.</span><span class="n">post_selector</span><span class="o">.</span><span class="n">should</span> <span class="n">eq</span><span class="p">(</span><span class="s1">&#39;.entry-content&#39;</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="n">it</span> <span class="s2">&quot;should raise an exception if the post selector is empty&quot;</span> <span class="k">do</span>
-</span><span class='line'>      <span class="n">expect</span> <span class="p">{</span> <span class="n">options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">relative_path</span> <span class="o">+</span> <span class="s1">&#39;/mocks/blank_uri.yml&#39;</span><span class="p">)</span> <span class="p">}</span><span class="o">.</span><span class="n">to</span> <span class="n">raise_error</span><span class="p">(</span><span class="no">Errno</span><span class="o">::</span><span class="no">ENOENT</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Ugh, hate to cut it short but looks like I&#8217;m going down a rabbit hole with validation. I&#8217;ll pickup tomorrow to see if we can iron a lot of this out.</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:11 pm</li>
-<li>Mood: Calm, Hot, Tired</li>
-<li>Sleep: 7</li>
-<li>Hunger: 6.5</li>
-<li>Coffee: 0</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; Older</a>
@@ -2982,6 +2834,10 @@ Initially the test fails so now we need to update our <code>Crawler</code> to ch
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/25/ending-my-first-chain/">Ending My First Chain</a>
       </li>
     
@@ -2995,10 +2851,6 @@ Initially the test fails so now we need to update our <code>Crawler</code> to ch
     
       <li class="post">
         <a href="/blog/2012/06/23/failing-at-ruby/">Failing at Ruby</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/22/wrapping-up-the-word-count-spider/">Wrapping up the Word Count Spider</a>
       </li>
     
   </ul>
