@@ -9,15 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Table of Contents Creational Abstract Factory
-Builder
-Factory Method
-Object Pool
-Prototype
-Singleton Structural Adapter
-Bridge
-Composite
-Decorator &hellip;">
+  <meta name="description" content="Back to Table of Contents The Strategy pattern is one of my personal favorites and you&#8217;ve probably seen or used it in some fashion without even &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -82,6 +74,309 @@ Decorator &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/03/javascript-design-patterns-strategy/">JavaScript Design Patterns: Strategy</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-03T15:12:00-07:00" pubdate data-updated="true">Aug 3<span>rd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Back to Table of Contents</a></h4>
+
+<p>The Strategy pattern is one of my personal favorites and you&#8217;ve probably seen or used it in some fashion without even knowing it. Its primary purpose is to help you separate the parts of an object which are subject to change from the rest of the static bits. Using Strategy objects versus subclasses can often result in much more flexible code since you&#8217;re creating a suite of easily swappable algorithms.</p>
+
+<h2>Formal Definition</h2>
+
+<blockquote><p>Define a family of algorithms, encapsulate each one, and make them interchangeable. Strategy lets the algorithm vary independently from clients that use it.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote>
+
+
+<h3>Also Known As</h3>
+
+<ul>
+<li>Policy</li>
+</ul>
+
+
+<h2>Contrived Example Time!</h2>
+
+<p>Let&#8217;s say you&#8217;re making a game and you have a Character class. This game has all sorts of different terrain types so your character can run through open fields, walk slowly through swamps or swim under the ocean. Since you don&#8217;t know what kind of other terrains the game designer is going to think up you decide that it would be a bad idea to give each character <code>run</code>, <code>walk</code>, and <code>swim</code> methods. After all, what if suddenly the character needs to <code>fly</code> or <code>crawl</code>? What if they&#8217;re wounded and they need to <code>limp</code>? This situation could potentially get out of hand very fast&#8230;</p>
+
+<p>There&#8217;s a good chance you&#8217;ve seen or written code like this before:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">move</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">state</span> <span class="o">===</span> <span class="s1">&#39;walking&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// do some walk animation</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">state</span> <span class="o">===</span> <span class="s1">&#39;running&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// do some running animation</span>
+</span><span class='line'>  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">state</span> <span class="o">===</span> <span class="s1">&#39;swimming&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// do some swimming animation</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When you see a big conditional like that or a switch statement it&#8217;s time to stop and wonder if there&#8217;s a better way. For instance if we need to subclass our Character we&#8217;re going to have to override that big conditional. What if we only want to replace the <code>swimming</code> bit? We&#8217;ll have to copy and paste the code from the super class for <code>walking</code> and <code>running</code> and then write new code specifically for <code>swimming</code>. And of course if <code>walking</code> and <code>running</code> ever change we&#8217;re totally screwed.</p>
+
+<h3>We need a Strategy to deal with this</h3>
+
+<p>Ok so we know that our character is going to be a real contortionist and need to run and jump and crab-walk all over the place. What if we took the code that made her run and we put it in its own object? How about we just define a Class for movements and we do this for all the different kinds of motion? Then when we need to move our Character we&#8217;ll just tell it to defer to one of these Movement objects.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">Movement</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">func</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">move</span> <span class="o">=</span> <span class="nx">func</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Movement</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">execute</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">move</span><span class="p">();</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">running</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Movement</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Hey I&#39;m running!&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">walking</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Movement</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Just walking along...&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now when we want to tell our character to move in a different way we&#8217;ll just update which Movement object its currently referencing.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">changeMovementType</span><span class="p">(</span><span class="nx">movement</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">movement</span> <span class="o">=</span> <span class="nx">movement</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">move</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">movement</span><span class="p">.</span><span class="nx">execute</span><span class="p">();</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In practice you might have something that looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">running</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Movement</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Hey I&#39;m running!&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">walking</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Movement</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Just walking along...&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Create a hero and walk through a peaceful forest...</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">hero</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Character</span><span class="p">();</span>
+</span><span class='line'><span class="nx">hero</span><span class="p">.</span><span class="nx">changeMovementType</span><span class="p">(</span><span class="nx">walking</span><span class="p">);</span>
+</span><span class='line'><span class="nx">hero</span><span class="p">.</span><span class="nx">move</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// ... OH NO MOTHERFUCKIN&#39; DINOSAURS!!!</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">hero</span><span class="p">.</span><span class="nx">changeMovementType</span><span class="p">(</span><span class="nx">running</span><span class="p">);</span>
+</span><span class='line'><span class="nx">hero</span><span class="p">.</span><span class="nx">move</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now it&#8217;s easy for us to add as many different kinds of motion as our little game designer can dream up. Want to give the character gas-powered robotic legs? No problem!</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">robotlegs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Movement</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Cruisin for oil...Look out humans!&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">hero</span><span class="p">.</span><span class="nx">changeMovementType</span><span class="p">(</span><span class="nx">robotlegs</span><span class="p">);</span>
+</span><span class='line'><span class="nx">hero</span><span class="p">.</span><span class="nx">move</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>When to use it</h2>
+
+<p>When you have a part of your Class that&#8217;s subject to change frequently or perhaps you have many related subclasses which only differ in behavior it&#8217;s often a good time to consider using a Strategy pattern.</p>
+
+<p>Another benefit of the Strategy pattern is that it can hide complex logic or data that the client doesn&#8217;t need to know about.</p>
+
+<h2>The Painting App</h2>
+
+<p>For a real world example of when to use Strategy objects consider your typical painting program. Often times you will offer a variety of different brush types to your user but you don&#8217;t want to have to change the fundamentals of how a mark shows up on screen every time the user decides to switch from a round to a square brush. Why not wrap those specific implementations in their own brush objects and later on when the user clicks to draw something to screen we&#8217;ll just defer to one of those brushes.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Grab a reference to the canvas and the drawing context</span>
+</span><span class='line'><span class="nx">$canvas</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#painter&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">context</span> <span class="o">=</span> <span class="nx">$canvas</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Define our brush strategy objects</span>
+</span><span class='line'><span class="nx">brushes</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">outline</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">draw</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">context</span><span class="p">.</span><span class="nx">strokeRect</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">pageX</span> <span class="o">-</span> <span class="nx">offsetLeft</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageY</span> <span class="o">-</span> <span class="nx">offsetTop</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">square</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">draw</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">context</span><span class="p">.</span><span class="nx">fillRect</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">pageX</span> <span class="o">-</span> <span class="nx">offsetLeft</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageY</span> <span class="o">-</span> <span class="nx">offsetTop</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">circle</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">draw</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">context</span><span class="p">.</span><span class="nx">arc</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">pageX</span> <span class="o">-</span> <span class="nx">offsetLeft</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageY</span> <span class="o">-</span> <span class="nx">offsetTop</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mi">2</span><span class="p">);</span>
+</span><span class='line'>          <span class="nx">context</span><span class="p">.</span><span class="nx">fill</span><span class="p">();</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">...</span> <span class="p">.</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">brush</span> <span class="o">=</span> <span class="nx">brushes</span><span class="p">.</span><span class="nx">square</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here we see that <code>brushes.outline</code>, <code>brushes.square</code>, and <code>brushes.circle</code> each implement a consistent interface for the <code>draw</code> call. However their exact implementation changes from one brush to the next. <code>brushes.outline</code> will only draw the stroke of a rectangle, whereas <code>brushes.square</code> and <code>brushes.circle</code> will fill their respective shapes in. Elsehwere in the program we set our initial brush to a default of brushes.square. When the users presses their mouse and moves it around screen we can defer to whichever Strategy the brush object is currently referencing:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Listen for mouse events on the canvas</span>
+</span><span class='line'><span class="nx">$canvas</span>
+</span><span class='line'>  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mousedown&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">isDrawing</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">})</span>
+</span><span class='line'>  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mouseup mouseleave&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">isDrawing</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">})</span>
+</span><span class='line'>  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mousemove&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">isDrawing</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="c1">// Defer drawing to a Strategy object</span>
+</span><span class='line'>          <span class="nx">brush</span><span class="p">.</span><span class="nx">draw</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">context</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Again notice that <code>.on('mousemove')</code> we first check to see if it&#8217;s ok to draw something and then defer to whichever Strategy is currently being referenced. Using this approach we can add limitless new brush types to the <code>brushes</code> object and easily change how our program performs at runtime. Be sure to check out the live example and the source for the full application.</p>
+
+<h3><a href="http://robdodson.s3.amazonaws.com/javascript-design-patterns/strategy/painter/index.html">Live Example</a></h3>
+
+<h3><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/strategy/painter">Source</a></h3>
+
+<h2>Related Patterns</h2>
+
+<p>Flyweight: Strategy objects often make good flyweights.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1994,213 +2289,6 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/">Object Oriented Scraper Backed With Tests Pt&#8230;9?</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-17T22:43:00-07:00" pubdate data-updated="true">Jun 17<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I just spent a few hours talking to my friend <a href="http://derekbradley.com/">Derek</a>(<a href="https://twitter.com/#!/derekebradley">@derekebradley</a>) about Ruby and it occured to me that I never finished this scraper project. We got awfully far with it but then it kind of died on the vine. <a href="http://robdodson.me/blog/2012/05/06/object-oriented-scraper-backed-with-tests/">Thankfully,</a> <a href="http://robdodson.me/blog/2012/05/07/object-oriented-scraper-backed-with-tests-pt-2/">I</a> <a href="http://robdodson.me/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/">wrote</a> <a href="http://robdodson.me/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4/">it</a> <a href="http://robdodson.me/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/">all</a> <a href="http://robdodson.me/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/">down.</a> <a href="http://robdodson.me/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7/">down.</a> <a href="http://robdodson.me/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8/">down.</a></p>
-
-<p>The fact of the matter is I didn&#8217;t know where to take the data. I didn&#8217;t have a design or a layout that I could put it all into. I want to change all that. I want to turn this into something useful. But first I have to make sense of all the code that was written so many weeks ago.</p>
-
-<h2>Tests as documentation&#8230;bullshit.</h2>
-
-<p>Ok ok. I should say it&#8217;s <em>total</em> bullshit to call your tests the documentation because they are helpful. But the fact of the matter is you can get so crafty with RSpec that it makes the tests difficult to read in a useful way. I&#8217;m not saying they&#8217;re illegible, it&#8217;s just that they leverage features which adds to their thought deficit. Before you go off saying that I wrote them wrong and tests should be all the documentation you need&#8230;shutup. They&#8217;re helpful but I would love it if I had written a bit of Markdown Readme to go with all this&#8230;</p>
-
-<h2>Explain yourself</h2>
-
-<p>Let&#8217;s see if I can regurgitate what this thing currently does in plain English.</p>
-
-<ul>
-<li><p>There&#8217;s a config.yml file. It says what page to scrape, what the CSS selector for a post looks like and what the CSS selector for metadata looks like. The metadata is the list at the bottom of every page listing the time, amount of sleep, coffee, etc.</p></li>
-<li><p>There&#8217;s a command line object, <code>tentacles</code>. It initiates <code>runner.rb</code>. <code>Runner</code> creates an instance of <code>Options</code>. <code>Options</code> loads the config.yml file and parses it, turning its properties into members of the options object.</p></li>
-<li><p>It actually doesn&#8217;t do anything else beyond that. <code>runner.rb</code> stops right there but we have Rspec tests which fake data and check to see if our other classes work. Those other classes are&#8230;</p></li>
-<li><p><code>crawler.rb</code> should be the real meat of our program. Funny, seeing as how I wrote all this, that I totally can&#8217;t remember who does what&#8230;</p></li>
-<li><p><code>crawler.rb</code> has two primary methods: <code>words_by_selector</code> and <code>metadata_by_selector</code>.</p></li>
-<li><p><code>words_by_selector</code> returns an array of words and the number of times they&#8217;ve occurred. This array should be in order from most used to least used.</p></li>
-<li><p><code>metadata_by_selector</code> returns the content of one of our metadata lists&#8230;. I think.</p></li>
-</ul>
-
-
-<h2>Make it work</h2>
-
-<p>With Tim Gunn&#8217;s mantra we&#8217;re gonna make this thing work. The tests verify that everything should be at least somewhat functioning. Since I&#8217;m a little drunk I can&#8217;t do a <em>super</em> deep dive but let&#8217;s see if we can get our runner to write out the contents of <code>words_by_selector</code> to a text file.</p>
-
-<figure class='code'><figcaption><span>runner.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;yaml&#39;</span>
-</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;options&#39;</span>
-</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;crawler&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Runner</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-</span><span class='line'>      <span class="vi">@options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">run</span>
-</span><span class='line'>      <span class="vi">@crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">output</span> <span class="o">=</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">words_by_selector</span><span class="p">(</span><span class="vi">@options</span><span class="o">.</span><span class="n">post_selector</span><span class="p">,</span> <span class="s1">&#39;ul:last-child&#39;</span><span class="p">)</span>
-</span><span class='line'>      <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;output.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">file</span><span class="o">|</span>
-</span><span class='line'>        <span class="n">output</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
-</span><span class='line'>          <span class="n">file</span><span class="o">.</span><span class="n">puts</span> <span class="n">line</span>
-</span><span class='line'>        <span class="k">end</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>To get this working I <code>cd</code> into the lib/ folder where all the code lives and do an <code>irb -I .</code> so I can require the local files.</p>
-
-<figure class='code'><figcaption><span>runner.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;runner&#39;</span>
-</span><span class='line'><span class="n">runner</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Runner</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;config.yml&#39;</span><span class="p">)</span>
-</span><span class='line'><span class="n">runner</span><span class="o">.</span><span class="n">run</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>After doing that we <em>do</em> get a text file, with copy that looks somewhat correct&#8230;</p>
-
-<figure class='code'><figcaption><span>runner.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">we</span><span class="p">:</span> <span class="mi">8</span>
-</span><span class='line'><span class="n">to</span><span class="p">:</span> <span class="mi">8</span>
-</span><span class='line'><span class="n">npm</span><span class="p">:</span> <span class="mi">6</span>
-</span><span class='line'><span class="n">should</span><span class="p">:</span> <span class="mi">5</span>
-</span><span class='line'><span class="n">package</span><span class="p">:</span> <span class="mi">4</span>
-</span><span class='line'><span class="n">our</span><span class="p">:</span> <span class="mi">4</span>
-</span><span class='line'><span class="n">compliment</span><span class="p">:</span> <span class="mi">4</span>
-</span><span class='line'><span class="n">git</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="mi">0</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="mi">4</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">need</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="mi">2</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">it</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">node_modules</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">the</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">have</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">be</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">json</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">your</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">any</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">dependencies</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">module</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="ow">and</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">node</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">add</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">xml2json</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">how</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">s</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="k">in</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">you</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">json1</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">an</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="mi">3</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">awesome</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">version</span><span class="p">:</span> <span class="mi">2</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>It looks like the copy from my most recent blog post, plus or minus a few words. Horrible regex aside it <em>kinda</em> works and that&#8217;s what we&#8217;re after. Maybe tomorrow we can turn it into some JSON :D Till then. - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 10:44 pm</li>
-<li>Mood: Drunk, Sleepy</li>
-<li>Sleep: 3</li>
-<li>Hunger: 4</li>
-<li>Coffee: 1</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -2216,6 +2304,10 @@ Again, this is all about learning and experimenting. In my opinion a good unders
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/03/javascript-design-patterns-strategy/">JavaScript Design Patterns: Strategy</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns</a>
       </li>
     
@@ -2229,10 +2321,6 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     
       <li class="post">
         <a href="/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/">Sublime Text 2 Tips and Shortcuts</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/23/failing-at-ruby/">Failing at Ruby</a>
       </li>
     
   </ul>

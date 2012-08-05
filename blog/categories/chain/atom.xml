@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-03T11:17:13-07:00</updated>
+  <updated>2012-08-05T11:53:50-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,220 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript Design Patterns: Strategy]]></title>
+    <link href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns-strategy/"/>
+    <updated>2012-08-03T15:12:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/08/03/javascript-design-patterns-strategy</id>
+    <content type="html"><![CDATA[<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Back to Table of Contents</a></h4>
+
+<p>The Strategy pattern is one of my personal favorites and you've probably seen or used it in some fashion without even knowing it. Its primary purpose is to help you separate the parts of an object which are subject to change from the rest of the static bits. Using Strategy objects versus subclasses can often result in much more flexible code since you're creating a suite of easily swappable algorithms.</p>
+
+<h2>Formal Definition</h2>
+
+<p><blockquote><p>Define a family of algorithms, encapsulate each one, and make them interchangeable. Strategy lets the algorithm vary independently from clients that use it.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote></p>
+
+<h3>Also Known As</h3>
+
+<ul>
+<li>Policy</li>
+</ul>
+
+
+<h2>Contrived Example Time!</h2>
+
+<p>Let's say you're making a game and you have a Character class. This game has all sorts of different terrain types so your character can run through open fields, walk slowly through swamps or swim under the ocean. Since you don't know what kind of other terrains the game designer is going to think up you decide that it would be a bad idea to give each character <code>run</code>, <code>walk</code>, and <code>swim</code> methods. After all, what if suddenly the character needs to <code>fly</code> or <code>crawl</code>? What if they're wounded and they need to <code>limp</code>? This situation could potentially get out of hand very fast...</p>
+
+<p>There's a good chance you've seen or written code like this before:</p>
+
+<p>``` js
+function move() {</p>
+
+<pre><code>if (state === 'walking') {
+    // do some walk animation
+} else if (state === 'running') {
+    // do some running animation
+} else if (state === 'swimming') {
+    // do some swimming animation
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>When you see a big conditional like that or a switch statement it's time to stop and wonder if there's a better way. For instance if we need to subclass our Character we're going to have to override that big conditional. What if we only want to replace the <code>swimming</code> bit? We'll have to copy and paste the code from the super class for <code>walking</code> and <code>running</code> and then write new code specifically for <code>swimming</code>. And of course if <code>walking</code> and <code>running</code> ever change we're totally screwed.</p>
+
+<h3>We need a Strategy to deal with this</h3>
+
+<p>Ok so we know that our character is going to be a real contortionist and need to run and jump and crab-walk all over the place. What if we took the code that made her run and we put it in its own object? How about we just define a Class for movements and we do this for all the different kinds of motion? Then when we need to move our Character we'll just tell it to defer to one of these Movement objects.</p>
+
+<p>``` js
+var Movement = function(func) {</p>
+
+<pre><code>this.move = func;
+</code></pre>
+
+<p>};</p>
+
+<p>Movement.prototype.execute = function() {</p>
+
+<pre><code>this.move();
+</code></pre>
+
+<p>};</p>
+
+<p>var running = new Movement(function() {</p>
+
+<pre><code>console.log("Hey I'm running!");
+</code></pre>
+
+<p>});</p>
+
+<p>var walking = new Movement(function() {</p>
+
+<pre><code>console.log("Just walking along...");
+</code></pre>
+
+<p>});
+```</p>
+
+<p>Now when we want to tell our character to move in a different way we'll just update which Movement object its currently referencing.</p>
+
+<p>``` js
+function changeMovementType(movement) {</p>
+
+<pre><code>this.movement = movement;
+</code></pre>
+
+<p>}</p>
+
+<p>function move() {</p>
+
+<pre><code>this.movement.execute();
+</code></pre>
+
+<p>}
+```</p>
+
+<p>In practice you might have something that looks like this:</p>
+
+<p>``` js
+var running = new Movement(function() {</p>
+
+<pre><code>console.log("Hey I'm running!");
+</code></pre>
+
+<p>});</p>
+
+<p>var walking = new Movement(function() {</p>
+
+<pre><code>console.log("Just walking along...");
+</code></pre>
+
+<p>});</p>
+
+<p>// Create a hero and walk through a peaceful forest...</p>
+
+<p>var hero = new Character();
+hero.changeMovementType(walking);
+hero.move();</p>
+
+<p>// ... OH NO MOTHERFUCKIN' DINOSAURS!!!</p>
+
+<p>hero.changeMovementType(running);
+hero.move();
+```</p>
+
+<p>Now it's easy for us to add as many different kinds of motion as our little game designer can dream up. Want to give the character gas-powered robotic legs? No problem!</p>
+
+<p>``` js
+var robotlegs = new Movement(function() {</p>
+
+<pre><code>console.log("Cruisin for oil...Look out humans!");
+</code></pre>
+
+<p>});</p>
+
+<p>hero.changeMovementType(robotlegs);
+hero.move();
+```</p>
+
+<h2>When to use it</h2>
+
+<p>When you have a part of your Class that's subject to change frequently or perhaps you have many related subclasses which only differ in behavior it's often a good time to consider using a Strategy pattern.</p>
+
+<p>Another benefit of the Strategy pattern is that it can hide complex logic or data that the client doesn't need to know about.</p>
+
+<h2>The Painting App</h2>
+
+<p>For a real world example of when to use Strategy objects consider your typical painting program. Often times you will offer a variety of different brush types to your user but you don't want to have to change the fundamentals of how a mark shows up on screen every time the user decides to switch from a round to a square brush. Why not wrap those specific implementations in their own brush objects and later on when the user clicks to draw something to screen we'll just defer to one of those brushes.</p>
+
+<p>``` js
+// Grab a reference to the canvas and the drawing context
+$canvas = $('#painter');
+context = $canvas[0].getContext('2d');</p>
+
+<p>// Define our brush strategy objects
+brushes = {</p>
+
+<pre><code>outline: {
+    draw: function(e, context) {
+        context.strokeRect(e.pageX - offsetLeft, e.pageY - offsetTop, 10, 10);
+    }
+},
+square: {
+    draw: function(e, context) {
+        context.fillRect(e.pageX - offsetLeft, e.pageY - offsetTop, 10, 10);
+    }
+},
+circle: {
+    draw: function(e, context) {
+        context.arc(e.pageX - offsetLeft, e.pageY - offsetTop, 10, 0, Math.PI * 2);
+        context.fill();
+    }
+}
+</code></pre>
+
+<p>};</p>
+
+<p>... .</p>
+
+<p>brush = brushes.square;
+```</p>
+
+<p>Here we see that <code>brushes.outline</code>, <code>brushes.square</code>, and <code>brushes.circle</code> each implement a consistent interface for the <code>draw</code> call. However their exact implementation changes from one brush to the next. <code>brushes.outline</code> will only draw the stroke of a rectangle, whereas <code>brushes.square</code> and <code>brushes.circle</code> will fill their respective shapes in. Elsehwere in the program we set our initial brush to a default of brushes.square. When the users presses their mouse and moves it around screen we can defer to whichever Strategy the brush object is currently referencing:</p>
+
+<p>``` js
+// Listen for mouse events on the canvas
+$canvas</p>
+
+<pre><code>.on('mousedown', function() {
+    isDrawing = true;
+})
+.on('mouseup mouseleave', function() {
+    isDrawing = false;
+})
+.on('mousemove', function(e) {
+    if (isDrawing) {
+        // Defer drawing to a Strategy object
+        brush.draw(e, context);
+    }
+});
+</code></pre>
+
+<p><code>``
+Again notice that</code>.on('mousemove')<code>we first check to see if it's ok to draw something and then defer to whichever Strategy is currently being referenced. Using this approach we can add limitless new brush types to the</code>brushes` object and easily change how our program performs at runtime. Be sure to check out the live example and the source for the full application.</p>
+
+<h3><a href="http://robdodson.s3.amazonaws.com/javascript-design-patterns/strategy/painter/index.html">Live Example</a></h3>
+
+<h3><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/strategy/painter">Source</a></h3>
+
+<h2>Related Patterns</h2>
+
+<p>Flyweight: Strategy objects often make good flyweights.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[JavaScript Design Patterns]]></title>
@@ -398,286 +612,6 @@ You'll notice that instead of just using a</code>wrap_in_tag<code>command name t
 <li>Mood: Tired, Lazy</li>
 <li>Sleep: 5</li>
 <li>Hunger: 5</li>
-<li>Coffee: 1</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Failing at Ruby]]></title>
-    <link href="http://robdodson.me/blog/2012/06/23/failing-at-ruby/"/>
-    <updated>2012-06-23T01:08:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/23/failing-at-ruby</id>
-    <content type="html"><![CDATA[<p>I'm just getting my ass kicked by Ruby tonight so I don't have much to show. Trying to just get my metadata scraping to output something currently looks like this:</p>
-
-<p>``` ruby
-require 'open-uri'
-require 'nokogiri'
-require 'mechanize'
-require_relative 'selection_error'</p>
-
-<p>module Tentacles
-  class Crawler</p>
-
-<pre><code>attr_reader :doc
-
-def self.from_uri(uri)
-  new(uri)
-end
-
-def initialize(uri)
-  # Create a new instance of Mechanize and grab our page
-  @agent = Mechanize.new
-
-  @uri = uri
-  @page = @agent.get(@uri)
-  @counts = Hash.new(0)
-end
-
-def words_by_selector(selector, ignored_selector = nil)
-  # Get all the links on the page
-  post_links = @page.links.find_all { |l| l.attributes.parent.name == 'h1' }
-  # Get rid of the first anchor since it's the site header
-  post_links.shift 
-  post_links.each do |link|
-    post = link.click
-    @doc = post.parser
-    nodes = nodes_by_selector(selector)
-    nodes.each do |node|
-      if ignored_selector
-        ignored = node.css(ignored_selector)
-        ignored.remove()
-      end
-      words = words_from_string(node.content)
-      count_frequency(words)
-    end
-  end
-
-  sorted = @counts.sort_by { |word, count| count }
-  sorted.reverse!
-  sorted.map! do |word, count|
-    { word: word, count: count }
-  end
-  { word_count: sorted }
-end
-
-def metadata_by_selector(selector)
-  metadata = { posts: [] }
-
-  # Get all the links on the page
-  post_links = @page.links.find_all { |l| l.attributes.parent.name == 'h1' }
-  # Get rid of the first anchor since it's the site header
-  post_links.shift
-  post_links.each do |link|
-    post = link.click
-    @doc = post.parser
-    time = @doc.css('time')[0]
-    post_data = {}
-    post_data[:date] = { date: time['datetime'] }
-    post_data[:stats] = []
-    nodes = nodes_by_selector(selector)
-    nodes.each do |node|
-      node.children.each do |child|
-        post_data[:stats].push(child.content)
-      end                
-    end
-    metadata[:posts].push(post_data)
-  end
-  p metadata
-end
-</code></pre>
-
-<p>  private</p>
-
-<pre><code>def nodes_by_selector(selector)
-  nodes = @doc.css(selector)
-  raise Tentacles::SelectionError, 
-    'The selector did not return an results!' if nodes.empty?
-  nodes
-end 
-
-def words_from_string(string)
-  string.downcase.scan(/[\w']+/)
-end
-
-def count_frequency(word_list)
-  for word in word_list
-    @counts[word] += 1
-  end
-  @counts
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Really ugly code that still doesn't work. My biggest problem with Ruby is that I don't have very good debugging tools and that frustrates the shit out of me. I'm so used to the visual debuggers in the Chrome Dev tools that doing everything with <code>p</code> or <code>puts</code> is just soul-crushing.</p>
-
-<p>Right now my biggest problem is that data isn't being returned from the spider for whatever reason. This is especially annoying because the operation takes a while to run... I should slim it down but my brain is too tired to re-write the code. I'm kind of hoping for a lucky break. Advice to anyone just starting out in programming, do not do exactly what I'm doing right now.</p>
-
-<p>Ok so after getting my ass totally handed to me by Ruby here's a working version of the spider that grabs the proper metadata.</p>
-
-<p>``` ruby
-require 'open-uri'
-require 'nokogiri'
-require 'mechanize'
-require_relative 'selection_error'</p>
-
-<p>module Tentacles
-  class Crawler</p>
-
-<pre><code>attr_reader :doc
-
-def self.from_uri(uri)
-  new(uri)
-end
-
-def initialize(uri)
-  # Create a new instance of Mechanize and grab our page
-  @agent = Mechanize.new
-
-  @uri = uri
-  @page = @agent.get(@uri)
-  @counts = Hash.new(0)
-end
-
-def words_by_selector(selector, ignored_selector = nil)
-  # # Get all the links on the page
-  # post_links = @page.links.find_all { |l| l.attributes.parent.name == 'h1' }
-  # # Get rid of the first anchor since it's the site header
-  # post_links.shift 
-  # post_links.each do |link|
-  #   post = link.click
-  #   @doc = post.parser
-  #   nodes = nodes_by_selector(selector)
-  #   nodes.each do |node|
-  #     if ignored_selector
-  #       ignored = node.css(ignored_selector)
-  #       ignored.remove()
-  #     end
-  #     words = words_from_string(node.content)
-  #     count_frequency(words)
-  #   end
-  # end
-
-  # sorted = @counts.sort_by { |word, count| count }
-  # sorted.reverse!
-  # sorted.map! do |word, count|
-  #   { word: word, count: count }
-  # end
-  # { word_count: sorted }
-end
-
-def metadata_by_selector(selector)
-  metadata = { posts: [] }
-  puts 'starting'
-  p metadata
-  # Get all the links on the page
-  post_links = @page.links.find_all { |l| l.attributes.parent.name == 'h1' }
-  # Get rid of the first anchor since it's the site header
-  post_links.shift
-  post_links.each do |link|
-    post = link.click
-    @doc = post.parser
-    time = @doc.css('time')[0]
-    post_data = {}
-    post_data[:date] = time['datetime']
-    post_data[:stats] = []
-    nodes = nodes_by_selector(selector)
-    nodes.each do |node|
-      node.children.each do |child|
-        unless child.content.chomp.empty?
-          post_data[:stats].push(child.content)
-        end
-      end                
-    end
-    metadata[:posts].push(post_data)
-    puts 'post added'
-    p metadata
-  end
-  puts 'returning'
-  p metadata
-  metadata
-end
-</code></pre>
-
-<p>  private</p>
-
-<pre><code>def nodes_by_selector(selector)
-  nodes = @doc.css(selector)
-  # raise Tentacles::SelectionError, 
-  #   'The selector did not return an results!' if nodes.empty?
-  nodes
-end 
-
-def words_from_string(string)
-  string.downcase.scan(/[\w']+/)
-end
-
-def count_frequency(word_list)
-  for word in word_list
-    @counts[word] += 1
-  end
-  @counts
-end
-</code></pre>
-
-<p>  end
-end
-<code>``
-I had to comment out the</code>Tentacles::SelectionError` because it was throwing and saying it wasn't getting any content with a selector even though it was. Not sure wtf is going on there but I'm sure it has to do with the fact that it's 1:30 a.m. I have a rule that nothing good happens after 11pm when it comes to coding. Tonight has lived up to that. Anyway the above should put out a hash which when converted to JSON looks like this:</p>
-
-<p>``` json
-{
-  "posts": [</p>
-
-<pre><code>{
-  "date": "2012-06-22T00:31:00-07:00",
-  "stats": [
-    "Time: 12:31 am",
-    "Mood: Tired",
-    "Sleep: 6",
-    "Hunger: 0",
-    "Coffee: 1"
-  ]
-},
-{
-  "date": "2012-06-21T01:27:00-07:00",
-  "stats": [
-    "Time: 1:28 am",
-    "Mood: Tired, Annoyed",
-    "Sleep: 6",
-    "Hunger: 0",
-    "Coffee: 1"
-  ]
-},
-{
-  "date": "2012-06-20T00:09:00-07:00",
-  "stats": [
-    "Time: 12:10 am",
-    "Mood: Tired, Introspective",
-    "Sleep: 4.5",
-    "Hunger: 2",
-    "Coffee: 1"
-  ]
-},
-</code></pre>
-
-<p>... .
-```
-I'm pretty certain I could have done this with Node in a fraction of the time if only because Node is much easier to debug with Chrome Dev tools using node-inspector. While I love the Ruby language I definitely do not like debugging it...</p>
-
-<p>Tomorrow I might write some JS to give my brain a break. I'm thoroughly pissed off at Ruby for the evening. - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 1:08 am</li>
-<li>Mood: Tired, Pissed</li>
-<li>Sleep: 6</li>
-<li>Hunger: 0</li>
 <li>Coffee: 1</li>
 </ul>
 

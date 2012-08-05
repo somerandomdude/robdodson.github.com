@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Alright, contuing from yesterday we want to take our little Node module and make it available to the world as a really awesome command line tool. The &hellip;">
+  <meta name="description" content="I just spent a few hours talking to my friend Derek(@derekebradley) about Ruby and it occured to me that I never finished this scraper project. We &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,213 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/">Object Oriented Scraper Backed With Tests Pt&#8230;9?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-17T22:43:00-07:00" pubdate data-updated="true">Jun 17<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I just spent a few hours talking to my friend <a href="http://derekbradley.com/">Derek</a>(<a href="https://twitter.com/#!/derekebradley">@derekebradley</a>) about Ruby and it occured to me that I never finished this scraper project. We got awfully far with it but then it kind of died on the vine. <a href="http://robdodson.me/blog/2012/05/06/object-oriented-scraper-backed-with-tests/">Thankfully,</a> <a href="http://robdodson.me/blog/2012/05/07/object-oriented-scraper-backed-with-tests-pt-2/">I</a> <a href="http://robdodson.me/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/">wrote</a> <a href="http://robdodson.me/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4/">it</a> <a href="http://robdodson.me/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/">all</a> <a href="http://robdodson.me/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/">down.</a> <a href="http://robdodson.me/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7/">down.</a> <a href="http://robdodson.me/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8/">down.</a></p>
+
+<p>The fact of the matter is I didn&#8217;t know where to take the data. I didn&#8217;t have a design or a layout that I could put it all into. I want to change all that. I want to turn this into something useful. But first I have to make sense of all the code that was written so many weeks ago.</p>
+
+<h2>Tests as documentation&#8230;bullshit.</h2>
+
+<p>Ok ok. I should say it&#8217;s <em>total</em> bullshit to call your tests the documentation because they are helpful. But the fact of the matter is you can get so crafty with RSpec that it makes the tests difficult to read in a useful way. I&#8217;m not saying they&#8217;re illegible, it&#8217;s just that they leverage features which adds to their thought deficit. Before you go off saying that I wrote them wrong and tests should be all the documentation you need&#8230;shutup. They&#8217;re helpful but I would love it if I had written a bit of Markdown Readme to go with all this&#8230;</p>
+
+<h2>Explain yourself</h2>
+
+<p>Let&#8217;s see if I can regurgitate what this thing currently does in plain English.</p>
+
+<ul>
+<li><p>There&#8217;s a config.yml file. It says what page to scrape, what the CSS selector for a post looks like and what the CSS selector for metadata looks like. The metadata is the list at the bottom of every page listing the time, amount of sleep, coffee, etc.</p></li>
+<li><p>There&#8217;s a command line object, <code>tentacles</code>. It initiates <code>runner.rb</code>. <code>Runner</code> creates an instance of <code>Options</code>. <code>Options</code> loads the config.yml file and parses it, turning its properties into members of the options object.</p></li>
+<li><p>It actually doesn&#8217;t do anything else beyond that. <code>runner.rb</code> stops right there but we have Rspec tests which fake data and check to see if our other classes work. Those other classes are&#8230;</p></li>
+<li><p><code>crawler.rb</code> should be the real meat of our program. Funny, seeing as how I wrote all this, that I totally can&#8217;t remember who does what&#8230;</p></li>
+<li><p><code>crawler.rb</code> has two primary methods: <code>words_by_selector</code> and <code>metadata_by_selector</code>.</p></li>
+<li><p><code>words_by_selector</code> returns an array of words and the number of times they&#8217;ve occurred. This array should be in order from most used to least used.</p></li>
+<li><p><code>metadata_by_selector</code> returns the content of one of our metadata lists&#8230;. I think.</p></li>
+</ul>
+
+
+<h2>Make it work</h2>
+
+<p>With Tim Gunn&#8217;s mantra we&#8217;re gonna make this thing work. The tests verify that everything should be at least somewhat functioning. Since I&#8217;m a little drunk I can&#8217;t do a <em>super</em> deep dive but let&#8217;s see if we can get our runner to write out the contents of <code>words_by_selector</code> to a text file.</p>
+
+<figure class='code'><figcaption><span>runner.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;yaml&#39;</span>
+</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;options&#39;</span>
+</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;crawler&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Runner</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span><span class='line'>      <span class="vi">@options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">def</span> <span class="nf">run</span>
+</span><span class='line'>      <span class="vi">@crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+</span><span class='line'>      <span class="n">output</span> <span class="o">=</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">words_by_selector</span><span class="p">(</span><span class="vi">@options</span><span class="o">.</span><span class="n">post_selector</span><span class="p">,</span> <span class="s1">&#39;ul:last-child&#39;</span><span class="p">)</span>
+</span><span class='line'>      <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;output.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">file</span><span class="o">|</span>
+</span><span class='line'>        <span class="n">output</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
+</span><span class='line'>          <span class="n">file</span><span class="o">.</span><span class="n">puts</span> <span class="n">line</span>
+</span><span class='line'>        <span class="k">end</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To get this working I <code>cd</code> into the lib/ folder where all the code lives and do an <code>irb -I .</code> so I can require the local files.</p>
+
+<figure class='code'><figcaption><span>runner.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;runner&#39;</span>
+</span><span class='line'><span class="n">runner</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Runner</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;config.yml&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="n">runner</span><span class="o">.</span><span class="n">run</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After doing that we <em>do</em> get a text file, with copy that looks somewhat correct&#8230;</p>
+
+<figure class='code'><figcaption><span>runner.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">we</span><span class="p">:</span> <span class="mi">8</span>
+</span><span class='line'><span class="n">to</span><span class="p">:</span> <span class="mi">8</span>
+</span><span class='line'><span class="n">npm</span><span class="p">:</span> <span class="mi">6</span>
+</span><span class='line'><span class="n">should</span><span class="p">:</span> <span class="mi">5</span>
+</span><span class='line'><span class="n">package</span><span class="p">:</span> <span class="mi">4</span>
+</span><span class='line'><span class="n">our</span><span class="p">:</span> <span class="mi">4</span>
+</span><span class='line'><span class="n">compliment</span><span class="p">:</span> <span class="mi">4</span>
+</span><span class='line'><span class="n">git</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="mi">0</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="mi">4</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="n">need</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="mi">2</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="n">it</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="n">node_modules</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="n">the</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="n">have</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="n">be</span><span class="p">:</span> <span class="mi">3</span>
+</span><span class='line'><span class="n">json</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">your</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">any</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">dependencies</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">module</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="ow">and</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">node</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">add</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">xml2json</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">how</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">s</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="k">in</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">you</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">json1</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">an</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="mi">3</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">awesome</span><span class="p">:</span> <span class="mi">2</span>
+</span><span class='line'><span class="n">version</span><span class="p">:</span> <span class="mi">2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It looks like the copy from my most recent blog post, plus or minus a few words. Horrible regex aside it <em>kinda</em> works and that&#8217;s what we&#8217;re after. Maybe tomorrow we can turn it into some JSON :D Till then. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 10:44 pm</li>
+<li>Mood: Drunk, Sleepy</li>
+<li>Sleep: 3</li>
+<li>Hunger: 4</li>
+<li>Coffee: 1</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1808,538 +2015,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/07/building-a-countdown-timer-with-socket-dot-io-pt-3/">Building a Countdown Timer With Socket.io Pt. 3</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-07T19:41:00-07:00" pubdate data-updated="true">Jun 7<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Today&#8217;s the day we wrap up our countdown timer and deploy it to Heroku. But before we launch this puppy we need to clean house a little and spice up the visual appeal.</p>
-
-<h3>Refactoring the Stopwatch</h3>
-
-<p>While the Stopwatch from our last post worked OK there are a spots that can be improved. For starters I&#8217;d like to separate the formatting of the time from the <code>onTick</code> method. Mainly because I want to be able to pull the current time out whenever someone hits reset or a new connection is made. Here&#8217;s how I updated Stopwatch to accomodate these changes:</p>
-
-<figure class='code'><figcaption><span>modles/stopwatch.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-<span class='line-number'>87</span>
-<span class='line-number'>88</span>
-<span class='line-number'>89</span>
-<span class='line-number'>90</span>
-<span class='line-number'>91</span>
-<span class='line-number'>92</span>
-<span class='line-number'>93</span>
-<span class='line-number'>94</span>
-<span class='line-number'>95</span>
-<span class='line-number'>96</span>
-<span class='line-number'>97</span>
-<span class='line-number'>98</span>
-<span class='line-number'>99</span>
-<span class='line-number'>100</span>
-<span class='line-number'>101</span>
-<span class='line-number'>102</span>
-<span class='line-number'>103</span>
-<span class='line-number'>104</span>
-<span class='line-number'>105</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">util</span>    <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;util&#39;</span><span class="p">),</span>
-</span><span class='line'>    <span class="nx">events</span>  <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;events&#39;</span><span class="p">)</span>
-</span><span class='line'>    <span class="nx">_</span>       <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;underscore&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// ---------------------------------------------</span>
-</span><span class='line'><span class="c1">// Constructor</span>
-</span><span class='line'><span class="c1">// ---------------------------------------------</span>
-</span><span class='line'><span class="kd">function</span> <span class="nx">Stopwatch</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">if</span><span class="p">(</span><span class="kc">false</span> <span class="o">===</span> <span class="p">(</span><span class="k">this</span> <span class="k">instanceof</span> <span class="nx">Stopwatch</span><span class="p">))</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nx">Stopwatch</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">hour</span> <span class="o">=</span> <span class="mi">3600000</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">minute</span> <span class="o">=</span> <span class="mi">60000</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">second</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">time</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hour</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">interval</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Use Underscore to bind all of our methods</span>
-</span><span class='line'>    <span class="c1">// to the proper context</span>
-</span><span class='line'>    <span class="nx">_</span><span class="p">.</span><span class="nx">bindAll</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// ---------------------------------------------</span>
-</span><span class='line'><span class="c1">// Inherit from EventEmitter</span>
-</span><span class='line'><span class="c1">// ---------------------------------------------</span>
-</span><span class='line'><span class="nx">util</span><span class="p">.</span><span class="nx">inherits</span><span class="p">(</span><span class="nx">Stopwatch</span><span class="p">,</span> <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// ---------------------------------------------</span>
-</span><span class='line'><span class="c1">// Methods</span>
-</span><span class='line'><span class="c1">// ---------------------------------------------</span>
-</span><span class='line'><span class="nx">Stopwatch</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">start</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">interval</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Starting Stopwatch!&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="c1">// note the use of _.bindAll in the constructor</span>
-</span><span class='line'>    <span class="c1">// with bindAll we can pass one of our methods to</span>
-</span><span class='line'>    <span class="c1">// setInterval and have it called with the proper &#39;this&#39; value</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">interval</span> <span class="o">=</span> <span class="nx">setInterval</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">onTick</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">second</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;start:stopwatch&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">Stopwatch</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">stop</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Stopping Stopwatch!&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">interval</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">clearInterval</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">interval</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">interval</span> <span class="o">=</span> <span class="kc">undefined</span><span class="p">;</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;stop:stopwatch&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">Stopwatch</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">reset</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Resetting Stopwatch!&#39;</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">time</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hour</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;reset:stopwatch&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">formatTime</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">time</span><span class="p">));</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">Stopwatch</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">onTick</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">time</span> <span class="o">-=</span> <span class="k">this</span><span class="p">.</span><span class="nx">second</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">formattedTime</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">formatTime</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">time</span><span class="p">);</span>
-</span><span class='line'>    <span class="k">this</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;tick:stopwatch&#39;</span><span class="p">,</span> <span class="nx">formattedTime</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">time</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">Stopwatch</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">formatTime</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">time</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">remainder</span> <span class="o">=</span> <span class="nx">time</span><span class="p">,</span>
-</span><span class='line'>        <span class="nx">numHours</span><span class="p">,</span>
-</span><span class='line'>        <span class="nx">numMinutes</span><span class="p">,</span>
-</span><span class='line'>        <span class="nx">numSeconds</span><span class="p">,</span>
-</span><span class='line'>        <span class="nx">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">numHours</span> <span class="o">=</span> <span class="nb">String</span><span class="p">(</span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">remainder</span> <span class="o">/</span> <span class="k">this</span><span class="p">.</span><span class="nx">hour</span><span class="p">,</span> <span class="mi">10</span><span class="p">));</span>
-</span><span class='line'>    <span class="nx">remainder</span> <span class="o">-=</span> <span class="k">this</span><span class="p">.</span><span class="nx">hour</span> <span class="o">*</span> <span class="nx">numHours</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">numMinutes</span> <span class="o">=</span> <span class="nb">String</span><span class="p">(</span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">remainder</span> <span class="o">/</span> <span class="k">this</span><span class="p">.</span><span class="nx">minute</span><span class="p">,</span> <span class="mi">10</span><span class="p">));</span>
-</span><span class='line'>    <span class="nx">remainder</span> <span class="o">-=</span> <span class="k">this</span><span class="p">.</span><span class="nx">minute</span> <span class="o">*</span> <span class="nx">numMinutes</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">numSeconds</span> <span class="o">=</span> <span class="nb">String</span><span class="p">(</span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">remainder</span> <span class="o">/</span> <span class="k">this</span><span class="p">.</span><span class="nx">second</span><span class="p">,</span> <span class="mi">10</span><span class="p">));</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">output</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">([</span><span class="nx">numHours</span><span class="p">,</span> <span class="nx">numMinutes</span><span class="p">,</span> <span class="nx">numSeconds</span><span class="p">],</span> <span class="kd">function</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">str</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">str</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span> <span class="o">+</span> <span class="nx">str</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">str</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">}).</span><span class="nx">join</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="nx">output</span><span class="p">;</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">Stopwatch</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getTime</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">formatTime</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">time</span><span class="p">);</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// ---------------------------------------------</span>
-</span><span class='line'><span class="c1">// Export</span>
-</span><span class='line'><span class="c1">// ---------------------------------------------</span>
-</span><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Stopwatch</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I also namespaced the events so they would be easier to read when mixed in with the socket.io events. During the refactoring I noticed there were a lot of actors listening to, emitting or calling something like <code>start</code>. I&#8217;m not sure if there are common socket.io namespacing patterns but I based what I did on Backbone events and I think it works out well enough.</p>
-
-<h3>Cleaning up app.js</h3>
-
-<p>These changes to <code>Stopwatch</code> also require us to update the <code>app.js</code> that uses it.</p>
-
-<figure class='code'><figcaption><span>app.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">stopwatch</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Stopwatch</span><span class="p">();</span>
-</span><span class='line'><span class="nx">stopwatch</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;tick:stopwatch&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">time</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">time</span><span class="o">:</span> <span class="nx">time</span> <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">stopwatch</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;reset:stopwatch&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">time</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">time</span><span class="o">:</span> <span class="nx">time</span> <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">stopwatch</span><span class="p">.</span><span class="nx">start</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">socket</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">io</span><span class="p">.</span><span class="nx">sockets</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">time</span><span class="o">:</span> <span class="nx">stopwatch</span><span class="p">.</span><span class="nx">getTime</span><span class="p">()</span> <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;click:start&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">stopwatch</span><span class="p">.</span><span class="nx">start</span><span class="p">();</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;click:stop&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">stopwatch</span><span class="p">.</span><span class="nx">stop</span><span class="p">();</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;click:reset&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">stopwatch</span><span class="p">.</span><span class="nx">reset</span><span class="p">();</span>
-</span><span class='line'>  <span class="p">});</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I&#8217;ve made it so whenever a user resets or connects to the page they get the latest time. And of course whenever the stopwatch ticks they&#8217;ll get an update as well. I think it might also be nice if pressing start dispatched the latest time, I should probably add that&#8230; ;)</p>
-
-<h3>Tweaking the views</h3>
-
-<p>Lastly I&#8217;ve updated the view by adding some more buttons to correspond to the start/stop and reset methods. I&#8217;ve also wrapped everything in a container to make it easier to position:</p>
-
-<figure class='code'><figcaption><span>views/index.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;wrapper&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;countdown&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;button</span> <span class="na">id=</span><span class="s">&quot;start&quot;</span> <span class="na">class=</span><span class="s">&quot;thoughtbot&quot;</span><span class="nt">&gt;</span>Start<span class="nt">&lt;/button&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;button</span> <span class="na">id=</span><span class="s">&quot;stop&quot;</span> <span class="na">class=</span><span class="s">&quot;thoughtbot&quot;</span><span class="nt">&gt;</span>Stop<span class="nt">&lt;/button&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;button</span> <span class="na">id=</span><span class="s">&quot;reset&quot;</span> <span class="na">class=</span><span class="s">&quot;thoughtbot&quot;</span><span class="nt">&gt;</span>Reset<span class="nt">&lt;/button&gt;</span>
-</span><span class='line'><span class="nt">&lt;/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<figure class='code'><figcaption><span>public/js/main.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">socket</span> <span class="o">=</span> <span class="nx">io</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">hostname</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#countdown&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">time</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#start&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;click:start&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#stop&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;click:stop&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#reset&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">&#39;click:reset&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Also notice that the socket events coming from the view have been namespaced as well.</p>
-
-<h3>Improving the type</h3>
-
-<p>Next up I want to enhance the type using <a href="http://www.google.com/webfonts">one of Google&#8217;s webfonts.</a> I chose a font called <code>Black Ops One</code> which seemed appropriately militaristic. Setting it up was as easy as adding one line to my <code>layout.ejs</code></p>
-
-<figure class='code'><figcaption><span>views/layout.ejs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;link</span> <span class="na">href=</span><span class="s">&#39;http://fonts.googleapis.com/css?family=Black+Ops+One&#39;</span> <span class="na">rel=</span><span class="s">&#39;stylesheet&#39;</span> <span class="na">type=</span><span class="s">&#39;text/css&#39;</span><span class="nt">&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>and my <code>main.css</code> file:</p>
-
-<figure class='code'><figcaption><span>public/css/main.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nf">#countdown</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">font-family</span><span class="o">:</span> <span class="s1">&#39;Black Ops One&#39;</span><span class="o">,</span> <span class="k">cursive</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">font-size</span><span class="o">:</span> <span class="m">90px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Finally I chose to use some funky buttons from <a href="https://github.com/ubuwaits/css3-buttons">Chad Mazzola&#8217;s CSS3 Buttons project.</a> I went with the Thoughtbot buttons since they were red and awesome. The styles are pretty long so I&#8217;m just going to post my entire <code>main.css</code> for you to see:</p>
-
-<figure class='code'><figcaption><span>public/css/main.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nf">#wrapper</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">475px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">height</span><span class="o">:</span> <span class="m">171px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">margin</span><span class="o">:</span> <span class="m">100px</span> <span class="k">auto</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">#countdown</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">font-family</span><span class="o">:</span> <span class="s1">&#39;Black Ops One&#39;</span><span class="o">,</span> <span class="k">cursive</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">font-size</span><span class="o">:</span> <span class="m">90px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">button</span><span class="nc">.thoughtbot</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="m">#ee432e</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="k">top</span><span class="o">,</span> <span class="k">left</span> <span class="k">bottom</span><span class="o">,</span> <span class="k">color</span><span class="o">-</span><span class="n">stop</span><span class="p">(</span><span class="m">0</span><span class="o">%,</span> <span class="m">#ee432e</span><span class="p">)</span><span class="o">,</span> <span class="k">color</span><span class="o">-</span><span class="n">stop</span><span class="p">(</span><span class="m">50</span><span class="o">%,</span> <span class="m">#c63929</span><span class="p">)</span><span class="o">,</span> <span class="k">color</span><span class="o">-</span><span class="n">stop</span><span class="p">(</span><span class="m">50</span><span class="o">%,</span> <span class="m">#b51700</span><span class="p">)</span><span class="o">,</span> <span class="k">color</span><span class="o">-</span><span class="n">stop</span><span class="p">(</span><span class="m">100</span><span class="o">%,</span> <span class="m">#891100</span><span class="p">));</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#ee432e</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#c63929</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#b51700</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#891100</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">moz</span><span class="o">-</span><span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#ee432e</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#c63929</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#b51700</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#891100</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">ms</span><span class="o">-</span><span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#ee432e</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#c63929</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#b51700</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#891100</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">o</span><span class="o">-</span><span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#ee432e</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#c63929</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#b51700</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#891100</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#ee432e</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#c63929</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#b51700</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#891100</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">border</span><span class="o">:</span> <span class="m">1px</span> <span class="k">solid</span> <span class="m">#951100</span><span class="p">;</span>
-</span><span class='line'>  <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="k">border</span><span class="o">-</span><span class="n">radius</span><span class="o">:</span> <span class="m">5px</span><span class="p">;</span>
-</span><span class='line'>  <span class="o">-</span><span class="n">moz</span><span class="o">-</span><span class="k">border</span><span class="o">-</span><span class="n">radius</span><span class="o">:</span> <span class="m">5px</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">border</span><span class="o">-</span><span class="n">radius</span><span class="o">:</span> <span class="m">5px</span><span class="p">;</span>
-</span><span class='line'>  <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="n">box</span><span class="o">-</span><span class="n">shadow</span><span class="o">:</span> <span class="k">inset</span> <span class="m">0px</span> <span class="m">0px</span> <span class="m">0px</span> <span class="m">1px</span> <span class="n">rgba</span><span class="p">(</span><span class="m">255</span><span class="o">,</span> <span class="m">115</span><span class="o">,</span> <span class="m">100</span><span class="o">,</span> <span class="m">0</span><span class="o">.</span><span class="m">4</span><span class="p">)</span><span class="o">,</span> <span class="m">0</span> <span class="m">1px</span> <span class="m">3px</span> <span class="m">#333333</span><span class="p">;</span>
-</span><span class='line'>  <span class="o">-</span><span class="n">moz</span><span class="o">-</span><span class="n">box</span><span class="o">-</span><span class="n">shadow</span><span class="o">:</span> <span class="k">inset</span> <span class="m">0px</span> <span class="m">0px</span> <span class="m">0px</span> <span class="m">1px</span> <span class="n">rgba</span><span class="p">(</span><span class="m">255</span><span class="o">,</span> <span class="m">115</span><span class="o">,</span> <span class="m">100</span><span class="o">,</span> <span class="m">0</span><span class="o">.</span><span class="m">4</span><span class="p">)</span><span class="o">,</span> <span class="m">0</span> <span class="m">1px</span> <span class="m">3px</span> <span class="m">#333333</span><span class="p">;</span>
-</span><span class='line'>  <span class="n">box</span><span class="o">-</span><span class="n">shadow</span><span class="o">:</span> <span class="k">inset</span> <span class="m">0px</span> <span class="m">0px</span> <span class="m">0px</span> <span class="m">1px</span> <span class="n">rgba</span><span class="p">(</span><span class="m">255</span><span class="o">,</span> <span class="m">115</span><span class="o">,</span> <span class="m">100</span><span class="o">,</span> <span class="m">0</span><span class="o">.</span><span class="m">4</span><span class="p">)</span><span class="o">,</span> <span class="m">0</span> <span class="m">1px</span> <span class="m">3px</span> <span class="m">#333333</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">color</span><span class="o">:</span> <span class="m">#fff</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">font</span><span class="o">:</span> <span class="k">bold</span> <span class="m">20px</span> <span class="s2">&quot;helvetica neue&quot;</span><span class="o">,</span> <span class="n">helvetica</span><span class="o">,</span> <span class="n">arial</span><span class="o">,</span> <span class="k">sans-serif</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">line-height</span><span class="o">:</span> <span class="m">1</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">padding</span><span class="o">:</span> <span class="m">12px</span> <span class="m">0</span> <span class="m">14px</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">text-align</span><span class="o">:</span> <span class="k">center</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">text-shadow</span><span class="o">:</span> <span class="m">0px</span> <span class="m">-1px</span> <span class="m">1px</span> <span class="n">rgba</span><span class="p">(</span><span class="m">0</span><span class="o">,</span> <span class="m">0</span><span class="o">,</span> <span class="m">0</span><span class="o">,</span> <span class="m">0</span><span class="o">.</span><span class="m">8</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">width</span><span class="o">:</span> <span class="m">150px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">button</span><span class="nc">.thoughtbot</span><span class="nd">:hover</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="m">#f37873</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="k">top</span><span class="o">,</span> <span class="k">left</span> <span class="k">bottom</span><span class="o">,</span> <span class="k">color</span><span class="o">-</span><span class="n">stop</span><span class="p">(</span><span class="m">0</span><span class="o">%,</span> <span class="m">#f37873</span><span class="p">)</span><span class="o">,</span> <span class="k">color</span><span class="o">-</span><span class="n">stop</span><span class="p">(</span><span class="m">50</span><span class="o">%,</span> <span class="m">#db504d</span><span class="p">)</span><span class="o">,</span> <span class="k">color</span><span class="o">-</span><span class="n">stop</span><span class="p">(</span><span class="m">50</span><span class="o">%,</span> <span class="m">#cb0500</span><span class="p">)</span><span class="o">,</span> <span class="k">color</span><span class="o">-</span><span class="n">stop</span><span class="p">(</span><span class="m">100</span><span class="o">%,</span> <span class="m">#a20601</span><span class="p">));</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#f37873</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#db504d</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#cb0500</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#a20601</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">moz</span><span class="o">-</span><span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#f37873</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#db504d</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#cb0500</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#a20601</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">ms</span><span class="o">-</span><span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#f37873</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#db504d</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#cb0500</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#a20601</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">o</span><span class="o">-</span><span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#f37873</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#db504d</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#cb0500</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#a20601</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#f37873</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#db504d</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#cb0500</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#a20601</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">cursor</span><span class="o">:</span> <span class="k">pointer</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">button</span><span class="nc">.thoughtbot</span><span class="nd">:active</span> <span class="p">{</span>
-</span><span class='line'>  <span class="k">background-color</span><span class="o">:</span> <span class="m">#d43c28</span><span class="p">;</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="n">linear</span><span class="o">,</span> <span class="k">left</span> <span class="k">top</span><span class="o">,</span> <span class="k">left</span> <span class="k">bottom</span><span class="o">,</span> <span class="k">color</span><span class="o">-</span><span class="n">stop</span><span class="p">(</span><span class="m">0</span><span class="o">%,</span> <span class="m">#d43c28</span><span class="p">)</span><span class="o">,</span> <span class="k">color</span><span class="o">-</span><span class="n">stop</span><span class="p">(</span><span class="m">50</span><span class="o">%,</span> <span class="m">#ad3224</span><span class="p">)</span><span class="o">,</span> <span class="k">color</span><span class="o">-</span><span class="n">stop</span><span class="p">(</span><span class="m">50</span><span class="o">%,</span> <span class="m">#9c1500</span><span class="p">)</span><span class="o">,</span> <span class="k">color</span><span class="o">-</span><span class="n">stop</span><span class="p">(</span><span class="m">100</span><span class="o">%,</span> <span class="m">#700d00</span><span class="p">));</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#d43c28</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#ad3224</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#9c1500</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#700d00</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">moz</span><span class="o">-</span><span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#d43c28</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#ad3224</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#9c1500</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#700d00</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">ms</span><span class="o">-</span><span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#d43c28</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#ad3224</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#9c1500</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#700d00</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="o">-</span><span class="n">o</span><span class="o">-</span><span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#d43c28</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#ad3224</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#9c1500</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#700d00</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="k">background-image</span><span class="o">:</span> <span class="n">linear</span><span class="o">-</span><span class="n">gradient</span><span class="p">(</span><span class="k">top</span><span class="o">,</span> <span class="m">#d43c28</span> <span class="m">0</span><span class="o">%,</span> <span class="m">#ad3224</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#9c1500</span> <span class="m">50</span><span class="o">%,</span> <span class="m">#700d00</span> <span class="m">100</span><span class="o">%</span><span class="p">);</span>
-</span><span class='line'>  <span class="o">-</span><span class="n">webkit</span><span class="o">-</span><span class="n">box</span><span class="o">-</span><span class="n">shadow</span><span class="o">:</span> <span class="k">inset</span> <span class="m">0px</span> <span class="m">0px</span> <span class="m">0px</span> <span class="m">1px</span> <span class="n">rgba</span><span class="p">(</span><span class="m">255</span><span class="o">,</span> <span class="m">115</span><span class="o">,</span> <span class="m">100</span><span class="o">,</span> <span class="m">0</span><span class="o">.</span><span class="m">4</span><span class="p">);</span>
-</span><span class='line'>  <span class="o">-</span><span class="n">moz</span><span class="o">-</span><span class="n">box</span><span class="o">-</span><span class="n">shadow</span><span class="o">:</span> <span class="k">inset</span> <span class="m">0px</span> <span class="m">0px</span> <span class="m">0px</span> <span class="m">1px</span> <span class="n">rgba</span><span class="p">(</span><span class="m">255</span><span class="o">,</span> <span class="m">115</span><span class="o">,</span> <span class="m">100</span><span class="o">,</span> <span class="m">0</span><span class="o">.</span><span class="m">4</span><span class="p">);</span>
-</span><span class='line'>  <span class="n">box</span><span class="o">-</span><span class="n">shadow</span><span class="o">:</span> <span class="k">inset</span> <span class="m">0px</span> <span class="m">0px</span> <span class="m">0px</span> <span class="m">1px</span> <span class="n">rgba</span><span class="p">(</span><span class="m">255</span><span class="o">,</span> <span class="m">115</span><span class="o">,</span> <span class="m">100</span><span class="o">,</span> <span class="m">0</span><span class="o">.</span><span class="m">4</span><span class="p">);</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/defcon_final.png" title="'Defcon final'" ></p>
-
-<p>SWEEEEEEET! I&#8217;ll go ahead and host it on Heroku but first I have to find out what the cost of leaving Node.js/Socket.io running indefinitely would be. Till then you should be able to get a local version of all this working or <a href="https://github.com/robdodson/defcon">just clone the Github repo</a> and now you too can have your very own Defcon stopwatch. enjoy! - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:41 pm</li>
-<li>Mood: Tired, Lazy</li>
-<li>Sleep: 6</li>
-<li>Hunger: 3</li>
-<li>Coffee: 1</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -2357,6 +2032,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/03/javascript-design-patterns-strategy/">JavaScript Design Patterns: Strategy</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns</a>
       </li>
     
@@ -2370,10 +2049,6 @@
     
       <li class="post">
         <a href="/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/">Sublime Text 2 Tips and Shortcuts</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/23/failing-at-ruby/">Failing at Ruby</a>
       </li>
     
   </ul>
