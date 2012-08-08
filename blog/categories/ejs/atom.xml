@@ -4,7 +4,7 @@
   <title><![CDATA[Category: EJS | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/ejs/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-05T15:13:39-07:00</updated>
+  <updated>2012-08-08T09:45:19-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -111,7 +111,7 @@ app.get('/', function(req, res) {
 
 
 <p>```
-<img class="center" src="https://s3.amazonaws.com/robdodson/images/rendering_the_index_template.png" title="'Rendering the index template'" ></p>
+{% img center https://s3.amazonaws.com/robdodson/images/rendering_the_index_template.png 'Rendering the index template' %}</p>
 
 <p>Furthermore we can use partials with Express and EJS like so:</p>
 
@@ -158,7 +158,7 @@ app.get('/', function(req, res) {
 
 <p>```</p>
 
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/rendering_the_header_partial.png" title="'Rendering the header partial'" ></p>
+<p>{% img center https://s3.amazonaws.com/robdodson/images/rendering_the_header_partial.png 'Rendering the header partial' %}</p>
 
 <p>And there ya go! Simple but hopefully useful if you're just getting started like I am :) - Rob</p>
 

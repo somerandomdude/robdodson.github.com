@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Sublime Text 2 | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/sublime-text-2/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-05T15:13:39-07:00</updated>
+  <updated>2012-08-08T09:45:19-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -164,7 +164,7 @@ That will tell Sublime that when I press</code>cmd+shift+r<code>it should act as
 
 <p>OK this one is also important and I can't recommend it enough. <strong>Learn to split your editor windows.</strong> I never used this feature in previous IDEs and now I wonder how I ever lived without it. Whether you have a unit test in one window and an implementation in the other, or some HTML and CSS, this feature is just always handy.</p>
 
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/sublime-split-panes.png" title="'Split windows in Sublime'" ></p>
+<p>{% img center https://s3.amazonaws.com/robdodson/images/sublime-split-panes.png 'Split windows in Sublime' %}</p>
 
 <p>I <em>live</em> in split panes. They've changed my workflow significantly for the better. Less time switching between files and finding your place is an incredible advantage. You can access them through <code>View &gt; Layouts</code>. It will behoove you to learn these keyboard shortcuts. Also learn the shortcuts for <code>View &gt; Focus Group</code> and <code>View &gt; Move File to Group</code>.</p>
 

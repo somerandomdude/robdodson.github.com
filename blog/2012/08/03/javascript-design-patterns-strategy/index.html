@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Back to Table of Contents The Strategy pattern is one of my personal favorites and you&#8217;ve probably seen or used it in some fashion without even &hellip;">
+  <meta name="description" content="The Strategy pattern is one of my personal favorites and you&#8217;ve probably seen or used it in some fashion without even knowing it. Its primary &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -100,9 +100,7 @@
   </header>
 
 
-<div class="entry-content"><h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Back to Table of Contents</a></h4>
-
-<p>The Strategy pattern is one of my personal favorites and you&#8217;ve probably seen or used it in some fashion without even knowing it. Its primary purpose is to help you separate the parts of an object which are subject to change from the rest of the static bits. Using Strategy objects versus subclasses can often result in much more flexible code since you&#8217;re creating a suite of easily swappable algorithms.</p>
+<div class="entry-content"><p>The Strategy pattern is one of my personal favorites and you&#8217;ve probably seen or used it in some fashion without even knowing it. Its primary purpose is to help you separate the parts of an object which are subject to change from the rest of the static bits. Using Strategy objects versus subclasses can often result in much more flexible code since you&#8217;re creating a suite of easily swappable algorithms.</p>
 
 <h2>Formal Definition</h2>
 
@@ -265,105 +263,22 @@
 
 <p>Another benefit of the Strategy pattern is that it can hide complex logic or data that the client doesn&#8217;t need to know about.</p>
 
-<h2>The Painting App</h2>
+<h2>Real World Examples</h2>
 
-<p>For a real world example of when to use Strategy objects consider your typical painting program. Often times you will offer a variety of different brush types to your user but you don&#8217;t want to have to change the fundamentals of how a mark shows up on screen every time the user decides to switch from a round to a square brush. Why not wrap those specific implementations in their own brush objects and later on when the user clicks to draw something to screen we&#8217;ll just defer to one of those brushes.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Grab a reference to the canvas and the drawing context</span>
-</span><span class='line'><span class="nx">$canvas</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#painter&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">context</span> <span class="o">=</span> <span class="nx">$canvas</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Define our brush strategy objects</span>
-</span><span class='line'><span class="nx">brushes</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">outline</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">draw</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>          <span class="nx">context</span><span class="p">.</span><span class="nx">strokeRect</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">pageX</span> <span class="o">-</span> <span class="nx">offsetLeft</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageY</span> <span class="o">-</span> <span class="nx">offsetTop</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">square</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">draw</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>          <span class="nx">context</span><span class="p">.</span><span class="nx">fillRect</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">pageX</span> <span class="o">-</span> <span class="nx">offsetLeft</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageY</span> <span class="o">-</span> <span class="nx">offsetTop</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">circle</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">draw</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>          <span class="nx">context</span><span class="p">.</span><span class="nx">arc</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">pageX</span> <span class="o">-</span> <span class="nx">offsetLeft</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageY</span> <span class="o">-</span> <span class="nx">offsetTop</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mi">2</span><span class="p">);</span>
-</span><span class='line'>          <span class="nx">context</span><span class="p">.</span><span class="nx">fill</span><span class="p">();</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">...</span> <span class="p">.</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">brush</span> <span class="o">=</span> <span class="nx">brushes</span><span class="p">.</span><span class="nx">square</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Here we see that <code>brushes.outline</code>, <code>brushes.square</code>, and <code>brushes.circle</code> each implement a consistent interface for the <code>draw</code> call. However their exact implementation changes from one brush to the next. <code>brushes.outline</code> will only draw the stroke of a rectangle, whereas <code>brushes.square</code> and <code>brushes.circle</code> will fill their respective shapes in. Elsehwere in the program we set our initial brush to a default of brushes.square. When the users presses their mouse and moves it around screen we can defer to whichever Strategy the brush object is currently referencing:</p>
+<p>Let&#8217;s say you&#8217;re designing a website with all kinds of different, interesting button animations. Sometimes buttons should expand when rolled over, other times they should fade and maybe some will change colors. You could have several button classes or jQuery selections but you&#8217;d be repeating a ton of code just for the sake of a little animation algorithm. Let&#8217;s see if we can write some strategy objects which solve this problem for us and give us a nice toolbox to work from.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Listen for mouse events on the canvas</span>
-</span><span class='line'><span class="nx">$canvas</span>
-</span><span class='line'>  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mousedown&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">isDrawing</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">})</span>
-</span><span class='line'>  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mouseup mouseleave&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">isDrawing</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">})</span>
-</span><span class='line'>  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mousemove&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">isDrawing</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>          <span class="c1">// Defer drawing to a Strategy object</span>
-</span><span class='line'>          <span class="nx">brush</span><span class="p">.</span><span class="nx">draw</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">context</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>  <span class="p">});</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">ButtonAnimation</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">animation</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">context</span> <span class="o">=</span> <span class="nx">context</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">animation</span> <span class="o">=</span> <span class="nx">func</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Again notice that <code>.on('mousemove')</code> we first check to see if it&#8217;s ok to draw something and then defer to whichever Strategy is currently being referenced. Using this approach we can add limitless new brush types to the <code>brushes</code> object and easily change how our program performs at runtime. Be sure to check out the live example and the source for the full application.</p>
-
-<h3><a href="http://robdodson.s3.amazonaws.com/javascript-design-patterns/strategy/painter/index.html">Live Example</a></h3>
-
-<h3><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/strategy/painter">Source</a></h3>
+<h3>Bocoup example</h3>
 
 <h2>Related Patterns</h2>
 
@@ -420,6 +335,8 @@
         <a class="basic-alignment left" href="/blog/2012/08/03/javascript-design-patterns/" title="Previous Post: JavaScript Design Patterns">&laquo; JavaScript Design Patterns</a>
       
       
+        <a class="basic-alignment right" href="/blog/2012/08/08/javascript-design-patterns-decorator/" title="Next Post: JavaScript Design Patterns: Decorator">JavaScript Design Patterns: Decorator &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -439,6 +356,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/08/javascript-design-patterns-decorator/">JavaScript Design Patterns: Decorator</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/03/javascript-design-patterns-strategy/">JavaScript Design Patterns: Strategy</a>
       </li>
     
@@ -452,10 +373,6 @@
     
       <li class="post">
         <a href="/blog/2012/06/24/sublime-snippet-basics/">Sublime Snippet Basics</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/">Sublime Text 2 Tips and Shortcuts</a>
       </li>
     
   </ul>

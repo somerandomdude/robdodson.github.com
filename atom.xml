@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-05T15:13:39-07:00</updated>
+  <updated>2012-08-08T09:34:34-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -14,13 +14,22 @@
 
   
   <entry>
+    <title type="html"><![CDATA[JavaScript Design Patterns: Decorator]]></title>
+    <link href="http://robdodson.me/blog/2012/08/08/javascript-design-patterns-decorator/"/>
+    <updated>2012-08-08T09:32:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/08/08/javascript-design-patterns-decorator</id>
+    <content type="html"><![CDATA[<p>This is where the Decorator article will go. Apologies for the temporary weirdness. I&#8217;m setting up Octopress on a new machine and sorting out all of its funky git branches. Stay tuned&#8230; ETA for this post is Thursday, Aug. 09</p>
+
+<p>&#8211; Rob</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[JavaScript Design Patterns: Strategy]]></title>
     <link href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns-strategy/"/>
     <updated>2012-08-03T15:12:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/08/03/javascript-design-patterns-strategy</id>
-    <content type="html"><![CDATA[<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Back to Table of Contents</a></h4>
-
-<p>The Strategy pattern is one of my personal favorites and you&#8217;ve probably seen or used it in some fashion without even knowing it. Its primary purpose is to help you separate the parts of an object which are subject to change from the rest of the static bits. Using Strategy objects versus subclasses can often result in much more flexible code since you&#8217;re creating a suite of easily swappable algorithms.</p>
+    <content type="html"><![CDATA[<p>The Strategy pattern is one of my personal favorites and you&#8217;ve probably seen or used it in some fashion without even knowing it. Its primary purpose is to help you separate the parts of an object which are subject to change from the rest of the static bits. Using Strategy objects versus subclasses can often result in much more flexible code since you&#8217;re creating a suite of easily swappable algorithms.</p>
 
 <h2>Formal Definition</h2>
 
@@ -183,105 +192,22 @@
 
 <p>Another benefit of the Strategy pattern is that it can hide complex logic or data that the client doesn&#8217;t need to know about.</p>
 
-<h2>The Painting App</h2>
+<h2>Real World Examples</h2>
 
-<p>For a real world example of when to use Strategy objects consider your typical painting program. Often times you will offer a variety of different brush types to your user but you don&#8217;t want to have to change the fundamentals of how a mark shows up on screen every time the user decides to switch from a round to a square brush. Why not wrap those specific implementations in their own brush objects and later on when the user clicks to draw something to screen we&#8217;ll just defer to one of those brushes.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Grab a reference to the canvas and the drawing context</span>
-</span><span class='line'><span class="nx">$canvas</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#painter&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">context</span> <span class="o">=</span> <span class="nx">$canvas</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">getContext</span><span class="p">(</span><span class="s1">&#39;2d&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Define our brush strategy objects</span>
-</span><span class='line'><span class="nx">brushes</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">outline</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">draw</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>          <span class="nx">context</span><span class="p">.</span><span class="nx">strokeRect</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">pageX</span> <span class="o">-</span> <span class="nx">offsetLeft</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageY</span> <span class="o">-</span> <span class="nx">offsetTop</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">square</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">draw</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>          <span class="nx">context</span><span class="p">.</span><span class="nx">fillRect</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">pageX</span> <span class="o">-</span> <span class="nx">offsetLeft</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageY</span> <span class="o">-</span> <span class="nx">offsetTop</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="nx">circle</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">draw</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>          <span class="nx">context</span><span class="p">.</span><span class="nx">arc</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">pageX</span> <span class="o">-</span> <span class="nx">offsetLeft</span><span class="p">,</span> <span class="nx">e</span><span class="p">.</span><span class="nx">pageY</span> <span class="o">-</span> <span class="nx">offsetTop</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span> <span class="o">*</span> <span class="mi">2</span><span class="p">);</span>
-</span><span class='line'>          <span class="nx">context</span><span class="p">.</span><span class="nx">fill</span><span class="p">();</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">...</span> <span class="p">.</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">brush</span> <span class="o">=</span> <span class="nx">brushes</span><span class="p">.</span><span class="nx">square</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Here we see that <code>brushes.outline</code>, <code>brushes.square</code>, and <code>brushes.circle</code> each implement a consistent interface for the <code>draw</code> call. However their exact implementation changes from one brush to the next. <code>brushes.outline</code> will only draw the stroke of a rectangle, whereas <code>brushes.square</code> and <code>brushes.circle</code> will fill their respective shapes in. Elsehwere in the program we set our initial brush to a default of brushes.square. When the users presses their mouse and moves it around screen we can defer to whichever Strategy the brush object is currently referencing:</p>
+<p>Let&#8217;s say you&#8217;re designing a website with all kinds of different, interesting button animations. Sometimes buttons should expand when rolled over, other times they should fade and maybe some will change colors. You could have several button classes or jQuery selections but you&#8217;d be repeating a ton of code just for the sake of a little animation algorithm. Let&#8217;s see if we can write some strategy objects which solve this problem for us and give us a nice toolbox to work from.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Listen for mouse events on the canvas</span>
-</span><span class='line'><span class="nx">$canvas</span>
-</span><span class='line'>  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mousedown&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">isDrawing</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">})</span>
-</span><span class='line'>  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mouseup mouseleave&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">isDrawing</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">})</span>
-</span><span class='line'>  <span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;mousemove&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">isDrawing</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>          <span class="c1">// Defer drawing to a Strategy object</span>
-</span><span class='line'>          <span class="nx">brush</span><span class="p">.</span><span class="nx">draw</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">context</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>  <span class="p">});</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">ButtonAnimation</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">animation</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">context</span> <span class="o">=</span> <span class="nx">context</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">animation</span> <span class="o">=</span> <span class="nx">func</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Again notice that <code>.on('mousemove')</code> we first check to see if it&#8217;s ok to draw something and then defer to whichever Strategy is currently being referenced. Using this approach we can add limitless new brush types to the <code>brushes</code> object and easily change how our program performs at runtime. Be sure to check out the live example and the source for the full application.</p>
-
-<h3><a href="http://robdodson.s3.amazonaws.com/javascript-design-patterns/strategy/painter/index.html">Live Example</a></h3>
-
-<h3><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/strategy/painter">Source</a></h3>
+<h3>Bocoup example</h3>
 
 <h2>Related Patterns</h2>
 
@@ -334,7 +260,7 @@
 <li>Null Object</li>
 <li>Observer</li>
 <li>State</li>
-<li><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns-strategy/">Strategy</a></li>
+<li>Strategy</li>
 <li>Template Method</li>
 <li>Visitor</li>
 <li>Monad Pattern / Promises</li>
@@ -3526,102 +3452,6 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 <li>Sleep: 7</li>
 <li>Hunger: 0</li>
 <li>Coffee: 1</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[CSS Semantics: Best Practices]]></title>
-    <link href="http://robdodson.me/blog/2012/06/09/css-semantics/"/>
-    <updated>2012-06-09T07:19:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/09/css-semantics</id>
-    <content type="html"><![CDATA[<p>CSS is, for me, one of the most challenging and nerve wracking aspects of my job. With most programming languages there are frameworks and guides and heuristics that all make up a suite of best practices. CSS doesn&#8217;t <em>really</em> have anything like this and as a result it&#8217;s kind of a mish-mash of good rules to follow, definite don&#8217;ts, and lots and lots of grey area. Since I&#8217;m starting a new CSS heavy project, and because I want to further my own understanding in this realm, I&#8217;m going to spend a few posts exploring the topic of what makes good, maintainable CSS. Along the way I&#8217;m also going to point out a few frameworks that I&#8217;ve been looking at, in particular <a href="http://oocss.org/">OOCSS</a> and <a href="http://smacss.com/">SMACSS.</a> But lets kick things off with a discussion of what it means to write good, semantic CSS selectors and we&#8217;ll follow up with frameworks in our next post.</p>
-
-<h2>Define Semantic</h2>
-
-<p>When I was trolling the interwebs for talks on writing large-scale maintainable CSS I somehow managed to come across <a href="http://css-tricks.com/semantic-class-names/">this article on css-tricks comparing the semantics of various css selectors.</a> After reading it I had this weird feeling like maybe I haven&#8217;t been putting as much thought into my css selectors as I should. My selectors need to be highly semantic, but what does that really <em>mean?</em></p>
-
-<p>Trying to look up the definition of &#8220;semantic&#8221; is kind of a fun, albeit a slightly annoying task since most definitions look like this:</p>
-
-<p><em>Of, relating to, or according to the science of semantics.</em></p>
-
-<p>Well&#8230;thanks. <a href="http://www.wordnik.com/words/semantic">The wonderful Wordnik site has a great list of definitions</a> the most useful of which is probably this:</p>
-
-<p><em>Reflecting intended structure and meaning.</em></p>
-
-<p>So a semantic CSS selector should reflect the intended structure or meaning of the element it is applied to. Hmm&#8230;that&#8217;s still a rather broad definition but at least we have a starting point. If I have a <code>div</code> that holds a bunch of news articles there&#8217;s probably a gradient of increasingly more semantic names I could use for it.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;container&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;article-box&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;newsstand&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>On the far end of the spectrum, <code>container</code> is about as generic as you can get and basically restates that something is a <code>div</code>. While I&#8217;ve been guilty of doing this in the past, if you&#8217;re saying a containing HTML Element is a &#8216;container&#8217; you&#8217;re restating the obvious and should probably work on improving the name.</p>
-
-<p><code>article-box</code> is much more descriptive than just <code>container</code> so I&#8217;d say it has a higher semantic &#8220;score&#8221;. But there is the potential for some semantic weirdness here, for instance, if we decide at a later date that we want our articles to be contained in a horizontal list it might make less sense to call it an &#8220;article-<em>box</em>&#8221;. So maybe <code>article-container</code> is semantically similar but also a bit more flexible?</p>
-
-<p>Finally we have <code>newsstand</code> which is highly semantic and probably my favorite of the bunch. <code>newsstand</code> describes what our element <em>is</em> but it doesn&#8217;t bother delving into how our element works. As a result <code>newsstand</code> can work however we want, it can be list like, or grid like, tabular, etc and it won&#8217;t matter. You might argue that this would be a good place to use an ID instead of a class but that decision should be weighed carefully. You have to make sure that 3 months or a year from now there isn&#8217;t the potential of having two newsstands on the same page.</p>
-
-<h3>If we only worked on contived examples&#8230;</h3>
-
-<p>Of course there&#8217;s a litany of cases where highly semantic naming just doesn&#8217;t quite cut it. Often times we&#8217;re given a layout which has a few primary areas (columns, headers, footer) and the designer is putting all sorts of content into those divisions. On one page it could be news articles, then a list of search results, then a directory of users, and so on. I would argue that for major layout elements it&#8217;s ok to use less semantic names, and in fact this is probably a good idea. So things like <code>column_1</code>, <code>flex-box</code>, <code>constrained-container</code>, are all specifying, at varying degrees, what the element is doing. They are less semantically rich than, say, <code>rolodex</code> or <code>id-badge</code>, but that&#8217;s because their very intention is to be generic.</p>
-
-<h3>What about helpers?</h3>
-
-<p><em>Preface: I know about SASS and LESS. Let&#8217;s pretend they don&#8217;t exist for a moment :D</em></p>
-
-<p>Here is an area where I recently got very tripped up and I&#8217;m still not entirely sure what the best approach might be. Let&#8217;s say you have a brand color, something like Facebook&#8217;s blue, and you need to apply it to all sorts of different and unrelated elements. If you&#8217;re like me then your brain starts thinking, &#8220;Well, that blue value is essentially a variable that I&#8217;d like to reuse. Maybe I should just make a helper style for it&#8230;&#8221; and so you produce something like this in a helpers.css file:</p>
-
-<figure class='code'><figcaption><span>helpers.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.light-blue</span> <span class="p">{</span>
-</span><span class='line'>    <span class="m">#00C</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now our HTML has little <code>light-blue</code>s sprinkled on top of it and we don&#8217;t have to worry about declaring that same blue value over and over again in our styles. But what happens when our company decides to rebrand and now our primary color is a bright red? Uh oh&#8230;You definitely don&#8217;t want to have to change HTML <em>and</em> CSS just to update a color.</p>
-
-<p><a href="http://css-tricks.com/semantic-class-names/#comment-102571">Neal G on CSS-Tricks made a very good comment regarding this scenario:</a></p>
-
-<blockquote><p>Perhaps an easier way to explain semantic CSS is simply, don’t name your classes or ids anything related to a CSS property. A property could be color, font-family, float, border, background etc.</p></blockquote>
-
-<p><a href="http://www.webdesignerdepot.com/2009/05/10-best-css-practices-to-improve-your-code/">Also from the Web Designer Depot</a></p>
-
-<blockquote><p>Name your elements based on what they are, not what they look like. For example, .comment-blue is much less versatile than .comment-beta, and .post-largefont is more limiting than .post-title.</p></blockquote>
-
-<p>Perhaps a better helper would have been <code>.brand-color</code> but again this is a contrived example. What about all the <em>other</em> colors on the site. And what about helpers that wrap commonly used styles like <code>float: left</code> and <code>clear: both</code>?</p>
-
-<p>The debate is pretty hot and heavy <a href="http://css-tricks.com/semantic-class-names">on the css-tricks article.</a> Just seach for the word &#8216;float&#8217; and you&#8217;ll see some pretty interesting discussions on it. My opinion is that you probably don&#8217;t want to tack a bunch of <code>.bright-red</code> or <code>.larger</code> classes everywhere but at the same time something like <code>.float-right</code> can be extremely useful and <a href="http://css-tricks.com/semantic-class-names/#comment-102906">in some cases forcing semantics into a design can actually make things worse</a> especially for <a href="http://css-tricks.com/semantic-class-names/#comment-103076">less technically inclined clients.</a></p>
-
-<p>As a bit of a homework assignment I would recommend looking into a few of the resources I&#8217;m posting below. Obviouslyl take everything with a grain of salt, there isn&#8217;t any true gospel for CSS so do what works best for you. I&#8217;ll cover OOCSS and SMACSS in my next post, till then, thanks for reading! - Rob</p>
-
-<p><a href="http://css-tricks.com/semantic-class-names/">What Makes For a Semantic Class Name?</a></p>
-
-<p><a href="http://www.stubbornella.org/content/2011/04/28/our-best-practices-are-killing-us/">Our Best Practices Are Killing Us</a></p>
-
-<p><a href="https://github.com/styleguide/css">Github CSS Style Guide</a></p>
-
-<p><a href="https://github.com/csswizardry/CSS-Guidelines/blob/master/CSS%20Guidelines.md">CSS Wizardry: CSS Guidelines</a></p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:23 am</li>
-<li>Mood: Awake, Annoyed</li>
-<li>Sleep: 7</li>
-<li>Hunger: 0</li>
-<li>Coffee: 0</li>
 </ul>
 
 ]]></content>

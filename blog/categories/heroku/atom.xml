@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Heroku | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/heroku/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-05T15:13:39-07:00</updated>
+  <updated>2012-08-08T09:45:19-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -226,11 +226,11 @@ Express server listening on port 5000 in development mode
 
 <p>If not leave me a comment and I'll see if I can help you debug it. However let's assume that everything DID go well for you and now you're ready to connect to the local version of your app. Point your browser to http://localhost:5000 and you should see something like this:</p>
 
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/all_is_well_with_sockets.png" title="'All is well with Socket.io'" ></p>
+<p>{% img center https://s3.amazonaws.com/robdodson/images/all_is_well_with_sockets.png 'All is well with Socket.io' %}</p>
 
 <p>Now open another browser window and also point it at localhost:5000. In one of the windows click the button that says <code>Reset</code> which should change the copy in <em>both</em> windows to 'War is imminent!'</p>
 
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/war_is_imminent_sockets.png" title="'War is Immentin with Socket.io'" ></p>
+<p>{% img center https://s3.amazonaws.com/robdodson/images/war_is_imminent_sockets.png 'War is Immentin with Socket.io' %}</p>
 
 <h3>Git'er done!</h3>
 
@@ -298,7 +298,7 @@ $ heroku ps</p>
 
 <p>With everything setup we should be able to run <code>heroku open</code> which will fire up our browser and direct it to an instance of our app. There seems to be a fair bit of latency so it can take several seconds for the initial status of 'All is well' to show up. If you see the Reset button with nothing above it give it around 10 seconds to see if it eventually updates. Open another browser window and point it at the Heroku domain in the address bar. If you press the Reset button in one window it should immediately update in the next one.</p>
 
-<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/heroku_war_is_imminent.png" title="'Heroku: War is Imminent'" ></p>
+<p>{% img center https://s3.amazonaws.com/robdodson/images/heroku_war_is_imminent.png 'Heroku: War is Imminent' %}</p>
 
 <h3>Wrapping up</h3>
 
@@ -417,7 +417,7 @@ You might see some deprecation warnings about vendor plugins. For now you can (p
 
 <p>One last tip re: your new Postgres setup. If you're just starting out like me then your command line fu is probably not as strong as you'd like it to be. Personally I really like having a nice GUI to visualize the tables in my database. For MySQL I usually use the awesome (and free) <a href="http://www.sequelpro.com/">SequelPro</a>. For PostgreSQL you can use <a href="http://inductionapp.com/">Induction</a>. It doesn't seem like they have a downloadable binary on their website (weird?) but you can grab one out of <a href="https://github.com/Induction/Induction/downloads">the Github repo's downloads page</a>. Connecting to your Postgres instance can be a little tricky, you have to make sure to use the PostgreSQL adapter, localhost as the hostname, your computer's username as the user and the password can remain blank. You also <em>HAVE</em> to give it a database name (even though it says it's optional) or it will throw a <code>FATAL:  database [your username] does not exist</code>. Here's a screenshot of what mine looks like:</p>
 
-<p><img class="center" src="/images/induction_screen.png" title="'Induction Login Screen'" ></p>
+<p>{% img center /images/induction_screen.png 'Induction Login Screen' %}</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
