@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Design Patterns | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/design-patterns/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-09T08:29:51-07:00</updated>
+  <updated>2012-08-09T09:14:42-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -538,7 +538,7 @@ $canvas
 <li>Factory Method</li>
 <li>Object Pool</li>
 <li>Prototype</li>
-<li>Singleton</li>
+<li><a href="http://robdodson.me/blog/2012/08/08/javascript-design-patterns-singleton/">Singleton</a></li>
 </ul>
 
 
@@ -568,7 +568,7 @@ $canvas
 <li>Null Object</li>
 <li>Observer</li>
 <li>State</li>
-<li>Strategy</li>
+<li><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns-strategy/">Strategy</a></li>
 <li>Template Method</li>
 <li>Visitor</li>
 <li>Monad Pattern / Promises</li>
