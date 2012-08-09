@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Backbone | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/backbone/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-08T09:45:19-07:00</updated>
+  <updated>2012-08-09T08:24:35-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -595,7 +595,7 @@ chatty: function() {
 ```</p>
 
 <p>And there you have it. When we click on <code>Subject</code> it should replace the content in <code>Observer</code> like so:
-{% img center /images/subject_observer.png 'The Observer hears the Subject' %}</p>
+<img class="center" src="/images/subject_observer.png" title="'The Observer hears the Subject'" ></p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
@@ -983,7 +983,7 @@ $("#main").append(rightView.render().el);
 
 <p>We should now have a very simple horizontal layout.</p>
 
-<p>{% img center http://f.cl.ly/items/173L112z0g2t3S1h3k1E/Screen%20Shot%202012-05-23%20at%209.02.56%20AM.png 'Our Basic Backbone Layout' %}</p>
+<p><img class="center" src="http://f.cl.ly/items/173L112z0g2t3S1h3k1E/Screen%20Shot%202012-05-23%20at%209.02.56%20AM.png" title="'Our Basic Backbone Layout'" ></p>
 
 <h3>Composite Views</h3>
 

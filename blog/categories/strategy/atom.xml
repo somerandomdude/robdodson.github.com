@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Strategy | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/strategy/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-08T09:45:19-07:00</updated>
+  <updated>2012-08-09T08:24:35-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -22,9 +22,7 @@
 
 <h2>Formal Definition</h2>
 
-<p>{% blockquote GoF, Design Patterns: Elements of Reusable Object-Oriented Software %}
-Define a family of algorithms, encapsulate each one, and make them interchangeable. Strategy lets the algorithm vary independently from clients that use it.
-{% endblockquote %}</p>
+<p><blockquote><p>Define a family of algorithms, encapsulate each one, and make them interchangeable. Strategy lets the algorithm vary independently from clients that use it.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote></p>
 
 <h3>Also Known As</h3>
 

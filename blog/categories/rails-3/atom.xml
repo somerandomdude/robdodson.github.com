@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Rails 3 | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/rails-3/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-08T09:45:19-07:00</updated>
+  <updated>2012-08-09T08:24:35-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -101,7 +101,7 @@ You might see some deprecation warnings about vendor plugins. For now you can (p
 
 <p>One last tip re: your new Postgres setup. If you're just starting out like me then your command line fu is probably not as strong as you'd like it to be. Personally I really like having a nice GUI to visualize the tables in my database. For MySQL I usually use the awesome (and free) <a href="http://www.sequelpro.com/">SequelPro</a>. For PostgreSQL you can use <a href="http://inductionapp.com/">Induction</a>. It doesn't seem like they have a downloadable binary on their website (weird?) but you can grab one out of <a href="https://github.com/Induction/Induction/downloads">the Github repo's downloads page</a>. Connecting to your Postgres instance can be a little tricky, you have to make sure to use the PostgreSQL adapter, localhost as the hostname, your computer's username as the user and the password can remain blank. You also <em>HAVE</em> to give it a database name (even though it says it's optional) or it will throw a <code>FATAL:  database [your username] does not exist</code>. Here's a screenshot of what mine looks like:</p>
 
-<p>{% img center /images/induction_screen.png 'Induction Login Screen' %}</p>
+<p><img class="center" src="/images/induction_screen.png" title="'Induction Login Screen'" ></p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
@@ -267,7 +267,7 @@ rvm gemset delete my-new-rails-setup
 
 <p>For starters here’s the image you see in Rails 3 when things go South:</p>
 
-<p>{% img center /images/unexpected_tidentifier.jpg 'Syntax Error: Unexpected tIDENTIFIER' %}</p>
+<p><img class="center" src="/images/unexpected_tidentifier.jpg" title="'Syntax Error: Unexpected tIDENTIFIER'" ></p>
 
 <p>Just to focus your attention, I’ll post the snippet of code that was causing the issue.</p>
 
@@ -370,7 +370,7 @@ say_hello({:name => 'Rob', :age => 27})
 <p>For my own benefit, and hopefully for the benefit of others, I’m going to post the errors and solutions that I come up with. Hopefully since I’m a total newbie, explaining things from my perspective will help other people who are new to the language as well.</p>
 
 <p>To start of we have the <code>NoMethodError</code>.
-{% img center /images/no_method_error.jpg 'NoMethodError' %}</p>
+<img class="center" src="/images/no_method_error.jpg" title="'NoMethodError'" ></p>
 
 <p>You get a <code>NoMethodError</code> when you try to call a method which either doesn’t exist on an Object, or the Object itself doesn’t exist. Since <code>Nil</code> is actually an object in Ruby (it’s an instance of <code>NilClass</code>) this error can sometimes be a bit misleading (especially if you come from a language where Nil or Null is represented by a primitive or a data type like in Actionscript 3).</p>
 

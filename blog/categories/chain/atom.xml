@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-08T09:45:19-07:00</updated>
+  <updated>2012-08-09T08:24:35-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -14,13 +14,287 @@
 
   
   <entry>
-    <title type="html"><![CDATA[JavaScript Design Patterns: Decorator]]></title>
-    <link href="http://robdodson.me/blog/2012/08/08/javascript-design-patterns-decorator/"/>
-    <updated>2012-08-08T09:32:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/08/08/javascript-design-patterns-decorator</id>
-    <content type="html"><![CDATA[<p>This is where the Decorator article will go. Apologies for the temporary weirdness. I'm setting up Octopress on a new machine and sorting out all of its funky git branches. Stay tuned... ETA for this post is Thursday, Aug. 09</p>
+    <title type="html"><![CDATA[JavaScript Design Patterns: Singleton]]></title>
+    <link href="http://robdodson.me/blog/2012/08/08/javascript-design-patterns-singleton/"/>
+    <updated>2012-08-08T19:52:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/08/08/javascript-design-patterns-singleton</id>
+    <content type="html"><![CDATA[<p>Ah yes the Singleton, a pattern whose name lives in infamy. For the uninitiated a little explanation is in order. A Singleton is an object which can only be instantiated one time. Repeated calls to its constructor return the same instance and in this way one can ensure that they don't accidentally create, say, two Users in a single User application. Doesn't sound too bad, right? Well, if you're responsible then it arguably <em>is</em> OK but there are many caveats. Before I get into those though, let's throw in the formal definition <em>a la</em> the Gang of Four.</p>
 
-<p>-- Rob</p>
+<h2>Formal Definition</h2>
+
+<p><blockquote><p>Ensure a class only has one instance, and provide a global point of access to it.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote></p>
+
+<h2>The icky bits</h2>
+
+<p>So I'm sure some of you are already a little anxious because I used the phrase "global point of access" and rightfully you should be. In OO software design <em>global</em> variables and objects are often frowned upon. They break encapsulation and more often than not cause more harm than good. You don't want the far flung bits of your app to be able to reach all the way up to the very top and fiddle around with stuff. When that starts to happen, and other objects also rely on those global variables, then any piece of code, anywhere in the project can change something which can in turn break a totally unrelated bit of functionality. Debugging becomes a nightmare because you're constantly moving from deeply nested object graphs up to the global scope and then back down again. I one time worked on a <em>major</em> application which I inherited from another developer. It was so riddled with Singletons that any change became a sisyphean ordeal of unintended consiquences and time lost debugging. Needless to say I want to put this warning front and center or else the programming gods would surely smite me.</p>
+
+<h2>Well I'm done! Fuck this shit...</h2>
+
+<p>OK before you start running for the hills I want to point out the ways in which Singletons can be useful and then you can make up your mind if they're right for you.</p>
+
+<p>Let's start with the most obvious one: You're probably already using Singletons!</p>
+
+<p>Ever written any code that looks like this?</p>
+
+<p>``` js
+var user = {</p>
+
+<pre><code>firstName: 'John',
+lastName: 'Doe',
+sayName: function() {
+    return this.firstName + ' ' + this.lastName;
+}
+</code></pre>
+
+<p>};
+```</p>
+
+<p>Yep, that's a Singleton. Once you create an object literal in JavaScript you've reserved a little piece of memory and no other object will ever be just like that one. Now, depending on the scope you might have only created a local variable but if that <code>user</code> is sitting outside a function then it's globally available to anyone who wants to fiddle with it. I guess the most famous Singleton probably looks like this: <code>$</code>. To put it another way, ever notice how you can use jQuery anywhere in your app after you've included it on the page...? Boom! Singleton!</p>
+
+<p><em>mind blown</em>  ... <em>face off</em> ...</p>
+
+<h2>OK, So they have their uses I guess</h2>
+
+<p>Yes as much as some are probably loathe to admit it, Singletons are quite useful in JavaScript. And as jQuery demonstrates their primary use is to namespace your code.
+While other languages like Java or C# have namespaces built in, JavaScript has to emulate them using simple objects.</p>
+
+<p>Consider the following scenario: You have a series of functions hanging out on the page that you frequently use in your program.</p>
+
+<p>``` js
+function login() {</p>
+
+<pre><code>// do some login shtuffs
+</code></pre>
+
+<p>}</p>
+
+<p>function logout() {</p>
+
+<pre><code>// do some logout shtuffs
+</code></pre>
+
+<p>}</p>
+
+<p>function addToCart() {</p>
+
+<pre><code>// blah, blah blah...
+</code></pre>
+
+<p>}
+```
+A few things are going on here...</p>
+
+<p><em>1. Our functions are polluting the global space.</em>
+Since they are just floating around on the page they have to attach to something. With no explicitely declared parent object they get hooked on to the globally available <code>window</code> object.</p>
+
+<p><em>2. They're in danger of being overwritten</em>
+If we were to accidentally define another global <code>addToCart</code> function or if we brought in a library whose author did the same, it would overwrite the original leading to a really gnarly debugging situation.</p>
+
+<p>Let's revise this by creating one (and only one) global object which our code can branch off of.</p>
+
+<p>``` js
+var NAMESPACE = {};</p>
+
+<p>NAMESPACE.login = function() {</p>
+
+<pre><code>// do some login shtuffs
+</code></pre>
+
+<p>}</p>
+
+<p>NAMESPACE.logout = function() {</p>
+
+<pre><code>// do some logout shtuffs
+</code></pre>
+
+<p>}</p>
+
+<p>NAMESPACE.addToCart = function() {</p>
+
+<pre><code>// blah, blah blah...
+</code></pre>
+
+<p>}
+<code>``
+Now so long as no one creates an object which also has the name</code>NAMESPACE` our code should be safe. From here we can do all sorts of things. We can nest more object literals or we can create constructor functions:</p>
+
+<p>``` js
+var NAMESPACE = {};</p>
+
+<p>NAMESPACE.Widget = function(foo, bar) {</p>
+
+<pre><code>// Some awesome widget code
+</code></pre>
+
+<p>}</p>
+
+<p>NAMESPACE.Widget.prototype.doSomethingAwesome = function() {</p>
+
+<pre><code>// do something awesome!!!
+</code></pre>
+
+<p>}</p>
+
+<p>var myWidget = new NAMESPACE.Widget('hello', 'world');
+```
+Take a look at <a href="https://github.com/mrdoob/three.js/">the Three.js library which</a> relies heavily on this pattern to structure its code.</p>
+
+<h2>But I like constructors!</h2>
+
+<p>OK so maybe object literals aren't your thing. That's understandable so let me show you a few other ways of writing Singletons.</p>
+
+<p>These first few come from Stoyan Stefanov's excellent book <a href="http://www.amazon.com/JavaScript-Patterns-Stoyan-Stefanov/dp/0596806752">JavaScript Patterns.</a></p>
+
+<p><strong>Singleton with a cached static property</strong></p>
+
+<p>``` js
+function User() {</p>
+
+<pre><code>// do we have an existing instance?
+if (typeof User.instance === 'object') {
+    return User.instance;
+}
+
+// proceed as normal
+this.firstName = 'John';
+this.lastName = 'Doe';
+
+// cache
+User.instance = this;
+
+// implicit return
+// return this;
+</code></pre>
+
+<p>}
+<code>``
+The cached static property is publicly available which adds a little danger (someone could say</code>Universe.instance = foo`) but this version is very straightforward and doesn't require closures and funky prototype work. If you're lazy this might be a good approach.</p>
+
+<p><strong>Singleton with a closure</strong></p>
+
+<p>``` js
+function User() {</p>
+
+<pre><code>// the cached instance
+var instance;
+
+// rewrite the constructor
+User = function() {
+    return instance;
+};
+
+// carry over the prototype
+User.prototype = this;
+
+// the instance
+instance = new User();
+
+// reset the constructor pointer
+instance.constructor = User;
+
+// all the functionality
+instance.firstName = 'John';
+instance.lastName = 'Doe';
+
+return instance;
+</code></pre>
+
+<p>}
+```</p>
+
+<p>This version takes a bit of fiddling to get the prototype to work as expected because we rewrite the constructor. The upshot is that <code>instance</code> is now private (being contained within the closure).</p>
+
+<p><strong>Singleton with a self executing function</strong></p>
+
+<p>``` js
+var User;
+(function() {</p>
+
+<pre><code>var instance;
+
+User = function User() {
+    if (instance) {
+        return instance;
+    }
+
+    instance = this;
+
+    // all the functionality
+    this.firstName = 'John';
+    this.lastName = 'Doe';
+};
+</code></pre>
+
+<p>}());
+```
+By wrapping the instance variable in a self executing function we make it private. This version doesn't require any prototype or constructor reassignment but it may potentially confuse people who aren't comfortable with self executing functions.</p>
+
+<p>Addy Osmani also defines a Singleton pattern in his book <a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript">Essential JavaScript Design Patterns.</a></p>
+
+<p>``` js
+var mySingleton = (function () {</p>
+
+<p>  // Instance stores a reference to the Singleton
+  var instance;</p>
+
+<p>  function init() {</p>
+
+<pre><code>// Singleton
+
+// Private methods and variables
+function privateMethod(){
+    console.log( "I am private" );
+}
+
+var privateVariable = "Im also private";
+
+return {
+
+  // Public methods and variables
+  publicMethod: function () {
+    console.log( "The public can see me!" );
+  },
+
+  publicProperty: "I am also public"
+};
+</code></pre>
+
+<p>  };</p>
+
+<p>  return {</p>
+
+<pre><code>// Get the Singleton instance if one exists
+// or create one if it doesn't
+getInstance: function () {
+
+  if ( !instance ) {
+    instance = init();
+  }
+
+  return instance;
+}
+</code></pre>
+
+<p>  };</p>
+
+<p>})();</p>
+
+<p>// Usage:</p>
+
+<p>var singleA = mySingleton;
+var singleB = mySingleton;
+console.log( singleA === singleB ); // true
+```</p>
+
+<p>This much more elaborate example allows us to define both private and public methods of our Singleton object at the cost of being a bit more complex than all the others.</p>
+
+<p>As Addy is quick to point out:</p>
+
+<blockquote><p>Whilst the Singleton has valid uses, often when we find ourselves needing it in JavaScript it's a sign that we may need to re-evaluate our design.</p>
+
+<p>They're often an indication that modules in a system are either tightly coupled or that logic is overly spread across multiple parts of a codebase. Singletons can be more difficult to test due to issues ranging from hidden dependencies, the difficulty in creating multiple instances, difficulty in stubbing dependencies and so on.</p></blockquote>
+
+<p>Definitely read <a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript">his full article</a> on the subject since it contains a handful of links to interesting side topics.</p>
 ]]></content>
   </entry>
   
@@ -33,9 +307,7 @@
 
 <h2>Formal Definition</h2>
 
-<p>{% blockquote GoF, Design Patterns: Elements of Reusable Object-Oriented Software %}
-Define a family of algorithms, encapsulate each one, and make them interchangeable. Strategy lets the algorithm vary independently from clients that use it.
-{% endblockquote %}</p>
+<p><blockquote><p>Define a family of algorithms, encapsulate each one, and make them interchangeable. Strategy lets the algorithm vary independently from clients that use it.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote></p>
 
 <h3>Also Known As</h3>
 

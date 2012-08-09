@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-08T09:34:34-07:00</updated>
+  <updated>2012-08-09T08:24:35-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -14,13 +14,403 @@
 
   
   <entry>
-    <title type="html"><![CDATA[JavaScript Design Patterns: Decorator]]></title>
-    <link href="http://robdodson.me/blog/2012/08/08/javascript-design-patterns-decorator/"/>
-    <updated>2012-08-08T09:32:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/08/08/javascript-design-patterns-decorator</id>
-    <content type="html"><![CDATA[<p>This is where the Decorator article will go. Apologies for the temporary weirdness. I&#8217;m setting up Octopress on a new machine and sorting out all of its funky git branches. Stay tuned&#8230; ETA for this post is Thursday, Aug. 09</p>
+    <title type="html"><![CDATA[JavaScript Design Patterns: Singleton]]></title>
+    <link href="http://robdodson.me/blog/2012/08/08/javascript-design-patterns-singleton/"/>
+    <updated>2012-08-08T19:52:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/08/08/javascript-design-patterns-singleton</id>
+    <content type="html"><![CDATA[<p>Ah yes the Singleton, a pattern whose name lives in infamy. For the uninitiated a little explanation is in order. A Singleton is an object which can only be instantiated one time. Repeated calls to its constructor return the same instance and in this way one can ensure that they don&#8217;t accidentally create, say, two Users in a single User application. Doesn&#8217;t sound too bad, right? Well, if you&#8217;re responsible then it arguably <em>is</em> OK but there are many caveats. Before I get into those though, let&#8217;s throw in the formal definition <em>a la</em> the Gang of Four.</p>
 
-<p>&#8211; Rob</p>
+<h2>Formal Definition</h2>
+
+<blockquote><p>Ensure a class only has one instance, and provide a global point of access to it.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote>
+
+
+<h2>The icky bits</h2>
+
+<p>So I&#8217;m sure some of you are already a little anxious because I used the phrase &#8220;global point of access&#8221; and rightfully you should be. In OO software design <em>global</em> variables and objects are often frowned upon. They break encapsulation and more often than not cause more harm than good. You don&#8217;t want the far flung bits of your app to be able to reach all the way up to the very top and fiddle around with stuff. When that starts to happen, and other objects also rely on those global variables, then any piece of code, anywhere in the project can change something which can in turn break a totally unrelated bit of functionality. Debugging becomes a nightmare because you&#8217;re constantly moving from deeply nested object graphs up to the global scope and then back down again. I one time worked on a <em>major</em> application which I inherited from another developer. It was so riddled with Singletons that any change became a sisyphean ordeal of unintended consiquences and time lost debugging. Needless to say I want to put this warning front and center or else the programming gods would surely smite me.</p>
+
+<h2>Well I&#8217;m done! Fuck this shit&#8230;</h2>
+
+<p>OK before you start running for the hills I want to point out the ways in which Singletons can be useful and then you can make up your mind if they&#8217;re right for you.</p>
+
+<p>Let&#8217;s start with the most obvious one: You&#8217;re probably already using Singletons!</p>
+
+<p>Ever written any code that looks like this?</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">firstName</span><span class="o">:</span> <span class="s1">&#39;John&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">lastName</span><span class="o">:</span> <span class="s1">&#39;Doe&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">sayName</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Yep, that&#8217;s a Singleton. Once you create an object literal in JavaScript you&#8217;ve reserved a little piece of memory and no other object will ever be just like that one. Now, depending on the scope you might have only created a local variable but if that <code>user</code> is sitting outside a function then it&#8217;s globally available to anyone who wants to fiddle with it. I guess the most famous Singleton probably looks like this: <code>$</code>. To put it another way, ever notice how you can use jQuery anywhere in your app after you&#8217;ve included it on the page&#8230;? Boom! Singleton!</p>
+
+<p><em>mind blown</em>  &#8230; <em>face off</em> &#8230;</p>
+
+<h2>OK, So they have their uses I guess</h2>
+
+<p>Yes as much as some are probably loathe to admit it, Singletons are quite useful in JavaScript. And as jQuery demonstrates their primary use is to namespace your code.
+While other languages like Java or C# have namespaces built in, JavaScript has to emulate them using simple objects.</p>
+
+<p>Consider the following scenario: You have a series of functions hanging out on the page that you frequently use in your program.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">login</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// do some login shtuffs</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">logout</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// do some logout shtuffs</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">addToCart</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// blah, blah blah...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>A few things are going on here&#8230;</p>
+
+<p><em>1. Our functions are polluting the global space.</em>
+Since they are just floating around on the page they have to attach to something. With no explicitely declared parent object they get hooked on to the globally available <code>window</code> object.</p>
+
+<p><em>2. They&#8217;re in danger of being overwritten</em>
+If we were to accidentally define another global <code>addToCart</code> function or if we brought in a library whose author did the same, it would overwrite the original leading to a really gnarly debugging situation.</p>
+
+<p>Let&#8217;s revise this by creating one (and only one) global object which our code can branch off of.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">NAMESPACE</span> <span class="o">=</span> <span class="p">{};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">NAMESPACE</span><span class="p">.</span><span class="nx">login</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// do some login shtuffs</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">NAMESPACE</span><span class="p">.</span><span class="nx">logout</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// do some logout shtuffs</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">NAMESPACE</span><span class="p">.</span><span class="nx">addToCart</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// blah, blah blah...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now so long as no one creates an object which also has the name <code>NAMESPACE</code> our code should be safe. From here we can do all sorts of things. We can nest more object literals or we can create constructor functions:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">NAMESPACE</span> <span class="o">=</span> <span class="p">{};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">NAMESPACE</span><span class="p">.</span><span class="nx">Widget</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">foo</span><span class="p">,</span> <span class="nx">bar</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// Some awesome widget code</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">NAMESPACE</span><span class="p">.</span><span class="nx">Widget</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">doSomethingAwesome</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// do something awesome!!!</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">myWidget</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">NAMESPACE</span><span class="p">.</span><span class="nx">Widget</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;world&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Take a look at <a href="https://github.com/mrdoob/three.js/">the Three.js library which</a> relies heavily on this pattern to structure its code.</p>
+
+<h2>But I like constructors!</h2>
+
+<p>OK so maybe object literals aren&#8217;t your thing. That&#8217;s understandable so let me show you a few other ways of writing Singletons.</p>
+
+<p>These first few come from Stoyan Stefanov&#8217;s excellent book <a href="http://www.amazon.com/JavaScript-Patterns-Stoyan-Stefanov/dp/0596806752">JavaScript Patterns.</a></p>
+
+<p><strong>Singleton with a cached static property</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">User</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// do we have an existing instance?</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">User</span><span class="p">.</span><span class="nx">instance</span> <span class="o">===</span> <span class="s1">&#39;object&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nx">User</span><span class="p">.</span><span class="nx">instance</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">// proceed as normal</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">=</span> <span class="s1">&#39;John&#39;</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span> <span class="o">=</span> <span class="s1">&#39;Doe&#39;</span><span class="p">;</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">// cache</span>
+</span><span class='line'>  <span class="nx">User</span><span class="p">.</span><span class="nx">instance</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="c1">// implicit return</span>
+</span><span class='line'>  <span class="c1">// return this;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The cached static property is publicly available which adds a little danger (someone could say <code>Universe.instance = foo</code>) but this version is very straightforward and doesn&#8217;t require closures and funky prototype work. If you&#8217;re lazy this might be a good approach.</p>
+
+<p><strong>Singleton with a closure</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">User</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// the cached instance</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">instance</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// rewrite the constructor</span>
+</span><span class='line'>  <span class="nx">User</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// carry over the prototype</span>
+</span><span class='line'>  <span class="nx">User</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// the instance</span>
+</span><span class='line'>  <span class="nx">instance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// reset the constructor pointer</span>
+</span><span class='line'>  <span class="nx">instance</span><span class="p">.</span><span class="nx">constructor</span> <span class="o">=</span> <span class="nx">User</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// all the functionality</span>
+</span><span class='line'>  <span class="nx">instance</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">=</span> <span class="s1">&#39;John&#39;</span><span class="p">;</span>
+</span><span class='line'>  <span class="nx">instance</span><span class="p">.</span><span class="nx">lastName</span> <span class="o">=</span> <span class="s1">&#39;Doe&#39;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This version takes a bit of fiddling to get the prototype to work as expected because we rewrite the constructor. The upshot is that <code>instance</code> is now private (being contained within the closure).</p>
+
+<p><strong>Singleton with a self executing function</strong></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">User</span><span class="p">;</span>
+</span><span class='line'><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">instance</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">User</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">User</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">instance</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">instance</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// all the functionality</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">firstName</span> <span class="o">=</span> <span class="s1">&#39;John&#39;</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">lastName</span> <span class="o">=</span> <span class="s1">&#39;Doe&#39;</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'><span class="p">}());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>By wrapping the instance variable in a self executing function we make it private. This version doesn&#8217;t require any prototype or constructor reassignment but it may potentially confuse people who aren&#8217;t comfortable with self executing functions.</p>
+
+<p>Addy Osmani also defines a Singleton pattern in his book <a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript">Essential JavaScript Design Patterns.</a></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">mySingleton</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Instance stores a reference to the Singleton</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">instance</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">function</span> <span class="nx">init</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Singleton</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Private methods and variables</span>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">privateMethod</span><span class="p">(){</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="s2">&quot;I am private&quot;</span> <span class="p">);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">privateVariable</span> <span class="o">=</span> <span class="s2">&quot;Im also private&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// Public methods and variables</span>
+</span><span class='line'>      <span class="nx">publicMethod</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="s2">&quot;The public can see me!&quot;</span> <span class="p">);</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">publicProperty</span><span class="o">:</span> <span class="s2">&quot;I am also public&quot;</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Get the Singleton instance if one exists</span>
+</span><span class='line'>    <span class="c1">// or create one if it doesn&#39;t</span>
+</span><span class='line'>    <span class="nx">getInstance</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span> <span class="o">!</span><span class="nx">instance</span> <span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">instance</span> <span class="o">=</span> <span class="nx">init</span><span class="p">();</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">return</span> <span class="nx">instance</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">})();</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Usage:</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">singleA</span> <span class="o">=</span> <span class="nx">mySingleton</span><span class="p">;</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">singleB</span> <span class="o">=</span> <span class="nx">mySingleton</span><span class="p">;</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">singleA</span> <span class="o">===</span> <span class="nx">singleB</span> <span class="p">);</span> <span class="c1">// true</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This much more elaborate example allows us to define both private and public methods of our Singleton object at the cost of being a bit more complex than all the others.</p>
+
+<p>As Addy is quick to point out:</p>
+
+<blockquote><p>Whilst the Singleton has valid uses, often when we find ourselves needing it in JavaScript it&#8217;s a sign that we may need to re-evaluate our design.</p>
+
+<p>They&#8217;re often an indication that modules in a system are either tightly coupled or that logic is overly spread across multiple parts of a codebase. Singletons can be more difficult to test due to issues ranging from hidden dependencies, the difficulty in creating multiple instances, difficulty in stubbing dependencies and so on.</p></blockquote>
+
+<p>Definitely read <a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript">his full article</a> on the subject since it contains a handful of links to interesting side topics.</p>
 ]]></content>
   </entry>
   

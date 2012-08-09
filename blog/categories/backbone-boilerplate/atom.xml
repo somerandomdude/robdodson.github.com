@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Backbone Boilerplate | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/backbone-boilerplate/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-08T09:45:19-07:00</updated>
+  <updated>2012-08-09T08:24:35-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -464,7 +464,7 @@ require(['app/greet'], function(greet) {
 });
 </code>  <br/>
 bear in mind that each module requires an http request to load it so you don't want to go overboard defining helper function modules. Note the extra http request in the profiler which loads greet.js.
-{% img center /images/module_costs.png 'Note the separate http request for greet.js' %}</p>
+<img class="center" src="/images/module_costs.png" title="'Note the separate http request for greet.js'" ></p>
 
 <p>Ok that's it for today. I'll try to continue on Saturday!</p>
 

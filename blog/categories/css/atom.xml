@@ -4,7 +4,7 @@
   <title><![CDATA[Category: CSS | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/css/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-08T09:45:19-07:00</updated>
+  <updated>2012-08-09T08:24:35-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -26,7 +26,7 @@
 
 <p>Since it's a little late in the evening I'm just going to dip my toe into some of what Foundation has to offer by quickly mocking up a very simple layout using their responsive grids.</p>
 
-<p>{% img center https://s3.amazonaws.com/robdodson/images/responsive_mockup.png 'Our very basic responsive layout' %}</p>
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/responsive_mockup.png" title="'Our very basic responsive layout'" ></p>
 
 <p>Obviously nothing fancy, the main bits I want to explore are how easy it is to lay items out using the grid and how does it react on the iPhone.</p>
 
@@ -193,7 +193,7 @@ text-align: center;
 <p>}
 ```</p>
 
-<p>{% img center https://s3.amazonaws.com/robdodson/images/responsive_layout_basic.png 'Our basic layout' %}</p>
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/responsive_layout_basic.png" title="'Our basic layout'" ></p>
 
 <p>That wasn't so hard was it?</p>
 
@@ -303,13 +303,13 @@ background: #CCC;
 <p>}
 ```</p>
 
-<p>{% img center https://s3.amazonaws.com/robdodson/images/responsive_layout_ipsum.png 'Responsive layout with lorem ipsum' %}</p>
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/responsive_layout_ipsum.png" title="'Responsive layout with lorem ipsum'" ></p>
 
 <h2>Making friends with mobile</h2>
 
 <p>Well I'm sure if you've made it to this point you're ready to see how this all works on an iPhone. A quick test you can perform is to just narrow your browser window until it is only about 300px wide (the iPhone has a roughly 320px display area, I believe). As you do so the columns should narrow, reflowing their content as they do so. Eventually our <code>aside</code> will <em>pop</em> from its current position and line up underneath our <code>.main</code> content.</p>
 
-<p>{% img center https://s3.amazonaws.com/robdodson/images/responsive_linear.png 'Linear flow with Foundation' %}</p>
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/responsive_linear.png" title="'Linear flow with Foundation'" ></p>
 
 <p>But what if we don't want the sidebar to appear on a mobile phone? Perhaps we just want to show the <code>.main</code> content if the screen is too narrow. Easy! Foundation provides <a href="http://foundation.zurb.com/docs/layout.php">some nice helper classes</a> which we can use to toggle elements on or off depending on the device. We'll just add a <code>.hide-on-phones</code> class to our aside</p>
 
@@ -319,7 +319,7 @@ background: #CCC;
 
 <p>and...<em>voila!</em> The <code>aside</code> disappears on small screens!</p>
 
-<p>{% img center https://s3.amazonaws.com/robdodson/images/responsive_hide_on_phones.png 'Hiding the aside' %}</p>
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/responsive_hide_on_phones.png" title="'Hiding the aside'" ></p>
 
 <p>Nice and simple, yeah? If you'd like to checkout the project running live you can <a href="http://robdodson.s3-website-us-east-1.amazonaws.com/tutorials/building-a-responsive-grid-with-foundation/index.html">follow this link</a>. Resize your browser or hit it with an iPhone to see it do its magic. - Rob</p>
 

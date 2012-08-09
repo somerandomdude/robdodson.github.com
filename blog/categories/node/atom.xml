@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Node | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/node/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-08T09:45:19-07:00</updated>
+  <updated>2012-08-09T08:24:35-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -458,7 +458,7 @@ Finally I chose to use some funky buttons from [Chad Mazzola's CSS3 Buttons proj
   box-shadow: inset 0px 0px 0px 1px rgba(255, 115, 100, 0.4);
 }
 ```
-{% img center https://s3.amazonaws.com/robdodson/images/defcon_final.png 'Defcon final' %}</p>
+<img class="center" src="https://s3.amazonaws.com/robdodson/images/defcon_final.png" title="'Defcon final'" ></p>
 
 <p>SWEEEEEEET! I'll go ahead and host it on Heroku but first I have to find out what the cost of leaving Node.js/Socket.io running indefinitely would be. Till then you should be able to get a local version of all this working or <a href="https://github.com/robdodson/defcon">just clone the Github repo</a> and now you too can have your very own Defcon stopwatch. enjoy! - Rob</p>
 

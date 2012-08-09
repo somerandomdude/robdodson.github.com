@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Errors | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/errors/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-08T09:45:19-07:00</updated>
+  <updated>2012-08-09T08:24:35-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -22,7 +22,7 @@
 
 <p>For starters here’s the image you see in Rails 3 when things go South:</p>
 
-<p>{% img center /images/unexpected_tidentifier.jpg 'Syntax Error: Unexpected tIDENTIFIER' %}</p>
+<p><img class="center" src="/images/unexpected_tidentifier.jpg" title="'Syntax Error: Unexpected tIDENTIFIER'" ></p>
 
 <p>Just to focus your attention, I’ll post the snippet of code that was causing the issue.</p>
 
@@ -125,7 +125,7 @@ say_hello({:name => 'Rob', :age => 27})
 <p>For my own benefit, and hopefully for the benefit of others, I’m going to post the errors and solutions that I come up with. Hopefully since I’m a total newbie, explaining things from my perspective will help other people who are new to the language as well.</p>
 
 <p>To start of we have the <code>NoMethodError</code>.
-{% img center /images/no_method_error.jpg 'NoMethodError' %}</p>
+<img class="center" src="/images/no_method_error.jpg" title="'NoMethodError'" ></p>
 
 <p>You get a <code>NoMethodError</code> when you try to call a method which either doesn’t exist on an Object, or the Object itself doesn’t exist. Since <code>Nil</code> is actually an object in Ruby (it’s an instance of <code>NilClass</code>) this error can sometimes be a bit misleading (especially if you come from a language where Nil or Null is represented by a primitive or a data type like in Actionscript 3).</p>
 
