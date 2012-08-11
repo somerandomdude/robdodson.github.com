@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Table of Contents Ah yes the Singleton, a pattern whose name lives in infamy. For the uninitiated a little explanation is in order. A Singleton is an &hellip;">
+  <meta name="description" content="Table of Contents If you&#8217;re coming from Ruby or Java you probably think of an Iterator as an object which gives you a consistent interface for &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,273 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/08/10/javascript-design-patterns-iterator/">JavaScript Design Patterns: Iterator</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-08-10T15:45:00-07:00" pubdate data-updated="true">Aug 10<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
+
+<p>If you&#8217;re coming from Ruby or Java you probably think of an Iterator as an object which gives you a consistent interface for traversing a collection of some kind. If you&#8217;re coming from JavaScript or Actionscript you probably just think of an iterator as the <code>i</code> value in a <code>for</code> loop. The term has mixed meanings but in this case we&#8217;re refering to the former, an object which gives us a consistent interface for iterating over a collection of some kind. If you&#8217;ve never used them before that might seem kind of silly. &#8220;If I need to loop over something I&#8217;m just going to loop over it!&#8221; For many use cases that&#8217;s totally fine. Where Iterator objects are useful is in situations where you might need to loop in an async fashion (stopping and restarting) or if you want to preclude an object from knowing too much about the inner workings of a collection.</p>
+
+<h2>Formal Definition</h2>
+
+<blockquote><p>Provide a way to access the elements of an aggregate object sequentially without exposing its underlying representation.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote>
+
+
+<h3>Also Known As</h3>
+
+<ul>
+<li>Cursor</li>
+</ul>
+
+
+<h2>Example Time</h2>
+
+<p>The code for an Iterator should be pretty easy to grok if you&#8217;ve worked with loops before. Here is a simple example which returns an Iterator for looping over an Array by every third value.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">iterator</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+</span><span class='line'>      <span class="nx">length</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">next</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">element</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">hasNext</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>          <span class="nx">element</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="nx">index</span><span class="p">];</span>
+</span><span class='line'>          <span class="nx">index</span> <span class="o">+=</span> <span class="mi">3</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">element</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">hasNext</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">index</span> <span class="o">&lt;</span> <span class="nx">length</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">rewind</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">data</span><span class="p">[</span><span class="nx">index</span><span class="p">];</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">current</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">data</span><span class="p">[</span><span class="nx">index</span><span class="p">];</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Our iterator has a handful of useful operations including <code>next</code>, <code>hasNext</code>, <code>rewind</code> and <code>current</code>.</p>
+
+<p><code>next</code> will return the next value and advance the index by 3.</p>
+
+<p><code>hasNext</code> will check to see if calling <code>next</code> will actually return an item. Useful for indicating when we&#8217;ve reached the end of a collection.</p>
+
+<p><code>rewind</code> will return the index to the beginning so we can loop over the collection again.</p>
+
+<p><code>current</code> will return the current item at the index without advancing the index.</p>
+
+<p>Let&#8217;s put these into play to see how it works:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="k">while</span><span class="p">(</span><span class="nx">iterator</span><span class="p">.</span><span class="nx">hasNext</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">iterator</span><span class="p">.</span><span class="nx">next</span><span class="p">());</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">iterator</span><span class="p">.</span><span class="nx">rewind</span><span class="p">();</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">iterator</span><span class="p">.</span><span class="nx">current</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we ran the above we&#8217;d see the following output in the console.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="mi">1</span>
+</span><span class='line'><span class="mi">4</span>
+</span><span class='line'><span class="mi">7</span>
+</span><span class='line'><span class="mi">10</span>
+</span><span class='line'><span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since the iterator is mainting its own state if we need to stop iteration at any point we just don&#8217;t call <code>next</code>. Using exclusively <code>for</code> loops we&#8217;d have to check against a flag of some kind, store our current position and then rebuild the loop starting from that point.</p>
+
+<h2>Not just for Arrays</h2>
+
+<p>As I mentioned before the Iterator gives us a consistent interface for traversing a collection, which means it can iterate over <em>any</em> object. Calendar Dates, Linked Lists, Node Graphs, whatever! Here&#8217;s an example of an iterator that traverses a simple Hash.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">iterator</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">foo</span><span class="o">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="nx">bar</span><span class="o">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="nx">baz</span><span class="o">:</span> <span class="s1">&#39;baz&#39;</span> <span class="p">},</span>
+</span><span class='line'>      <span class="nx">keys</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">data</span><span class="p">),</span>
+</span><span class='line'>      <span class="nx">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">length</span> <span class="o">=</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">next</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">element</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">hasNext</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>          <span class="nx">element</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="nx">keys</span><span class="p">[</span><span class="nx">index</span><span class="p">]];</span>
+</span><span class='line'>          <span class="nx">index</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">element</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">hasNext</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">index</span> <span class="o">&lt;</span> <span class="nx">length</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">rewind</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">data</span><span class="p">[</span><span class="nx">keys</span><span class="p">[</span><span class="nx">index</span><span class="p">]];</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">current</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">data</span><span class="p">[</span><span class="nx">keys</span><span class="p">[</span><span class="nx">index</span><span class="p">]];</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Notice how the interface is identical to our previous Iterator? That&#8217;s one of the key aspects to this pattern: Regardless of the <em>type</em> of collection, we can define a consistent interface to loop through it. It also means that the client doesn&#8217;t need to know anything about the implementation of the actual collection, and by wrapping it in a closure we can prevent the client from <em>editing</em> the collection. Personally I like the idea of certain services handing out iterators rather than a wholesale dump of all the data. As always use whichever tool is appropriate for the context.</p>
+
+<p>One quick note regarding Hashes. Previous versions of the ECMA spec did not require that Hash keys be kept in order. While most modern browsers <em>do</em> keep them in order there are some funky inconsistencies. For instance, if you write out the following Hash:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">hash</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;foo&#39;</span><span class="o">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="o">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="o">:</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="o">:</span> <span class="s1">&#39;world&#39;</span> <span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Google Chrome will swap the order of the keys such that they appear like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span> <span class="s1">&#39;1&#39;</span><span class="o">:</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="o">:</span> <span class="s1">&#39;world&#39;</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="o">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="o">:</span> <span class="s1">&#39;bar&#39;</span> <span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There are some interesting discussions on StackOverflow which cover this topic but it&#8217;s a bit outside the scope of this article so I&#8217;ll just link to them here:</p>
+
+<ul>
+<li><a href="http://stackoverflow.com/questions/5773950/how-to-keep-an-javascript-object-array-ordered-while-also-maintaining-key-lookup">How to keep an Javascript object/array ordered while also maintaining key lookups?</a></li>
+<li><a href="http://stackoverflow.com/questions/3549894/javascript-data-structure-for-fast-lookup-and-ordered-looping">Javascript data structure for fast lookup and ordered looping?</a></li>
+</ul>
+
+
+<h2>JavaScript 1.7</h2>
+
+<p>Although not widely supported yet, JavaScript 1.7 includes a built in Iterator object which can be used to wrap an Array or Hash with just a single line of code.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;application/javascript;version=1.7&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">lang</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;JavaScript&#39;</span><span class="p">,</span> <span class="nx">birthYear</span><span class="o">:</span> <span class="mi">1995</span> <span class="p">};</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">it</span> <span class="o">=</span> <span class="nx">Iterator</span><span class="p">(</span><span class="nx">lang</span><span class="p">);</span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The above script block will not work in Chrome but it should work in the latest version of Firefox. Note the <code>type</code> attribute of the script tag which instructs the interpreter to handle the code as JS 1.7.</p>
+
+<p>For some further reading on the topic checkout the MDN article which covers <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Iterators_and_Generators">Iterators in JavaScript 1.7</a></p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -498,6 +765,8 @@ If we were to accidentally define another global <code>addToCart</code> function
 <p>They&#8217;re often an indication that modules in a system are either tightly coupled or that logic is overly spread across multiple parts of a codebase. Singletons can be more difficult to test due to issues ranging from hidden dependencies, the difficulty in creating multiple instances, difficulty in stubbing dependencies and so on.</p></blockquote>
 
 <p>Definitely read <a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript">his full article</a> on the subject since it contains a handful of links to interesting side topics.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 </div>
   
   
@@ -801,6 +1070,8 @@ If we were to accidentally define another global <code>addToCart</code> function
 <h2>Related Patterns</h2>
 
 <p>Flyweight: Strategy objects often make good flyweights.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 </div>
   
   
@@ -889,6 +1160,8 @@ If we were to accidentally define another global <code>addToCart</code> function
 
 <p>Patterns should be used with caution as not everything fits so neatly into their paradigms. It&#8217;s often said that a beginner never met a pattern he didn&#8217;t like. In my experiences I&#8217;ve been burned by pattern overuse and at other times they have legitimately saved my ass. It&#8217;s also true that many patterns don&#8217;t really work or aren&#8217;t appropriate for particular languages. For instance, the GoF book was written <em>primarily for languages which shared features of C++ and SmallTalk</em>. I totally agree with this sentiment but I feel like along the way we&#8217;ll discover what does and doesn&#8217;t make sense in a dynamic language like JS and hopefully we can toss in some new patterns of our own. Already to the list I&#8217;ve added Promises which I use quite frequently and find to be a wonderful alternative to JavaScript&#8217;s oft seen pyramid of callbacks.
 Again, this is all about learning and experimenting. In my opinion a good understanding of design patterns is a threshold that needs to be crossed at some point in your career. I&#8217;m committed to doing this every single day for the next few weeks so hopefully by the end of it we&#8217;ll have a useful resource that others can benefit from. Stay tuned!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 </div>
   
   
@@ -2425,92 +2698,6 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/20/crawling-pages-with-mechanize-and-nokogiri/">Crawling Pages With Mechanize and Nokogiri</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-20T00:09:00-07:00" pubdate data-updated="true">Jun 20<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Short post tonight because I spent so much time figuring out the code. It&#8217;s late and my brain is firing on about 1 cylinder so it took longer than I expected to get everything working.</p>
-
-<p>The scraper that I&#8217;m building is supposed to work like a spider and crawl of the pages of my blog. I wasn&#8217;t sure what the best way to do that was so I started Googling and came up with <a href="http://mechanize.rubyforge.org/">Mechanize.</a> There are other tools built on top of Mechanize, like <a href="https://github.com/felipecsl/wombat">Wombat</a>, but since my task is so simple I figured I could just write everything I needed with Mechanize and Nokogiri. It&#8217;s usually a better idea to work with simple tools when you&#8217;re first grasping concepts so you don&#8217;t get lost in the weeds of some high powered framework.</p>
-
-<p>Since it&#8217;s late I&#8217;ll let the code do the talking:</p>
-
-<figure class='code'><figcaption><span>crawler.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;mechanize&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># Create a new instance of Mechanize and grab our page</span>
-</span><span class='line'><span class="n">agent</span> <span class="o">=</span> <span class="no">Mechanize</span><span class="o">.</span><span class="n">new</span>
-</span><span class='line'><span class="n">page</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://robdodson.me/blog/archives/&#39;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># Find all the links on the page that are contained within</span>
-</span><span class='line'><span class="c1"># h1 tags.</span>
-</span><span class='line'><span class="n">post_links</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">find_all</span> <span class="p">{</span> <span class="o">|</span><span class="n">l</span><span class="o">|</span> <span class="n">l</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;h1&#39;</span> <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1"># Click on one of our post links and store the response</span>
-</span><span class='line'><span class="n">post</span> <span class="o">=</span> <span class="n">post_links</span><span class="o">[</span><span class="mi">1</span><span class="o">].</span><span class="n">click</span>
-</span><span class='line'><span class="n">doc</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">parser</span> <span class="c1"># Same as Nokogiri::HTML(page.body)</span>
-</span><span class='line'><span class="nb">p</span> <span class="n">doc</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This code is hopefully easy enough to digest. After I get the page I find all of the links which are wrapped inside of an <code>h1</code>. Just as an example I <code>click</code> a link from the list using Array syntax and store the response in another var. You <em>could</em> click all of the links by iterating through the post_links object, and that&#8217;s what we&#8217;ll tackle tomorrow. For now I just follow 1 link and use a convenience method to parse the page with Nokogiri. After that we have a Nokogiri <code>doc</code> ready to be manipulated however we see fit.</p>
-
-<p><a href="https://gist.github.com/2958538">Here&#8217;s a link to the Gist</a> if you&#8217;d like to tweak or play with the code. Pop it into <code>irb</code> and give it a shot. - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 12:10 am</li>
-<li>Mood: Tired, Introspective</li>
-<li>Sleep: 4.5</li>
-<li>Hunger: 2</li>
-<li>Coffee: 1</li>
-</ul>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -2526,6 +2713,10 @@ Again, this is all about learning and experimenting. In my opinion a good unders
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/10/javascript-design-patterns-iterator/">JavaScript Design Patterns: Iterator</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/08/javascript-design-patterns-singleton/">JavaScript Design Patterns: Singleton</a>
       </li>
     
@@ -2539,10 +2730,6 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     
       <li class="post">
         <a href="/blog/2012/06/25/ending-my-first-chain/">Ending My First Chain</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/24/sublime-snippet-basics/">Sublime Snippet Basics</a>
       </li>
     
   </ul>

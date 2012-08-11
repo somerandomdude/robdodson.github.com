@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-09T09:53:02-07:00</updated>
+  <updated>2012-08-11T08:47:31-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,246 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript Design Patterns: Iterator]]></title>
+    <link href="http://robdodson.me/blog/2012/08/10/javascript-design-patterns-iterator/"/>
+    <updated>2012-08-10T15:45:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/08/10/javascript-design-patterns-iterator</id>
+    <content type="html"><![CDATA[<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
+
+<p>If you&#8217;re coming from Ruby or Java you probably think of an Iterator as an object which gives you a consistent interface for traversing a collection of some kind. If you&#8217;re coming from JavaScript or Actionscript you probably just think of an iterator as the <code>i</code> value in a <code>for</code> loop. The term has mixed meanings but in this case we&#8217;re refering to the former, an object which gives us a consistent interface for iterating over a collection of some kind. If you&#8217;ve never used them before that might seem kind of silly. &#8220;If I need to loop over something I&#8217;m just going to loop over it!&#8221; For many use cases that&#8217;s totally fine. Where Iterator objects are useful is in situations where you might need to loop in an async fashion (stopping and restarting) or if you want to preclude an object from knowing too much about the inner workings of a collection.</p>
+
+<h2>Formal Definition</h2>
+
+<blockquote><p>Provide a way to access the elements of an aggregate object sequentially without exposing its underlying representation.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote>
+
+
+<h3>Also Known As</h3>
+
+<ul>
+<li>Cursor</li>
+</ul>
+
+
+<h2>Example Time</h2>
+
+<p>The code for an Iterator should be pretty easy to grok if you&#8217;ve worked with loops before. Here is a simple example which returns an Iterator for looping over an Array by every third value.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">iterator</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+</span><span class='line'>      <span class="nx">length</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">next</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">element</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">hasNext</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>          <span class="nx">element</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="nx">index</span><span class="p">];</span>
+</span><span class='line'>          <span class="nx">index</span> <span class="o">+=</span> <span class="mi">3</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">element</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">hasNext</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">index</span> <span class="o">&lt;</span> <span class="nx">length</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">rewind</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">data</span><span class="p">[</span><span class="nx">index</span><span class="p">];</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">current</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">data</span><span class="p">[</span><span class="nx">index</span><span class="p">];</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Our iterator has a handful of useful operations including <code>next</code>, <code>hasNext</code>, <code>rewind</code> and <code>current</code>.</p>
+
+<p><code>next</code> will return the next value and advance the index by 3.</p>
+
+<p><code>hasNext</code> will check to see if calling <code>next</code> will actually return an item. Useful for indicating when we&#8217;ve reached the end of a collection.</p>
+
+<p><code>rewind</code> will return the index to the beginning so we can loop over the collection again.</p>
+
+<p><code>current</code> will return the current item at the index without advancing the index.</p>
+
+<p>Let&#8217;s put these into play to see how it works:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="k">while</span><span class="p">(</span><span class="nx">iterator</span><span class="p">.</span><span class="nx">hasNext</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">iterator</span><span class="p">.</span><span class="nx">next</span><span class="p">());</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">iterator</span><span class="p">.</span><span class="nx">rewind</span><span class="p">();</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">iterator</span><span class="p">.</span><span class="nx">current</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we ran the above we&#8217;d see the following output in the console.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="mi">1</span>
+</span><span class='line'><span class="mi">4</span>
+</span><span class='line'><span class="mi">7</span>
+</span><span class='line'><span class="mi">10</span>
+</span><span class='line'><span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since the iterator is mainting its own state if we need to stop iteration at any point we just don&#8217;t call <code>next</code>. Using exclusively <code>for</code> loops we&#8217;d have to check against a flag of some kind, store our current position and then rebuild the loop starting from that point.</p>
+
+<h2>Not just for Arrays</h2>
+
+<p>As I mentioned before the Iterator gives us a consistent interface for traversing a collection, which means it can iterate over <em>any</em> object. Calendar Dates, Linked Lists, Node Graphs, whatever! Here&#8217;s an example of an iterator that traverses a simple Hash.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">iterator</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">foo</span><span class="o">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="nx">bar</span><span class="o">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="nx">baz</span><span class="o">:</span> <span class="s1">&#39;baz&#39;</span> <span class="p">},</span>
+</span><span class='line'>      <span class="nx">keys</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">data</span><span class="p">),</span>
+</span><span class='line'>      <span class="nx">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">length</span> <span class="o">=</span> <span class="nx">keys</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">next</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">element</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">hasNext</span><span class="p">())</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>          <span class="nx">element</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="nx">keys</span><span class="p">[</span><span class="nx">index</span><span class="p">]];</span>
+</span><span class='line'>          <span class="nx">index</span><span class="o">++</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">element</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">hasNext</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">index</span> <span class="o">&lt;</span> <span class="nx">length</span><span class="p">;</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">rewind</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">data</span><span class="p">[</span><span class="nx">keys</span><span class="p">[</span><span class="nx">index</span><span class="p">]];</span>
+</span><span class='line'>      <span class="p">},</span>
+</span><span class='line'>      <span class="nx">current</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">data</span><span class="p">[</span><span class="nx">keys</span><span class="p">[</span><span class="nx">index</span><span class="p">]];</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Notice how the interface is identical to our previous Iterator? That&#8217;s one of the key aspects to this pattern: Regardless of the <em>type</em> of collection, we can define a consistent interface to loop through it. It also means that the client doesn&#8217;t need to know anything about the implementation of the actual collection, and by wrapping it in a closure we can prevent the client from <em>editing</em> the collection. Personally I like the idea of certain services handing out iterators rather than a wholesale dump of all the data. As always use whichever tool is appropriate for the context.</p>
+
+<p>One quick note regarding Hashes. Previous versions of the ECMA spec did not require that Hash keys be kept in order. While most modern browsers <em>do</em> keep them in order there are some funky inconsistencies. For instance, if you write out the following Hash:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">hash</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;foo&#39;</span><span class="o">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="o">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="o">:</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="o">:</span> <span class="s1">&#39;world&#39;</span> <span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Google Chrome will swap the order of the keys such that they appear like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span> <span class="s1">&#39;1&#39;</span><span class="o">:</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="o">:</span> <span class="s1">&#39;world&#39;</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="o">:</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="o">:</span> <span class="s1">&#39;bar&#39;</span> <span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There are some interesting discussions on StackOverflow which cover this topic but it&#8217;s a bit outside the scope of this article so I&#8217;ll just link to them here:</p>
+
+<ul>
+<li><a href="http://stackoverflow.com/questions/5773950/how-to-keep-an-javascript-object-array-ordered-while-also-maintaining-key-lookup">How to keep an Javascript object/array ordered while also maintaining key lookups?</a></li>
+<li><a href="http://stackoverflow.com/questions/3549894/javascript-data-structure-for-fast-lookup-and-ordered-looping">Javascript data structure for fast lookup and ordered looping?</a></li>
+</ul>
+
+
+<h2>JavaScript 1.7</h2>
+
+<p>Although not widely supported yet, JavaScript 1.7 includes a built in Iterator object which can be used to wrap an Array or Hash with just a single line of code.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;application/javascript;version=1.7&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">lang</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;JavaScript&#39;</span><span class="p">,</span> <span class="nx">birthYear</span><span class="o">:</span> <span class="mi">1995</span> <span class="p">};</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">it</span> <span class="o">=</span> <span class="nx">Iterator</span><span class="p">(</span><span class="nx">lang</span><span class="p">);</span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The above script block will not work in Chrome but it should work in the latest version of Firefox. Note the <code>type</code> attribute of the script tag which instructs the interpreter to handle the code as JS 1.7.</p>
+
+<p>For some further reading on the topic checkout the MDN article which covers <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Iterators_and_Generators">Iterators in JavaScript 1.7</a></p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[JavaScript Design Patterns: Singleton]]></title>
@@ -413,6 +653,8 @@ If we were to accidentally define another global <code>addToCart</code> function
 <p>They&#8217;re often an indication that modules in a system are either tightly coupled or that logic is overly spread across multiple parts of a codebase. Singletons can be more difficult to test due to issues ranging from hidden dependencies, the difficulty in creating multiple instances, difficulty in stubbing dependencies and so on.</p></blockquote>
 
 <p>Definitely read <a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript">his full article</a> on the subject since it contains a handful of links to interesting side topics.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   
@@ -689,6 +931,8 @@ If we were to accidentally define another global <code>addToCart</code> function
 <h2>Related Patterns</h2>
 
 <p>Flyweight: Strategy objects often make good flyweights.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   
@@ -750,6 +994,8 @@ If we were to accidentally define another global <code>addToCart</code> function
 
 <p>Patterns should be used with caution as not everything fits so neatly into their paradigms. It&#8217;s often said that a beginner never met a pattern he didn&#8217;t like. In my experiences I&#8217;ve been burned by pattern overuse and at other times they have legitimately saved my ass. It&#8217;s also true that many patterns don&#8217;t really work or aren&#8217;t appropriate for particular languages. For instance, the GoF book was written <em>primarily for languages which shared features of C++ and SmallTalk</em>. I totally agree with this sentiment but I feel like along the way we&#8217;ll discover what does and doesn&#8217;t make sense in a dynamic language like JS and hopefully we can toss in some new patterns of our own. Already to the list I&#8217;ve added Promises which I use quite frequently and find to be a wonderful alternative to JavaScript&#8217;s oft seen pyramid of callbacks.
 Again, this is all about learning and experimenting. In my opinion a good understanding of design patterns is a threshold that needs to be crossed at some point in your career. I&#8217;m committed to doing this every single day for the next few weeks so hopefully by the end of it we&#8217;ll have a useful resource that others can benefit from. Stay tuned!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   
@@ -3614,321 +3860,6 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 <li>Sleep: 7</li>
 <li>Hunger: 0</li>
 <li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Let's Talk SMACSS, Man]]></title>
-    <link href="http://robdodson.me/blog/2012/06/09/lets-talk-smacss/"/>
-    <updated>2012-06-09T21:03:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/09/lets-talk-smacss</id>
-    <content type="html"><![CDATA[<p>In an effort to further my understanding of CSS best practices I&#8217;ve ended up with two sort of looming frameworks: <a href="http://oocss.org/">OOCSS</a> and <a href="http://smacss.com/">SMACSS.</a> After reading up on both I feel more drawn toward SMACSS, most likely because it features a lumberjack on its site. I want to give a quick summary of what SMACSS has to offer. In so doing I&#8217;m going to borrow liberally from the documentation and then explain my thinking as it relates to certain passages. Cool? OK.</p>
-
-<h2>The Skinny</h2>
-
-<p>The ideas behind SMACSS were fostered over time by its creator, Jonathan Snook, who has worked on tons of sites, most notably YAHOO! Mail&#8217;s latest redesign. SMACSS is not a library of ready-made code that you can just download like <a href="http://twitter.github.com/bootstrap/">Twitter&#8217;s Bootstrap</a> or <a href="http://foundation.zurb.com/">ZURB&#8217;s Foundation.</a> Instead it is a collection of design ideas and suggestions codefied in an easy to read ebook. Think of it as a tool to help you decide <em>how</em> you&#8217;re going to write your CSS, rather than something which will write your CSS for you.</p>
-
-<p>The Core of the book, which is what I&#8217;m going to focus on today, is separated by stylesheet: Base Rules, Layout Rules, Module Rules, State Rules, and Theme Rules.</p>
-
-<h2>Base Rules</h2>
-
-<blockquote><p>Base rules are the defaults. They are almost exclusively single element selectors but it could include attribute selectors, pseudo-class selectors, child selectors or sibling selectors. Essentially, a base style says that wherever this element is on the page, it should look like this. &#8211; SMACSS, Categorizing CSS Rules</p></blockquote>
-
-<p><a href="http://www.stubbornella.org/content/">Nicole Sullivan</a>, creator of OOCSS, suggests that we start with the smallest possible elements of our site and design up from there. In the SMACSS philosophy this process would start with our <code>base.css</code> file. Think of it as the place where we define the absolute most basic styles any element on our site can have.</p>
-
-<figure class='code'><figcaption><span>base.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nt">body</span><span class="o">,</span> <span class="nt">form</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">margin</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">padding</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">a</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">color</span><span class="o">:</span> <span class="m">#039</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">a</span><span class="nd">:hover</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">color</span><span class="o">:</span> <span class="m">#03F</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The idea is to give us a decent, even playing field where all of our core pieces are ready to be used in whatever fashion we see fit. You might find that you enjoy adding your css reset or normalization to a base.css file but personally I like to keep my reset separate to reduce clutter.</p>
-
-<h2>Layout Rules</h2>
-
-<blockquote><p>Layout rules divide the page into sections. Layouts hold one or more modules together. &#8211; SMACSS, Categorizing CSS Rules</p></blockquote>
-
-<p>Your layout rules are where prototypes start to come to life. Every site can be broken down into two very broad layers. The first is the scaffolding of the page and the second is the modules which live in the scaffolding.</p>
-
-<p>To understand scaffolding, try looking at a website like <a href="http://www.cnn.com/">CNN</a> and unfocusing your eyes. Once you&#8217;re ignoring the words and pictures you should be able to easily describe the major areas of content: the header, the primary content, sidebars, etc. The rules which govern the positioning of those elements should live in <code>layout.css</code>.</p>
-
-<figure class='code'><figcaption><span>layout.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nf">#header</span><span class="o">,</span> <span class="nf">#article</span><span class="o">,</span> <span class="nf">#footer</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">width</span><span class="o">:</span> <span class="m">960px</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">margin</span><span class="o">:</span> <span class="k">auto</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">#article</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">border</span><span class="o">:</span> <span class="k">solid</span> <span class="m">#CCC</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">border-width</span><span class="o">:</span> <span class="m">1px</span> <span class="m">0</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>It&#8217;s also a good place to put other generalized layout styles which might be used elsewhere in your site. For instance, a horizontal list for menu items or breadcrumbs:</p>
-
-<figure class='code'><figcaption><span>layout.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.h-list</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">margin</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">padding</span><span class="o">:</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">list-style-type</span><span class="o">:</span> <span class="k">none</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'><span class="nc">.h-list</span> <span class="o">&gt;</span> <span class="nt">li</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="o">-</span><span class="k">block</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">margin</span><span class="o">:</span> <span class="m">0</span> <span class="m">10px</span> <span class="m">0</span> <span class="m">0</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c">/* IE7 hack to mimic inline-block on block elements */</span>
-</span><span class='line'>    <span class="o">*</span><span class="k">display</span><span class="o">:</span> <span class="k">inline</span><span class="p">;</span>
-</span><span class='line'>    <span class="o">*</span><span class="n">zoom</span><span class="o">:</span> <span class="m">1</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>These styles don&#8217;t care about the color or background or any other specifics of their elements. They only care about how those elements will be layed out in space.</p>
-
-<h2>Module Rules</h2>
-
-<blockquote><p>Modules are the reusable, modular parts of our design. They are the callouts, the sidebar sections, the product lists and so on. &#8211; SMACSS, Categorizing CSS Rules</p></blockquote>
-
-<p>The module rules are where the majority of your site code will go, as this sheet defines all the little inhabitants of that second layer I mentioned, the modules <em>inside</em> the scaffolding. Each module should be able to stand on its own, and as such, it might be a good idea to design them first in a separate file so there is no temptation to leverage styles already on the page. Once your module is complete you can drop it into your document and it <em>should</em> play nice with everyone else.</p>
-
-<p>Each module will typically start with a class name, and all subsequent selectors should work from this point down. Or if our module is going to be rather complex we can namespace our selectors. For instance:</p>
-
-<figure class='code'><figcaption><span>modules.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.pod</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">width</span><span class="o">:</span> <span class="m">100</span><span class="o">%</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.pod</span> <span class="o">&gt;</span> <span class="nt">h3</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">color</span><span class="o">:</span> <span class="m">#F00</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">/* Or... */</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.pod-title</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">color</span><span class="o">:</span> <span class="m">#F00</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Whether you use descendant selectors or namespaced clases is really up to you and how complex your modules get. You definitely don&#8217;t want to end up with classitis. The advantage to using <code>.pod-title</code> is that it doesn&#8217;t tie us to an <code>h3</code>, however your markup might become a total mess if every single element requires its own class. Balance is key.</p>
-
-<h3>Subclassing Modules</h3>
-
-<p>One very important concept to keep in mind is that of subclassing modules. Imagine a scenario where you have a widget which exists in your primary content area. One day your boss tells you to move it into the sidebar, and once it&#8217;s there 99% of the styles should look the same, except the widget will now be about 3/4ths of its normal width and its text should be red instead of blue. Your first inclination might be to move the code for the widget into the sidebar and then to do something like this:</p>
-
-<figure class='code'><figcaption><span>modules.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="c">/*</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">DON&#39;T DO THIS!</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">*/</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.widget</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">width</span><span class="o">:</span> <span class="m">100px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.widget</span> <span class="nc">.widget-title</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">color</span><span class="o">:</span> <span class="m">#00F</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">#sidebar</span> <span class="nc">.widget</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">width</span><span class="o">:</span> <span class="m">75px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nf">#sidebar</span> <span class="nc">.widget</span> <span class="nc">.widget-title</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">width</span><span class="o">:</span> <span class="m">75px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>By leveraging the parent context we&#8217;ve now locked ourselves into a specificity war. Any change to our second widget requires the <code>#sidebar</code> id, which also means that this second widget cannot live anywhere else. Rather than using the parent we should consider the widget that lives in the sidebar as an <em>extension</em> of our original object.</p>
-
-<figure class='code'><figcaption><span>modules.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.widget</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">width</span><span class="o">:</span> <span class="m">100px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.widget</span> <span class="nc">.widget-title</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">color</span><span class="o">:</span> <span class="m">#00F</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">/* Our Subclass */</span>
-</span><span class='line'><span class="nc">.widget-constrained</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">width</span><span class="o">:</span> <span class="m">75px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nc">.widget-constrained</span> <span class="nc">.widget-title</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">color</span><span class="o">:</span> <span class="m">#F00</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>To use a subclass we should apply both the original and the subclass styles to our element:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;widget widget-constrained&quot;</span><span class="nt">&gt;</span>...<span class="nt">&lt;/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The benefit of doing it this way is that the styles are easier to read and also more flexible. Since there&#8217;s no parent coupling our <code>widget-constrained</code> can be used in the sidebar, footer, modals, or anywhere else you&#8217;d like.</p>
-
-<h2>State Rules</h2>
-
-<blockquote><p>State rules are ways to describe how our modules or layouts will look when in a particular state. Is it hidden or expanded? Is it active or inactive? They are about describing how a module or layout looks on screens that are smaller or bigger. They are also about describing how a module might look in different views like the home page or the inside page. &#8211; SMACSS, Categorizing CSS Rules</p></blockquote>
-
-<p>The best example of what should go into a <code>states.css</code> is the classic error state.</p>
-
-<figure class='code'><figcaption><span>states.css</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nc">.is-error</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">border</span><span class="o">:</span> <span class="m">1px</span> <span class="k">solid</span> <span class="nb">red</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Really anything that would potentially be added with JavaScript to illustrate a change in a module&#8217;s state would be a good candidate. Some other ones that come to mind are <code>is-hidden</code> or <code>is-pressed</code>.</p>
-
-<p>One rather sticky point to the whole idea of a <code>states.css</code> is that most of the states would need to either rely on being loaded after all your other stylesheets or have an <code>!important</code> added to them. I think for a lot of folks that is a dealbreaker, although in my opinion, if used properly, those few !importants can be very useful. For instance, if we add an <code>is-hidden</code> state to one of our elements I think it&#8217;s perfectly ok to <code>!important</code> the <code>display: none</code>.</p>
-
-<h3>Module States</h3>
-
-<p>An alternative to using <code>!important</code> all over the place is the idea of module states. So rather than <code>.is-pressed</code> in our <code>states.css</code> we would have <code>.is-btn-pressed</code> next to our <code>.btn</code> module in <code>modules.css</code>. I like this approach a lot and think it solves many of the places where <code>states.css</code> feels too general.</p>
-
-<h2>Theme Rules</h2>
-
-<blockquote><p>Theme rules are similar to state rules in that they describe how modules or layouts might look. Most sites don’t require a layer of theming but it is good to be aware of it.</p></blockquote>
-
-<p>The primary consideration for theme rules are when your site is able to be reskinned and also if the typography can be changed.</p>
-
-<p>Skinning a new module with a <code>theme.css</code> might look something like this:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="c">/* in modules.css */</span>
-</span><span class='line'><span class="nc">.mod</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">border</span><span class="o">:</span> <span class="m">1px</span> <span class="k">solid</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="c">/* in theme.css */</span>
-</span><span class='line'><span class="nc">.mod</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">border-color</span><span class="o">:</span> <span class="nb">blue</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Likewise if you need to switch to a different font or size, here is where you would do that. To be honest I don&#8217;t currently need to make any of my projects skinnable so I haven&#8217;t explored the ideas around <code>theme.css</code> all that much, but I do think it&#8217;s a good idea to keep in the back of your hat.</p>
-
-<h2>Wrap it up!</h2>
-
-<p>That does it for tonight. Hopefully you&#8217;re a little more enlightened with regards to SMACSS. Definitely <a href="http://smacss.com/">checkout the SMACSS site</a> and grab the book. And as always please feel free to leave comments and feedback. Thanks! - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 9:03 pm</li>
-<li>Mood: Anxious</li>
-<li>Sleep: 7</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
 </ul>
 
 ]]></content>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-09T09:53:02-07:00</updated>
+  <updated>2012-08-11T08:47:31-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,175 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript Design Patterns: Iterator]]></title>
+    <link href="http://robdodson.me/blog/2012/08/10/javascript-design-patterns-iterator/"/>
+    <updated>2012-08-10T15:45:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/08/10/javascript-design-patterns-iterator</id>
+    <content type="html"><![CDATA[<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
+
+<p>If you're coming from Ruby or Java you probably think of an Iterator as an object which gives you a consistent interface for traversing a collection of some kind. If you're coming from JavaScript or Actionscript you probably just think of an iterator as the <code>i</code> value in a <code>for</code> loop. The term has mixed meanings but in this case we're refering to the former, an object which gives us a consistent interface for iterating over a collection of some kind. If you've never used them before that might seem kind of silly. "If I need to loop over something I'm just going to loop over it!" For many use cases that's totally fine. Where Iterator objects are useful is in situations where you might need to loop in an async fashion (stopping and restarting) or if you want to preclude an object from knowing too much about the inner workings of a collection.</p>
+
+<h2>Formal Definition</h2>
+
+<p><blockquote><p>Provide a way to access the elements of an aggregate object sequentially without exposing its underlying representation.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote></p>
+
+<h3>Also Known As</h3>
+
+<ul>
+<li>Cursor</li>
+</ul>
+
+
+<h2>Example Time</h2>
+
+<p>The code for an Iterator should be pretty easy to grok if you've worked with loops before. Here is a simple example which returns an Iterator for looping over an Array by every third value.</p>
+
+<p>``` js
+var iterator = (function() {</p>
+
+<pre><code>var index = 0,
+    data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    length = data.length;
+
+return {
+    next: function() {
+        var element;
+        if (!this.hasNext()) {
+            return null;
+        }
+        element = data[index];
+        index += 3;
+        return element;
+    },
+    hasNext: function() {
+        return index &lt; length;
+    },
+    rewind: function() {
+        index = 0;
+        return data[index];
+    },
+    current: function() {
+        return data[index];
+    }
+}
+</code></pre>
+
+<p>}());
+<code>``
+Our iterator has a handful of useful operations including</code>next<code>,</code>hasNext<code>,</code>rewind<code>and</code>current`.</p>
+
+<p><code>next</code> will return the next value and advance the index by 3.</p>
+
+<p><code>hasNext</code> will check to see if calling <code>next</code> will actually return an item. Useful for indicating when we've reached the end of a collection.</p>
+
+<p><code>rewind</code> will return the index to the beginning so we can loop over the collection again.</p>
+
+<p><code>current</code> will return the current item at the index without advancing the index.</p>
+
+<p>Let's put these into play to see how it works:</p>
+
+<p>``` js
+while(iterator.hasNext()) {</p>
+
+<pre><code>console.log(iterator.next());
+</code></pre>
+
+<p>}</p>
+
+<p>iterator.rewind();
+console.log(iterator.current());
+```</p>
+
+<p>If we ran the above we'd see the following output in the console.</p>
+
+<p><code>
+1
+4
+7
+10
+1
+</code>
+Since the iterator is mainting its own state if we need to stop iteration at any point we just don't call <code>next</code>. Using exclusively <code>for</code> loops we'd have to check against a flag of some kind, store our current position and then rebuild the loop starting from that point.</p>
+
+<h2>Not just for Arrays</h2>
+
+<p>As I mentioned before the Iterator gives us a consistent interface for traversing a collection, which means it can iterate over <em>any</em> object. Calendar Dates, Linked Lists, Node Graphs, whatever! Here's an example of an iterator that traverses a simple Hash.</p>
+
+<p>``` js
+var iterator = (function() {</p>
+
+<pre><code>var data = { foo: 'foo', bar: 'bar', baz: 'baz' },
+    keys = Object.keys(data),
+    index = 0,
+    length = keys.length;
+
+return {
+    next: function() {
+        var element;
+        if (!this.hasNext()) {
+            return null;
+        }
+        element = data[keys[index]];
+        index++;
+        return element;
+    },
+    hasNext: function() {
+        return index &lt; length;
+    },
+    rewind: function() {
+        index = 0;
+        return data[keys[index]];
+    },
+    current: function() {
+        return data[keys[index]];
+    }
+}
+</code></pre>
+
+<p>}());
+```
+Notice how the interface is identical to our previous Iterator? That's one of the key aspects to this pattern: Regardless of the <em>type</em> of collection, we can define a consistent interface to loop through it. It also means that the client doesn't need to know anything about the implementation of the actual collection, and by wrapping it in a closure we can prevent the client from <em>editing</em> the collection. Personally I like the idea of certain services handing out iterators rather than a wholesale dump of all the data. As always use whichever tool is appropriate for the context.</p>
+
+<p>One quick note regarding Hashes. Previous versions of the ECMA spec did not require that Hash keys be kept in order. While most modern browsers <em>do</em> keep them in order there are some funky inconsistencies. For instance, if you write out the following Hash:</p>
+
+<p><code>js
+var hash = { 'foo': 'foo', 'bar': 'bar', '1': 'hello', '2': 'world' };
+</code>
+Google Chrome will swap the order of the keys such that they appear like this:</p>
+
+<p><code>js
+{ '1': 'hello', '2': 'world', 'foo': 'foo', 'bar': 'bar' };
+</code>
+There are some interesting discussions on StackOverflow which cover this topic but it's a bit outside the scope of this article so I'll just link to them here:</p>
+
+<ul>
+<li><a href="http://stackoverflow.com/questions/5773950/how-to-keep-an-javascript-object-array-ordered-while-also-maintaining-key-lookup">How to keep an Javascript object/array ordered while also maintaining key lookups?</a></li>
+<li><a href="http://stackoverflow.com/questions/3549894/javascript-data-structure-for-fast-lookup-and-ordered-looping">Javascript data structure for fast lookup and ordered looping?</a></li>
+</ul>
+
+
+<h2>JavaScript 1.7</h2>
+
+<p>Although not widely supported yet, JavaScript 1.7 includes a built in Iterator object which can be used to wrap an Array or Hash with just a single line of code.</p>
+
+<p>``` html</p>
+
+<script type="application/javascript;version=1.7">
+    var lang = { name: 'JavaScript', birthYear: 1995 };
+    var it = Iterator(lang);
+</script>
+
+
+<p><code>``
+The above script block will not work in Chrome but it should work in the latest version of Firefox. Note the</code>type` attribute of the script tag which instructs the interpreter to handle the code as JS 1.7.</p>
+
+<p>For some further reading on the topic checkout the MDN article which covers <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Iterators_and_Generators">Iterators in JavaScript 1.7</a></p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[JavaScript Design Patterns: Singleton]]></title>
@@ -297,6 +466,8 @@ console.log( singleA === singleB ); // true
 <p>They're often an indication that modules in a system are either tightly coupled or that logic is overly spread across multiple parts of a codebase. Singletons can be more difficult to test due to issues ranging from hidden dependencies, the difficulty in creating multiple instances, difficulty in stubbing dependencies and so on.</p></blockquote>
 
 <p>Definitely read <a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript">his full article</a> on the subject since it contains a handful of links to interesting side topics.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   
@@ -524,6 +695,8 @@ $canvas
 <h2>Related Patterns</h2>
 
 <p>Flyweight: Strategy objects often make good flyweights.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   
@@ -585,6 +758,8 @@ $canvas
 
 <p>Patterns should be used with caution as not everything fits so neatly into their paradigms. It's often said that a beginner never met a pattern he didn't like. In my experiences I've been burned by pattern overuse and at other times they have legitimately saved my ass. It's also true that many patterns don't really work or aren't appropriate for particular languages. For instance, the GoF book was written <em>primarily for languages which shared features of C++ and SmallTalk</em>. I totally agree with this sentiment but I feel like along the way we'll discover what does and doesn't make sense in a dynamic language like JS and hopefully we can toss in some new patterns of our own. Already to the list I've added Promises which I use quite frequently and find to be a wonderful alternative to JavaScript's oft seen pyramid of callbacks.
 Again, this is all about learning and experimenting. In my opinion a good understanding of design patterns is a threshold that needs to be crossed at some point in your career. I'm committed to doing this every single day for the next few weeks so hopefully by the end of it we'll have a useful resource that others can benefit from. Stay tuned!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   
@@ -630,112 +805,6 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 <li>Mood: Tired, Relaxed</li>
 <li>Sleep: 6</li>
 <li>Hunger: 8</li>
-<li>Coffee: 1</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Sublime Snippet Basics]]></title>
-    <link href="http://robdodson.me/blog/2012/06/24/sublime-snippet-basics/"/>
-    <updated>2012-06-24T22:48:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/24/sublime-snippet-basics</id>
-    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/">Yesterday I covered some tips and tricks</a> I've learned over the past few months of using Sublime. Something I didn't touch on is Sublime's Snippet architecture. Essentially a snippet is a little piece of code that gets executed when you type some characters and hit the <code>tab</code> key. For instance I have a snippet that spits out <code>console.log()</code> whenever I type <code>lg</code> and press <code>tab</code>. One clever feature of snippets is that they can be bound to a keyboard shortcut if the key binding calls the <code>insert_snippet</code> command and passes the path to the snippet file as an argument. For example:</p>
-
-<p>```json
-{</p>
-
-<pre><code>"keys": ["super+shift+r"], 
-"command": "insert_snippet", 
-"args": { 
-    "name": "Packages/XML/long-tag.sublime-snippet" 
-} 
-</code></pre>
-
-<p>}
-<code>``
-That will tell Sublime that when I press</code>cmd+shift+r<code>it should act as if I triggered the long-tag snippet for XML files. Basically that will let me highlight some text, hit</code>cmd+shift+r` and then I can type some HTML or XML tags to wrap my text. Cool. So let's go about writing our own snippet to learn a bit more about this process.</p>
-
-<h2>Getting Started</h2>
-
-<p>The previously mentioned snippet is great for wrapping an item in HTML/XML tags but it totally breaks if we need to wrap our selection in anything not existing within brackets: <code>&lt;/&gt;</code>. Since I write a lot of Markdown I'm always wrapping text in some kind of markdown syntax, <code>*like this*</code>, but there's no easy way to do this. The aforementioned snippet is close so we're going to copy it and tweak it to do what we need.</p>
-
-<p><a href="http://docs.sublimetext.info/en/latest/reference/snippets.html">The documentation on snippets for Sublime is short and full of good information. I suggest you read it before continuing on.</a></p>
-
-<p>We're going to copy the file located at <code>/Library/Application\ Support/Sublime\ Text\ 2/Packages/XML</code> and move it into our <code>/Packages/User</code> directory. I chose to rename the file to <code>wrap-anything.sublime-snippet</code>. The original snippet looks like this:</p>
-
-<p>```xml
-<snippet></p>
-
-<pre><code>&lt;content&gt;&lt;![CDATA[&lt;${1:p}&gt;${2:$SELECTION}&lt;/${1/([^ ]+).*/$1/}&gt;]]&gt;&lt;/content&gt;
-&lt;tabTrigger&gt;&amp;lt;&lt;/tabTrigger&gt;
-&lt;scope&gt;text.xml&lt;/scope&gt;
-&lt;description&gt;Long Tag&lt;/description&gt;
-</code></pre>
-
-<p></snippet>
-```</p>
-
-<p><code>&lt;content&gt;</code> is where we put everything that's going to be spit out by our snippet when it's executed. Items are wrapped in a <code>CDATA</code> tag so they don't interfere with the rest of the XML.</p>
-
-<p>The first part <code>&lt;${1:p}&gt;</code> outputs a <code>&lt;</code> followed by a variable, <code>$1</code> which has a default value of the letter "p" and it closes with a <code>&gt;</code>. If our snippet only contained this bit of code then when we ran it the output would be <code>&lt;p&gt;</code>.</p>
-
-<p>The second part uses one of the environment variables <a href="http://docs.sublimetext.info/en/latest/reference/snippets.html">talked about in the snippet documentation.</a> <code>$SELECTION</code> will take whatever we've highlighted and make it part of the snippet output. You'll notice this variable is prefixed with a <code>2:</code> meaning it's our second variable and it's default output is going to be whatever was highlighted. The 2 also indicates that if the user hits <code>tab</code> this is the second place they'll go.</p>
-
-<p>The third part contains a block of regex which, I think, just matches whatever the user types after the snippet has executed. My regex sucks so correct me if I'm wrong.</p>
-
-<p><code>&lt;tabTrigger&gt;</code> indicates what character should be typed before hitting <code>tab</code> to fire off the snippet. In this case it's a <code>&lt;</code></p>
-
-<p><code>&lt;scope&gt;</code> defines where the snippet should run I believe.. But I'm not entirely sure. The documentation just says "Scope selector to activate this snippet." I didn't see a text.xml file anywhere in the <code>Packages/XML/</code> folder and I know this snippet works in non-xml files so...yeah...<em>shrug</em></p>
-
-<p><code>&lt;description&gt;</code> lets you describe the thing. duh.</p>
-
-<p>OK let's make our own simplified snippet:</p>
-
-<p>```xml
-<snippet></p>
-
-<pre><code>&lt;content&gt;&lt;![CDATA[${1:`}${2:$SELECTION}${1}]]&gt;&lt;/content&gt;
-&lt;tabTrigger&gt;&lt;/tabTrigger&gt;
-&lt;scope&gt;&lt;/scope&gt;
-&lt;description&gt;Wrap any block of text&lt;/description&gt;
-</code></pre>
-
-<p></snippet>
-```</p>
-
-<p>Our snippet is less sophisticated than the previous one since we've excluded the regex. With the above snippet located in our <code>Packages/User/</code> folder we can tie it to a keyboard shortcut like so:</p>
-
-<p><code>json
-{ "keys": ["super+r"], "command": "insert_snippet", "args": { "name": "Packages/User/wrap-anything.sublime-snippet" } },
-</code></p>
-
-<p>Now when we hit <code>cmd+r</code> it will let us wrap our current selection in whatever we want :)</p>
-
-<p>For good measure here's a really useful console.log snippet that's triggered by typing <code>lg</code> and then pressing <code>tab</code>.</p>
-
-<p>```xml
-<snippet></p>
-
-<pre><code>&lt;content&gt;&lt;![CDATA[console.log(${1});]]&gt;&lt;/content&gt;
-&lt;tabTrigger&gt;lg&lt;/tabTrigger&gt;
-&lt;scope&gt;source.js&lt;/scope&gt;
-&lt;description&gt;console.log()&lt;/description&gt;
-</code></pre>
-
-<p></snippet>
-```</p>
-
-<p>No need to bind this to a keyboard shortcut (unless you want to) because it defines a tab trigger. I know this wasn't super in-depth but hopefully it gives you a little bit of a start. <a href="http://docs.sublimetext.info/en/latest/reference/snippets.html">Read the documentation on snippets</a> and tighten up your regex! - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 10:48 pm</li>
-<li>Mood: Tired, Lazy</li>
-<li>Sleep: 5</li>
-<li>Hunger: 0</li>
 <li>Coffee: 1</li>
 </ul>
 

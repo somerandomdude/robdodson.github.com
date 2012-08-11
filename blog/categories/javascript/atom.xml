@@ -4,7 +4,7 @@
   <title><![CDATA[Category: JavaScript | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/javascript/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-09T09:53:02-07:00</updated>
+  <updated>2012-08-11T08:47:31-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,175 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript Design Patterns: Iterator]]></title>
+    <link href="http://robdodson.me/blog/2012/08/10/javascript-design-patterns-iterator/"/>
+    <updated>2012-08-10T15:45:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/08/10/javascript-design-patterns-iterator</id>
+    <content type="html"><![CDATA[<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
+
+<p>If you're coming from Ruby or Java you probably think of an Iterator as an object which gives you a consistent interface for traversing a collection of some kind. If you're coming from JavaScript or Actionscript you probably just think of an iterator as the <code>i</code> value in a <code>for</code> loop. The term has mixed meanings but in this case we're refering to the former, an object which gives us a consistent interface for iterating over a collection of some kind. If you've never used them before that might seem kind of silly. "If I need to loop over something I'm just going to loop over it!" For many use cases that's totally fine. Where Iterator objects are useful is in situations where you might need to loop in an async fashion (stopping and restarting) or if you want to preclude an object from knowing too much about the inner workings of a collection.</p>
+
+<h2>Formal Definition</h2>
+
+<p><blockquote><p>Provide a way to access the elements of an aggregate object sequentially without exposing its underlying representation.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote></p>
+
+<h3>Also Known As</h3>
+
+<ul>
+<li>Cursor</li>
+</ul>
+
+
+<h2>Example Time</h2>
+
+<p>The code for an Iterator should be pretty easy to grok if you've worked with loops before. Here is a simple example which returns an Iterator for looping over an Array by every third value.</p>
+
+<p>``` js
+var iterator = (function() {</p>
+
+<pre><code>var index = 0,
+    data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    length = data.length;
+
+return {
+    next: function() {
+        var element;
+        if (!this.hasNext()) {
+            return null;
+        }
+        element = data[index];
+        index += 3;
+        return element;
+    },
+    hasNext: function() {
+        return index &lt; length;
+    },
+    rewind: function() {
+        index = 0;
+        return data[index];
+    },
+    current: function() {
+        return data[index];
+    }
+}
+</code></pre>
+
+<p>}());
+<code>``
+Our iterator has a handful of useful operations including</code>next<code>,</code>hasNext<code>,</code>rewind<code>and</code>current`.</p>
+
+<p><code>next</code> will return the next value and advance the index by 3.</p>
+
+<p><code>hasNext</code> will check to see if calling <code>next</code> will actually return an item. Useful for indicating when we've reached the end of a collection.</p>
+
+<p><code>rewind</code> will return the index to the beginning so we can loop over the collection again.</p>
+
+<p><code>current</code> will return the current item at the index without advancing the index.</p>
+
+<p>Let's put these into play to see how it works:</p>
+
+<p>``` js
+while(iterator.hasNext()) {</p>
+
+<pre><code>console.log(iterator.next());
+</code></pre>
+
+<p>}</p>
+
+<p>iterator.rewind();
+console.log(iterator.current());
+```</p>
+
+<p>If we ran the above we'd see the following output in the console.</p>
+
+<p><code>
+1
+4
+7
+10
+1
+</code>
+Since the iterator is mainting its own state if we need to stop iteration at any point we just don't call <code>next</code>. Using exclusively <code>for</code> loops we'd have to check against a flag of some kind, store our current position and then rebuild the loop starting from that point.</p>
+
+<h2>Not just for Arrays</h2>
+
+<p>As I mentioned before the Iterator gives us a consistent interface for traversing a collection, which means it can iterate over <em>any</em> object. Calendar Dates, Linked Lists, Node Graphs, whatever! Here's an example of an iterator that traverses a simple Hash.</p>
+
+<p>``` js
+var iterator = (function() {</p>
+
+<pre><code>var data = { foo: 'foo', bar: 'bar', baz: 'baz' },
+    keys = Object.keys(data),
+    index = 0,
+    length = keys.length;
+
+return {
+    next: function() {
+        var element;
+        if (!this.hasNext()) {
+            return null;
+        }
+        element = data[keys[index]];
+        index++;
+        return element;
+    },
+    hasNext: function() {
+        return index &lt; length;
+    },
+    rewind: function() {
+        index = 0;
+        return data[keys[index]];
+    },
+    current: function() {
+        return data[keys[index]];
+    }
+}
+</code></pre>
+
+<p>}());
+```
+Notice how the interface is identical to our previous Iterator? That's one of the key aspects to this pattern: Regardless of the <em>type</em> of collection, we can define a consistent interface to loop through it. It also means that the client doesn't need to know anything about the implementation of the actual collection, and by wrapping it in a closure we can prevent the client from <em>editing</em> the collection. Personally I like the idea of certain services handing out iterators rather than a wholesale dump of all the data. As always use whichever tool is appropriate for the context.</p>
+
+<p>One quick note regarding Hashes. Previous versions of the ECMA spec did not require that Hash keys be kept in order. While most modern browsers <em>do</em> keep them in order there are some funky inconsistencies. For instance, if you write out the following Hash:</p>
+
+<p><code>js
+var hash = { 'foo': 'foo', 'bar': 'bar', '1': 'hello', '2': 'world' };
+</code>
+Google Chrome will swap the order of the keys such that they appear like this:</p>
+
+<p><code>js
+{ '1': 'hello', '2': 'world', 'foo': 'foo', 'bar': 'bar' };
+</code>
+There are some interesting discussions on StackOverflow which cover this topic but it's a bit outside the scope of this article so I'll just link to them here:</p>
+
+<ul>
+<li><a href="http://stackoverflow.com/questions/5773950/how-to-keep-an-javascript-object-array-ordered-while-also-maintaining-key-lookup">How to keep an Javascript object/array ordered while also maintaining key lookups?</a></li>
+<li><a href="http://stackoverflow.com/questions/3549894/javascript-data-structure-for-fast-lookup-and-ordered-looping">Javascript data structure for fast lookup and ordered looping?</a></li>
+</ul>
+
+
+<h2>JavaScript 1.7</h2>
+
+<p>Although not widely supported yet, JavaScript 1.7 includes a built in Iterator object which can be used to wrap an Array or Hash with just a single line of code.</p>
+
+<p>``` html</p>
+
+<script type="application/javascript;version=1.7">
+    var lang = { name: 'JavaScript', birthYear: 1995 };
+    var it = Iterator(lang);
+</script>
+
+
+<p><code>``
+The above script block will not work in Chrome but it should work in the latest version of Firefox. Note the</code>type` attribute of the script tag which instructs the interpreter to handle the code as JS 1.7.</p>
+
+<p>For some further reading on the topic checkout the MDN article which covers <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Iterators_and_Generators">Iterators in JavaScript 1.7</a></p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[JavaScript Design Patterns: Singleton]]></title>
@@ -297,6 +466,8 @@ console.log( singleA === singleB ); // true
 <p>They're often an indication that modules in a system are either tightly coupled or that logic is overly spread across multiple parts of a codebase. Singletons can be more difficult to test due to issues ranging from hidden dependencies, the difficulty in creating multiple instances, difficulty in stubbing dependencies and so on.</p></blockquote>
 
 <p>Definitely read <a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript">his full article</a> on the subject since it contains a handful of links to interesting side topics.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   
@@ -524,6 +695,8 @@ $canvas
 <h2>Related Patterns</h2>
 
 <p>Flyweight: Strategy objects often make good flyweights.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   
@@ -585,6 +758,8 @@ $canvas
 
 <p>Patterns should be used with caution as not everything fits so neatly into their paradigms. It's often said that a beginner never met a pattern he didn't like. In my experiences I've been burned by pattern overuse and at other times they have legitimately saved my ass. It's also true that many patterns don't really work or aren't appropriate for particular languages. For instance, the GoF book was written <em>primarily for languages which shared features of C++ and SmallTalk</em>. I totally agree with this sentiment but I feel like along the way we'll discover what does and doesn't make sense in a dynamic language like JS and hopefully we can toss in some new patterns of our own. Already to the list I've added Promises which I use quite frequently and find to be a wonderful alternative to JavaScript's oft seen pyramid of callbacks.
 Again, this is all about learning and experimenting. In my opinion a good understanding of design patterns is a threshold that needs to be crossed at some point in your career. I'm committed to doing this every single day for the next few weeks so hopefully by the end of it we'll have a useful resource that others can benefit from. Stay tuned!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
   </entry>
   
@@ -807,292 +982,6 @@ var videoPlayer = new VideoPlayer();</p>
 <li>Time: 9:48 pm</li>
 <li>Mood: Focused, Hurried</li>
 <li>Sleep: 5</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Take Control of your App with the JavaScript State Pattern]]></title>
-    <link href="http://robdodson.me/blog/2012/06/02/take-control-of-your-app-with-the-javascript-state-patten/"/>
-    <updated>2012-06-02T00:09:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/02/take-control-of-your-app-with-the-javascript-state-patten</id>
-    <content type="html"><![CDATA[<p>Last week I wrote a post about <a href="http://robdodson.me/blog/2012/05/25/backbone-events-framework-communication/">communicating between views in Backbone.js</a> and since then it has easily become my most popular article. The comments have forced me to think about the ways in which I typically manage state in very large Flash applications and how that might translate to JavaScript and Backbone. Today I want to present my all time favorite design pattern, the State pattern, and illustrate how it can help you maintain control of your application. I want to warn you that I'm going to show a rather large block of what looks like repetitive code because I want the pattern to be obvious. In tomorrow's post we'll clean it up and try it out with a Backbone Model and View.</p>
-
-<h3>The State pattern?</h3>
-
-<p>Ok let's get started. I want to write a video player so I'm going to need an object that can handle <code>play</code>, <code>stop</code> and <code>pause</code> states. I would say that there are probably a ton of video players out there that have <code>play</code>, <code>stop</code> and <code>pause</code> methods on them, and I bet many look kind of like this:</p>
-
-<p>``` js
-play: function() {</p>
-
-<pre><code>if (this.status == 'playing') {
-    return;
-} else if (this.status == 'stopped') {
-    // play the video
-} else if (this.status == 'paused') {
-    // unpause and play
-}
-else if ...
-</code></pre>
-
-<p>}
-```</p>
-
-<p>Or maybe instead of a long conditional there's a switch statement or something. But <em>essentially</em> you're querying some variable somewhere to check what state the object is in and you're branching your logic as a result. Now, I would argue that this is a really brittle process and probably error prone. You could imagine that in each of those conditional blocks there might be several lines of code: preparing to play, stopping the video, tearing down this or that... Or perhaps if you're moving from one state to another you want to animate something on screen, maybe do some ajax, who knows!? Really no matter what you're doing if you're tossing it into these big conditionals it's going to become a nightmare to manage.</p>
-
-<p>Alternatives? Ok, let's think of our video player in terms of the actions that it performs. Our player can play, it can stop and it can pause. What if instead of play, pause and stop acting as methods on our object, we make each of those states into its <em>own</em> object? So when the play state object is told to play it says 'Hey! I'm already playing. No need to change' and when it's told to stop it says 'Ah stopping, eh? Let me defer to my friend the Stop state object'.</p>
-
-<p>To illustrate this I've written a very simple player which just logs what it's doing as you ask it to change state. I want to point out that this code is neither DRY nor very useful in a real world situation but it's intended to illustrate a point. Hopefully when you see the repetition you'll quickly say to yourself 'Hey! Those state objects could be made into a more general/abstract parent object.' That would be the correct mindset but I thought that if I skipped this part the pattern might not be obvious for those new to it.</p>
-
-<p>``` js
-var player = {</p>
-
-<pre><code>state: undefined,
-states: {
-    playing: {
-        initialize: function(target) {
-            this.target = target;
-        },
-        enter: function() {
-            console.log('setting up the playing state');
-        },
-        execute: function() {
-            console.log('playing!');
-        },
-        play: function() {
-            console.log('already playing!');
-        },
-        stop: function() {
-            this.target.changeState(this.target.states.stopping);
-        },
-        pause: function() {
-            this.target.changeState(this.target.states.pausing);
-        },
-        exit: function() {
-            console.log('tearing down the playing state');
-        }
-    },
-    stopping: {
-        initialize: function(target) {
-            this.target = target;
-        },
-        enter: function() {
-            console.log('setting up the stopping state');
-        },
-        execute: function() {
-            console.log('stopping!');
-        },
-        play: function() {
-            this.target.changeState(this.target.states.playing);
-        },
-        stop: function() {
-            console.log('already stopped!');
-        },
-        pause: function() {
-            this.target.changeState(this.target.states.pausing);
-        },
-        exit: function() {
-            console.log('tearing down the stopping state');                
-        }
-    },
-    pausing: {
-        initialize: function(target) {
-            this.target = target;
-        },            
-        enter: function() {
-            console.log('setting up the pausing state');
-        },
-        execute: function() {
-            console.log('pausing!');
-        },
-        play: function() {
-            this.target.changeState(this.target.states.playing);
-        },
-        stop: function() {
-            this.target.changeState(this.target.states.stopping);
-        },
-        pause: function() {
-            console.log('already paused!');
-        },
-        exit: function() {
-            console.log('tearing down the pausing state!');                
-        }
-    }
-},
-initialize: function() {
-    this.states.playing.initialize(this);
-    this.states.stopping.initialize(this);
-    this.states.pausing.initialize(this);
-    this.state = this.states.stopping;
-},
-play: function() {
-    this.state.play();
-},
-stop: function() {
-    this.state.stop();
-},
-pause: function() {
-    this.state.pause();
-},
-changeState: function(state) {
-    if (this.state !== state) {
-        this.state.exit();
-        this.state = state;
-        this.state.enter();
-        this.state.execute();
-    }
-}
-</code></pre>
-
-<p>};
-```</p>
-
-<p>Lots of code, I know. But there is serious value in digesting this pattern so stick with me here and I'll go through it bit by bit. Let's start at the top where we define our object:</p>
-
-<p>``` js
-var player = {</p>
-
-<pre><code>state: undefined,
-states: {
-    playing: {
-        initialize: function(target) {
-            this.target = target;
-        },
-        enter: function() {
-            console.log('setting up the playing state');
-        },
-        execute: function() {
-            console.log('playing!');
-        },
-        play: function() {
-            console.log('already playing!');
-        },
-        stop: function() {
-            this.target.changeState(this.target.states.stopping);
-        },
-        pause: function() {
-            this.target.changeState(this.target.states.pausing);
-        },
-        exit: function() {
-            console.log('tearing down the playing state');
-        }
-    },
-</code></pre>
-
-<p>... .
-<code>``
-First we declare our object and give it a property of</code>state<code>which we set to</code>undefined` for now. We're going to be creating state object to delegate all of our method calls to so once we're ready to use our player we'll set its initial state.</p>
-
-<p>The <code>states</code> object (note the plurality) holds all of the different state objects that our player can use. In this version we've defined <code>playing</code>, <code>stopping</code> and <code>pausing</code> but you could also add states like <code>buffering</code> or <code>initializing</code>. Keep in mind that this pattern can be applied to just about anything. For instance, if you were making a game with an old prospector his state objects could be <code>mining</code>, <code>drinking</code> and <code>sleeping</code>. The main thing to remember is that <strong>your state objects should all define the exact same public methods</strong>.</p>
-
-<p>We can skip the <code>stopping</code> and <code>pausing</code> states since they're nearly identical to the <code>playing</code> state. Instead let's jump down to the bottom and look at the last bit.</p>
-
-<p>``` js
-initialize: function() {</p>
-
-<pre><code>this.states.playing.initialize(this);
-this.states.stopping.initialize(this);
-this.states.pausing.initialize(this);
-this.state = this.states.stopping;
-</code></pre>
-
-<p>},
-play: function() {</p>
-
-<pre><code>this.state.play();
-</code></pre>
-
-<p>},
-stop: function() {</p>
-
-<pre><code>this.state.stop();
-</code></pre>
-
-<p>},
-pause: function() {</p>
-
-<pre><code>this.state.pause();
-</code></pre>
-
-<p>},
-changeState: function(state) {</p>
-
-<pre><code>if (this.state !== state) {
-    this.state.exit();
-    this.state = state;
-    this.state.enter();
-    this.state.execute();
-}
-</code></pre>
-
-<p>}
-```</p>
-
-<p>In our player's initialize function we give each state a reference to the player object so we can tell it to <code>changeState</code>. We also set our initial state to be the stopping state.</p>
-
-<p>Now let's look at the <code>play</code> method. Do you see how it defers the call to whatever object is currently set as the player's <code>state</code>? Since <code>this.state</code> refers to <code>this.states.stopping</code> we're effectively calling the <code>play</code> method of the <code>stopping</code> state object. Go look at the other state objects to see how they respond to having their <code>play</code> methods called. In the case of <code>states.stopping</code>, calling <code>play</code> is going to tell its <code>target</code> (which is just a reference to the player) to <code>changeState</code>, passing in the <code>states.playing</code> state.</p>
-
-<p><code>changeState</code> is kind of an awesome method because it does a ton of work but it does it very elegantly and efficiently. For starters it makes sure that the state we've asked to change to is actually different than our current state. Then it tells our current state to <code>exit()</code>. A state's <code>exit()</code> method is a great place to tear down any constructs that we may have built to support that action. Next it sets our current state to the new state. Lastly, it calls <code>enter()</code> (a good place to build up supporting constructs) and <code>execute()</code>, which is where we do the main work of our state. That's pretty straightforward right?</p>
-
-<p>Since <code>play</code>, <code>pause</code> and <code>stop</code> are members of our player's public API, <strong>all of our states must also implement those methods.</strong> Otherwise you would get an error if you called <code>play()</code> on the object and its state did not support that method. Keep this in mind when you're designing your state objects.</p>
-
-<h3>Aaaaand we're off!</h3>
-
-<p>Let's look at our player in action:</p>
-
-<p>```
-// We start off in the stopping state
-// So when we call stop...
-player.initialize();
-player.stop();</p>
-
-<p>=> 'already stopped!'</p>
-
-<p>// Let's move to the playing state
-player.play();</p>
-
-<p>=> 'tearing down the stopping state'
-=> 'setting up the playing state'
-=> 'playing!'</p>
-
-<p>// Quick call pause!
-player.pause();</p>
-
-<p>=> 'tearing down the playing state'
-=> 'setting up the pausing state'
-=> 'pausing!'</p>
-
-<p>// Um... call pause like 3 times cuz
-// I'm a button masher!!!
-player.pause();
-player.pause();
-player.pause();</p>
-
-<p>=> 'already paused!'
-=> 'already paused!'
-=> 'already paused!'</p>
-
-<p>// OK call play again!
-player.play();</p>
-
-<p>=> 'tearing down the pausing state!'
-=> 'setting up the playing state'
-=> 'playing!'
-```</p>
-
-<h3>I like it, but...</h3>
-
-<p>Before you run for the hills due to the sheer volume of boilerplate code I want to remind you that almost all of this repetition can easily be cleaned up. If we defined a base state that all of our other states extended then they would only need to override the methods that they cared about. For instance, the <code>stopping</code> state and <code>pausing</code> state both tell their target to <code>changeState</code> when someone calls <code>play</code>. This kind of functionality is easily moved into a base state. Also if you have no need for <code>enter</code> and <code>exit</code> methods those can be removed or also thrown into the base state. I'll dig into this more tomorrow but for now play around with the example and leave some feedback if you have comments or suggestions. Thanks!</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 12:10 am</li>
-<li>Mood: Tired, Drunk</li>
-<li>Sleep: 7</li>
 <li>Hunger: 0</li>
 <li>Coffee: 1</li>
 </ul>

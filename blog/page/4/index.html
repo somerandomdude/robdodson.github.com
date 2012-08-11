@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Continuing from yesterday&#8217;s post I&#8217;m going to start to incorporate Backbone into my BDD setup. I&#8217;m going to use the Backbone &hellip;">
+  <meta name="description" content="Today&#8217;s post is meant to scratch an itch I had the other day regarding templates. My friend wanted to load an underscore template along with &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +74,327 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/">Using jQuery Deferred to Load an Underscore Template</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-30T08:53:00-07:00" pubdate data-updated="true">May 30<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Today&#8217;s post is meant to scratch an itch I had the other day regarding templates. My friend wanted to load an underscore template along with some JSON data but wasn&#8217;t sure what the best approach would be. Since I&#8217;m using Backbone Boilerplate I&#8217;ve gotten used to having my template loading method already stubbed out for me. Here&#8217;s the one they use:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">fetchTemplate</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">path</span><span class="p">,</span> <span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">JST</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">JST</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">JST</span> <span class="o">||</span> <span class="p">{};</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">def</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Should be an instant synchronous way of getting the template, if it</span>
+</span><span class='line'>  <span class="c1">// exists in the JST object.</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">JST</span><span class="p">[</span><span class="nx">path</span><span class="p">])</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">done</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">done</span><span class="p">(</span><span class="nx">JST</span><span class="p">[</span><span class="nx">path</span><span class="p">]);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">def</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">JST</span><span class="p">[</span><span class="nx">path</span><span class="p">]);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Fetch it asynchronously if not available from JST, ensure that</span>
+</span><span class='line'>  <span class="c1">// template requests are never cached and prevent global ajax event</span>
+</span><span class='line'>  <span class="c1">// handlers from firing.</span>
+</span><span class='line'>  <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">url</span><span class="o">:</span> <span class="nx">path</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;get&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">dataType</span><span class="o">:</span> <span class="s2">&quot;text&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">cache</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+</span><span class='line'>    <span class="nx">global</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">contents</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">JST</span><span class="p">[</span><span class="nx">path</span><span class="p">]</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span><span class="nx">contents</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// Set the global JST cache and return the template</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">done</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">done</span><span class="p">(</span><span class="nx">JST</span><span class="p">[</span><span class="nx">path</span><span class="p">]);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// Resolve the template deferred</span>
+</span><span class='line'>      <span class="nx">def</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">JST</span><span class="p">[</span><span class="nx">path</span><span class="p">]);</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Ensure a normalized return value (Promise)</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">def</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Not having previous experience working with <a href="http://api.jquery.com/category/deferred-object/">jQuery.Deferred</a> I was initially put-off by the idea of just copy/pasting this function over to him, especially since I couldn&#8217;t explain what was going on. I knew that I probably wanted to use Deferreds and Promises but I wasn&#8217;t sure how best to explain the concepts nor did this method seem to do much in the way of loading JSON, it was just for loading templates. Since my friend only wanted to load 1 template and 1 JSON file I thought it best for us to start small, and to write something that we could easily debug. Knowing I wanted to use Deferreds I found <a href="http://msdn.microsoft.com/en-us/magazine/gg723713.aspx">this wonderful article by Addy Osmani and Julian Aubourg</a> detailing how Deferreds work. It is VERY comprehensive and for our purposes I only needed to read the first few paragraphs before I had enough to start.</p>
+
+<p>In a nutshell deferreds are objects which contain promises (also objects). Promises can be in various states, <code>pending</code>, <code>resolved</code> or <code>rejected</code>. Once you have a deferred (or it&#8217;s promise) you can hook functions on to it so when it changes from a <code>pending</code> to <code>resolved</code> state all those functions fire. It&#8217;s actually the promise that changes state but you can use the deferred like a promise because in most cases it will just proxy the calls to its promise object. Using deferreds can be nice for several reasons. For starters, you can avoid the jQuery <em>pyramid of doom</em></p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// NOOOOOOoooooooooo</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;foo.php&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+</span><span class='line'>      <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;bar.php&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+</span><span class='line'>          <span class="nx">url</span><span class="o">:</span> <span class="s1">&#39;baz.php&#39;</span><span class="p">,</span>
+</span><span class='line'>          <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="p">...</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>        <span class="p">})</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Secondly your deferreds/promises are little tokens that you can hand out from your services so other actors don&#8217;t have to get all up in your ajax guts. Someone makes an API request, you give em a token, when it resolves they play with the data.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">doSomethingWithHugeData</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;man, look at all these 1&#39;s and 0&#39;s!&quot;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">dfd</span> <span class="o">=</span> <span class="nx">myService</span><span class="p">.</span><span class="nx">getSomeHugeData</span><span class="p">();</span>
+</span><span class='line'><span class="nx">dfd</span><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="nx">doSomethingWithHugeData</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is a much nicer approach than passing in a callback that your service will need to execute whenever it finishes getting its data. Your service shouldn&#8217;t care about your callbacks. It should care about getting data and letting people know when that data&#8217;s been got! :D</p>
+
+<h3>But I digress&#8230;</h3>
+
+<p>We were <em>trying</em> to load some JSON and a template, so let&#8217;s get back to the task at hand. Since we know that we have two ajax calls, one for the JSON and one for the template, and we know that we don&#8217;t really want to do anything till both of these calls have completed we&#8217;ve got a perfect use case for <a href="http://api.jquery.com/jQuery.when/">$.when</a>. <code>when</code> accepts a list of deferreds/promises and acts as one big deferred, waiting for all of its children to resolve before it resolves. This is a nice way to build a sequencer. In our case we&#8217;re going to take  two ajax calls and toss them into <code>$.when</code>. When it resolves we&#8217;ll use <code>$.then</code> to tell it what our success and failure callbacks should be.</p>
+
+<figure class='code'><figcaption><span>index.html</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span><span class='line'><span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">&quot;en&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;title&gt;</span>Deferred Sandbox<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;jquery.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;underscore.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;main&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;script&gt;</span>
+</span><span class='line'>      <span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">function</span> <span class="nx">successFunc</span><span class="p">(</span><span class="nx">jsonRes</span><span class="p">,</span> <span class="nx">templateRes</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">json</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">first</span><span class="p">(</span><span class="nx">jsonRes</span><span class="p">);</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">template</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">first</span><span class="p">(</span><span class="nx">templateRes</span><span class="p">);</span>
+</span><span class='line'>          <span class="kd">var</span> <span class="nx">compiled</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span><span class="nx">template</span><span class="p">,</span> <span class="nx">json</span><span class="p">);</span>
+</span><span class='line'>          <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#main&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">compiled</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">function</span> <span class="nx">failureFunc</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;fail whale!&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nx">$</span><span class="p">.</span><span class="nx">when</span><span class="p">(</span>
+</span><span class='line'>          <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="s2">&quot;person.json&quot;</span><span class="p">),</span>
+</span><span class='line'>          <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="s2">&quot;person.template.html&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">successFunc</span><span class="p">,</span> <span class="nx">failureFunc</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="p">});</span>
+</span><span class='line'>    <span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
+</span><span class='line'><span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In our case everything is in the same folder as index.html so there&#8217;s no need for any paths. Keep in mind that in most (all?) browsers you&#8217;ll need to be running a local server for the above code to actually work. In Chrome, at least, you can&#8217;t run an html file from file:// and have it load external resources, it&#8217;ll complain that the access-origin is not allowed.</p>
+
+<p>Let me take a moment to explain <code>$.then</code> a little bit. We know that <code>$.ajax</code> returns a deferred, and that the deferred&#8217;s promise can be in three states: <code>pending</code>, <code>resolved</code>, <code>rejected</code>. So if we did something like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">dfd</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="s1">&#39;foobar.php&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>dfd</code> would be a deferred object with a <code>pending</code> promise. Deferred&#8217;s let us link methods up to them for when their state changes. These methods are: <code>done()</code>, <code>fail()</code>, <code>always()</code>, <code>progress()</code>, and <code>then()</code>. There are more but <a href="http://api.jquery.com/category/deferred-object/">I&#8217;ll let the documentation explain them.</a> <code>done()</code> and <code>fail()</code> each accept either a single callback or an array of callbacks to be fired when the deferred changes to either the <code>resolved</code> or <code>rejected</code> state.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">successFunc</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;success! do stuff with data!&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">function</span> <span class="nx">failureFunc</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;failure! um...give up!&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">service</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">getJSON</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">(</span><span class="s1">&#39;person.json&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">service</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">()</span>
+</span><span class='line'><span class="p">.</span><span class="nx">done</span><span class="p">(</span><span class="nx">successFunc</span><span class="p">)</span>
+</span><span class='line'><span class="p">.</span><span class="nx">fail</span><span class="p">(</span><span class="nx">failureFunc</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>always()</code> fires its callbacks regardless of whether the deferred was <code>resolved</code> or <code>rejected</code>. This might be a good place to put any cleanup code. <code>progress()</code> is fired during any progress events that the process might emit. Finally there&#8217;s <code>then()</code> which is what we&#8217;re using in our template example. <code>then()</code> is essentially shorthand for <code>done()</code> and <code>fail()</code> so you can pass it two callbacks or two arrays of success/fail callbacks.</p>
+
+<p>Hopefully that&#8217;s helpful for you all and you can go back and clean up some of those pyramids that might be lingering in your code. Till tomorrow! - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 8:00 am</li>
+<li>Mood: Reserved, Sedate</li>
+<li>Sleep: 7</li>
+<li>Hunger: 4</li>
+<li>Coffee: 0</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -3055,447 +3376,6 @@ The last few bits prevent the link from completely refreshing the page—<code>e
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/20/some-more-backbone-dot-js-basics/">Some More Backbone.js Basics</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-20T08:19:00-07:00" pubdate data-updated="true">May 20<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Here are some quick Backbone snippets to help visualize concepts. I&#8217;ll move around fairly quickly so if you&#8217;re interested in going more in-depth then checkout the documentation.</p>
-
-<h3>Events</h3>
-
-<p>Backbone events are pretty straightforward. To create a pub/sub relationship you use the <code>on</code> and <code>off</code> methods of <code>Backbone.Events</code>:</p>
-
-<p>In the above example you could make <code>dispatcher</code> into an AMD module and load the dependency with Require.js, something <a href="http://robdodson.me/blog/2012/05/18/backbone-boilerplate-playing-with-require-dot-js/">I&#8217;ve covered in a previous post.</a></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">dispatcher</span> <span class="o">=</span> <span class="p">{};</span>
-</span><span class='line'><span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">dispatcher</span><span class="p">,</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Events</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">receiver</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// Start listening for the &#39;hello&#39; event from the dispatcher.</span>
-</span><span class='line'>        <span class="c1">// When we hear the &#39;hello&#39; event we&#39;ll run a function</span>
-</span><span class='line'>        <span class="nx">dispatcher</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">sayHello</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">sayHello</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;hello!&#39;</span><span class="p">);</span>
-</span><span class='line'>        <span class="c1">// Kill the listener so we only get called once</span>
-</span><span class='line'>        <span class="nx">dispatcher</span><span class="p">.</span><span class="nx">off</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">sayHello</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">receiver</span><span class="p">.</span><span class="nx">initialize</span><span class="p">();</span>
-</span><span class='line'><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">dispatcher</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;hello&#39;</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Models</h3>
-
-<p>Backbone models are interesting because they implement explicit <code>get</code> and <code>set</code> methods. When you change a property with the get and set methods it will fire off an event. Here&#8217;s a fiddle showing how to model a <code>Book</code>. We&#8217;ll change the author and the DOM will reflect this update.</p>
-
-<iframe style="width: 100%; height: 400px" src="http://jsfiddle.net/robdodson/dC5GD/1/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
-
-
-<p>If your model implements an <code>initialize</code> function it will be called as soon as the object is created. In other words, its a constructor. If you pass a hash to the model&#8217;s constructor it will set those attributes on itself. The hash and any additional arguments will also be passed to <code>initialize</code>.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Define an initialize function for our book</span>
-</span><span class='line'><span class="c1">// Initialize will be called anytime we say new Book()</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Book</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">foo</span><span class="p">,</span> <span class="nx">bar</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">foo</span><span class="p">);</span>
-</span><span class='line'>        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">bar</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// You can pass in a hash to set initial values on the model</span>
-</span><span class='line'><span class="c1">// The hash and any additional arguments will also be passed</span>
-</span><span class='line'><span class="c1">// to the initialize function</span>
-</span><span class='line'><span class="nx">book</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Book</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">author</span><span class="o">:</span> <span class="s1">&#39;Hunter S. Thompson&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Fear and Loating in Las Vegas&#39;</span>
-</span><span class='line'><span class="p">},</span> <span class="s1">&#39;hello world!&#39;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">book</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;author&#39;</span><span class="p">));</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>Poor man&#8217;s data-binding</h4>
-
-<p>Now that we have a basic understanding of models we can write our own simple binding setup. This example presumes we have an <code>#author</code> and a <code>#title</code> element somewhere on our page.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">Book</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">book</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Book</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">author</span><span class="o">:</span> <span class="s1">&#39;Hunter S. Thompson&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Fear and Loating in Las Vegas&#39;</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// Listen for any change event coming from the model.</span>
-</span><span class='line'><span class="c1">// When any attribute changes we&#39;ll tell our elements to</span>
-</span><span class='line'><span class="c1">// automatically update.</span>
-</span><span class='line'><span class="nx">book</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#author&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">book</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;author&#39;</span><span class="p">));</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#title&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">book</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">));</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">book</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;author&#39;</span><span class="p">,</span> <span class="s1">&#39;Mickey Mouse&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="nx">book</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;Everyone Poops&#39;</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>Backbone.sync</h4>
-
-<p>To mess around with saving data we&#8217;ll need to alter <code>Backbone.sync</code>.</p>
-
-<blockquote><p>Backbone.sync is the function that Backbone calls every time it attempts to read or save a model to the server. By default, it uses (jQuery/Zepto).ajax to make a RESTful JSON request and returns a jqXHR. You can override it in order to use a different persistence strategy, such as WebSockets, XML transport, or Local Storage.</p></blockquote>
-
-<p>Backbone will decide whether a save call should perform a create with <code>HTTP POST</code> or an update <code>HTTP PUT</code> based on whether or not our model has an id attribute already.</p>
-
-<p>Here&#8217;s an example from the Backbone docs which overrides the sync functionality and fakes a request to a server.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Backbone</span><span class="p">.</span><span class="nx">sync</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">method</span><span class="p">,</span> <span class="nx">model</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">method</span> <span class="o">+</span> <span class="s2">&quot;: &quot;</span> <span class="o">+</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">model</span><span class="p">));</span>
-</span><span class='line'>  <span class="nx">model</span><span class="p">.</span><span class="nx">id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// This line is crucial!</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">book</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;The Rough Riders&quot;</span><span class="p">,</span>
-</span><span class='line'>  <span class="nx">author</span><span class="o">:</span> <span class="s2">&quot;Theodore Roosevelt&quot;</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">book</span><span class="p">.</span><span class="nx">save</span><span class="p">();</span>
-</span><span class='line'><span class="c1">// create: {&quot;title&quot;:&quot;The Rough Riders&quot;,&quot;author&quot;:&quot;Theodore Roosevelt&quot;}</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">book</span><span class="p">.</span><span class="nx">save</span><span class="p">({</span><span class="nx">author</span><span class="o">:</span> <span class="s2">&quot;Teddy&quot;</span><span class="p">});</span>
-</span><span class='line'><span class="c1">// update: {&quot;title&quot;:&quot;The Rough Riders&quot;,&quot;author&quot;:&quot;Teddy&quot;}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>​If we don&#8217;t give our model an <code>id</code> on line 3 then Backbone has no way of knowing if the model has been previously saved or not. It will keep doing create/POST until it receives that id.</p>
-
-<h3>Collections</h3>
-
-<p>If you don&#8217;t want to setup a server but you do want to play around with saving models and collections you can use <a href="https://github.com/jeromegn/Backbone.localStorage">the Backbone LocalStorage adapter written by Jerome Gravel-Niquet</a>. After you&#8217;ve included the js file in your code somewhere you can use it like so:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">Book</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({});</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Books</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Collection</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">model</span><span class="o">:</span> <span class="nx">Book</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">localStorage</span><span class="o">:</span> <span class="k">new</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">LocalStorage</span><span class="p">(</span><span class="s2">&quot;Books&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">library</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Books</span><span class="p">();</span>
-</span><span class='line'><span class="nx">library</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;sync&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;sync succesful!&#39;</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">othello</span> <span class="o">=</span> <span class="nx">library</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">title</span><span class="o">:</span> <span class="s2">&quot;Othello&quot;</span><span class="p">,</span>
-</span><span class='line'>  <span class="nx">author</span><span class="o">:</span> <span class="s2">&quot;William Shakespeare&quot;</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>To <code>fetch</code> the models in the collection at a later point you can do the following:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">Book</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({});</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Books</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Collection</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">model</span><span class="o">:</span> <span class="nx">Book</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">localStorage</span><span class="o">:</span> <span class="k">new</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">LocalStorage</span><span class="p">(</span><span class="s2">&quot;Books&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">library</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Books</span><span class="p">();</span>
-</span><span class='line'><span class="nx">library</span><span class="p">.</span><span class="nx">fetch</span><span class="p">();</span>
-</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">library</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The docs mention that you shouldn&#8217;t use this to initialize your collections. Instead you should <a href="http://documentcloud.github.com/backbone/#FAQ-bootstrap">bootstrap your app</a> at page load. Here&#8217;s the passage:</p>
-
-<blockquote><p>Note that fetch should not be used to populate collections on page load — all models needed at load time should already be bootstrapped in to place. fetch is intended for lazily-loading models for interfaces that are not needed immediately: for example, documents with collections of notes that may be toggled open and closed.</p></blockquote>
-
-<h3>Routers</h3>
-
-<p>Routers are used to map URLs to actions. If you&#8217;re using the Backbone Boilerplate you should see this block of code in your main.js.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Defining the application router, you can attach sub routers here.</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Router</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Router</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>  <span class="nx">routes</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;&quot;</span><span class="o">:</span> <span class="s2">&quot;index&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;:hash&quot;</span><span class="o">:</span> <span class="s2">&quot;index&quot;</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">index</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">hash</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">route</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">tutorial</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example</span><span class="p">.</span><span class="nx">Views</span><span class="p">.</span><span class="nx">Tutorial</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// Attach the tutorial to the DOM</span>
-</span><span class='line'>    <span class="nx">tutorial</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">el</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#main&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">el</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="c1">// Fix for hashes in pushState and hash fragment</span>
-</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">hash</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">route</span><span class="p">.</span><span class="nx">_alreadyTriggered</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="c1">// Reset to home, pushState support automatically converts hashes</span>
-</span><span class='line'>        <span class="nx">Backbone</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">navigate</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="c1">// Trigger the default browser behavior</span>
-</span><span class='line'>        <span class="nx">location</span><span class="p">.</span><span class="nx">hash</span> <span class="o">=</span> <span class="nx">hash</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="c1">// Set an internal flag to stop recursive looping</span>
-</span><span class='line'>        <span class="nx">route</span><span class="p">.</span><span class="nx">_alreadyTriggered</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>One gotcha is that the definition of <code>":hash": "index"</code> will send any route that follows the base domain to the index function. For instance if you did the following:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">routes</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;&quot;</span><span class="o">:</span> <span class="s2">&quot;index&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;:hash&quot;</span><span class="o">:</span> <span class="s2">&quot;index&quot;</span>
-</span><span class='line'>    <span class="s2">&quot;search&quot;</span><span class="o">:</span> <span class="s2">&quot;search&quot;</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="p">...</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nx">search</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;time to search!&#39;</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Instead of the search function running what will actually happen is mysite.com/search will be converted into mysite.com/#search and the word <code>search</code> will be sent to the index function to supply the <code>hash</code> argument. To fix this you&#8217;ll need to remove the <code>":hash": "index"</code> route.</p>
-
-<h3>Views</h3>
-
-<p>Views can either work with existing DOM elements or create new ones. Here&#8217;s a very basic fiddle in which a BodyView is created to wrap our <code>body</code> tag and BoxView is appended to it. We add a little jQuery animation to show the process in action.</p>
-
-<iframe style="width: 100%; height: 400px" src="http://jsfiddle.net/robdodson/rJEkv/embedded/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
-
-
-<p>You&#8217;ll often want to link a view&#8217;s render method up to a model&#8217;s change event so the two will stay in sync. Here&#8217;s a quick and dirty example showing how to bind in this fashion.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">Book</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span><span class="p">.</span><span class="nx">extend</span><span class="p">({});</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">BookView</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;book-view&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;change&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">,</span> <span class="k">this</span><span class="p">);</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; by &#39;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;author&#39;</span><span class="p">));</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">outliers</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Book</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">author</span><span class="o">:</span> <span class="s1">&#39;Malcolm Gladwell&#39;</span><span class="p">,</span>
-</span><span class='line'>    <span class="nx">title</span><span class="o">:</span> <span class="s1">&#39;Outliers&#39;</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">bookView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">BookView</span><span class="p">({</span><span class="nx">model</span><span class="o">:</span> <span class="nx">outliers</span><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">bookView</span><span class="p">.</span><span class="nx">el</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">outliers</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s1">&#39;author&#39;</span><span class="p">,</span> <span class="s1">&#39;Mickey Mouse&#39;</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Instead of throwing your HTML into the render method as a String it&#8217;s advised that you use some kind of templating library. Underscore templates seem like a good place to start but Backbone is designed to be template agnostic so you could easily switch to Mustache/Handelbars or HAML if you want. Tomorrow I&#8217;ll look into displaying some content using an Underscore template linked up to a model. Till then.. :D</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/5/">&larr; Older</a>
@@ -3513,6 +3393,10 @@ The last few bits prevent the link from completely refreshing the page—<code>e
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/10/javascript-design-patterns-iterator/">JavaScript Design Patterns: Iterator</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/08/javascript-design-patterns-singleton/">JavaScript Design Patterns: Singleton</a>
       </li>
     
@@ -3526,10 +3410,6 @@ The last few bits prevent the link from completely refreshing the page—<code>e
     
       <li class="post">
         <a href="/blog/2012/06/25/ending-my-first-chain/">Ending My First Chain</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/24/sublime-snippet-basics/">Sublime Snippet Basics</a>
       </li>
     
   </ul>
