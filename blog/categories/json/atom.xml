@@ -4,7 +4,7 @@
   <title><![CDATA[Category: JSON | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/json/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -19,6 +19,9 @@
     <updated>2012-06-18T08:19:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/18/outputting-json-from-ruby</id>
     <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/">Last night</a> I got the scraper to write an output.txt file which listed all the contents of <code>words_by_selector</code>. Today I want to make it write to JSON instead of plain text and I want to back it with some tests.</p>
+
+<!--more-->
+
 
 <h2>Updating our tests</h2>
 

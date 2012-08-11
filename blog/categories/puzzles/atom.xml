@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Puzzles | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/puzzles/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -21,6 +21,9 @@
     <content type="html"><![CDATA[<p>I'm a big fan of sites like <a href="http://www.rubyquiz.com/">RubyQuiz</a> and <a href="http://www.codeeval.com/">CodeEval</a>. In my opinion doing short puzzles and brain-teasers is a great way to explore a language. Here's one such puzzle taken from CodeEval which asks that you devise a program to read in a file, parse each line and decide if it is a pangram or not.</p>
 
 <blockquote><p>The sentence 'A quick brown fox jumps over the lazy dog' contains every single letter in the alphabet. Such sentences are called pangrams. You are to write a program, which takes a sentence, and returns all the letters it is missing (which prevent it from being a pangram). You should ignore the case of the letters in sentence, and your return should be all lower case letters, in alphabetical order. You should also ignore all non US-ASCII characters.In case the input sentence is already a pangram, print out the string NULL</p></blockquote>
+
+<!--more-->
+
 
 <p>Here's my first attempt. Hopefully I can come back to this post in a few weeks and try it again in a bit more elegant fashion :)</p>
 

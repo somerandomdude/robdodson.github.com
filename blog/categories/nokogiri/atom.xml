@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Nokogiri | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/nokogiri/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -123,6 +123,9 @@ end
 ```</p>
 
 <p>Really ugly code that still doesn't work. My biggest problem with Ruby is that I don't have very good debugging tools and that frustrates the shit out of me. I'm so used to the visual debuggers in the Chrome Dev tools that doing everything with <code>p</code> or <code>puts</code> is just soul-crushing.</p>
+
+<!--more-->
+
 
 <p>Right now my biggest problem is that data isn't being returned from the spider for whatever reason. This is especially annoying because the operation takes a while to run... I should slim it down but my brain is too tired to re-write the code. I'm kind of hoping for a lucky break. Advice to anyone just starting out in programming, do not do exactly what I'm doing right now.</p>
 
@@ -350,6 +353,9 @@ Having a horrible time getting anything to run tonight. The code from above is a
 
 <p>The scraper that I'm building is supposed to work like a spider and crawl of the pages of my blog. I wasn't sure what the best way to do that was so I started Googling and came up with <a href="http://mechanize.rubyforge.org/">Mechanize.</a> There are other tools built on top of Mechanize, like <a href="https://github.com/felipecsl/wombat">Wombat</a>, but since my task is so simple I figured I could just write everything I needed with Mechanize and Nokogiri. It's usually a better idea to work with simple tools when you're first grasping concepts so you don't get lost in the weeds of some high powered framework.</p>
 
+<!--more-->
+
+
 <p>Since it's late I'll let the code do the talking:</p>
 
 <p>``` ruby crawler.rb
@@ -396,6 +402,9 @@ p doc
     <updated>2012-05-16T07:42:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8</id>
     <content type="html"><![CDATA[<p>Yesterday's I refactored my specs and crawler to support ignoring selections. While I started parsing the metadata I quickly realized that certain bits were rather specific and needed to have custom parsing methods. Today I'm going to write some format objects to help with all that.</p>
+
+<!--more-->
+
 
 <p>Our metadata on the page looks like this:</p>
 
@@ -611,6 +620,9 @@ end
     <updated>2012-05-15T21:33:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7</id>
     <content type="html"><![CDATA[<p>During my last post I realized that including my metadata in the blog post as only a ul meant that all the words were being scraped as part of the keyword frequency search. After thinking about it for a while I think I'm going to give the keyword search method an optional value which it can use to ignore or delete certain nodes.</p>
+
+<!--more-->
+
 
 <p>Thankfully I have my tests in place to validate what our final output should look like. Which means I'm basically hacking away at Nokogiri to get things to pass. Here's what I finally settle on:</p>
 

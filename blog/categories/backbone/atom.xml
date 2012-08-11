@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Backbone | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/backbone/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -19,6 +19,9 @@
     <updated>2012-06-02T18:22:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/02/managing-your-backbone-views-with-the-state-pattern</id>
     <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/02/take-control-of-your-app-with-the-javascript-state-patten/">Yesterday I wrote a post to illustrate the concepts behind the State pattern</a> (one of my all time favorite tools). If you're new to this pattern and haven't read my previous post I suggest you start there and read this one after you've had a chance to play around with the ideas.</p>
+
+<!--more-->
+
 
 <p>I wanted to write about this pattern in the context of a Backbone app because I think there's a lot of value in exploring different ways to manage our Views and Models. Here's an example Video Player in which several State objects inherit from a common ancestor, <code>BaseState</code>. I chose to make <code>BaseState</code> extend <code>Backbone.Model</code> because it seemed like the best fit for this kind of thing, although typically when I implement this pattern in other languages I just use generic Objects. I would have done that here but Backbone's <code>extend</code> functionality makes the code so much cleaner.</p>
 
@@ -245,6 +248,9 @@ var videoPlayer = new VideoPlayer();</p>
     <updated>2012-05-29T08:03:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/29/testing-backbone-modules</id>
     <content type="html"><![CDATA[<p>Continuing from <a href="http://robdodson.me/blog/2012/05/28/mocking-requests-with-mocha-chai-and-sinon/">yesterday's post</a> I'm going to start to incorporate Backbone into my BDD setup. I'm going to use the <a href="https://github.com/tbranyen/backbone-boilerplate">Backbone Boilerplate</a> and <a href="https://github.com/backbone-boilerplate/grunt-bbb">grunt-bbb</a> to setup a new project. If you're new to the boilerplate or grunt-bbb <a href="http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/">checkout my previous post on getting started.</a></p>
+
+<!--more-->
+
 
 <h3>Shiny and new</h3>
 
@@ -488,6 +494,9 @@ var doc = Documents.first(); // &lt;-- Model object</p>
 
 <p>When you use this approach it's trivial to tell the view to listen to the model's change event and then call <code>view.render()</code>. Essentially you are munging some of a Controller's responsibilities into the View. That's all well and good but let's say we want to dispatch an event from one view which will affect other views and actors. This event has nothing to do with a model, maybe it's just an animation of some kind that others need to know about. So how do we go about this?</p>
 
+<!--more-->
+
+
 <h3>Communicating between Views in Backbone</h3>
 
 <p>To facilitate this communication we're going to use the <code>app</code> object that <a href="https://github.com/tbranyen/backbone-boilerplate">Backbone Boilerplate</a> creates for us. If you look in the <code>namespace.js</code> file that comes with the boilerplate you should see a line like this way down at the bottom:</p>
@@ -616,6 +625,9 @@ chatty: function() {
     <updated>2012-05-24T07:23:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/24/backbone-events-between-views</id>
     <content type="html"><![CDATA[<p>Today I want to figure out what kind of events to use when one of my views is added to the DOM. This can have a lot of ramifications for positioning elements around the view and setting up properties on the view itself.</p>
+
+<!--more-->
+
 
 <h3>View Events and the DOM</h3>
 
@@ -889,6 +901,9 @@ initialize: function() {
     <updated>2012-05-23T07:56:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/23/how-do-you-switch-between-views-in-backbone</id>
     <content type="html"><![CDATA[<p>I'm going to try to approach some of my future articles as more of a question/answer setup so they don't turn into these sprawling tutorials. Today I want to focus on moving between views in Backbone.js. I'm starting with some very simple templates and three views: LeftView, MiddleView, RightView. To do this quickly we'll make it so each view is essentially a big button which, when clicked on, should animate to the middle of the screen.</p>
+
+<!--more-->
+
 
 <p>Here's what one of my templates looks like:</p>
 

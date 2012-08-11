@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>JavaScript Design Patterns - Rob Dodson talks internets</title>
+  <title>JavaScript Design Patterns: Table of Contents - Rob Dodson talks internets</title>
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Table of Contents Creational Abstract Factory
+  <meta name="description" content="Creational Abstract Factory
 Builder
 Factory Method
 Object Pool
@@ -17,7 +17,9 @@ Prototype
 Singleton Structural Adapter
 Bridge
 Composite
-Decorator &hellip;">
+Decorator
+Facade
+Flyweight &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -85,7 +87,7 @@ Decorator &hellip;">
   
   <header>
     
-      <h1 class="entry-title">JavaScript Design Patterns</h1>
+      <h1 class="entry-title">JavaScript Design Patterns: Table of Contents</h1>
     
     
       <p class="meta">
@@ -108,9 +110,7 @@ Decorator &hellip;">
   </header>
 
 
-<div class="entry-content"><h2>Table of Contents</h2>
-
-<h3>Creational</h3>
+<div class="entry-content"><h3>Creational</h3>
 
 <ul>
 <li>Abstract Factory</li>
@@ -156,6 +156,9 @@ Decorator &hellip;">
 
 
 <p>I&#8217;ve been trying to think up <a href="http://robdodson.me/blog/2012/06/25/ending-my-first-chain/">a new chain</a> since coming back from Europe but nothing was enticing me. Then a few days ago I had a conversation with one of my friends in which we discussed using Promises in JavaScript. And later on we discussed Builders. I was doing my best to explain the two but really wished that I had a resource where I could just show some simple code examples. It occurred to me that I&#8217;ve always wanted to go through the <a href="http://www.amazon.com/Design-Patterns-Elements-Reusable-Object-Oriented/dp/0201633612/ref=sr_1_1?ie=UTF8&amp;qid=1344014497&amp;sr=8-1&amp;keywords=design+patterns">Gang of Four book</a> and just write my own interpretation of each pattern. Since I&#8217;m currently working primarily in JavaScript I thought it might be an interesting challenge to convert their examples, often in strongly typed languages, to something as dynamic and loosey-goosey as JS.</p>
+
+<!--more-->
+
 
 <p>I know there are a lot of people out there who <a href="http://www.codinghorror.com/blog/2005/09/head-first-design-patterns.html">aren&#8217;t too</a> <a href="http://thinkrelevance.com/blog/2007/05/17/design-patterns-are-code-smells">keen on</a> design patterns but that&#8217;s not to say that they shouldn&#8217;t be used or studied. There&#8217;s a lot of code out there that starts with <code>jQuery.click()</code> or <code>addEventListener</code> or <code>.on()</code> and all of them are implementations of the Observer pattern. Finding this reusable approach is the main point of patterns and along with it comes a shared vocabulary that can be passed on to other developers. Rather than saying &#8220;Let&#8217;s defer the methods of our object that are subject to change to well encapsulated algorithms.&#8221; We can just say &#8220;A Strategy pattern might be nice here.&#8221;</p>
 
@@ -248,7 +251,7 @@ Again, this is all about learning and experimenting. In my opinion a good unders
       </li>
     
       <li class="post">
-        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns</a>
+        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns: Table of Contents</a>
       </li>
     
       <li class="post">
@@ -278,7 +281,7 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
         github.showRepos({
             user: 'robdodson',
-            count: 0,
+            count: 4,
             skip_forks: true,
             target: '#gh_repos'
         });

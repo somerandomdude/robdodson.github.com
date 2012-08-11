@@ -102,6 +102,9 @@
 
 <div class="entry-content"><p>Since I&#8217;ve been talking so much about <a href="http://d3js.org/">D3.js</a> lately I thought it might be fun to start a little project which combines D3 and Ruby. The idea is to build a very simple page scraper that counts how often certain words are used in each post. I&#8217;ve also decided to start adding a little block of metadata at the end of each post so I can graph that over time as well.</p>
 
+<!--more-->
+
+
 <p>So how do we get started? Well first we&#8217;ll need to build a page scraper of some kind. This program will have to consume the contents of an HTML page, find the node that contains our blog post and count up how often each word reoccurs. For right now that should be more than enough to get us started. We&#8217;ll look at grabbing the metadata and drawing graphs in future posts. I should point out that this idea was inspired by the wonderful site <a href="http://smarterware.org/5359/taking-on-the-750-words-march-challenge">750words.com</a> which creates <a href="http://smarterware.org/5359/taking-on-the-750-words-march-challenge">a beautiful exploration section</a> any time you write a new journal entry. Definitely check out that site, it&#8217;s amazing.</p>
 
 <h3>Hello Noko</h3>
@@ -346,7 +349,7 @@
       </li>
     
       <li class="post">
-        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns</a>
+        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns: Table of Contents</a>
       </li>
     
       <li class="post">
@@ -376,7 +379,7 @@
 
         github.showRepos({
             user: 'robdodson',
-            count: 0,
+            count: 4,
             skip_forks: true,
             target: '#gh_repos'
         });

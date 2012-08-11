@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Writing | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/writing/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -64,6 +64,9 @@
 
 
 <p>This morning I was hoping to cover some of the basics of using D3.js. Along the way I realized I really wanted people to be able to see the graphs on the blog itself. I <em>could</em> have used JSFiddle, but I didn't like all that chrome repeated across the page. So I came up with my own solution with a little bit of hacking :)</p>
+
+<!--more-->
+
 
 <p>I'll have to save the basics for tomorrow since I've already spent way too much time just getting this setup. But I will offer a brief explanation of D3 and how I got it working on Octopress.</p>
 
@@ -326,6 +329,9 @@ After we declare the self-executing function we include another function called<
     <content type="html"><![CDATA[<p><em>I'm going to try to write this as a bit of a lightening post to see if I can bring down the time it takes me to produce something.</em></p>
 
 <p><a href="http://octopress.org/">Octopress</a> is a blogging framework written by <a href="http://brandonmathis.com/">Brandon Mathis</a> (<a href="https://twitter.com/#!/imathis">@imathis</a>) which sits on top of <a href="https://github.com/mojombo/jekyll">Jekyll</a>. Jekyll is a static site generator, meaning there's no database associated with your blog. Instead of writing everything in a WSYWIG linked to MySQL (like Wordpress or Blogger) you produce text files using Markdown which are then converted to static HTML. There are 3 huge benefits to this approach. First, writing in Markdown is awesome. Once you learn the syntax it's incredibly fast and you don't have to spend time playing with a tiny little editor window just to <s>add</s> <em>some</em> <strong>style</strong> to your posts. Second, writing in your favorite text editor is also awesome. I produce everything in <a href="http://www.sublimetext.com/2">Sublime Text 2</a> and every day I discover new tricks to make the process better. If you've ever had to write a blog post using one of those horrible little TinyMCE editors you will appreciate this feature. And lastly, static HTML is <em>fast</em>.</p>
+
+<!--more-->
+
 
 <p>Octopress takes what Jekyll has started and adds some useful tasks and templates which make setting up your own blog a breeze. I'm going to quickly cover the steps needed to set everything up on Github Pages using a custom domain since that's something I struggled with when first starting out.</p>
 

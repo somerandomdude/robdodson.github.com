@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Active Support | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/active-support/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -19,6 +19,9 @@
     <updated>2012-04-28T07:20:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/04/28/playing-with-ruby-dates</id>
     <content type="html"><![CDATA[<p>One of <a href="https://vimeo.com/40633070">my previous projects</a> involved a ton of work using Flash's built in Date object. We ended up rolling our own Calendar library which was both tedious and time consuming to debug. Now that I'm digging into Ruby for my newest project, I wanted to see what features the language has to offer. So far I'm <em>really</em> impressed and that's after only a few hours of exploration. I'll detail some of the tricks I've learned along the way so hopefully other newcomers can benefit.</p>
+
+<!--more-->
+
 
 <h3>Ruby Date Object Basics</h3>
 

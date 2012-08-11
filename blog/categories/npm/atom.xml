@@ -4,7 +4,7 @@
   <title><![CDATA[Category: NPM | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/npm/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -19,6 +19,9 @@
     <updated>2012-06-16T23:06:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm</id>
     <content type="html"><![CDATA[<p>Alright, <a href="http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/">contuing from yesterday</a> we want to take our little Node module and make it available to the world as a really awesome command line tool.</p>
+
+<!--more-->
+
 
 <p>The first thing we need to do is register an NPM account.</p>
 
@@ -80,6 +83,9 @@ git commit -am 'Initial commit'
     <updated>2012-06-15T19:46:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line</id>
     <content type="html"><![CDATA[<p>This post is going to be short and sweet because I have to help my lady pack for her big trip to Germany. Over the past few days I've been messing around with command line tools written in Ruby so today I decided to give it a shot in Node.</p>
+
+<!--more-->
+
 
 <p>We're going to start small in this first post and just get a little script running. After that we'll step it up so it can be distributed using NPM, <a href="http://robdodson.me/blog/2012/06/14/how-to-write-a-command-line-ruby-gem/">just like we did with our previous Ruby gem.</a></p>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -123,6 +123,9 @@ end
 ```</p>
 
 <p>Really ugly code that still doesn't work. My biggest problem with Ruby is that I don't have very good debugging tools and that frustrates the shit out of me. I'm so used to the visual debuggers in the Chrome Dev tools that doing everything with <code>p</code> or <code>puts</code> is just soul-crushing.</p>
+
+<!--more-->
+
 
 <p>Right now my biggest problem is that data isn't being returned from the spider for whatever reason. This is especially annoying because the operation takes a while to run... I should slim it down but my brain is too tired to re-write the code. I'm kind of hoping for a lucky break. Advice to anyone just starting out in programming, do not do exactly what I'm doing right now.</p>
 
@@ -299,6 +302,9 @@ I'm pretty certain I could have done this with Node in a fraction of the time if
     <updated>2012-06-22T00:31:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/22/wrapping-up-the-word-count-spider</id>
     <content type="html"><![CDATA[<p>Yeesh, I gotta stop writing so late at night... Last night I was trying to get my spider to follow all the links on the blog's archive page and then sum up all the words from every post. Unfortunately I was way too tired to get that to actually work. Tonight I finished that step of the process but it required some ugly code and refactoring our unit tests. Without further adieu...</p>
+
+<!--more-->
+
 
 <p>```ruby tentacles/lib/tentacles/runner.b
 require 'yaml'
@@ -603,6 +609,9 @@ Having a horrible time getting anything to run tonight. The code from above is a
 
 <p>The scraper that I'm building is supposed to work like a spider and crawl of the pages of my blog. I wasn't sure what the best way to do that was so I started Googling and came up with <a href="http://mechanize.rubyforge.org/">Mechanize.</a> There are other tools built on top of Mechanize, like <a href="https://github.com/felipecsl/wombat">Wombat</a>, but since my task is so simple I figured I could just write everything I needed with Mechanize and Nokogiri. It's usually a better idea to work with simple tools when you're first grasping concepts so you don't get lost in the weeds of some high powered framework.</p>
 
+<!--more-->
+
+
 <p>Since it's late I'll let the code do the talking:</p>
 
 <p>``` ruby crawler.rb
@@ -649,6 +658,9 @@ p doc
     <updated>2012-06-18T08:19:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/18/outputting-json-from-ruby</id>
     <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/">Last night</a> I got the scraper to write an output.txt file which listed all the contents of <code>words_by_selector</code>. Today I want to make it write to JSON instead of plain text and I want to back it with some tests.</p>
+
+<!--more-->
+
 
 <h2>Updating our tests</h2>
 

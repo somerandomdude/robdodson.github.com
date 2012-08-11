@@ -4,7 +4,7 @@
   <title><![CDATA[Category: D3 | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/d3/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -54,6 +54,9 @@
 
 
 <p>In <a href="http://localhost:4000/blog/2012/05/03/d3-basics-an-introduction-to-scales/">the last post</a> we did a basic introduction to the concept of scales in <a href="http://d3js.org/">D3.js</a>. Today we'll look at our first scale and write some code to visualize it.</p>
+
+<!--more-->
+
 
 <h3>Linear Scales</h3>
 
@@ -304,6 +307,9 @@ As each element of the array is passed to our width accessor it's run through th
 
 <p>After selections, scales are probably the most frequently used element in D3 because they faciliate such great control over data and screen space. I want to spend several posts documenting how scales work to help out anyone who is struggling with the concept. We'll start with a high level overview of what a scale is in D3 and then explore the individual objects to learn their nuances.</p>
 
+<!--more-->
+
+
 <h3>What Are D3 Scales?</h3>
 
 <p>Essentially a scale is a convenience function for mapping input data to an output range, typically x/y positions or width/height. Scales can also be used to link data to arbitrary values like categories or days of the week, or to quantize data into "buckets".</p>
@@ -422,6 +428,9 @@ x.range([0, 1000]);
 
 
 <p>This morning I was hoping to cover some of the basics of using D3.js. Along the way I realized I really wanted people to be able to see the graphs on the blog itself. I <em>could</em> have used JSFiddle, but I didn't like all that chrome repeated across the page. So I came up with my own solution with a little bit of hacking :)</p>
+
+<!--more-->
+
 
 <p>I'll have to save the basics for tomorrow since I've already spent way too much time just getting this setup. But I will offer a brief explanation of D3 and how I got it working on Octopress.</p>
 

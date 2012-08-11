@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Socket.io | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/socket-io/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -19,6 +19,16 @@
     <updated>2012-06-07T19:41:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/07/building-a-countdown-timer-with-socket-dot-io-pt-3</id>
     <content type="html"><![CDATA[<p>Today's the day we wrap up our countdown timer and deploy it to Heroku. But before we launch this puppy we need to clean house a little and spice up the visual appeal.</p>
+
+<!--more-->
+
+
+<ul>
+<li><a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">Getting Started</a></li>
+<li><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/">Click here for part 1.</a></li>
+<li><a href="http://robdodson.me/blog/2012/06/06/building-a-countdown-timer-with-socket-dot-io-pt-2/">Click here for part 2.</a></li>
+</ul>
+
 
 <h3>Refactoring the Stopwatch</h3>
 
@@ -356,6 +366,16 @@ Finally I chose to use some funky buttons from [Chad Mazzola's CSS3 Buttons proj
     <id>http://robdodson.me/blog/2012/06/06/building-a-countdown-timer-with-socket-dot-io-pt-2</id>
     <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/">Continuing from yesterday's post</a> we started out with a rather crude timer and today I want to upgrade it to a full fledged model, <code>Stopwatch</code>, which dispatches events for the view to hook on to.</p>
 
+<!--more-->
+
+
+<ul>
+<li><a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">Getting Started</a></li>
+<li><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/">Click here for part 1.</a></li>
+<li><a href="http://robdodson.me/blog/2012/06/07/building-a-countdown-timer-with-socket-dot-io-pt-3/">Click here for part 3.</a></li>
+</ul>
+
+
 <h3>Extend Node's EventEmitter</h3>
 
 <p>We want to extend Node's EventEmitter object in order for our Stopwatch to dispatch its tick events. <a href="http://elegantcode.com/2011/02/21/taking-baby-steps-with-node-js-implementing-events/">Following this great article by Jan Van Ryswyck</a> I've arrived at something that looks like this:</p>
@@ -635,9 +655,17 @@ tick: 00:59:57
     <link href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/"/>
     <updated>2012-06-05T08:07:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io</id>
-    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io-pt-2/">Click here for part 2.</a></p>
+    <content type="html"><![CDATA[<p>Yesterday I put together a very simple Node/Socket.io application and showed how to deploy it to Heroku. Today I'm going to keep going with that app to see if I can get the functionality that I want. The app is a basic stopwatch so that shouldn't be too hard. If you want to catch up <a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">checkout yesterday's article</a> which explains setting everything up.</p>
 
-<p>Yesterday I put together a very simple Node/Socket.io application and showed how to deploy it to Heroku. Today I'm going to keep going with that app to see if I can get the functionality that I want. The app is a basic stopwatch so that shouldn't be too hard. If you want to catch up <a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">checkout yesterday's article</a> which explains setting everything up.</p>
+<!--more-->
+
+
+<ul>
+<li><a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">Getting Started</a></li>
+<li><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io-pt-2/">Click here for part 2.</a></li>
+<li><a href="http://robdodson.me/blog/2012/06/07/building-a-countdown-timer-with-socket-dot-io-pt-3/">Click here for part 3.</a></li>
+</ul>
+
 
 <h3>Countdown</h3>
 
@@ -718,6 +746,9 @@ var socket = io.connect(window.location.hostname);</p>
     <content type="html"><![CDATA[<p>At my office we like to shoot each other from across the room with Nerf guns. In an effort to actually remain productive we've implemented a rule that whenever you get shot you're dead for 1 hour. But that hour can be a little tricky to keep track of between players. Who's dead and who isn't? Am I about to be shot right now??</p>
 
 <p>In an effort to keep track of things (and also because I need to write a blog post) I decided to start working on a little <a href="http://nodejs.org/">Node.js</a> and <a href="http://socket.io/">Socket.io</a> app. In this first post I'm just going to get things setup and deploy them to Heroku. Hopefully tomorrow we can work on implementing the actual timers. If you've never worked with Heroku before <a href="https://devcenter.heroku.com/articles/quickstart">you'll need to follow their getting started guide</a> to make sure you have all the proper command line tools. Don't worry, it's really easy and their documentation is <strong>awesome</strong>.</p>
+
+<!--more-->
+
 
 <h3>Express it!</h3>
 

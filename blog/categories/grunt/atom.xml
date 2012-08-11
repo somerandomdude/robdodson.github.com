@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Grunt | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/grunt/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -19,6 +19,9 @@
     <updated>2012-05-17T07:47:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate</id>
     <content type="html"><![CDATA[<p>I have an upcoming project which uses <a href="http://documentcloud.github.com/backbone/">Backbone</a> and <a href="http://nodejs.org/">Node.js</a> so I thought it would be good to blog about the topics (particularly Backbone) for a while to make sure I'm well up to speed.</p>
+
+<!--more-->
+
 
 <p>We're using the <a href="https://github.com/tbranyen/backbone-boilerplate">Backbone Boilerplate</a> to get us started since it includes a bit of file structure and a build process. As they mention in the docs you have to install <a href="https://github.com/cowboy/grunt">Grunt</a> if you want to use the build process they've stubbed out. Grunt is a javascript build tool which uses Node (think Rake in JS).</p>
 

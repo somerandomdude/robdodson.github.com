@@ -2,279 +2,279 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://robdodson.me/blog/2011/09/20/nomethoderror-in-rails-3/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:44:04-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2011/09/21/syntax-error-unexpected-tidentifier/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:44:16-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2011/09/23/how-to-use-rvm-for-rails3/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:44:29-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/04/27/how-to-setup-postgresql-for-rails-and-heroku/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:44:40-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/04/28/playing-with-ruby-dates/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:44:54-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/04/29/how-to-run-tests-in-sublime-text/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:45:01-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/04/30/custom-domain-with-octopress-and-github-pages/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:45:37-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/01/ruby-objects-and-dot-syntax/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:45:55-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/02/d3-js-and-octopress/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:46:05-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/03/d3-basics-an-introduction-to-scales/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:46:11-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/04/d3-basics-the-linear-scale/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:46:23-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/05/05/building-a-simple-scraper-with-nokogiri-in-ruby/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:46:35-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/06/object-oriented-scraper-backed-with-tests/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:46:54-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/05/07/object-oriented-scraper-backed-with-tests-pt-2/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:47:00-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:47:15-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/09/pangrams-in-ruby/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:47:34-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/10/design-by-configuration-sucks/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:48:00-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:48:07-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:48:12-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:48:16-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/14/hacking-the-path-variable-in-sublime-text/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:48:20-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:48:24-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:48:29-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:49:02-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/05/18/backbone-boilerplate-playing-with-require-dot-js/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:49:18-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/19/my-first-chain/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:49:35-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/20/some-more-backbone-dot-js-basics/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:49:43-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/05/21/exploring-the-backbone-router-and-history-api/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:50:11-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/22/css3-transitions-with-gfx/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:50:26-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/05/23/how-do-you-switch-between-views-in-backbone/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:50:37-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/24/backbone-events-between-views/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:50:43-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/25/backbone-events-framework-communication/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:51:39-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/27/penner-easing-equations-with-gfx-and-css3/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:51:56-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:52:05-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/28/mocking-requests-with-mocha-chai-and-sinon/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:52:12-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/29/testing-backbone-modules/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:52:19-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:52:34-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/05/31/how-to-use-ejs-in-express/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:52:40-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/06/02/take-control-of-your-app-with-the-javascript-state-patten/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:53:01-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/06/02/managing-your-backbone-views-with-the-state-pattern/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:52:47-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/06/03/make-your-own-jquery-deferreds-and-promises/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:53:06-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:56:31-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:59:09-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/06/06/building-a-countdown-timer-with-socket-dot-io-pt-2/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:59:31-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/06/07/building-a-countdown-timer-with-socket-dot-io-pt-3/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T09:59:43-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/09/css-semantics/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:04:02-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/09/lets-talk-smacss/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:04:06-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/10/building-a-responsive-grid-with-foundation/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:04:33-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/11/some-octopress-rake-tips/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:04:41-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/12/messing-around-with-gems/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:04:51-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:05:09-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/14/how-to-write-a-command-line-ruby-gem/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:05:17-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:05:22-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:05:33-07:00</lastmod>
     </url>
     <url>
         <loc>
             http://robdodson.me/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/
         </loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:05:49-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/18/outputting-json-from-ruby/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:06:00-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/20/crawling-pages-with-mechanize-and-nokogiri/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:06:25-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/21/quick-spider-example/</loc>
@@ -282,46 +282,46 @@
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/22/wrapping-up-the-word-count-spider/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:07:18-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/23/failing-at-ruby/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:07:43-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:07:51-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/24/sublime-snippet-basics/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:08:09-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/06/25/ending-my-first-chain/</loc>
-        <lastmod>2012-08-08T09:09:15-07:00</lastmod>
+        <lastmod>2012-08-11T10:08:17-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/08/03/javascript-design-patterns/</loc>
-        <lastmod>2012-08-11T09:16:23-07:00</lastmod>
+        <lastmod>2012-08-11T10:10:33-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/08/03/javascript-design-patterns-strategy/</loc>
-        <lastmod>2012-08-11T09:00:51-07:00</lastmod>
+        <lastmod>2012-08-11T10:08:27-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/08/08/javascript-design-patterns-singleton/</loc>
-        <lastmod>2012-08-11T09:11:59-07:00</lastmod>
+        <lastmod>2012-08-11T10:08:56-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/2012/08/10/javascript-design-patterns-iterator/</loc>
-        <lastmod>2012-08-11T09:00:37-07:00</lastmod>
+        <lastmod>2012-08-11T10:09:43-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/blog/archives/</loc>
-        <lastmod>2012-08-11T09:16:23-07:00</lastmod>
+        <lastmod>2012-08-11T10:10:33-07:00</lastmod>
     </url>
     <url>
         <loc>http://robdodson.me/</loc>
-        <lastmod>2012-08-11T09:16:23-07:00</lastmod>
+        <lastmod>2012-08-11T10:10:33-07:00</lastmod>
     </url>
 </urlset>

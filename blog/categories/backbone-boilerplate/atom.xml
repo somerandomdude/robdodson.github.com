@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Backbone Boilerplate | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/backbone-boilerplate/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -19,6 +19,9 @@
     <updated>2012-05-29T08:03:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/29/testing-backbone-modules</id>
     <content type="html"><![CDATA[<p>Continuing from <a href="http://robdodson.me/blog/2012/05/28/mocking-requests-with-mocha-chai-and-sinon/">yesterday's post</a> I'm going to start to incorporate Backbone into my BDD setup. I'm going to use the <a href="https://github.com/tbranyen/backbone-boilerplate">Backbone Boilerplate</a> and <a href="https://github.com/backbone-boilerplate/grunt-bbb">grunt-bbb</a> to setup a new project. If you're new to the boilerplate or grunt-bbb <a href="http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/">checkout my previous post on getting started.</a></p>
+
+<!--more-->
+
 
 <h3>Shiny and new</h3>
 
@@ -247,7 +250,10 @@ define(function(require) {
     <link href="http://robdodson.me/blog/2012/05/18/backbone-boilerplate-playing-with-require-dot-js/"/>
     <updated>2012-05-18T08:07:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/18/backbone-boilerplate-playing-with-require-dot-js</id>
-    <content type="html"><![CDATA[<p>I want to keep playing with require.js and AMD modules today so I can really internalize the concepts around them. I'm going to go through the examples in <a href="http://requirejs.org/docs/api.html#jsfiles">the require documentation</a> starting with loading regular scripts and then defining modules and loading those. Here's our boilerplate HTML:</p>
+    <content type="html"><![CDATA[<p>I want to keep playing with require.js and AMD modules today so I can really internalize the concepts around them. I'm going to go through the examples in <a href="http://requirejs.org/docs/api.html#jsfiles">the require documentation</a> starting with loading regular scripts and then defining modules and loading those.</p>
+
+<!--more-->
+
 
 <p>Here is our boilerplate HTML. It's a standard HTML5 file which just includes require.js at the bottom of the page.
 ``` html
@@ -478,6 +484,9 @@ bear in mind that each module requires an http request to load it so you don't w
     <updated>2012-05-17T07:47:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate</id>
     <content type="html"><![CDATA[<p>I have an upcoming project which uses <a href="http://documentcloud.github.com/backbone/">Backbone</a> and <a href="http://nodejs.org/">Node.js</a> so I thought it would be good to blog about the topics (particularly Backbone) for a while to make sure I'm well up to speed.</p>
+
+<!--more-->
+
 
 <p>We're using the <a href="https://github.com/tbranyen/backbone-boilerplate">Backbone Boilerplate</a> to get us started since it includes a bit of file structure and a build process. As they mention in the docs you have to install <a href="https://github.com/cowboy/grunt">Grunt</a> if you want to use the build process they've stubbed out. Grunt is a javascript build tool which uses Node (think Rake in JS).</p>
 

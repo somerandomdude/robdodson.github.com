@@ -4,7 +4,7 @@
   <title><![CDATA[Category: BDD | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/bdd/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -19,6 +19,9 @@
     <updated>2012-05-29T08:03:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/29/testing-backbone-modules</id>
     <content type="html"><![CDATA[<p>Continuing from <a href="http://robdodson.me/blog/2012/05/28/mocking-requests-with-mocha-chai-and-sinon/">yesterday's post</a> I'm going to start to incorporate Backbone into my BDD setup. I'm going to use the <a href="https://github.com/tbranyen/backbone-boilerplate">Backbone Boilerplate</a> and <a href="https://github.com/backbone-boilerplate/grunt-bbb">grunt-bbb</a> to setup a new project. If you're new to the boilerplate or grunt-bbb <a href="http://robdodson.me/blog/2012/05/17/getting-familiar-with-backbone-boilerplate/">checkout my previous post on getting started.</a></p>
+
+<!--more-->
+
 
 <h3>Shiny and new</h3>
 
@@ -248,6 +251,9 @@ define(function(require) {
     <updated>2012-05-28T11:20:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/28/mocking-requests-with-mocha-chai-and-sinon</id>
     <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai/">After a bit of a rocky start yesterday</a> I've finally got Mocha and Chai running in the browser which is great. Today I'd like to test out some of the async functionality of Mocha. This seems to be the big selling point for most people so we'll kick the tires a bit.</p>
+
+<!--more-->
+
 
 <h3>Basic Async Tests with Mocha and Chai</h3>
 
@@ -656,6 +662,9 @@ done();
     <id>http://robdodson.me/blog/2012/05/27/testing-backbone-boilerplate-with-mocha-and-chai</id>
     <content type="html"><![CDATA[<p>Since I was previously doing so much RSpec I want to try to bring some of that over to my JavaScript work. Lately I've been working with the Backbone Boilerplate which is a wonderful jump-start for folks who want to get up and running with AMD and Backbone. Today I'm going to see if I can get a working BDD setup going which will run some very basic tests. In a future post I'll use this new setup to do some BDD with Backbone Boilerplate.</p>
 
+<!--more-->
+
+
 <h3>Setting up Mocha and Chai</h3>
 
 <p>I chose Mocha over Jasmine because I've already worked with Jasmine so there wasn't much mystery there and also because I've heard really good things about Mocha. I think it's cool that if I choose to do a Node.js project Mocha will be able to test both my server and client code.</p>
@@ -879,6 +888,9 @@ it('should work with should', function() {
     <id>http://robdodson.me/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8</id>
     <content type="html"><![CDATA[<p>Yesterday's I refactored my specs and crawler to support ignoring selections. While I started parsing the metadata I quickly realized that certain bits were rather specific and needed to have custom parsing methods. Today I'm going to write some format objects to help with all that.</p>
 
+<!--more-->
+
+
 <p>Our metadata on the page looks like this:</p>
 
 <p><code>
@@ -1093,6 +1105,9 @@ end
     <updated>2012-05-15T21:33:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7</id>
     <content type="html"><![CDATA[<p>During my last post I realized that including my metadata in the blog post as only a ul meant that all the words were being scraped as part of the keyword frequency search. After thinking about it for a while I think I'm going to give the keyword search method an optional value which it can use to ignore or delete certain nodes.</p>
+
+<!--more-->
+
 
 <p>Thankfully I have my tests in place to validate what our final output should look like. Which means I'm basically hacking away at Nokogiri to get things to pass. Here's what I finally settle on:</p>
 

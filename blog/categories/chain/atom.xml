@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -21,6 +21,9 @@
     <content type="html"><![CDATA[<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
 
 <p>If you're coming from Ruby or Java you probably think of an Iterator as an object which gives you a consistent interface for traversing a collection of some kind. If you're coming from JavaScript or Actionscript you probably just think of an iterator as the <code>i</code> value in a <code>for</code> loop. The term has mixed meanings but in this case we're refering to the former, an object which gives us a consistent interface for iterating over a collection of some kind. If you've never used them before that might seem kind of silly. "If I need to loop over something I'm just going to loop over it!" For many use cases that's totally fine. Where Iterator objects are useful is in situations where you might need to loop in an async fashion (stopping and restarting) or if you want to preclude an object from knowing too much about the inner workings of a collection.</p>
+
+<!--more-->
+
 
 <h2>Formal Definition</h2>
 
@@ -187,6 +190,14 @@ The above script block will not work in Chrome but it should work in the latest 
 </ul>
 
 
+<p><small><cite style="color:#AAA;">Gamma, Erich; Helm, Richard; Johnson, Ralph; Vlissides, John (1994-10-31). Design Patterns: Elements of Reusable Object-Oriented Software. Pearson Education (USA).</cite></small></p>
+
+<hr>
+
+
+<br>
+
+
 <p>Thanks for reading! If you have questions or feedback please leave a comment below. - Rob</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
@@ -201,6 +212,9 @@ The above script block will not work in Chrome but it should work in the latest 
     <content type="html"><![CDATA[<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
 
 <p>Ah yes the Singleton, a pattern whose name lives in infamy. For the uninitiated a little explanation is in order. A Singleton is an object which can only be instantiated one time. Repeated calls to its constructor return the same instance and in this way one can ensure that they don't accidentally create, say, two Users in a single User application. Doesn't sound too bad, right? Well, if you're responsible then it arguably <em>is</em> OK but there are many caveats. Before I get into those though, let's throw in the formal definition <em>a la</em> the Gang of Four.</p>
+
+<!--more-->
+
 
 <h2>Formal Definition</h2>
 
@@ -505,6 +519,9 @@ console.log( singleA === singleB ); // true
 
 <p>The Strategy pattern is one of my personal favorites and you've probably seen or used it in some fashion without even knowing it. Its primary purpose is to help you separate the parts of an object which are subject to change from the rest of the static bits. Using Strategy objects versus subclasses can often result in much more flexible code since you're creating a suite of easily swappable algorithms.</p>
 
+<!--more-->
+
+
 <h2>Formal Definition</h2>
 
 <p><blockquote><p>Define a family of algorithms, encapsulate each one, and make them interchangeable. Strategy lets the algorithm vary independently from clients that use it.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote></p>
@@ -724,6 +741,14 @@ $canvas
 </ul>
 
 
+<p><small><cite style="color:#AAA;">Gamma, Erich; Helm, Richard; Johnson, Ralph; Vlissides, John (1994-10-31). Design Patterns: Elements of Reusable Object-Oriented Software. Pearson Education (USA).</cite></small></p>
+
+<hr>
+
+
+<br>
+
+
 <p>Thanks for reading! If you have questions or feedback please leave a comment below. - Rob</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
@@ -731,13 +756,11 @@ $canvas
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[JavaScript Design Patterns]]></title>
+    <title type="html"><![CDATA[JavaScript Design Patterns: Table of Contents]]></title>
     <link href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/"/>
     <updated>2012-08-03T09:39:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/08/03/javascript-design-patterns</id>
-    <content type="html"><![CDATA[<h2>Table of Contents</h2>
-
-<h3>Creational</h3>
+    <content type="html"><![CDATA[<h3>Creational</h3>
 
 <ul>
 <li>Abstract Factory</li>
@@ -784,6 +807,9 @@ $canvas
 
 <p>I've been trying to think up <a href="http://robdodson.me/blog/2012/06/25/ending-my-first-chain/">a new chain</a> since coming back from Europe but nothing was enticing me. Then a few days ago I had a conversation with one of my friends in which we discussed using Promises in JavaScript. And later on we discussed Builders. I was doing my best to explain the two but really wished that I had a resource where I could just show some simple code examples. It occurred to me that I've always wanted to go through the <a href="http://www.amazon.com/Design-Patterns-Elements-Reusable-Object-Oriented/dp/0201633612/ref=sr_1_1?ie=UTF8&amp;qid=1344014497&amp;sr=8-1&amp;keywords=design+patterns">Gang of Four book</a> and just write my own interpretation of each pattern. Since I'm currently working primarily in JavaScript I thought it might be an interesting challenge to convert their examples, often in strongly typed languages, to something as dynamic and loosey-goosey as JS.</p>
 
+<!--more-->
+
+
 <p>I know there are a lot of people out there who <a href="http://www.codinghorror.com/blog/2005/09/head-first-design-patterns.html">aren't too</a> <a href="http://thinkrelevance.com/blog/2007/05/17/design-patterns-are-code-smells">keen on</a> design patterns but that's not to say that they shouldn't be used or studied. There's a lot of code out there that starts with <code>jQuery.click()</code> or <code>addEventListener</code> or <code>.on()</code> and all of them are implementations of the Observer pattern. Finding this reusable approach is the main point of patterns and along with it comes a shared vocabulary that can be passed on to other developers. Rather than saying "Let's defer the methods of our object that are subject to change to well encapsulated algorithms." We can just say "A Strategy pattern might be nice here."</p>
 
 <p>Patterns should be used with caution as not everything fits so neatly into their paradigms. It's often said that a beginner never met a pattern he didn't like. In my experiences I've been burned by pattern overuse and at other times they have legitimately saved my ass. It's also true that many patterns don't really work or aren't appropriate for particular languages. For instance, the GoF book was written <em>primarily for languages which shared features of C++ and SmallTalk</em>. I totally agree with this sentiment but I feel like along the way we'll discover what does and doesn't make sense in a dynamic language like JS and hopefully we can toss in some new patterns of our own. Already to the list I've added Promises which I use quite frequently and find to be a wonderful alternative to JavaScript's oft seen pyramid of callbacks.
@@ -799,6 +825,9 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <updated>2012-06-25T22:58:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/25/ending-my-first-chain</id>
     <content type="html"><![CDATA[<p>On April 28th, <a href="http://www.facebook.com/photo.php?fbid=964312982287&amp;set=a.616835240467.2181266.39601696&amp;type=1">I vowed to write a blog post a day until I had to go to Europe.</a> Of course the real threat was that if I failed to do so I would have to give 500 dollars to the Republican party, most likely to John Boehner. In my original post I said I would write till the 27th but I've moved that date up so I can spend tomorrow night packing and wrapping things up in the city before I head out on my trip. So tonight's post will mark the end of my first chain which means it's time for a little post-mortem.</p>
+
+<!--more-->
+
 
 <h2>Why Did I Do It?</h2>
 

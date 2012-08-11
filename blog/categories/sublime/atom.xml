@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Sublime | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/sublime/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -18,7 +18,12 @@
     <link href="http://robdodson.me/blog/2012/06/24/sublime-snippet-basics/"/>
     <updated>2012-06-24T22:48:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/24/sublime-snippet-basics</id>
-    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/">Yesterday I covered some tips and tricks</a> I've learned over the past few months of using Sublime. Something I didn't touch on is Sublime's Snippet architecture. Essentially a snippet is a little piece of code that gets executed when you type some characters and hit the <code>tab</code> key. For instance I have a snippet that spits out <code>console.log()</code> whenever I type <code>lg</code> and press <code>tab</code>. One clever feature of snippets is that they can be bound to a keyboard shortcut if the key binding calls the <code>insert_snippet</code> command and passes the path to the snippet file as an argument. For example:</p>
+    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/">Yesterday I covered some tips and tricks</a> I've learned over the past few months of using Sublime. Something I didn't touch on is Sublime's Snippet architecture.</p>
+
+<!--more-->
+
+
+<p>Essentially a snippet is a little piece of code that gets executed when you type some characters and hit the <code>tab</code> key. For instance I have a snippet that spits out <code>console.log()</code> whenever I type <code>lg</code> and press <code>tab</code>. One clever feature of snippets is that they can be bound to a keyboard shortcut if the key binding calls the <code>insert_snippet</code> command and passes the path to the snippet file as an argument. For example:</p>
 
 <p>```json
 {</p>
@@ -125,6 +130,9 @@ That will tell Sublime that when I press</code>cmd+shift+r<code>it should act as
     <updated>2012-06-23T22:28:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/23/sublime-text-2-tips-and-shortcuts</id>
     <content type="html"><![CDATA[<p>I've been using Sublime Text 2 for probably two months now and in that time I've discovered tons of useful tricks. I figured I should start writing them down for anyone who might be interested. I'll try to explain the bits that seem esoteric because there are a lot of cool commands which only work in certain contexts.</p>
+
+<!--more-->
+
 
 <h2>Finding your preferences</h2>
 
@@ -302,6 +310,9 @@ You'll notice that instead of just using a</code>wrap_in_tag<code>command name t
     <id>http://robdodson.me/blog/2012/05/14/hacking-the-path-variable-in-sublime-text</id>
     <content type="html"><![CDATA[<p>This is going to be a bit of a lightning post but I wanted to quickly show off how to edit the PATH variable that Sublime text uses. I should warn you that that I am neither an expert in Python nor am I a very seasoned Sublime user. So having said that take all of this with a grain of salt and use at your own risk.</p>
 
+<!--more-->
+
+
 <h3>Our first (crappy) plugin!</h3>
 
 <p>Sublime has a great plugin architecture that makes it extremely easy to add to the platform. If you create a <code>.py</code> file in the <code>~/Library/Application Support/Sublime Text 2/Packages/User/</code> folder it will be loaded as soon as Sublime starts. Writing plugins seems to be actually quite easy based on their <a href="http://www.sublimetext.com/docs/plugin-basics">documentation and examples.</a> We won't be following the typical plugin architecture since we're just trying to hack a system variable and that doesn't seem to necessitate the use of their built in modules.</p>
@@ -352,6 +363,9 @@ If you add this file to the Sublime user's directory outlined above you should b
     <updated>2012-04-29T09:26:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/04/29/how-to-run-tests-in-sublime-text</id>
     <content type="html"><![CDATA[<p>If you're lazy like me then you love to automate as much of your process as possible. Running tests from within your IDE is one of those tasks that screams for a keyboard shortcut. In full featured tools like RubyMine or Eclipse this is usually pretty straightforward. However many developers in the Ruby community seem to prefer more lightweight tools like TextMate, Vim and Sublime. Today we'll look at how to setup RubyTest in Sublime Text 2 so we can easily run tests with just a few hotkeys. The tests will be written in <a href="http://rspec.info/">Rspec</a> which should be familiar to most Rubyists.</p>
+
+<!--more-->
+
 
 <h3>How to setup RubyTest in Sublime Text 2</h3>
 

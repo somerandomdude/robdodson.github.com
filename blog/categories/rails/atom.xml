@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Rails | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -21,6 +21,9 @@
     <content type="html"><![CDATA[<h3>Install PostgreSQL Locally</h3>
 
 <p>Ryan Bates has already put together a wonderful Railscast on this topic so feel free to <a href="http://railscasts.com/episodes/342-migrating-to-postgresql">jump over there</a> to view it. My main goal in writing this post was to distill down what he said, point out a small gotcha along the way and offer some additional tools.</p>
+
+<!--more-->
+
 
 <p>There are a few different options for installing PostgreSQL. The first one, which Ryan outlines, is to use <a href="http://mxcl.github.com/homebrew/">Homebrew</a> and simply do a <code>brew install postgresql</code>. Some folks might not be comfortable with that process so I wanted to also recommend the new <a href="http://postgresapp.com/">PostgreSQL.app</a> from the team at <a href="http://www.heroku.com/">Heroku</a>. If you're more used to tools like <a href="http://www.mamp.info/en/index.html">MAMP</a> then the PostgreSQL.app might be a bit more your style.</p>
 
@@ -115,6 +118,9 @@ You might see some deprecation warnings about vendor plugins. For now you can (p
     <content type="html"><![CDATA[<h3>What is RVM?</h3>
 
 <p><a href="https://rvm.io//">RVM</a> is a great Ruby and gem management tool that should probably be the first thing you install if you’re learning Rails (or Ruby for that matter). The main benefit of RVM is that it helps to keep your rubies and your gems organized into discrete folders which can easily be thrown away and recreated. If you’ve ever had a gem explode on you, then you know how great a feature like this is. I’ll cover the basics of using RVM in this post to quickly get you up and running. This tutorial is written for the OSX terminal, if you're on Windows...um...kill yourself.</p>
+
+<!--more-->
+
 
 <h3>How to Install RVM</h3>
 
@@ -265,6 +271,9 @@ rvm gemset delete my-new-rails-setup
     <id>http://robdodson.me/blog/2011/09/21/syntax-error-unexpected-tidentifier</id>
     <content type="html"><![CDATA[<p>Today we’re going to look at this little gem, which is really nothing more than a syntax error. If you’re not used to Ruby’s syntax, this can be a particularly easy stumbling block.</p>
 
+<!--more-->
+
+
 <p>For starters here’s the image you see in Rails 3 when things go South:</p>
 
 <p><img class="center" src="/images/unexpected_tidentifier.jpg" title="'Syntax Error: Unexpected tIDENTIFIER'" ></p>
@@ -368,6 +377,9 @@ say_hello({:name => 'Rob', :age => 27})
     <content type="html"><![CDATA[<p>Coming from Actionscript 3 I’m pretty used to all of the different errors that the Flash compiler and runtime typically throw at me. But now that I’ve started teaching myself Ruby on Rails 3 I’m having to learn a whole new lexicon of messages which generally amount to “Something blow’d up..”</p>
 
 <p>For my own benefit, and hopefully for the benefit of others, I’m going to post the errors and solutions that I come up with. Hopefully since I’m a total newbie, explaining things from my perspective will help other people who are new to the language as well.</p>
+
+<!--more-->
+
 
 <p>To start of we have the <code>NoMethodError</code>.
 <img class="center" src="/images/no_method_error.jpg" title="'NoMethodError'" ></p>

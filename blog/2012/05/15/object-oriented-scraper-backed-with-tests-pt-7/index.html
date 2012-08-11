@@ -102,6 +102,9 @@
 
 <div class="entry-content"><p>During my last post I realized that including my metadata in the blog post as only a ul meant that all the words were being scraped as part of the keyword frequency search. After thinking about it for a while I think I&#8217;m going to give the keyword search method an optional value which it can use to ignore or delete certain nodes.</p>
 
+<!--more-->
+
+
 <p>Thankfully I have my tests in place to validate what our final output should look like. Which means I&#8217;m basically hacking away at Nokogiri to get things to pass. Here&#8217;s what I finally settle on:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -291,7 +294,7 @@
       </li>
     
       <li class="post">
-        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns</a>
+        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns: Table of Contents</a>
       </li>
     
       <li class="post">
@@ -321,7 +324,7 @@
 
         github.showRepos({
             user: 'robdodson',
-            count: 0,
+            count: 4,
             skip_forks: true,
             target: '#gh_repos'
         });

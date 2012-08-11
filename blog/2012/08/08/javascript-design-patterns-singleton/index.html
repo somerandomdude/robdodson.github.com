@@ -104,6 +104,9 @@
 
 <p>Ah yes the Singleton, a pattern whose name lives in infamy. For the uninitiated a little explanation is in order. A Singleton is an object which can only be instantiated one time. Repeated calls to its constructor return the same instance and in this way one can ensure that they don&#8217;t accidentally create, say, two Users in a single User application. Doesn&#8217;t sound too bad, right? Well, if you&#8217;re responsible then it arguably <em>is</em> OK but there are many caveats. Before I get into those though, let&#8217;s throw in the formal definition <em>a la</em> the Gang of Four.</p>
 
+<!--more-->
+
+
 <h2>Formal Definition</h2>
 
 <blockquote><p>Ensure a class only has one instance, and provide a global point of access to it.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote>
@@ -596,7 +599,7 @@ If we were to accidentally define another global <code>addToCart</code> function
       </li>
     
       <li class="post">
-        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns</a>
+        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns: Table of Contents</a>
       </li>
     
       <li class="post">
@@ -626,7 +629,7 @@ If we were to accidentally define another global <code>addToCart</code> function
 
         github.showRepos({
             user: 'robdodson',
-            count: 0,
+            count: 4,
             skip_forks: true,
             target: '#gh_repos'
         });

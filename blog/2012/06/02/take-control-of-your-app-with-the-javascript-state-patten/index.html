@@ -102,6 +102,9 @@
 
 <div class="entry-content"><p>Last week I wrote a post about <a href="http://robdodson.me/blog/2012/05/25/backbone-events-framework-communication/">communicating between views in Backbone.js</a> and since then it has easily become my most popular article. The comments have forced me to think about the ways in which I typically manage state in very large Flash applications and how that might translate to JavaScript and Backbone. Today I want to present my all time favorite design pattern, the State pattern, and illustrate how it can help you maintain control of your application. I want to warn you that I&#8217;m going to show a rather large block of what looks like repetitive code because I want the pattern to be obvious. In tomorrow&#8217;s post we&#8217;ll clean it up and try it out with a Backbone Model and View.</p>
 
+<!--more-->
+
+
 <h3>The State pattern?</h3>
 
 <p>Ok let&#8217;s get started. I want to write a video player so I&#8217;m going to need an object that can handle <code>play</code>, <code>stop</code> and <code>pause</code> states. I would say that there are probably a ton of video players out there that have <code>play</code>, <code>stop</code> and <code>pause</code> methods on them, and I bet many look kind of like this:</p>
@@ -634,7 +637,7 @@
       </li>
     
       <li class="post">
-        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns</a>
+        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns: Table of Contents</a>
       </li>
     
       <li class="post">
@@ -664,7 +667,7 @@
 
         github.showRepos({
             user: 'robdodson',
-            count: 0,
+            count: 4,
             skip_forks: true,
             target: '#gh_repos'
         });

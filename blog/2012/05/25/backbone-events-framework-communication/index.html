@@ -121,6 +121,9 @@
 
 <p>When you use this approach it&#8217;s trivial to tell the view to listen to the model&#8217;s change event and then call <code>view.render()</code>. Essentially you are munging some of a Controller&#8217;s responsibilities into the View. That&#8217;s all well and good but let&#8217;s say we want to dispatch an event from one view which will affect other views and actors. This event has nothing to do with a model, maybe it&#8217;s just an animation of some kind that others need to know about. So how do we go about this?</p>
 
+<!--more-->
+
+
 <h3>Communicating between Views in Backbone</h3>
 
 <p>To facilitate this communication we&#8217;re going to use the <code>app</code> object that <a href="https://github.com/tbranyen/backbone-boilerplate">Backbone Boilerplate</a> creates for us. If you look in the <code>namespace.js</code> file that comes with the boilerplate you should see a line like this way down at the bottom:</p>
@@ -396,7 +399,7 @@
       </li>
     
       <li class="post">
-        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns</a>
+        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns: Table of Contents</a>
       </li>
     
       <li class="post">
@@ -426,7 +429,7 @@
 
         github.showRepos({
             user: 'robdodson',
-            count: 0,
+            count: 4,
             skip_forks: true,
             target: '#gh_repos'
         });

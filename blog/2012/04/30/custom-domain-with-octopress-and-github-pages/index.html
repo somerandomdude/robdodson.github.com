@@ -104,6 +104,9 @@
 
 <p><a href="http://octopress.org/">Octopress</a> is a blogging framework written by <a href="http://brandonmathis.com/">Brandon Mathis</a> (<a href="https://twitter.com/#!/imathis">@imathis</a>) which sits on top of <a href="https://github.com/mojombo/jekyll">Jekyll</a>. Jekyll is a static site generator, meaning there&#8217;s no database associated with your blog. Instead of writing everything in a WSYWIG linked to MySQL (like Wordpress or Blogger) you produce text files using Markdown which are then converted to static HTML. There are 3 huge benefits to this approach. First, writing in Markdown is awesome. Once you learn the syntax it&#8217;s incredibly fast and you don&#8217;t have to spend time playing with a tiny little editor window just to <s>add</s> <em>some</em> <strong>style</strong> to your posts. Second, writing in your favorite text editor is also awesome. I produce everything in <a href="http://www.sublimetext.com/2">Sublime Text 2</a> and every day I discover new tricks to make the process better. If you&#8217;ve ever had to write a blog post using one of those horrible little TinyMCE editors you will appreciate this feature. And lastly, static HTML is <em>fast</em>.</p>
 
+<!--more-->
+
+
 <p>Octopress takes what Jekyll has started and adds some useful tasks and templates which make setting up your own blog a breeze. I&#8217;m going to quickly cover the steps needed to set everything up on Github Pages using a custom domain since that&#8217;s something I struggled with when first starting out.</p>
 
 <p>If you don&#8217;t already have RVM installed you can <a href="http://robdodson.me/blog/2011/09/23/how-to-use-rvm-for-rails3/">refer back to my previous post on getting setup</a>. If you&#8217;re unexperienced I highly recommend going the RVM route, though there&#8217;s also <a href="https://github.com/sstephenson/rbenv#section_2">an explanation for setting up rbenv if you would prefer</a>. I should point out that I&#8217;m going to pretty much mirror <a href="http://octopress.org/docs/setup/">the Octopress setup guide</a> but I&#8217;ll add some tips toward the end for setting up a custom domain.</p>
@@ -349,7 +352,7 @@ Now let&#8217;s tell RVM to use Ruby 1.9.3 with our custom Octopress gemset.</p>
       </li>
     
       <li class="post">
-        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns</a>
+        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns: Table of Contents</a>
       </li>
     
       <li class="post">
@@ -379,7 +382,7 @@ Now let&#8217;s tell RVM to use Ruby 1.9.3 with our custom Octopress gemset.</p>
 
         github.showRepos({
             user: 'robdodson',
-            count: 0,
+            count: 4,
             skip_forks: true,
             target: '#gh_repos'
         });

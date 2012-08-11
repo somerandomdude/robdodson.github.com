@@ -102,6 +102,9 @@
 
 <div class="entry-content"><p><a href="http://robdodson.me/blog/2012/06/02/take-control-of-your-app-with-the-javascript-state-patten/">Yesterday I wrote a post to illustrate the concepts behind the State pattern</a> (one of my all time favorite tools). If you&#8217;re new to this pattern and haven&#8217;t read my previous post I suggest you start there and read this one after you&#8217;ve had a chance to play around with the ideas.</p>
 
+<!--more-->
+
+
 <p>I wanted to write about this pattern in the context of a Backbone app because I think there&#8217;s a lot of value in exploring different ways to manage our Views and Models. Here&#8217;s an example Video Player in which several State objects inherit from a common ancestor, <code>BaseState</code>. I chose to make <code>BaseState</code> extend <code>Backbone.Model</code> because it seemed like the best fit for this kind of thing, although typically when I implement this pattern in other languages I just use generic Objects. I would have done that here but Backbone&#8217;s <code>extend</code> functionality makes the code so much cleaner.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -459,7 +462,7 @@
       </li>
     
       <li class="post">
-        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns</a>
+        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns: Table of Contents</a>
       </li>
     
       <li class="post">
@@ -489,7 +492,7 @@
 
         github.showRepos({
             user: 'robdodson',
-            count: 0,
+            count: 4,
             skip_forks: true,
             target: '#gh_repos'
         });

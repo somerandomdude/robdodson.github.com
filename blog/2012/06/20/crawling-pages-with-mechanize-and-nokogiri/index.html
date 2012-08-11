@@ -104,6 +104,9 @@
 
 <p>The scraper that I&#8217;m building is supposed to work like a spider and crawl of the pages of my blog. I wasn&#8217;t sure what the best way to do that was so I started Googling and came up with <a href="http://mechanize.rubyforge.org/">Mechanize.</a> There are other tools built on top of Mechanize, like <a href="https://github.com/felipecsl/wombat">Wombat</a>, but since my task is so simple I figured I could just write everything I needed with Mechanize and Nokogiri. It&#8217;s usually a better idea to work with simple tools when you&#8217;re first grasping concepts so you don&#8217;t get lost in the weeds of some high powered framework.</p>
 
+<!--more-->
+
+
 <p>Since it&#8217;s late I&#8217;ll let the code do the talking:</p>
 
 <figure class='code'><figcaption><span>crawler.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -236,7 +239,7 @@
       </li>
     
       <li class="post">
-        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns</a>
+        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns: Table of Contents</a>
       </li>
     
       <li class="post">
@@ -266,7 +269,7 @@
 
         github.showRepos({
             user: 'robdodson',
-            count: 0,
+            count: 4,
             skip_forks: true,
             target: '#gh_repos'
         });

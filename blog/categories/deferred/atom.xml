@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Deferred | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/deferred/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -19,6 +19,9 @@
     <updated>2012-06-03T20:33:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/03/make-your-own-jquery-deferreds-and-promises</id>
     <content type="html"><![CDATA[<p>Last week <a href="http://robdodson.me/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/">I did a post on how to load an Underscore template using jQuery's Deferred method</a>. I got some great feedback from folks and decided I should do a follow up showing how to create your own Deferreds.</p>
+
+<!--more-->
+
 
 <h3>What's a Deferred again...?</h3>
 
@@ -196,7 +199,12 @@ There are more cool things you can do with</code>Deferreds<code>I highly recomme
     <link href="http://robdodson.me/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template/"/>
     <updated>2012-05-30T08:53:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/30/using-jquery-deferred-to-load-an-underscore-template</id>
-    <content type="html"><![CDATA[<p>Today's post is meant to scratch an itch I had the other day regarding templates. My friend wanted to load an underscore template along with some JSON data but wasn't sure what the best approach would be. Since I'm using Backbone Boilerplate I've gotten used to having my template loading method already stubbed out for me. Here's the one they use:</p>
+    <content type="html"><![CDATA[<p>Today's post is meant to scratch an itch I had the other day regarding templates. My friend wanted to load an underscore template along with some JSON data but wasn't sure what the best approach would be.</p>
+
+<!--more-->
+
+
+<p>Since I'm using Backbone Boilerplate I've gotten used to having my template loading method already stubbed out for me. Here's the one they use:</p>
 
 <p>``` js
 fetchTemplate: function(path, done) {

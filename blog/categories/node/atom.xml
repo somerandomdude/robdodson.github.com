@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Node | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/node/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -19,6 +19,9 @@
     <updated>2012-06-16T23:06:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm</id>
     <content type="html"><![CDATA[<p>Alright, <a href="http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/">contuing from yesterday</a> we want to take our little Node module and make it available to the world as a really awesome command line tool.</p>
+
+<!--more-->
+
 
 <p>The first thing we need to do is register an NPM account.</p>
 
@@ -80,6 +83,9 @@ git commit -am 'Initial commit'
     <updated>2012-06-15T19:46:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line</id>
     <content type="html"><![CDATA[<p>This post is going to be short and sweet because I have to help my lady pack for her big trip to Germany. Over the past few days I've been messing around with command line tools written in Ruby so today I decided to give it a shot in Node.</p>
+
+<!--more-->
+
 
 <p>We're going to start small in this first post and just get a little script running. After that we'll step it up so it can be distributed using NPM, <a href="http://robdodson.me/blog/2012/06/14/how-to-write-a-command-line-ruby-gem/">just like we did with our previous Ruby gem.</a></p>
 
@@ -145,6 +151,16 @@ git commit -am 'Initial commit'
     <updated>2012-06-07T19:41:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/07/building-a-countdown-timer-with-socket-dot-io-pt-3</id>
     <content type="html"><![CDATA[<p>Today's the day we wrap up our countdown timer and deploy it to Heroku. But before we launch this puppy we need to clean house a little and spice up the visual appeal.</p>
+
+<!--more-->
+
+
+<ul>
+<li><a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">Getting Started</a></li>
+<li><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/">Click here for part 1.</a></li>
+<li><a href="http://robdodson.me/blog/2012/06/06/building-a-countdown-timer-with-socket-dot-io-pt-2/">Click here for part 2.</a></li>
+</ul>
+
 
 <h3>Refactoring the Stopwatch</h3>
 
@@ -482,6 +498,16 @@ Finally I chose to use some funky buttons from [Chad Mazzola's CSS3 Buttons proj
     <id>http://robdodson.me/blog/2012/06/06/building-a-countdown-timer-with-socket-dot-io-pt-2</id>
     <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/">Continuing from yesterday's post</a> we started out with a rather crude timer and today I want to upgrade it to a full fledged model, <code>Stopwatch</code>, which dispatches events for the view to hook on to.</p>
 
+<!--more-->
+
+
+<ul>
+<li><a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">Getting Started</a></li>
+<li><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/">Click here for part 1.</a></li>
+<li><a href="http://robdodson.me/blog/2012/06/07/building-a-countdown-timer-with-socket-dot-io-pt-3/">Click here for part 3.</a></li>
+</ul>
+
+
 <h3>Extend Node's EventEmitter</h3>
 
 <p>We want to extend Node's EventEmitter object in order for our Stopwatch to dispatch its tick events. <a href="http://elegantcode.com/2011/02/21/taking-baby-steps-with-node-js-implementing-events/">Following this great article by Jan Van Ryswyck</a> I've arrived at something that looks like this:</p>
@@ -761,9 +787,17 @@ tick: 00:59:57
     <link href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io/"/>
     <updated>2012-06-05T08:07:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io</id>
-    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io-pt-2/">Click here for part 2.</a></p>
+    <content type="html"><![CDATA[<p>Yesterday I put together a very simple Node/Socket.io application and showed how to deploy it to Heroku. Today I'm going to keep going with that app to see if I can get the functionality that I want. The app is a basic stopwatch so that shouldn't be too hard. If you want to catch up <a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">checkout yesterday's article</a> which explains setting everything up.</p>
 
-<p>Yesterday I put together a very simple Node/Socket.io application and showed how to deploy it to Heroku. Today I'm going to keep going with that app to see if I can get the functionality that I want. The app is a basic stopwatch so that shouldn't be too hard. If you want to catch up <a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">checkout yesterday's article</a> which explains setting everything up.</p>
+<!--more-->
+
+
+<ul>
+<li><a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">Getting Started</a></li>
+<li><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io-pt-2/">Click here for part 2.</a></li>
+<li><a href="http://robdodson.me/blog/2012/06/07/building-a-countdown-timer-with-socket-dot-io-pt-3/">Click here for part 3.</a></li>
+</ul>
+
 
 <h3>Countdown</h3>
 

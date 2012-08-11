@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Backbone Events | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/backbone-events/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -32,6 +32,9 @@ var doc = Documents.first(); // &lt;-- Model object</p>
 ```</p>
 
 <p>When you use this approach it's trivial to tell the view to listen to the model's change event and then call <code>view.render()</code>. Essentially you are munging some of a Controller's responsibilities into the View. That's all well and good but let's say we want to dispatch an event from one view which will affect other views and actors. This event has nothing to do with a model, maybe it's just an animation of some kind that others need to know about. So how do we go about this?</p>
+
+<!--more-->
+
 
 <h3>Communicating between Views in Backbone</h3>
 
@@ -161,6 +164,9 @@ chatty: function() {
     <updated>2012-05-24T07:23:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/05/24/backbone-events-between-views</id>
     <content type="html"><![CDATA[<p>Today I want to figure out what kind of events to use when one of my views is added to the DOM. This can have a lot of ramifications for positioning elements around the view and setting up properties on the view itself.</p>
+
+<!--more-->
+
 
 <h3>View Events and the DOM</h3>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T09:16:30-07:00</updated>
+  <updated>2012-08-11T10:11:26-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -21,6 +21,9 @@
     <content type="html"><![CDATA[<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
 
 <p>If you&#8217;re coming from Ruby or Java you probably think of an Iterator as an object which gives you a consistent interface for traversing a collection of some kind. If you&#8217;re coming from JavaScript or Actionscript you probably just think of an iterator as the <code>i</code> value in a <code>for</code> loop. The term has mixed meanings but in this case we&#8217;re refering to the former, an object which gives us a consistent interface for iterating over a collection of some kind. If you&#8217;ve never used them before that might seem kind of silly. &#8220;If I need to loop over something I&#8217;m just going to loop over it!&#8221; For many use cases that&#8217;s totally fine. Where Iterator objects are useful is in situations where you might need to loop in an async fashion (stopping and restarting) or if you want to preclude an object from knowing too much about the inner workings of a collection.</p>
+
+<!--more-->
+
 
 <h2>Formal Definition</h2>
 
@@ -258,6 +261,14 @@
 </ul>
 
 
+<p><small><cite style="color:#AAA;">Gamma, Erich; Helm, Richard; Johnson, Ralph; Vlissides, John (1994-10-31). Design Patterns: Elements of Reusable Object-Oriented Software. Pearson Education (USA).</cite></small></p>
+
+<hr>
+
+
+<br>
+
+
 <p>Thanks for reading! If you have questions or feedback please leave a comment below. - Rob</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
@@ -272,6 +283,9 @@
     <content type="html"><![CDATA[<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
 
 <p>Ah yes the Singleton, a pattern whose name lives in infamy. For the uninitiated a little explanation is in order. A Singleton is an object which can only be instantiated one time. Repeated calls to its constructor return the same instance and in this way one can ensure that they don&#8217;t accidentally create, say, two Users in a single User application. Doesn&#8217;t sound too bad, right? Well, if you&#8217;re responsible then it arguably <em>is</em> OK but there are many caveats. Before I get into those though, let&#8217;s throw in the formal definition <em>a la</em> the Gang of Four.</p>
+
+<!--more-->
+
 
 <h2>Formal Definition</h2>
 
@@ -692,6 +706,9 @@ If we were to accidentally define another global <code>addToCart</code> function
 
 <p>The Strategy pattern is one of my personal favorites and you&#8217;ve probably seen or used it in some fashion without even knowing it. Its primary purpose is to help you separate the parts of an object which are subject to change from the rest of the static bits. Using Strategy objects versus subclasses can often result in much more flexible code since you&#8217;re creating a suite of easily swappable algorithms.</p>
 
+<!--more-->
+
+
 <h2>Formal Definition</h2>
 
 <blockquote><p>Define a family of algorithms, encapsulate each one, and make them interchangeable. Strategy lets the algorithm vary independently from clients that use it.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote>
@@ -960,6 +977,14 @@ If we were to accidentally define another global <code>addToCart</code> function
 </ul>
 
 
+<p><small><cite style="color:#AAA;">Gamma, Erich; Helm, Richard; Johnson, Ralph; Vlissides, John (1994-10-31). Design Patterns: Elements of Reusable Object-Oriented Software. Pearson Education (USA).</cite></small></p>
+
+<hr>
+
+
+<br>
+
+
 <p>Thanks for reading! If you have questions or feedback please leave a comment below. - Rob</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
@@ -967,13 +992,11 @@ If we were to accidentally define another global <code>addToCart</code> function
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[JavaScript Design Patterns]]></title>
+    <title type="html"><![CDATA[JavaScript Design Patterns: Table of Contents]]></title>
     <link href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/"/>
     <updated>2012-08-03T09:39:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/08/03/javascript-design-patterns</id>
-    <content type="html"><![CDATA[<h2>Table of Contents</h2>
-
-<h3>Creational</h3>
+    <content type="html"><![CDATA[<h3>Creational</h3>
 
 <ul>
 <li>Abstract Factory</li>
@@ -1020,6 +1043,9 @@ If we were to accidentally define another global <code>addToCart</code> function
 
 <p>I&#8217;ve been trying to think up <a href="http://robdodson.me/blog/2012/06/25/ending-my-first-chain/">a new chain</a> since coming back from Europe but nothing was enticing me. Then a few days ago I had a conversation with one of my friends in which we discussed using Promises in JavaScript. And later on we discussed Builders. I was doing my best to explain the two but really wished that I had a resource where I could just show some simple code examples. It occurred to me that I&#8217;ve always wanted to go through the <a href="http://www.amazon.com/Design-Patterns-Elements-Reusable-Object-Oriented/dp/0201633612/ref=sr_1_1?ie=UTF8&amp;qid=1344014497&amp;sr=8-1&amp;keywords=design+patterns">Gang of Four book</a> and just write my own interpretation of each pattern. Since I&#8217;m currently working primarily in JavaScript I thought it might be an interesting challenge to convert their examples, often in strongly typed languages, to something as dynamic and loosey-goosey as JS.</p>
 
+<!--more-->
+
+
 <p>I know there are a lot of people out there who <a href="http://www.codinghorror.com/blog/2005/09/head-first-design-patterns.html">aren&#8217;t too</a> <a href="http://thinkrelevance.com/blog/2007/05/17/design-patterns-are-code-smells">keen on</a> design patterns but that&#8217;s not to say that they shouldn&#8217;t be used or studied. There&#8217;s a lot of code out there that starts with <code>jQuery.click()</code> or <code>addEventListener</code> or <code>.on()</code> and all of them are implementations of the Observer pattern. Finding this reusable approach is the main point of patterns and along with it comes a shared vocabulary that can be passed on to other developers. Rather than saying &#8220;Let&#8217;s defer the methods of our object that are subject to change to well encapsulated algorithms.&#8221; We can just say &#8220;A Strategy pattern might be nice here.&#8221;</p>
 
 <p>Patterns should be used with caution as not everything fits so neatly into their paradigms. It&#8217;s often said that a beginner never met a pattern he didn&#8217;t like. In my experiences I&#8217;ve been burned by pattern overuse and at other times they have legitimately saved my ass. It&#8217;s also true that many patterns don&#8217;t really work or aren&#8217;t appropriate for particular languages. For instance, the GoF book was written <em>primarily for languages which shared features of C++ and SmallTalk</em>. I totally agree with this sentiment but I feel like along the way we&#8217;ll discover what does and doesn&#8217;t make sense in a dynamic language like JS and hopefully we can toss in some new patterns of our own. Already to the list I&#8217;ve added Promises which I use quite frequently and find to be a wonderful alternative to JavaScript&#8217;s oft seen pyramid of callbacks.
@@ -1035,6 +1061,9 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <updated>2012-06-25T22:58:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/25/ending-my-first-chain</id>
     <content type="html"><![CDATA[<p>On April 28th, <a href="http://www.facebook.com/photo.php?fbid=964312982287&amp;set=a.616835240467.2181266.39601696&amp;type=1">I vowed to write a blog post a day until I had to go to Europe.</a> Of course the real threat was that if I failed to do so I would have to give 500 dollars to the Republican party, most likely to John Boehner. In my original post I said I would write till the 27th but I&#8217;ve moved that date up so I can spend tomorrow night packing and wrapping things up in the city before I head out on my trip. So tonight&#8217;s post will mark the end of my first chain which means it&#8217;s time for a little post-mortem.</p>
+
+<!--more-->
+
 
 <h2>Why Did I Do It?</h2>
 
@@ -1082,7 +1111,12 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <link href="http://robdodson.me/blog/2012/06/24/sublime-snippet-basics/"/>
     <updated>2012-06-24T22:48:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/24/sublime-snippet-basics</id>
-    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/">Yesterday I covered some tips and tricks</a> I&#8217;ve learned over the past few months of using Sublime. Something I didn&#8217;t touch on is Sublime&#8217;s Snippet architecture. Essentially a snippet is a little piece of code that gets executed when you type some characters and hit the <code>tab</code> key. For instance I have a snippet that spits out <code>console.log()</code> whenever I type <code>lg</code> and press <code>tab</code>. One clever feature of snippets is that they can be bound to a keyboard shortcut if the key binding calls the <code>insert_snippet</code> command and passes the path to the snippet file as an argument. For example:</p>
+    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/23/sublime-text-2-tips-and-shortcuts/">Yesterday I covered some tips and tricks</a> I&#8217;ve learned over the past few months of using Sublime. Something I didn&#8217;t touch on is Sublime&#8217;s Snippet architecture.</p>
+
+<!--more-->
+
+
+<p>Essentially a snippet is a little piece of code that gets executed when you type some characters and hit the <code>tab</code> key. For instance I have a snippet that spits out <code>console.log()</code> whenever I type <code>lg</code> and press <code>tab</code>. One clever feature of snippets is that they can be bound to a keyboard shortcut if the key binding calls the <code>insert_snippet</code> command and passes the path to the snippet file as an argument. For example:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -1204,6 +1238,9 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <updated>2012-06-23T22:28:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/23/sublime-text-2-tips-and-shortcuts</id>
     <content type="html"><![CDATA[<p>I&#8217;ve been using Sublime Text 2 for probably two months now and in that time I&#8217;ve discovered tons of useful tricks. I figured I should start writing them down for anyone who might be interested. I&#8217;ll try to explain the bits that seem esoteric because there are a lot of cool commands which only work in certain contexts.</p>
+
+<!--more-->
+
 
 <h2>Finding your preferences</h2>
 
@@ -1586,6 +1623,9 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>Really ugly code that still doesn&#8217;t work. My biggest problem with Ruby is that I don&#8217;t have very good debugging tools and that frustrates the shit out of me. I&#8217;m so used to the visual debuggers in the Chrome Dev tools that doing everything with <code>p</code> or <code>puts</code> is just soul-crushing.</p>
 
+<!--more-->
+
+
 <p>Right now my biggest problem is that data isn&#8217;t being returned from the spider for whatever reason. This is especially annoying because the operation takes a while to run&#8230; I should slim it down but my brain is too tired to re-write the code. I&#8217;m kind of hoping for a lucky break. Advice to anyone just starting out in programming, do not do exactly what I&#8217;m doing right now.</p>
 
 <p>Ok so after getting my ass totally handed to me by Ruby here&#8217;s a working version of the spider that grabs the proper metadata.</p>
@@ -1893,6 +1933,11 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <updated>2012-06-22T00:31:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/22/wrapping-up-the-word-count-spider</id>
     <content type="html"><![CDATA[<p>Yeesh, I gotta stop writing so late at night&#8230; Last night I was trying to get my spider to follow all the links on the blog&#8217;s archive page and then sum up all the words from every post. Unfortunately I was way too tired to get that to actually work. Tonight I finished that step of the process but it required some ugly code and refactoring our unit tests. Without further adieu&#8230;</p>
+
+<!--more-->
+
+
+
 
 <figure class='code'><figcaption><span>tentacles/lib/tentacles/runner.b</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -2405,6 +2450,9 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>The scraper that I&#8217;m building is supposed to work like a spider and crawl of the pages of my blog. I wasn&#8217;t sure what the best way to do that was so I started Googling and came up with <a href="http://mechanize.rubyforge.org/">Mechanize.</a> There are other tools built on top of Mechanize, like <a href="https://github.com/felipecsl/wombat">Wombat</a>, but since my task is so simple I figured I could just write everything I needed with Mechanize and Nokogiri. It&#8217;s usually a better idea to work with simple tools when you&#8217;re first grasping concepts so you don&#8217;t get lost in the weeds of some high powered framework.</p>
 
+<!--more-->
+
+
 <p>Since it&#8217;s late I&#8217;ll let the code do the talking:</p>
 
 <figure class='code'><figcaption><span>crawler.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -2461,6 +2509,9 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <updated>2012-06-18T08:19:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/18/outputting-json-from-ruby</id>
     <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/">Last night</a> I got the scraper to write an output.txt file which listed all the contents of <code>words_by_selector</code>. Today I want to make it write to JSON instead of plain text and I want to back it with some tests.</p>
+
+<!--more-->
+
 
 <h2>Updating our tests</h2>
 
@@ -2645,6 +2696,9 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>The fact of the matter is I didn&#8217;t know where to take the data. I didn&#8217;t have a design or a layout that I could put it all into. I want to change all that. I want to turn this into something useful. But first I have to make sense of all the code that was written so many weeks ago.</p>
 
+<!--more-->
+
+
 <h2>Tests as documentation&#8230;bullshit.</h2>
 
 <p>Ok ok. I should say it&#8217;s <em>total</em> bullshit to call your tests the documentation because they are helpful. But the fact of the matter is you can get so crafty with RSpec that it makes the tests difficult to read in a useful way. I&#8217;m not saying they&#8217;re illegible, it&#8217;s just that they leverage features which adds to their thought deficit. Before you go off saying that I wrote them wrong and tests should be all the documentation you need&#8230;shutup. They&#8217;re helpful but I would love it if I had written a bit of Markdown Readme to go with all this&#8230;</p>
@@ -2823,6 +2877,9 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <id>http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm</id>
     <content type="html"><![CDATA[<p>Alright, <a href="http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/">contuing from yesterday</a> we want to take our little Node module and make it available to the world as a really awesome command line tool.</p>
 
+<!--more-->
+
+
 <p>The first thing we need to do is register an NPM account.</p>
 
 <p><code>npm adduser</code></p>
@@ -2896,6 +2953,9 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <updated>2012-06-15T19:46:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line</id>
     <content type="html"><![CDATA[<p>This post is going to be short and sweet because I have to help my lady pack for her big trip to Germany. Over the past few days I&#8217;ve been messing around with command line tools written in Ruby so today I decided to give it a shot in Node.</p>
+
+<!--more-->
+
 
 <p>We&#8217;re going to start small in this first post and just get a little script running. After that we&#8217;ll step it up so it can be distributed using NPM, <a href="http://robdodson.me/blog/2012/06/14/how-to-write-a-command-line-ruby-gem/">just like we did with our previous Ruby gem.</a></p>
 
@@ -2971,6 +3031,9 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <content type="html"><![CDATA[<p>So <a href="http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby/">yesterday we saw how to setup and run ruby scripts as executables from the command line.</a> While this is pretty rad, it definitely has its limitations. For one, it&#8217;s not very portable and secondly it just isn&#8217;t very flexible or powerful. If we stuck with this approach we&#8217;d need to write our own semantic versioning, we&#8217;d have to setup a way to make sure that all of our required 3rd party gems get installed properly&#8230; really it&#8217;ll just be a big mess if we try to hand-roll it.</p>
 
 <p>Instead we&#8217;re going to turn to Bundler to help us manage our files and turn our command line tool into a ruby gem. I&#8217;m going to start fresh and create a totally new tool, called <code>zerp</code>. I don&#8217;t know what <code>zerp</code>&#8217;s purpose will be in the long run, but today we&#8217;re going to make it print some text to verify everything is working.</p>
+
+<!--more-->
+
 
 <h2>New RVM Gemset</h2>
 
@@ -3156,6 +3219,9 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <id>http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby</id>
     <content type="html"><![CDATA[<p>Yesterday I tried to do a post on creating your first Ruby Gem as a command line tool. <a href="http://robdodson.me/blog/2012/06/12/messing-around-with-gems/">It didn&#8217;t go very well.</a> In an effort to better understand what goes on with command line tools I&#8217;m going to start from the most basic, a ruby script that is in our <code>PATH</code>.</p>
 
+<!--more-->
+
+
 <p>I&#8217;ve previously added the folder <code>~/bin</code> to my PATH so I know that if I drop an executable script in there I should be able to run it by just typing its name. Let&#8217;s give that a shot. First we&#8217;ll make a new file just called <code>sherp</code> without any file extension. Make sure to <code>chmod 755 sherpa</code> so that it&#8217;s executable. Then we&#8217;ll add the following:</p>
 
 <figure class='code'><figcaption><span>~/bin/sherpa</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -3296,6 +3362,9 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <id>http://robdodson.me/blog/2012/06/12/messing-around-with-gems</id>
     <content type="html"><![CDATA[<p>I want to work on a code generation tool, similar to the one offered up by Rails. However my Ruby-fu is a bit rusty at the moment so this might be an interesting struggle.</p>
 
+<!--more-->
+
+
 <p>The first thing I&#8217;m going to do is create a new gemset with rvm. Our gem is going to be called <code>r2</code> after the much beloved R2D2 so we&#8217;ll also call our gemset <code>r2</code>.</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -3327,6 +3396,9 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <updated>2012-06-11T19:04:00-07:00</updated>
     <id>http://robdodson.me/blog/2012/06/11/some-octopress-rake-tips</id>
     <content type="html"><![CDATA[<p>This is a quick post just to scratch one of my own itches. I&#8217;ve been using Octopress every single day for around two months now and the generation time for my blog is slowly starting to creep up. I&#8217;d heard that you could isolate a post and just preview/generate it instead of doing the whole blog every time but it wasn&#8217;t until today that I finally decided to look into it.</p>
+
+<!--more-->
+
 
 <p>Turns out it&#8217;s really simple. Let&#8217;s say we are going through our usual steps of creating a new post:</p>
 
@@ -3429,6 +3501,9 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <content type="html"><![CDATA[<p>Yesterday I introduced <a href="http://smacss.com/">SMACSS</a> and did my best to give a high level overview of its main ideas. I&#8217;m using it on my current project and I&#8217;m really enjoying it so far. There&#8217;s just something about having things codified by someone with more experience that gives me immense comfort. When I feel confused I can refer back to those docs and sort out what would be the best path. Standing on the shoulders of giants and all that jazz ;)</p>
 
 <p>Today I want to talk about a CSS framework called <a href="http://foundation.zurb.com/">Foundation</a>, written by the team at <a href="http://www.zurb.com/">ZURB.</a> Unlike SMACSS, Foundation is an actual library of modular code ready to help you quickly prototype your project. The two aren&#8217;t mutually exclusive. You might think of Foundation as a shiny new toolbox but SMACSS is going to be your &#8216;How To&#8217; manual, helping you implement all the new goodes that Foundation has to offer.</p>
+
+<!--more-->
+
 
 <p>I&#8217;m sure many of you have heard of <a href="http://twitter.github.com/bootstrap/">Bootstrap</a> which is very similar and somewhat more popular than Foundation. I chose to use Foundation for this post because Bootstrap feels bloated to me, and I also didn&#8217;t want to have to do everything in <a href="http://lesscss.org/">LESS.</a> Don&#8217;t get me wrong, I loves me some LESS and some <a href="http://sass-lang.com/">SASS</a>, but not everyone is comfortable with those tools and it&#8217;s already a big ask to ramp up on a new CSS framework.</p>
 
