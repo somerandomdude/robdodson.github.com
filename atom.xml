@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T10:11:26-07:00</updated>
+  <updated>2012-08-11T10:26:34-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -265,6 +265,11 @@
 
 <hr>
 
+
+<br>
+
+
+<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
 
 <br>
 
@@ -691,6 +696,11 @@ If we were to accidentally define another global <code>addToCart</code> function
 <br>
 
 
+<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
+
+<br>
+
+
 <p>Thanks for reading! If you have questions or feedback please leave a comment below. - Rob</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
@@ -981,6 +991,11 @@ If we were to accidentally define another global <code>addToCart</code> function
 
 <hr>
 
+
+<br>
+
+
+<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
 
 <br>
 
