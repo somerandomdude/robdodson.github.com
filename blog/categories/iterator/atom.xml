@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Iterator | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/iterator/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T08:53:48-07:00</updated>
+  <updated>2012-08-11T09:12:52-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -153,7 +153,7 @@ Google Chrome will swap the order of the keys such that they appear like this:</
 <p><code>js
 { '1': 'hello', '2': 'world', 'foo': 'foo', 'bar': 'bar' };
 </code>
-There are some interesting discussions on StackOverflow which cover this topic but it's a bit outside the scope of this article so I'll just link to them here:</p>
+There are some interesting discussions on StackOverflow which cover this topic but it's a bit outside the scope of this article. If you're interested you can find them here:</p>
 
 <ul>
 <li><a href="http://stackoverflow.com/questions/5773950/how-to-keep-an-javascript-object-array-ordered-while-also-maintaining-key-lookup">How to keep an Javascript object/array ordered while also maintaining key lookups?</a></li>
@@ -177,6 +177,17 @@ There are some interesting discussions on StackOverflow which cover this topic b
 The above script block will not work in Chrome but it should work in the latest version of Firefox. Note the</code>type` attribute of the script tag which instructs the interpreter to handle the code as JS 1.7.</p>
 
 <p>For some further reading on the topic checkout the MDN article which covers <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Iterators_and_Generators">Iterators in JavaScript 1.7</a></p>
+
+<h2>Related Patterns</h2>
+
+<ul>
+<li>Composite: Iterators are often applied to recursive structures such as Composites.</li>
+<li>Factory Method: Polymorphic iterators rely on factory methods to instantiate the appropriate Iterator subclass.</li>
+<li>Memento: Often used in conjunction with the Iterator pattern. An iterator can use a memento to capture the state of an iteration. The iterator stores the memento internally.</li>
+</ul>
+
+
+<p>Thanks for reading! If you have questions or feedback please leave a comment below. - Rob</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>

@@ -307,7 +307,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>There are some interesting discussions on StackOverflow which cover this topic but it&#8217;s a bit outside the scope of this article so I&#8217;ll just link to them here:</p>
+<p>There are some interesting discussions on StackOverflow which cover this topic but it&#8217;s a bit outside the scope of this article. If you&#8217;re interested you can find them here:</p>
 
 <ul>
 <li><a href="http://stackoverflow.com/questions/5773950/how-to-keep-an-javascript-object-array-ordered-while-also-maintaining-key-lookup">How to keep an Javascript object/array ordered while also maintaining key lookups?</a></li>
@@ -333,6 +333,17 @@
 <p>The above script block will not work in Chrome but it should work in the latest version of Firefox. Note the <code>type</code> attribute of the script tag which instructs the interpreter to handle the code as JS 1.7.</p>
 
 <p>For some further reading on the topic checkout the MDN article which covers <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Iterators_and_Generators">Iterators in JavaScript 1.7</a></p>
+
+<h2>Related Patterns</h2>
+
+<ul>
+<li>Composite: Iterators are often applied to recursive structures such as Composites.</li>
+<li>Factory Method: Polymorphic iterators rely on factory methods to instantiate the appropriate Iterator subclass.</li>
+<li>Memento: Often used in conjunction with the Iterator pattern. An iterator can use a memento to capture the state of an iteration. The iterator stores the memento internally.</li>
+</ul>
+
+
+<p>Thanks for reading! If you have questions or feedback please leave a comment below. - Rob</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 </div>
@@ -766,6 +777,20 @@ If we were to accidentally define another global <code>addToCart</code> function
 
 <p>Definitely read <a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript">his full article</a> on the subject since it contains a handful of links to interesting side topics.</p>
 
+<h2>Related Patterns</h2>
+
+<p>Many patterns can be implemented using the Singleton pattern. See Abstract Factory, Builder, and Prototype.</p>
+
+<p><small><cite style="color:#AAA;">Gamma, Erich; Helm, Richard; Johnson, Ralph; Vlissides, John (1994-10-31). Design Patterns: Elements of Reusable Object-Oriented Software. Pearson Education (USA).</cite></small></p>
+
+<hr>
+
+
+<br>
+
+
+<p>Thanks for reading! If you have questions or feedback please leave a comment below. - Rob</p>
+
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 </div>
   
@@ -1069,7 +1094,12 @@ If we were to accidentally define another global <code>addToCart</code> function
 
 <h2>Related Patterns</h2>
 
-<p>Flyweight: Strategy objects often make good flyweights.</p>
+<ul>
+<li>Flyweight: Strategy objects often make good flyweights.</li>
+</ul>
+
+
+<p>Thanks for reading! If you have questions or feedback please leave a comment below. - Rob</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 </div>

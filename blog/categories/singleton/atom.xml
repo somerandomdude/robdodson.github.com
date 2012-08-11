@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Singleton | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/singleton/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T08:53:48-07:00</updated>
+  <updated>2012-08-11T09:12:52-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -297,6 +297,20 @@ console.log( singleA === singleB ); // true
 <p>They're often an indication that modules in a system are either tightly coupled or that logic is overly spread across multiple parts of a codebase. Singletons can be more difficult to test due to issues ranging from hidden dependencies, the difficulty in creating multiple instances, difficulty in stubbing dependencies and so on.</p></blockquote>
 
 <p>Definitely read <a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript">his full article</a> on the subject since it contains a handful of links to interesting side topics.</p>
+
+<h2>Related Patterns</h2>
+
+<p>Many patterns can be implemented using the Singleton pattern. See Abstract Factory, Builder, and Prototype.</p>
+
+<p><small><cite style="color:#AAA;">Gamma, Erich; Helm, Richard; Johnson, Ralph; Vlissides, John (1994-10-31). Design Patterns: Elements of Reusable Object-Oriented Software. Pearson Education (USA).</cite></small></p>
+
+<hr>
+
+
+<br>
+
+
+<p>Thanks for reading! If you have questions or feedback please leave a comment below. - Rob</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 ]]></content>
