@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-11T08:47:31-07:00</updated>
+  <updated>2012-08-11T08:52:22-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -103,7 +103,7 @@
 
 <p><code>next</code> will return the next value and advance the index by 3.</p>
 
-<p><code>hasNext</code> will check to see if calling <code>next</code> will actually return an item. Useful for indicating when we&#8217;ve reached the end of a collection.</p>
+<p><code>hasNext</code> will check to see if calling <code>next</code> will actually return an item. Good for indicating when we&#8217;ve reached the end of a collection.</p>
 
 <p><code>rewind</code> will return the index to the beginning so we can loop over the collection again.</p>
 
@@ -975,7 +975,7 @@ If we were to accidentally define another global <code>addToCart</code> function
 <li>Chain of Responsibility</li>
 <li>Command</li>
 <li>Interpreter</li>
-<li>Iterator</li>
+<li><a href="http://robdodson.me/blog/2012/08/10/javascript-design-patterns-iterator/">Iterator</a></li>
 <li>Mediator</li>
 <li>Memento</li>
 <li>Null Object</li>
