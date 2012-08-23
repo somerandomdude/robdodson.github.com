@@ -9,7 +9,29 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Short post tonight because I spent so much time figuring out the code. It&#8217;s late and my brain is firing on about 1 cylinder so it took longer &hellip;">
+  <meta name="description" content="1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+require &#39;mechanize&#39; # Create a new instance of Mechanize and grab our page
+agent = &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +96,100 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/06/21/quick-spider-example/">Quick Spider Example</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-06-21T01:27:00-07:00" pubdate data-updated="true">Jun 21<span>st</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;mechanize&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Create a new instance of Mechanize and grab our page</span>
+</span><span class='line'><span class="n">agent</span> <span class="o">=</span> <span class="no">Mechanize</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'><span class="n">page</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;http://robdodson.me/blog/archives/&#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Find all the links on the page that are contained within</span>
+</span><span class='line'><span class="c1"># h1 tags.</span>
+</span><span class='line'><span class="n">post_links</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">find_all</span> <span class="p">{</span> <span class="o">|</span><span class="n">l</span><span class="o">|</span> <span class="n">l</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;h1&#39;</span> <span class="p">}</span>
+</span><span class='line'><span class="n">post_links</span><span class="o">.</span><span class="n">shift</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c1"># Follow each link and print out its title</span>
+</span><span class='line'><span class="n">post_links</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">link</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">post</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">click</span>
+</span><span class='line'>    <span class="n">doc</span> <span class="o">=</span> <span class="n">post</span><span class="o">.</span><span class="n">parser</span>
+</span><span class='line'>    <span class="nb">p</span> <span class="n">doc</span><span class="o">.</span><span class="n">css</span><span class="p">(</span><span class="s1">&#39;.entry-title&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Having a horrible time getting anything to run tonight. The code from above is a continuation from yesterday&#8217;s post except this time we&#8217;re finding every link on the page, then following that link and spitting out its title. Using this formula you could build something entirely recursive which acts as a full blown spider.</p>
+
+<p>Unfortunately getting this to integrate into the existing app is not working for me tonight. Coding anything after 11 pm is usually a bad call, so I&#8217;m going to shut it down and try again in the morning.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+
+<ul>
+<li>Time: 1:28 am</li>
+<li>Mood: Tired, Annoyed</li>
+<li>Sleep: 6</li>
+<li>Hunger: 0</li>
+<li>Coffee: 1</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -450,49 +566,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/06/10/building-a-responsive-grid-with-foundation/">Building a Responsive Grid With Foundation</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-10T20:24:00-07:00" pubdate data-updated="true">Jun 10<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Yesterday I introduced <a href="http://smacss.com/">SMACSS</a> and did my best to give a high level overview of its main ideas. I&#8217;m using it on my current project and I&#8217;m really enjoying it so far. There&#8217;s just something about having things codified by someone with more experience that gives me immense comfort. When I feel confused I can refer back to those docs and sort out what would be the best path. Standing on the shoulders of giants and all that jazz ;)</p>
-
-<p>Today I want to talk about a CSS framework called <a href="http://foundation.zurb.com/">Foundation</a>, written by the team at <a href="http://www.zurb.com/">ZURB.</a> Unlike SMACSS, Foundation is an actual library of modular code ready to help you quickly prototype your project. The two aren&#8217;t mutually exclusive. You might think of Foundation as a shiny new toolbox but SMACSS is going to be your &#8216;How To&#8217; manual, helping you implement all the new goodes that Foundation has to offer.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/06/10/building-a-responsive-grid-with-foundation/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -510,6 +583,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/16/javascript-design-patterns-observer/">JavaScript Design Patterns: Observer</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/10/javascript-design-patterns-iterator/">JavaScript Design Patterns: Iterator</a>
       </li>
     
@@ -523,10 +600,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns: Table of Contents</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/25/ending-my-first-chain/">Ending My First Chain</a>
       </li>
     
   </ul>

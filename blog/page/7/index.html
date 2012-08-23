@@ -9,7 +9,10 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="I&#8217;m going to try to write this as a bit of a lightening post to see if I can bring down the time it takes me to produce something. Octopress is &hellip;">
+  <meta name="description" content="Coming from JavaScript I&#8217;m very accustomed to doing something like this: Javascript1
+2
+3
+var person = { name: &#39;Rob&#39;, city: &#39;San &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -74,6 +77,75 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/01/ruby-objects-and-dot-syntax/">Ruby Objects and Dot Syntax</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-01T07:37:00-07:00" pubdate data-updated="true">May 1<span>st</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Coming from JavaScript I&#8217;m very accustomed to doing something like this:</p>
+
+<figure class='code'><figcaption><span>Javascript</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">person</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="nx">city</span><span class="o">:</span> <span class="s1">&#39;San Francisco&#39;</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span> <span class="nx">person</span><span class="p">.</span><span class="nx">city</span> <span class="p">);</span>   <span class="c1">// &#39;San Francisco&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Using dot syntax to access a <code>Hash</code> is second nature to me. That&#8217;s why I was surprised when I ran into the following error yesterday while writing some Ruby.</p>
+
+<figure class='code'><figcaption><span>Ruby</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">person</span> <span class="o">=</span> <span class="p">{</span><span class="nb">name</span><span class="p">:</span> <span class="s1">&#39;Rob&#39;</span><span class="p">,</span> <span class="n">city</span><span class="p">:</span> <span class="s1">&#39;San Francisco&#39;</span><span class="p">}</span>
+</span><span class='line'> <span class="o">=&gt;</span> <span class="p">{</span><span class="ss">:name</span><span class="o">=&gt;</span><span class="s2">&quot;Rob&quot;</span><span class="p">,</span> <span class="ss">:city</span><span class="o">=&gt;</span><span class="s2">&quot;San Francisco&quot;</span><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">puts</span> <span class="n">person</span><span class="o">.</span><span class="n">city</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">NoMethodError</span><span class="p">:</span> <span class="n">undefined</span> <span class="nb">method</span> <span class="sb">`city&#39; for {:name=&gt;&quot;Rob&quot;, :city=&gt;&quot;San Francisco&quot;}:Hash</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>&#8220;Hmm, weird,&#8221; I thought. I know I&#8217;ve seen dot syntax used in Ruby before..what gives?</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/05/01/ruby-objects-and-dot-syntax/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -385,6 +457,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/16/javascript-design-patterns-observer/">JavaScript Design Patterns: Observer</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/10/javascript-design-patterns-iterator/">JavaScript Design Patterns: Iterator</a>
       </li>
     
@@ -398,10 +474,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns: Table of Contents</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/06/25/ending-my-first-chain/">Ending My First Chain</a>
       </li>
     
   </ul>
