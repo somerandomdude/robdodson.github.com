@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-27T23:15:41-07:00</updated>
+  <updated>2012-08-27T23:18:28-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -1949,7 +1949,7 @@ If we were to accidentally define another global <code>addToCart</code> function
 <li>Adapter</li>
 <li>Bridge</li>
 <li>Composite</li>
-<li>Decorator</li>
+<li><a href="http://robdodson.me/blog/2012/08/27/javascript-design-patterns-decorator/">Decorator</a></li>
 <li>Facade</li>
 <li>Flyweight</li>
 <li>Private Class Data</li>
