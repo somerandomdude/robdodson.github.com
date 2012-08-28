@@ -9,10 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Coming from JavaScript I&#8217;m very accustomed to doing something like this: Javascript1
-2
-3
-var person = { name: &#39;Rob&#39;, city: &#39;San &hellip;">
+  <meta name="description" content=".chart { font-family: Arial, sans-serif; font-size: 10px; } .bar { fill: steelblue; } .axis path, .axis line { fill: none; stroke: #000; shape- &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -96,6 +93,92 @@ var person = { name: &#39;Rob&#39;, city: &#39;San &hellip;">
   </section>
 </div>
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/02/d3-js-and-octopress/">D3.js and Octopress</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-02T07:20:00-07:00" pubdate data-updated="true">May 2<span>nd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><!-- CSS Styles: -->
+
+
+<div>
+  <style type="text/css">
+
+    .chart {
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+    }
+
+    .bar {
+      fill: steelblue;
+    }
+
+    .axis path, .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+  </style>
+</div>
+
+
+
+
+<!-- Global Variables and Handlers: -->
+
+
+<script type="text/javascript">
+
+  var data = [1, 1, 2, 3, 5, 8];
+
+  var margin = {top: 40, right: 40, bottom: 40, left: 40},
+      width = $('.entry-content').width(),
+      height = 300;
+
+  $(window).resize(function() {
+    width = $('.entry-content').width();
+  });
+
+</script>
+
+
+<p>This morning I was hoping to cover some of the basics of using D3.js. Along the way I realized I really wanted people to be able to see the graphs on the blog itself. I <em>could</em> have used JSFiddle, but I didn&#8217;t like all that chrome repeated across the page. So I came up with my own solution with a little bit of hacking :)</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/05/02/d3-js-and-octopress/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -476,6 +559,10 @@ var person = { name: &#39;Rob&#39;, city: &#39;San &hellip;">
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/27/javascript-design-patterns-decorator/">JavaScript Design Patterns: Decorator</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/16/javascript-design-patterns-observer/">JavaScript Design Patterns: Observer</a>
       </li>
     
@@ -489,10 +576,6 @@ var person = { name: &#39;Rob&#39;, city: &#39;San &hellip;">
     
       <li class="post">
         <a href="/blog/2012/08/03/javascript-design-patterns-strategy/">JavaScript Design Patterns: Strategy</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns: Table of Contents</a>
       </li>
     
   </ul>

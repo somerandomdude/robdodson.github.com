@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-24T14:09:58-07:00</updated>
+  <updated>2012-08-27T23:15:41-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,538 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript Design Patterns: Decorator]]></title>
+    <link href="http://robdodson.me/blog/2012/08/27/javascript-design-patterns-decorator/"/>
+    <updated>2012-08-27T09:59:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/08/27/javascript-design-patterns-decorator</id>
+    <content type="html"><![CDATA[<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
+
+<p>A Decorator is an object which adds functionality to another object dynamically. It can be used to enhance the behavior of an object without requiring the author to reopen its class. While Decorators might feel a little weird to implement in static languages they&#8217;re extremely simple in JavaScript due to the ease with with JS passes around functions and handles dynamic types.</p>
+
+<!--more-->
+
+
+<h2>Formal Definition</h2>
+
+<blockquote><p>Attach additional responsibilities to an object dynamically. Decorators provide a flexible alternative to subclassing for extending functionality.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote>
+
+
+<h3>Also Known As</h3>
+
+<ul>
+<li>Wrapper</li>
+</ul>
+
+
+<h2>When to use it</h2>
+
+<ul>
+<li><p>When you&#8217;d like to add responsibilities to individual objects dynamically (i.e. without subclassing/inheritence).</p></li>
+<li><p>When you&#8217;d like to be able to remove the functionality at a later time. An <code>undecorate</code> method, for instance.</p></li>
+<li><p>When extension by subclassing would be unmanageable or lead to a class explosion. For instance, if a <code>Vehicle</code> class is subclassed by 30 other vehicle objects with only minor differences.</p></li>
+</ul>
+
+
+<h2>Pros and Cons</h2>
+
+<ul>
+<li><p><strong>Pro</strong>: More flexible than inheritance.</p></li>
+<li><p><strong>Pro</strong>: Avoids feature-laden classes high up in the hierarchy.</p></li>
+<li><p><strong>Con</strong>: A decorator and its component aren’t identical.</p></li>
+<li><p><strong>Con</strong>: Lots of little objects.</p></li>
+</ul>
+
+
+<h2>A Brief Explanation</h2>
+
+<p>The Decorator pattern is very similar to one we&#8217;ve addressed earlier, called <a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns-strategy/">Strategy.</a> The differences between the two can be subtle but usually a decorator <em>enhances</em>, layers upon or &#8220;decorates&#8221; the object or method it&#8217;s wrapping. In contrast, a strategy will replace a method&#8217;s algorithm completely.</p>
+
+<p>The primary benefit of the Decorator pattern is that you can take a rather vanilla object and wrap it in more advanced behaviors. For instance a view which renders a plain window can have decorators to add different backgrounds, scroll bars, borders, etc. The underlying code, or guts, of the window object remains the same while the decorators provide a new <em>skin.</em></p>
+
+<p>Decorators are not limited to visual components. In fact much of the <code>java.io</code> package is composed of Decorators which add additional functionality such as buffering file streams and adding line numbers. A similar application to JavaScript might involve decorating I/O in Node.js. For instance, incoming data might need to be converted to ASCII and then compressed in some way. It might not <em>always</em> need to be converted to ASCII and it might not <em>always</em> need to be compressed. In this scenario we can apply or remove I/O decorators at runtime changing the behavior of our object instead of writing a big class with a bunch of cross-cutting concerns.</p>
+
+<h2>Enough Talk! COOOOODE!!!</h2>
+
+<p>Ok so let&#8217;s do an example. We&#8217;re going to create a <code>Validator</code> class which looks at the contents of a form and adds error messages to an array if anything in the form is not correct. We want our <code>Validator</code> to be really simple so it&#8217;ll just have two methods: <code>validate</code> and <code>decorate</code>. As the name implies <code>validate</code> will tell our validator to compare the form against its internal rules. We&#8217;ll use <code>decorate</code> to specify those rules. The <code>decorate</code> method will accept a String, such as &#8216;hasAge&#8217; or &#8216;hasZipCode&#8217; which corresponds to an actual function. We&#8217;ll collect these functions in a list and compare the contents of the form to each item in the list.</p>
+
+<p>We&#8217;ll start with the constructor and <code>decorate</code> method:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">Validator</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">errors</span> <span class="o">=</span> <span class="p">[];</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">decoratorsList</span> <span class="o">=</span> <span class="p">[];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Validator</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">decorate</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">decoratorsList</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">name</span><span class="p">);</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We&#8217;ll collect any error messages in the <code>errors</code> array. We could write a method like <code>validator.hasErrors()</code> to check the length and contents of the array but for now I&#8217;ll leave that unspecified. Just know that if we do come across an error we&#8217;ll toss it in there.</p>
+
+<p>The <code>decoratorsList</code> will hold all of our decorator functions. This is not how the Gang of Four does things, or how you will see the Decorator pattern presented in languages like Java or C++, but that&#8217;s because they&#8217;re using static languages which don&#8217;t do well with functions being passed around. In our case since JavaScript functions are objects we can pass our decorators into a collection to have them called sequentially. This is the easier approach recommended by <a href="https://twitter.com/stoyanstefanov">Stoyan Stefanov</a> in <a href="http://www.amazon.com/JavaScript-Patterns-Stoyan-Stefanov/dp/0596806752">JavaScript Patterns.</a> A little later I&#8217;ll show you the &#8220;hard&#8221; approach and you can decide which you prefer ;)</p>
+
+<p>OK moving on&#8230; Let&#8217;s define some decorator functions. We&#8217;ll add an object to our constructor called <code>decorators</code> and we&#8217;ll attach our functions to it.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Validator</span><span class="p">.</span><span class="nx">decorators</span> <span class="o">=</span> <span class="p">{};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Validator</span><span class="p">.</span><span class="nx">decorators</span><span class="p">.</span><span class="nx">hasName</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">validate</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">form</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// Code to verify presence of name...</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// If no name found...</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;no name!&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Validator</span><span class="p">.</span><span class="nx">decorators</span><span class="p">.</span><span class="nx">hasAge</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">validate</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">form</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// Code to verify presence of age...</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// If no age found...</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;no age!&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Validator</span><span class="p">.</span><span class="nx">decorators</span><span class="p">.</span><span class="nx">hasZipCode</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">validate</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">form</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// Code to verify presence of zip code...</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="c1">// If no zip found...</span>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;no zip!&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Each decorator is actually an object which implements the same interface as our <code>Validator</code> object. When we have all of our decorators added to our <code>decoratorsList</code> we&#8217;ll be able to loop through and call <code>validate</code> on each one.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Validator</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">validate</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">form</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">i</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">max</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">name</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">form</span> <span class="o">=</span> <span class="nx">form</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">max</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">decoratorsList</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">max</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">name</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">decoratorsList</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+</span><span class='line'>      <span class="nx">Validator</span><span class="p">.</span><span class="nx">decorators</span><span class="p">[</span><span class="nx">name</span><span class="p">].</span><span class="nx">validate</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">form</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>At last we come to the <code>validate</code> method. It first receives an object containing all of our form data. Next it prepares to loop through our collection of decorators. We use the name of the decorator object as a key and <code>call</code> its <code>validate</code> method, passing in <code>this</code> for our context and also the form object as an argument. This way all of the validators will execute in the context of our <code>Validator</code> instance and they should all have access to the form data.</p>
+
+<p>Let&#8217;s try it out!</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Validator</span><span class="p">();</span>
+</span><span class='line'><span class="nx">validator</span><span class="p">.</span><span class="nx">decorate</span><span class="p">(</span><span class="s1">&#39;hasName&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">validator</span><span class="p">.</span><span class="nx">decorate</span><span class="p">(</span><span class="s1">&#39;hasAge&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">validator</span><span class="p">.</span><span class="nx">decorate</span><span class="p">(</span><span class="s1">&#39;hasZipCode&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">validator</span><span class="p">.</span><span class="nx">validate</span><span class="p">({});</span> <span class="c1">// we&#39;ll just use a blank object in place of real form data</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">validator</span><span class="p">.</span><span class="nx">errors</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We aren&#8217;t really doing any validation at this point so our <code>console.log</code> at the end should output an array with 3 error messages, one from each of the validator decorators. But there you go, you&#8217;ve now got a fully decorated <code>validate</code> function. What was once rather vanilla can have all sorts of new and interesting validations applied to it!</p>
+
+<h2>What if my Decorators need additional arguments?</h2>
+
+<p>The above example gets us started decorating but it leaves some room for improvement. For starters what if we want to pass additional arguments to our validation functions? Let&#8217;s revamp this thing just a bit so we can get really fancy&#8230;</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">Validator</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">errors</span> <span class="o">=</span> <span class="p">[];</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">decoratorsList</span> <span class="o">=</span> <span class="p">[];</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Validator</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">decorate</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">decoratorsList</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span> <span class="nx">name</span><span class="o">:</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">args</span><span class="o">:</span> <span class="nx">args</span> <span class="p">});</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Validator</span><span class="p">.</span><span class="nx">decorators</span> <span class="o">=</span> <span class="p">{};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Validator</span><span class="p">.</span><span class="nx">decorators</span><span class="p">.</span><span class="nx">hasName</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">validate</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">form</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// Code to verify presence of name...</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;no name!&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Validator</span><span class="p">.</span><span class="nx">decorators</span><span class="p">.</span><span class="nx">hasAge</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">validate</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">form</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// Code to verify presence of age...</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;no age!&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Validator</span><span class="p">.</span><span class="nx">decorators</span><span class="p">.</span><span class="nx">hasZipCode</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">validate</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">form</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="c1">// Code to verify presence of zip code...</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">this</span><span class="p">.</span><span class="nx">errors</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;no zip!&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Validator</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">validate</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">form</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">i</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">max</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">temp</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">name</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">args</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">form</span> <span class="o">=</span> <span class="nx">form</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">max</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">decoratorsList</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+</span><span class='line'>  <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">max</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">temp</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">decoratorsList</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+</span><span class='line'>      <span class="nx">name</span> <span class="o">=</span> <span class="nx">temp</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+</span><span class='line'>      <span class="nx">args</span> <span class="o">=</span> <span class="nx">temp</span><span class="p">.</span><span class="nx">args</span><span class="p">;</span>
+</span><span class='line'>      <span class="nx">Validator</span><span class="p">.</span><span class="nx">decorators</span><span class="p">[</span><span class="nx">name</span><span class="p">].</span><span class="nx">validate</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">form</span><span class="p">,</span> <span class="nx">args</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">};</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This time we are passing an optional hash to our <code>decorate</code> method which is stored along with its corresponding decorator object. If you&#8217;ve ever used validators in Rails this should feel similar. Time to see it in action!</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Validator</span><span class="p">();</span>
+</span><span class='line'><span class="nx">validator</span><span class="p">.</span><span class="nx">decorate</span><span class="p">(</span><span class="s1">&#39;hasName&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">length</span><span class="o">:</span> <span class="mi">5</span> <span class="p">});</span>
+</span><span class='line'><span class="nx">validator</span><span class="p">.</span><span class="nx">decorate</span><span class="p">(</span><span class="s1">&#39;hasAge&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">minimum</span><span class="o">:</span> <span class="mi">21</span> <span class="p">});</span>
+</span><span class='line'><span class="nx">validator</span><span class="p">.</span><span class="nx">decorate</span><span class="p">(</span><span class="s1">&#39;hasZipCode&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">validator</span><span class="p">.</span><span class="nx">validate</span><span class="p">({});</span> <span class="c1">// some form data. in this case just an anonymous object</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">validator</span><span class="p">.</span><span class="nx">errors</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Time to do things the hard way&#8230;</h2>
+
+<p>I promised I would show you the more classical example of Decorator and since I am a man of my word I <em>guess</em> you can see it&#8230; I haven&#8217;t used Decorators enough to say for certain if this is an unnecessarily complex approach—perhaps it has its benefits—but I don&#8217;t think I&#8217;d recommend it over our previous examples. I&#8217;m taking this code almost verbatim from <a href="http://www.amazon.com/JavaScript-Patterns-Stoyan-Stefanov/dp/0596806752">JavaScript Patterns</a> so full credit goes to Stoyan for coming up with it.</p>
+
+<p>In this example we&#8217;re going to format a Sale price so that it can work for both U.S. and Canadian stores. This means applying different tax rates and outputting the text with different currency symbols.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">Sale</span><span class="p">(</span><span class="nx">price</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">price</span> <span class="o">=</span> <span class="nx">price</span> <span class="o">||</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Sale</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getPrice</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">price</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Things start off very similar to our last example. Instead of <code>validate</code> the method we&#8217;re interested in this time is <code>getPrice</code>. If you&#8217;ve been paying attention you&#8217;ll notice that in our previous example <code>validate</code> was rather complex. Yet <code>getPrice</code> is so&#8230;simple. Hmm&#8230;</p>
+
+<p>Let&#8217;s move on to the decorators.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Sale</span><span class="p">.</span><span class="nx">decorators</span> <span class="o">=</span> <span class="p">{};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Sale</span><span class="p">.</span><span class="nx">decorators</span><span class="p">.</span><span class="nx">fedtax</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">getPrice</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">price</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_super</span><span class="p">.</span><span class="nx">getPrice</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">price</span> <span class="o">+=</span> <span class="nx">price</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">/</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nx">price</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Sale</span><span class="p">.</span><span class="nx">decorators</span><span class="p">.</span><span class="nx">quebec</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">getPrice</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="kd">var</span> <span class="nx">price</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">_super</span><span class="p">.</span><span class="nx">getPrice</span><span class="p">();</span>
+</span><span class='line'>      <span class="nx">price</span> <span class="o">+=</span> <span class="nx">price</span> <span class="o">*</span> <span class="mf">7.5</span> <span class="o">/</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class='line'>      <span class="k">return</span> <span class="nx">price</span><span class="p">;</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Sale</span><span class="p">.</span><span class="nx">decorators</span><span class="p">.</span><span class="nx">usd</span> <span class="o">=</span> <span class="p">{</span> <span class="c1">// U.S. dollars</span>
+</span><span class='line'>  <span class="nx">getPrice</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="s2">&quot;$&quot;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">_super</span><span class="p">.</span><span class="nx">getPrice</span><span class="p">().</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Sale</span><span class="p">.</span><span class="nx">decorators</span><span class="p">.</span><span class="nx">cdn</span> <span class="o">=</span> <span class="p">{</span> <span class="c1">// Canadian dollars</span>
+</span><span class='line'>  <span class="nx">getPrice</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="s2">&quot;CDN$&quot;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">_super</span><span class="p">.</span><span class="nx">getPrice</span><span class="p">().</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This may look similar to the last example but take note of the use of <code>_super</code>. The <code>_super</code> property is actually a reference to a parent class instance. We&#8217;ll use this reference to travel up the chain of decorators, performing an operation and returning the price at each stop.</p>
+
+<p>This leads us to the <code>decorate</code> method:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">Sale</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">decorate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">decorator</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">F</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{},</span>
+</span><span class='line'>  <span class="nx">overrides</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">constructor</span><span class="p">.</span><span class="nx">decorators</span><span class="p">[</span><span class="nx">decorator</span><span class="p">],</span>
+</span><span class='line'>  <span class="nx">i</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">newobj</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Create prototype chain</span>
+</span><span class='line'>  <span class="nx">F</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span><span class='line'>  <span class="nx">newobj</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">F</span><span class="p">();</span>
+</span><span class='line'>  <span class="nx">newobj</span><span class="p">.</span><span class="nx">_super</span> <span class="o">=</span> <span class="nx">F</span><span class="p">.</span><span class="nx">prototype</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// Mixin properties/methods of our decorator</span>
+</span><span class='line'>  <span class="c1">// Overriding the ones from our prototype</span>
+</span><span class='line'>  <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="k">in</span> <span class="nx">overrides</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span> <span class="p">(</span><span class="nx">overrides</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">i</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">newobj</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">overrides</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">newobj</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you&#8217;re unfamiliar with JavaScript prototypes this can look a little daunting. We&#8217;re using a pattern that <a href="http://www.amazon.com/JavaScript-Patterns-Stoyan-Stefanov/dp/0596806752">JavaScript Patterns</a> refers to as <em>Rented Constructor</em> in order to essentially take a snapshot of our current object, store it in <code>_super</code> and then mixin new decorator methods. Let&#8217;s see it in action to clarify things a bit better.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">sale</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Sale</span><span class="p">(</span><span class="mi">50</span><span class="p">);</span>
+</span><span class='line'><span class="nx">sale</span> <span class="o">=</span> <span class="nx">sale</span><span class="p">.</span><span class="nx">decorate</span><span class="p">(</span><span class="s1">&#39;fedtax&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">sale</span> <span class="o">=</span> <span class="nx">sale</span><span class="p">.</span><span class="nx">decorate</span><span class="p">(</span><span class="s1">&#39;cdn&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">sale</span><span class="p">.</span><span class="nx">getPrice</span><span class="p">());</span> <span class="c1">// outputs $CDN52.50</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You&#8217;ll notice that each time we call <code>decorate</code> we have to re-assign the sale variable to a new instance. Each new instance has a reference to the previous sale object. When we finally call <code>getPrice</code> it walks up this chain of instances and calls <code>getPrice</code> on each stop along the way. In the end we have something which is functionally identical to our first example but potentially a lot harder to understand. In other words, stick with the first approach :D</p>
+
+<h2>The Open-Closed Principle</h2>
+
+<p>I&#8217;m going to go off on a quick tangent here because of something I saw in <a href="http://www.amazon.com/First-Design-Patterns-Elisabeth-Freeman/dp/0596007124">Head First Design Patterns.</a> There&#8217;s a common heuristic in software design known as the <strong>Open-Closed Principle</strong> which states that &#8220;classes should be open for extension but closed for modification.&#8221; Let&#8217;s explore this concept with our Sale object.</p>
+
+<p>Consider the following bit of code:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">function</span> <span class="nx">Sale</span><span class="p">(</span><span class="nx">price</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">this</span><span class="p">.</span><span class="nx">price</span> <span class="o">=</span> <span class="nx">price</span> <span class="o">||</span> <span class="mi">100</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Sale</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getPrice</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">price</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You should be able to look at this snippet of code and say that it&#8217;s almost certainly bug free. Now let&#8217;s pretend we aren&#8217;t using decorators and our boss comes to us and says we need to add US and Canadian taxes and currency symbols.</p>
+
+<p>&#8220;<em>Hm&#8230;I guess that means I&#8217;ll need to pass those parameters into the constructor and then write some booleans or something to check if we&#8217;re Canadian or US&#8230; Or maybe I&#8217;ll put them all in a hash&#8230; Or&#8230;</em>&#8221;</p>
+
+<p>Regardless of what we choose to do, if it involves opening up the class then there&#8217;s a chance that we&#8217;ll compromise our previous snippet of code. The more times we do this the more we increase the likelihood that we&#8217;ll introduce a bug which might go uncaught for a long time. Eventually what started off as extremely simple, bug-free code, can turn into a rat&#8217;s nest.</p>
+
+<p>So, where possible, try to avoid reopening classes and find ways to extend their functionality. This can mean simply subclassing the parent, or using one of the many design patterns we&#8217;ll be covering.</p>
+
+<h2>Related Patterns</h2>
+
+<ul>
+<li><p>Adapter: A decorator is different from an adapter in that a decorator only changes an object’s responsibilities, not its interface; an adapter will give an object a completely new interface.</p></li>
+<li><p>Composite: A decorator can be viewed as a degenerate composite with only one component. However, a decorator adds additional responsibilities—it isn&#8217;t intended for object aggregation.</p></li>
+<li><p><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns-strategy/">Strategy:</a> A decorator lets you change the skin of an object; a strategy lets you change the guts. These are two alternative ways of changing an object.</p></li>
+</ul>
+
+
+<p><small><cite style="color:#AAA;">Gamma, Erich; Helm, Richard; Johnson, Ralph; Vlissides, John (1994-10-31). Design Patterns: Elements of Reusable Object-Oriented Software. Pearson Education (USA).</cite></small></p>
+
+<hr>
+
+
+<br>
+
+
+<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
+
+<br>
+
+
+<p>Thanks for reading! If you have questions or feedback please leave a comment below. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[JavaScript Design Patterns: Observer]]></title>
@@ -3788,109 +4320,6 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 <li>Sleep: 6</li>
 <li>Hunger: 8</li>
 <li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Some Octopress Rake Tips]]></title>
-    <link href="http://robdodson.me/blog/2012/06/11/some-octopress-rake-tips/"/>
-    <updated>2012-06-11T19:04:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/11/some-octopress-rake-tips</id>
-    <content type="html"><![CDATA[<p>This is a quick post just to scratch one of my own itches. I&#8217;ve been using Octopress every single day for around two months now and the generation time for my blog is slowly starting to creep up. I&#8217;d heard that you could isolate a post and just preview/generate it instead of doing the whole blog every time but it wasn&#8217;t until today that I finally decided to look into it.</p>
-
-<!--more-->
-
-
-<p>Turns out it&#8217;s really simple. Let&#8217;s say we are going through our usual steps of creating a new post:</p>
-
-<p><code>rake new_post["Today is a Wonderful Day"]</code></p>
-
-<p>Now that we have our post ready we can isolate it from all the others:</p>
-
-<p><code>rake isolate[wonderful-day]</code></p>
-
-<p>Notice I didn&#8217;t pass in the entire filename? That&#8217;s because the Rake task inspects each of our posts and stashes anything that doesn&#8217;t include the String &#8216;wonderful-day&#8217; in the filename.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">Dir</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">#{</span><span class="n">source_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="n">posts_dir</span><span class="si">}</span><span class="s2">/*.*&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">post</span><span class="o">|</span>
-</span><span class='line'>    <span class="no">FileUtils</span><span class="o">.</span><span class="n">mv</span> <span class="n">post</span><span class="p">,</span> <span class="n">stash_dir</span> <span class="k">unless</span> <span class="n">post</span><span class="o">.</span><span class="n">include?</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now that our post is isolated we can preview it, like we always do:</p>
-
-<p><code>rake preview</code></p>
-
-<p>Write a little bit, save, and hit <code>localhost:4000</code> to see your super speedy blog post!</p>
-
-<p>When we&#8217;re all done we integrate the post back in with the rest of our blog.</p>
-
-<p><code>rake integrate</code></p>
-
-<p>And finally we generate and deploy it, which can be done in a single command:</p>
-
-<p><code>rake gen_deploy</code></p>
-
-<p>There are a few other useful rake tasks, you can see the whole list by running:</p>
-
-<p><code>rake -T</code></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">rake</span> <span class="n">clean</span>                     <span class="c1"># Clean out caches: .pygments-cache, .gist-cache, .sass-cache</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">copydot</span><span class="o">[</span><span class="n">source</span><span class="p">,</span><span class="n">dest</span><span class="o">]</span>      <span class="c1"># copy dot files for deployment</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">deploy</span>                    <span class="c1"># Default deploy task</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">gen_deploy</span>                <span class="c1"># Generate website and deploy</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">generate</span>                  <span class="c1"># Generate jekyll site</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">install</span><span class="o">[</span><span class="n">theme</span><span class="o">]</span>            <span class="c1"># Initial setup for Octopress: copies the default theme into the path of Jekyll&#39;s generator.</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">integrate</span>                 <span class="c1"># Move all stashed posts back into the posts directory, ready for site generation.</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">isolate</span><span class="o">[</span><span class="n">filename</span><span class="o">]</span>         <span class="c1"># Move all other posts than the one currently being worked on to a temporary stash location (stas...</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">list</span>                      <span class="c1"># list tasks</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">new_page</span><span class="o">[</span><span class="n">filename</span><span class="o">]</span>        <span class="c1"># Create a new page in source/(filename)/index.markdown</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">new_post</span><span class="o">[</span><span class="n">title</span><span class="o">]</span>           <span class="c1"># Begin a new post in source/_posts</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">preview</span>                   <span class="c1"># preview the site in a web browser</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">push</span>                      <span class="c1"># deploy public directory to github pages</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">rsync</span>                     <span class="c1"># Deploy website via rsync</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">set_root_dir</span><span class="o">[</span><span class="n">dir</span><span class="o">]</span>         <span class="c1"># Update configurations to support publishing to root or sub directory</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">setup_github_pages</span><span class="o">[</span><span class="n">repo</span><span class="o">]</span>  <span class="c1"># Set up _deploy folder and deploy branch for Github Pages deployment</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">update_source</span><span class="o">[</span><span class="n">theme</span><span class="o">]</span>      <span class="c1"># Move source to source.old, install source theme updates, replace source/_includes/navigation.ht...</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">update_style</span><span class="o">[</span><span class="n">theme</span><span class="o">]</span>       <span class="c1"># Move sass to sass.old, install sass theme updates, replace sass/custom with sass.old/custom</span>
-</span><span class='line'><span class="n">rake</span> <span class="n">watch</span>                     <span class="c1"># Watch the site and regenerate when it changes</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I&#8217;m looking forward to trying out Octopress 2.1 as it includes <a href="https://github.com/imathis/octopress/pull/207">a more streamlined generate task</a> as well as some other nifty features. - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:18 pm</li>
-<li>Mood: Caffeinated</li>
-<li>Sleep: 7</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
 </ul>
 
 ]]></content>

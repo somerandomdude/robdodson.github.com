@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="I want to talk a bit more about the Backbone Router because I think it&#8217;s one of the first pieces of the framework that people run up against &hellip;">
+  <meta name="description" content="CSS3 is a rather verbose tool especially when it comes to transitions and animations. I want to see if there&#8217;s a way to clean a lot of that up &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -93,6 +93,97 @@
   </section>
 </div>
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/22/css3-transitions-with-gfx/">CSS3 Transitions With GFX</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-22T08:06:00-07:00" pubdate data-updated="true">May 22<span>nd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>CSS3 is a rather verbose tool especially when it comes to transitions and animations. I want to see if there&#8217;s a way to clean a lot of that up with either a SASS mixin or a jQuery library like <a href="http://maccman.github.com/gfx/">gfx.</a></p>
+
+<p>We&#8217;ll try to do something simple at first to recreate an animation like the one we have below.</p>
+
+<p><small>Rollover the grey area to activate it.</small></p>
+
+<!-- CSS Styles: -->
+
+
+<div>
+  <style type="text/css">
+    .container {
+      width: 300px;
+      height: 300px;
+      position: relative;
+      background-color: #CCC;
+    }
+
+    #example1 .container:hover .widget {
+      background-color: red;
+      left: 200px;
+      top: 200px;
+    }
+
+    #example1 .widget {
+      background-color: black;
+      left: 10px;
+      position: absolute;
+      top: 10px;
+      width: 20px;
+      height: 20px;
+      -webkit-transition: background-color 1s linear, left 1s, top 2s;
+      -moz-transition: background-color 1s linear, left 1s, top 2s;
+      -ms-transition: background-color 1s linear, left 1s, top 2s;
+      -o-transition: background-color 1s linear, left 1s, top 2s;
+      transition: background-color 1s linear, left 1s, top 2s;
+    }
+  </style>
+</div>
+
+
+
+
+<div id="example1">
+  <div class="container">
+      <div class="widget"></div>
+  </div>​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​
+</div>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/05/22/css3-transitions-with-gfx/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -465,47 +556,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/">Object Oriented Scraper Backed With Tests Pt. 5</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-12T07:02:00-07:00" pubdate data-updated="true">May 12<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Last night I got the <code>Crawler</code> passing its test for <code>#get_words_by_selector</code>. This morning I realize that when someone sends in a junk selector I want to raise an exception of some kind. Since I don&#8217;t know much about Ruby Exceptions I&#8217;m doing a little digging&#8230;Ruby has both <code>throw</code>/<code>catch</code> and <code>raise</code>/<code>rescue</code> so what&#8217;s the difference between throw/catch and raise/rescue in Ruby?</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; Older</a>
@@ -523,6 +573,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/27/javascript-design-patterns-decorator/">JavaScript Design Patterns: Decorator</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/16/javascript-design-patterns-observer/">JavaScript Design Patterns: Observer</a>
       </li>
     
@@ -536,10 +590,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/03/javascript-design-patterns-strategy/">JavaScript Design Patterns: Strategy</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns: Table of Contents</a>
       </li>
     
   </ul>

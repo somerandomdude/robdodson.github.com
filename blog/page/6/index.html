@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Dodson">
 
   
-  <meta name="description" content="Continuing from our previous post we&#8217;re going to keep working on our Crawler and our specs to see if we can start pulling real data from our &hellip;">
+  <meta name="description" content="Last night I got the Crawler passing its test for #get_words_by_selector. This morning I realize that when someone sends in a junk selector I want to &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -93,6 +93,47 @@
   </section>
 </div>
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/">Object Oriented Scraper Backed With Tests Pt. 5</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-12T07:02:00-07:00" pubdate data-updated="true">May 12<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Last night I got the <code>Crawler</code> passing its test for <code>#get_words_by_selector</code>. This morning I realize that when someone sends in a junk selector I want to raise an exception of some kind. Since I don&#8217;t know much about Ruby Exceptions I&#8217;m doing a little digging&#8230;Ruby has both <code>throw</code>/<code>catch</code> and <code>raise</code>/<code>rescue</code> so what&#8217;s the difference between throw/catch and raise/rescue in Ruby?</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -551,92 +592,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/02/d3-js-and-octopress/">D3.js and Octopress</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-02T07:20:00-07:00" pubdate data-updated="true">May 2<span>nd</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><!-- CSS Styles: -->
-
-
-<div>
-  <style type="text/css">
-
-    .chart {
-      font-family: Arial, sans-serif;
-      font-size: 10px;
-    }
-
-    .bar {
-      fill: steelblue;
-    }
-
-    .axis path, .axis line {
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
-    }
-
-  </style>
-</div>
-
-
-
-
-<!-- Global Variables and Handlers: -->
-
-
-<script type="text/javascript">
-
-  var data = [1, 1, 2, 3, 5, 8];
-
-  var margin = {top: 40, right: 40, bottom: 40, left: 40},
-      width = $('.entry-content').width(),
-      height = 300;
-
-  $(window).resize(function() {
-    width = $('.entry-content').width();
-  });
-
-</script>
-
-
-<p>This morning I was hoping to cover some of the basics of using D3.js. Along the way I realized I really wanted people to be able to see the graphs on the blog itself. I <em>could</em> have used JSFiddle, but I didn&#8217;t like all that chrome repeated across the page. So I came up with my own solution with a little bit of hacking :)</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/05/02/d3-js-and-octopress/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/7/">&larr; Older</a>
@@ -654,6 +609,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/27/javascript-design-patterns-decorator/">JavaScript Design Patterns: Decorator</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/16/javascript-design-patterns-observer/">JavaScript Design Patterns: Observer</a>
       </li>
     
@@ -667,10 +626,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/03/javascript-design-patterns-strategy/">JavaScript Design Patterns: Strategy</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/03/javascript-design-patterns/">JavaScript Design Patterns: Table of Contents</a>
       </li>
     
   </ul>

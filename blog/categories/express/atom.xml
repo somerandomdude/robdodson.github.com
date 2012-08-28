@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Express | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/express/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-24T14:09:58-07:00</updated>
+  <updated>2012-08-27T23:15:41-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -662,7 +662,7 @@ tick: 00:59:57
 
 <ul>
 <li><a href="http://robdodson.me/blog/2012/06/04/deploying-your-first-node-dot-js-and-socket-dot-io-app-to-heroku/">Getting Started</a></li>
-<li><a href="http://robdodson.me/blog/2012/06/05/building-a-countdown-timer-with-socket-dot-io-pt-2/">Click here for part 2.</a></li>
+<li><a href="http://robdodson.me/blog/2012/06/06/building-a-countdown-timer-with-socket-dot-io-pt-2/">Click here for part 2.</a></li>
 <li><a href="http://robdodson.me/blog/2012/06/07/building-a-countdown-timer-with-socket-dot-io-pt-3/">Click here for part 3.</a></li>
 </ul>
 
