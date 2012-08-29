@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Observer | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/observer/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-28T11:45:35-07:00</updated>
+  <updated>2012-08-29T09:11:46-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -291,6 +291,8 @@ o.subscribers = {
 
 <p>}
 ```</p>
+
+<h3><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/observer/">Source</a></h3>
 
 <h2>Related Patterns</h2>
 
