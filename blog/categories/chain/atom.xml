@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chain | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/chain/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-29T09:11:46-07:00</updated>
+  <updated>2012-08-29T09:31:11-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -390,7 +390,7 @@ You should be able to look at this snippet of code and say that it's almost cert
 
 <p>So, where possible, try to avoid reopening classes and find ways to extend their functionality. This can mean simply subclassing the parent, or using one of the many design patterns we'll be covering.</p>
 
-<h3><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/decorator/">Source</a></h3>
+<h2><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/decorator/">Grab the Example Source</a></h2>
 
 <h2>Related Patterns</h2>
 
@@ -699,7 +699,7 @@ o.subscribers = {
 <p>}
 ```</p>
 
-<h3><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/observer/">Source</a></h3>
+<h2><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/observer/">Grab the Example Source</a></h2>
 
 <h2>Related Patterns</h2>
 
@@ -895,7 +895,7 @@ The above script block will not work in Chrome but it should work in the latest 
 
 <p>For some further reading on the topic checkout the MDN article which covers <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Iterators_and_Generators">Iterators in JavaScript 1.7</a></p>
 
-<h3><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/iterator/">Source</a></h3>
+<h2><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/iterator/">Grab the Example Source</a></h2>
 
 <h2>Related Patterns</h2>
 
@@ -1198,8 +1198,8 @@ getInstance: function () {
 
 <p>// Usage:</p>
 
-<p>var singleA = mySingleton;
-var singleB = mySingleton;
+<p>var singleA = mySingleton.getInstance();
+var singleB = mySingleton.getInstance();
 console.log( singleA === singleB ); // true
 ```</p>
 
@@ -1212,6 +1212,8 @@ console.log( singleA === singleB ); // true
 <p>They're often an indication that modules in a system are either tightly coupled or that logic is overly spread across multiple parts of a codebase. Singletons can be more difficult to test due to issues ranging from hidden dependencies, the difficulty in creating multiple instances, difficulty in stubbing dependencies and so on.</p></blockquote>
 
 <p>Definitely read <a href="http://addyosmani.com/resources/essentialjsdesignpatterns/book/#singletonpatternjavascript">his full article</a> on the subject since it contains a handful of links to interesting side topics.</p>
+
+<h2><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/singleton/">Grab the Example Source</a></h2>
 
 <h2>Related Patterns</h2>
 
@@ -1458,7 +1460,7 @@ $canvas
 
 <h3><a href="http://robdodson.s3.amazonaws.com/javascript-design-patterns/strategy/painter/index.html">Live Example</a></h3>
 
-<h3><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/strategy/">Source</a></h3>
+<h2><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/strategy/">Grab the Example Source</a></h2>
 
 <h2>Related Patterns</h2>
 
