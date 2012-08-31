@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-31T11:40:18-07:00</updated>
+  <updated>2012-08-31T11:48:57-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -503,7 +503,7 @@
 
 <h2>Time to do things the hard way&#8230;</h2>
 
-<p>I promised I would show you the more classical example of Decorator and since I am a man of my word I <em>guess</em> you can see it&#8230; I haven&#8217;t used Decorators enough to say for certain if this is an unnecessarily complex approach—perhaps it has its benefits—but I don&#8217;t think I&#8217;d recommend it over our previous examples. I&#8217;m taking this code almost verbatim from <a href="http://www.amazon.com/JavaScript-Patterns-Stoyan-Stefanov/dp/0596806752">JavaScript Patterns</a> so full credit goes to Stoyan for coming up with it.</p>
+<p>I promised I would show you the more classical example of Decorator and since I am a man of my word I <em>guess</em> you can see it&#8230; I would not recommend using this approach because it can require overwriting all of your methods to make sure you&#8217;re always in the correct context. Still, as a kind of academic observation it&#8217;s a cool example and demonstrates how JS can emulate other languages. I&#8217;m taking this code almost verbatim from <a href="http://www.amazon.com/JavaScript-Patterns-Stoyan-Stefanov/dp/0596806752">JavaScript Patterns</a> so full credit goes to Stoyan for coming up with it.</p>
 
 <p>In this example we&#8217;re going to format a Sale price so that it can work for both U.S. and Canadian stores. This means applying different tax rates and outputting the text with different currency symbols.</p>
 
@@ -651,7 +651,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>You&#8217;ll notice that each time we call <code>decorate</code> we have to re-assign the sale variable to a new instance. Each new instance has a reference to the previous sale object. When we finally call <code>getPrice</code> it walks up this chain of instances and calls <code>getPrice</code> on each stop along the way. In the end we have something which is functionally identical to our first example but potentially a lot harder to understand. In other words, stick with the first approach :D</p>
+<p>You&#8217;ll notice that each time we call <code>decorate</code> we have to re-assign the sale variable to a new instance. Each new instance has a reference to the previous sale object. When we finally call <code>getPrice</code> it walks up this chain of instances and calls <code>getPrice</code> on each stop along the way. In the end we have something which is functionally identical to our first example but potentially a lot harder to understand. In other words, stick with the first approach! Also be sure to <a href="http://robdodson.me/blog/2012/08/30/javascript-design-patterns-decorator-pt-2/">see my update</a> which discusses this example a bit more and points out a few more of its flaws. Again, it&#8217;s a neat idea to mess around with but there are much easier ways.</p>
 
 <h2>The Open-Closed Principle</h2>
 
