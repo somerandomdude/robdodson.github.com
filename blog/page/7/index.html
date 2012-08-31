@@ -99,6 +99,92 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2012/05/03/d3-basics-an-introduction-to-scales/">D3 Basics: An Introduction to Scales</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-03T10:04:00-07:00" pubdate data-updated="true">May 3<span>rd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><!-- CSS Styles: -->
+
+
+<div>
+  <style type="text/css">
+
+    .chart {
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+    }
+
+    .bar {
+      fill: steelblue;
+    }
+
+    .axis path, .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+  </style>
+</div>
+
+
+
+
+<!-- Global Variables: -->
+
+
+<script type="text/javascript">
+
+  var data = [1, 1, 2, 3, 5, 8];
+
+  var margin = {top: 40, right: 40, bottom: 40, left: 40},
+      width = $('.entry-content').width(),
+      height = 300;
+
+  $(window).resize(function() {
+    width = $('.entry-content').width();
+  });
+
+</script>
+
+
+<p>After selections, scales are probably the most frequently used element in D3 because they faciliate such great control over data and screen space. I want to spend several posts documenting how scales work to help out anyone who is struggling with the concept. We&#8217;ll start with a high level overview of what a scale is in D3 and then explore the individual objects to learn their nuances.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/05/03/d3-basics-an-introduction-to-scales/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2012/05/02/d3-js-and-octopress/">D3.js and Octopress</a></h1>
     
     
@@ -559,6 +645,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/08/30/javascript-design-patterns-decorator-pt-2/">JavaScript Design Patterns: Decorator pt. 2</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/08/27/javascript-design-patterns-decorator/">JavaScript Design Patterns: Decorator</a>
       </li>
     
@@ -572,10 +662,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/08/javascript-design-patterns-singleton/">JavaScript Design Patterns: Singleton</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/03/javascript-design-patterns-strategy/">JavaScript Design Patterns: Strategy</a>
       </li>
     
   </ul>

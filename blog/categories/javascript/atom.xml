@@ -4,7 +4,7 @@
   <title><![CDATA[Category: JavaScript | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/javascript/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-29T09:31:11-07:00</updated>
+  <updated>2012-08-30T19:49:32-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,134 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript Design Patterns: Decorator pt. 2]]></title>
+    <link href="http://robdodson.me/blog/2012/08/30/javascript-design-patterns-decorator-pt-2/"/>
+    <updated>2012-08-30T18:07:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/08/30/javascript-design-patterns-decorator-pt-2</id>
+    <content type="html"><![CDATA[<p><a href="http://robdodson.me/blog/2012/08/27/javascript-design-patterns-decorator/">Yesterday's post</a> drew a lot of traffic from Reddit and with it came some really good feedback. If you haven't read the <a href="http://robdodson.me/blog/2012/08/27/javascript-design-patterns-decorator/">previous post</a> please do so first and then come back here.</p>
+
+<p>I want to go through some of what was said so I can refine my examples and also clear up any confusion.</p>
+
+<!--more-->
+
+
+<h2>That Prototype Example Sucked</h2>
+
+<p>OK let me start off by apologizing for even including that second example (the <code>Sale</code> decorators). It was meant as a kind of fun academic exercise but I tried to make it clear that I wasn't suggesting anyone actually implement it. Redditor gizmo490 pointed out that for the pattern to actually work you would have to overwrite all the methods of the <code>Sale</code> object or risk working in the wrong context. You can see our full discussion <a href="http://www.reddit.com/r/javascript/comments/z0z2j/decorators_in_javascript_hope_you_enjoy/c60qb0c">here.</a></p>
+
+<p>So I'll just say if you're considering that second example: Stop. Just don't do it. It is way too much code.</p>
+
+<h2>We don't necessarily need all those objects</h2>
+
+<p>Another Redditor, Draders, pointed out that the decorator objects aren't really necessary since we can just put functions directly into the decoratorsList.</p>
+
+<p><code>js
+// This is presuming that `add` pushes a function into the
+// list of decorators
+validator.add('zipcode', validateZipCodeFunction);
+</code>
+If you want <code>validateZipCodeFunction</code> to be reusable you'll have to define it somewhere and attaching it to the Validator object is probably a fine choice. In the end it's a bit less code so definitely something to think about.</p>
+
+<h2>Finally, the power of CLOSURES!</h2>
+
+<p>Finally, and this is really the reason why I wanted to write this update, Redditor emehrkay pointed out that my examples are basically ignoring the power of JS functions and closures. <a href="http://www.reddit.com/r/javascript/comments/z0z2j/decorators_in_javascript_hope_you_enjoy/c60rl7x">In his quick and dirty example</a> he shows how to achieve a similar goal with much less code:</p>
+
+<p>``` js
+function test(arg){</p>
+
+<pre><code>return arg + arg;
+</code></pre>
+
+<p>}</p>
+
+<p>function testDecorator(fn, args){</p>
+
+<pre><code>var arg = args[0] * 2;
+
+return fn(arg);
+</code></pre>
+
+<p>}</p>
+
+<p>function decorate(dec, fn, args){</p>
+
+<pre><code>return function(){
+    return dec(fn, args);
+}
+</code></pre>
+
+<p>}</p>
+
+<p>x = decorate(testDecorator, test, [2])();
+console.log(x)
+```</p>
+
+<p>So here's my attempt to recreate the <code>Sale</code> example but using more of emehrkay's approach:</p>
+
+<p>``` js
+function Sale(price) {</p>
+
+<pre><code>this.price = price || 100;
+</code></pre>
+
+<p>}</p>
+
+<p>Sale.prototype.getPrice = function() {</p>
+
+<pre><code>return this.price;
+</code></pre>
+
+<p>};</p>
+
+<p>Sale.prototype.setPrice = function(price) {</p>
+
+<pre><code>this.price = price;
+</code></pre>
+
+<p>};</p>
+
+<p>function usd(fn, context) {</p>
+
+<pre><code>var price = fn.call(context);
+return "$" + price;
+</code></pre>
+
+<p>}</p>
+
+<p>function decorate(dec, fn, context) {</p>
+
+<pre><code>return function() {
+    return dec.call(context, fn, context);
+};
+</code></pre>
+
+<p>}</p>
+
+<p>// Let's run it!
+var sale = new Sale(50);</p>
+
+<p>// Decorate our getPrice method. We'll just add
+// some extra dollar signs to the output.
+sale.getPrice = decorate(usd, sale.getPrice, sale);
+sale.getPrice = decorate(usd, sale.getPrice, sale);
+sale.getPrice = decorate(usd, sale.getPrice, sale);
+console.log(sale.getPrice()); // output: $$$50</p>
+
+<p>// Test to make sure other methods can still
+// access the price in the correct context
+sale.setPrice(100);
+console.log(sale.getPrice()); // output: $$$100
+```</p>
+
+<h2><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/decorator/">Grab the Example Source</a></h2>
+
+<p>Thanks for reading! If you have questions or feedback please leave a comment below. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[JavaScript Design Patterns: Decorator]]></title>
@@ -1218,256 +1346,6 @@ console.log( singleA === singleB ); // true
 <h2>Related Patterns</h2>
 
 <p>Many patterns can be implemented using the Singleton pattern. See Abstract Factory, Builder, and Prototype.</p>
-
-<p><small><cite style="color:#AAA;">Gamma, Erich; Helm, Richard; Johnson, Ralph; Vlissides, John (1994-10-31). Design Patterns: Elements of Reusable Object-Oriented Software. Pearson Education (USA).</cite></small></p>
-
-<hr>
-
-
-<br>
-
-
-<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
-
-<br>
-
-
-<p>Thanks for reading! If you have questions or feedback please leave a comment below. - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[JavaScript Design Patterns: Strategy]]></title>
-    <link href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns-strategy/"/>
-    <updated>2012-08-03T15:12:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/08/03/javascript-design-patterns-strategy</id>
-    <content type="html"><![CDATA[<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
-
-<p>The Strategy pattern is one of my personal favorites and you've probably seen or used it in some fashion without even knowing it. Its primary purpose is to help you separate the parts of an object which are subject to change from the rest of the static bits. Using Strategy objects versus subclasses can often result in much more flexible code since you're creating a suite of easily swappable algorithms.</p>
-
-<!--more-->
-
-
-<h2>Formal Definition</h2>
-
-<p><blockquote><p>Define a family of algorithms, encapsulate each one, and make them interchangeable. Strategy lets the algorithm vary independently from clients that use it.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote></p>
-
-<h3>Also Known As</h3>
-
-<ul>
-<li>Policy</li>
-</ul>
-
-
-<h2>Contrived Example Time!</h2>
-
-<p>Let's say you're making a game and you have a Character class. This game has all sorts of different terrain types so your character can run through open fields, walk slowly through swamps or swim under the ocean. Since you don't know what kind of other terrains the game designer is going to think up you decide that it would be a bad idea to give each character <code>run</code>, <code>walk</code>, and <code>swim</code> methods. After all, what if suddenly the character needs to <code>fly</code> or <code>crawl</code>? What if they're wounded and they need to <code>limp</code>? This situation could potentially get out of hand very fast...</p>
-
-<p>There's a good chance you've seen or written code like this before:</p>
-
-<p>``` js
-function move() {</p>
-
-<pre><code>if (state === 'walking') {
-    // do some walk animation
-} else if (state === 'running') {
-    // do some running animation
-} else if (state === 'swimming') {
-    // do some swimming animation
-}
-</code></pre>
-
-<p>}
-```</p>
-
-<p>When you see a big conditional like that or a switch statement it's time to stop and wonder if there's a better way. For instance if we need to subclass our Character we're going to have to override that big conditional. What if we only want to replace the <code>swimming</code> bit? We'll have to copy and paste the code from the super class for <code>walking</code> and <code>running</code> and then write new code specifically for <code>swimming</code>. And of course if <code>walking</code> and <code>running</code> ever change we're totally screwed.</p>
-
-<h3>We need a Strategy to deal with this</h3>
-
-<p>Ok so we know that our character is going to be a real contortionist and need to run and jump and crab-walk all over the place. What if we took the code that made her run and we put it in its own object? How about we just define a Class for movements and we do this for all the different kinds of motion? Then when we need to move our Character we'll just tell it to defer to one of these Movement objects.</p>
-
-<p>``` js
-var Movement = function(func) {</p>
-
-<pre><code>this.move = func;
-</code></pre>
-
-<p>};</p>
-
-<p>Movement.prototype.execute = function() {</p>
-
-<pre><code>this.move();
-</code></pre>
-
-<p>};</p>
-
-<p>var running = new Movement(function() {</p>
-
-<pre><code>console.log("Hey I'm running!");
-</code></pre>
-
-<p>});</p>
-
-<p>var walking = new Movement(function() {</p>
-
-<pre><code>console.log("Just walking along...");
-</code></pre>
-
-<p>});
-```</p>
-
-<p>Now when we want to tell our character to move in a different way we'll just update which Movement object its currently referencing.</p>
-
-<p>``` js
-function changeMovementType(movement) {</p>
-
-<pre><code>this.movement = movement;
-</code></pre>
-
-<p>}</p>
-
-<p>function move() {</p>
-
-<pre><code>this.movement.execute();
-</code></pre>
-
-<p>}
-```</p>
-
-<p>In practice you might have something that looks like this:</p>
-
-<p>``` js
-var running = new Movement(function() {</p>
-
-<pre><code>console.log("Hey I'm running!");
-</code></pre>
-
-<p>});</p>
-
-<p>var walking = new Movement(function() {</p>
-
-<pre><code>console.log("Just walking along...");
-</code></pre>
-
-<p>});</p>
-
-<p>// Create a hero and walk through a peaceful forest...</p>
-
-<p>var hero = new Character();
-hero.changeMovementType(walking);
-hero.move();</p>
-
-<p>// ... OH NO MOTHERFUCKIN' DINOSAURS!!!</p>
-
-<p>hero.changeMovementType(running);
-hero.move();
-```</p>
-
-<p>Now it's easy for us to add as many different kinds of motion as our little game designer can dream up. Want to give the character gas-powered robotic legs? No problem!</p>
-
-<p>``` js
-var robotlegs = new Movement(function() {</p>
-
-<pre><code>console.log("Cruisin for oil...Look out humans!");
-</code></pre>
-
-<p>});</p>
-
-<p>hero.changeMovementType(robotlegs);
-hero.move();
-```</p>
-
-<h2>When to use it</h2>
-
-<p>When you have a part of your Class that's subject to change frequently or perhaps you have many related subclasses which only differ in behavior it's often a good time to consider using a Strategy pattern.</p>
-
-<p>Another benefit of the Strategy pattern is that it can hide complex logic or data that the client doesn't need to know about.</p>
-
-<h2>The Painting App</h2>
-
-<p>For a real world example of when to use Strategy objects consider your typical painting program. Often times you will offer a variety of different brush types to your user but you don’t want to have to change the fundamentals of how a mark shows up on screen every time the user decides to switch from a round to a square brush. Why not wrap those specific implementations in their own brush objects and later on when the user clicks to draw something to screen we’ll just defer to one of those brushes.</p>
-
-<p>``` js
-// Grab a reference to the canvas and the drawing context
-$canvas = $('#painter');
-context = $canvas[0].getContext('2d');</p>
-
-<p>// Define our brush strategy objects
-brushes = {
-  outline: {</p>
-
-<pre><code>  draw: function(e, context) {
-      context.strokeRect(e.pageX - offsetLeft, e.pageY - offsetTop, 10, 10);
-  }
-</code></pre>
-
-<p>  },
-  square: {</p>
-
-<pre><code>  draw: function(e, context) {
-      context.fillRect(e.pageX - offsetLeft, e.pageY - offsetTop, 10, 10);
-  }
-</code></pre>
-
-<p>  },
-  circle: {</p>
-
-<pre><code>  draw: function(e, context) {
-      context.arc(e.pageX - offsetLeft, e.pageY - offsetTop, 10, 0, Math.PI * 2);
-      context.fill();
-  }
-</code></pre>
-
-<p>  }
-};</p>
-
-<p>... .</p>
-
-<p>brush = brushes.square;
-```</p>
-
-<p>Here we see that <code>brushes.outline</code>, <code>brushes.square</code>, and <code>brushes.circle</code> each implement a consistent interface for the <code>draw</code> call. However their exact implementation changes from one brush to the next. <code>brushes.outline</code> will only draw the stroke of a rectangle, whereas <code>brushes.square</code> and <code>brushes.circle</code> will fill their respective shapes in. Elsewhere in the program we set our initial brush to a default of brushes.square. When the users presses their mouse and moves it around screen we can defer to whichever Strategy the brush object is currently referencing:</p>
-
-<p>``` js
-// Listen for mouse events on the canvas
-$canvas
-  .on('mousedown', function() {</p>
-
-<pre><code>  isDrawing = true;
-</code></pre>
-
-<p>  })
-  .on('mouseup mouseleave', function() {</p>
-
-<pre><code>  isDrawing = false;
-</code></pre>
-
-<p>  })
-  .on('mousemove', function(e) {</p>
-
-<pre><code>  if (isDrawing) {
-      // Defer drawing to a Strategy object
-      brush.draw(e, context);
-  }
-</code></pre>
-
-<p>  });
-```</p>
-
-<p>Again notice that <code>.on('mousemove')</code> we first check to see if it’s ok to draw something and then defer to whichever Strategy is currently being referenced. Using this approach we can add limitless new brush types to the <code>brushes</code> object and easily change how our program performs at runtime. Be sure to check out the live example and the source for the full application.</p>
-
-<h3><a href="http://robdodson.s3.amazonaws.com/javascript-design-patterns/strategy/painter/index.html">Live Example</a></h3>
-
-<h2><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/strategy/">Grab the Example Source</a></h2>
-
-<h2>Related Patterns</h2>
-
-<ul>
-<li>Flyweight: Strategy objects often make good flyweights.</li>
-</ul>
-
 
 <p><small><cite style="color:#AAA;">Gamma, Erich; Helm, Richard; Johnson, Ralph; Vlissides, John (1994-10-31). Design Patterns: Elements of Reusable Object-Oriented Software. Pearson Education (USA).</cite></small></p>
 
