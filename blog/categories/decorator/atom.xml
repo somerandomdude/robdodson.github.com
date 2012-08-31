@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Decorator | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/decorator/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-30T19:49:32-07:00</updated>
+  <updated>2012-08-30T19:50:57-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -131,7 +131,8 @@ console.log(sale.getPrice()); // output: $$$50</p>
 // access the price in the correct context
 sale.setPrice(100);
 console.log(sale.getPrice()); // output: $$$100
-```</p>
+<code>``
+Since we're kind of mixing OO and functional style here the one caveat is that you have to pass the context to your decorators so when they call</code>getPrice` they know which instance they're referring to. So the code is a little funky but still interesting and if anyone can think of a way to write it cleaner I'm all ears!</p>
 
 <h2><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/decorator/">Grab the Example Source</a></h2>
 
