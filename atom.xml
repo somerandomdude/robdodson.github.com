@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-08-31T11:48:57-07:00</updated>
+  <updated>2012-09-05T13:54:16-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,412 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript Design Patterns: Factory]]></title>
+    <link href="http://robdodson.me/blog/2012/09/03/javascript-design-patterns-factory/"/>
+    <updated>2012-09-03T12:40:00-07:00</updated>
+    <id>http://robdodson.me/blog/2012/09/03/javascript-design-patterns-factory</id>
+    <content type="html"><![CDATA[<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
+
+<p>Factories encapsulate and separate object creation from the rest of your code. In situations where the creation of an object can be complex or subject to change a factory can act as a nice buffer to help keep things tidy. Without proper planning Factories can lead to class explosions; as a result the pattern can be both a blessing and a curse depending on how it&#8217;s used.</p>
+
+<!--more-->
+
+
+<h2>Formal Definition</h2>
+
+<h4>Factory Method</h4>
+
+<blockquote><p>Define an interface for creating an object, but let subclasses decide which class to instantiate. Factory Method lets a class defer instantiation to subclasses.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote>
+
+
+<h4>Abstract Factory</h4>
+
+<blockquote><p>Provide an interface for creating families of related or dependent objects without specifying their concrete classes.</p><footer><strong>GoF</strong> <cite>Design Patterns: Elements of Reusable Object-Oriented Software</cite></footer></blockquote>
+
+
+<h3>Also Known As</h3>
+
+<ul>
+<li>Virtual Constructor (<strong>Factory Method</strong>)</li>
+<li>Kit (<strong>Abstract Factory</strong>)</li>
+</ul>
+
+
+<h2>Simple Factory vs Factory Method vs Abstract Factory</h2>
+
+<p>The phrase &#8220;Factory Pattern&#8221; is rather overloaded so I&#8217;m going to give you a quick crash course in the three main types of factories.</p>
+
+<p>A <strong>simple factory</strong> is an object which encapsulates the creation of another object, shielding that code from the rest of your application.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">UserFactory</span><span class="p">.</span><span class="nx">createUser</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It&#8217;s common to parameterize simple factory methods to increase the number of products they&#8217;re able to return.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">admin</span> <span class="o">=</span> <span class="nx">UserFactory</span><span class="p">.</span><span class="nx">createUser</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">customer</span> <span class="o">=</span> <span class="nx">UserFactory</span><span class="p">.</span><span class="nx">createUser</span><span class="p">(</span><span class="s1">&#39;customer&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The actual implementaiton of <code>createUser</code> might look something like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">UserFactory</span><span class="p">.</span><span class="nx">createUser</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="nx">type</span> <span class="o">==</span> <span class="s1">&#39;admin&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nx">Admin</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">type</span> <span class="o">==</span> <span class="s1">&#39;customer&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nx">Customer</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Typically the return value from a factory is known as the <code>Product</code>. In the case of our <code>UserFactory</code> there are two Products: <code>Admin</code> and <code>Customer</code>. It&#8217;s important for these products to maintain a consistent interface so the client can use any product from our factory without needing to do elaborate checks to see if a particular method exists.</p>
+
+<h3>Factory Method</h3>
+
+<p>While the Simple Factory is a nice start and good for many situations it&#8217;s possible to extend this even further through the use of the <strong>Factory Method</strong> pattern.</p>
+
+<blockquote><p>The Factory Method Pattern defines an interface <br/>for creating an object, but lets subclasses decide which <br/>class to instantiate.  Factory Method lets a class defer <br/>instantiation to subclasses.</p><footer><strong>Elisabeth Freeman</strong> <cite>Head First Design Patterns</cite></footer></blockquote>
+
+
+<p>Factory Method defines one method, <code>createThing</code> for instance, which is overriden by subclasses who decide what to return. The Factories and Products must conform to interfaces for clients to be able to use them.</p>
+
+<p>In <em>Head First Design Patterns</em> a Factory Method pattern is used to allow a PizzaStore to define many subclasses such as ChicagoPizzaStore, CaliforniaPizzaStore, NewYorkPizzaStore. Each subclass overrides <code>createPizza</code> and returns its own particular style of pizza (ie: a ChicagoPizza or a CaliforniaPizza). The main take away is that there is only one method, <code>createPizza</code>, that does anything. By subclassing and overriding this method we can offer aditional flexibility beyond what&#8217;s possible with the Simple Factory.</p>
+
+<h3>Abstract Factory</h3>
+
+<p>Unlike the Factory Method pattern, <strong>Abstract Factory</strong> defines any number of methods which return Products.</p>
+
+<blockquote><p>The Abstract Factory Pattern provides an interface <br/>for creating families of related or dependent objects <br/>without specifying their concrete classes.</p><footer><strong>Elisabeth Freeman</strong> <cite>Head First Design Patterns</cite></footer></blockquote>
+
+
+<p>Again in <em>Head First Design Patterns</em>, an Abstract Factory pattern is used to provide different Pizza ingredients depending on the type of Pizza. For instance, a ChicagoPizza would be given a ChicagoPizzaIngredients factory with methods like <code>createDough</code>, <code>createSauce</code>, <code>createCheese</code>, etc. A CaliforniaPizzaIngredients factory would also implement <code>createDough</code>, <code>createSauce</code> and <code>createCheese</code>. In this way the factories would be interchangeable.</p>
+
+<p>The authors are keen to point out that the methods of the Abstract Factory (<code>createDough</code>, <code>createSauce</code>, etc) look very similar to the Factory Method (<code>createPizza</code>). One way of thinking about things is that an Abstract Factory can be composed of Factory Methods.</p>
+
+<h2>The Factory Method in JavaScript</h2>
+
+<p>Since I&#8217;ve already shown a basic Simple Factory let&#8217;s take a stab at doing the Factory Method in JS. We&#8217;ll continue with the PizzaStore theme since I&#8217;ve already spelled out how each pattern applies to it. We&#8217;re going to do this without the use of the <code>new</code> keyword and instead we&#8217;ll take advantage of JavaScript&#8217;s prototypes. How you ask?</p>
+
+<h3>The very awesome Object.create</h3>
+
+<p>ECMAScript 5 introduced a new method of the <code>Object</code> prototype called <code>create</code>. You can read up on it in full detail <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/create">on MDN.</a> In a nutshell it lets you pass in a prototype and receive a new object which points to that prototype. <code>Object.create</code> is actually a simple Factory Method! Here&#8217;s an example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">firstPizzaStore</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">PizzaStore</span><span class="p">);</span>
+</span><span class='line'><span class="nx">firstPizzaStore</span><span class="p">.</span><span class="nx">createPizza</span><span class="p">();</span> <span class="c1">// returns &#39;Generic pizza created&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>One very cool feature of <code>Object.create</code> is that it accepts a properties object which is then mixed in to the returned object. The code can get a little verbose since it uses <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Object/defineProperty">defineProperty syntax</a> so instead let&#8217;s steal a function from <a href="http://yehudakatz.com/2011/08/12/understanding-prototypes-in-javascript/">Yehuda Katz</a> which lets us do something very similar.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">fromPrototype</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">prototype</span><span class="p">,</span> <span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">newObject</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">prototype</span><span class="p">);</span>
+</span><span class='line'>    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">prop</span> <span class="k">in</span> <span class="nx">object</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">object</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="nx">prop</span><span class="p">))</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">newObject</span><span class="p">[</span><span class="nx">prop</span><span class="p">]</span> <span class="o">=</span> <span class="nx">object</span><span class="p">[</span><span class="nx">prop</span><span class="p">];</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">newObject</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that we have that we can continue on our way. One quick caveat though! Some browsers *cough* <strong>IE</strong> *cough* don&#8217;t support <code>Object.create</code> so we need to shim it. Thankfully MDN has got our back:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Polyfill</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">o</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">arguments</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Object.create implementation only accepts the first parameter.&#39;</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="kd">function</span> <span class="nx">F</span><span class="p">()</span> <span class="p">{}</span>
+</span><span class='line'>        <span class="nx">F</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">=</span> <span class="nx">o</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nx">F</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Drop that into your page and you should be able to use Object.create like we are above. Note that the shim does not support the second properties object. For our purposes that&#8217;s ok but definitely keep it in mind if you&#8217;re thinking of using it.</p>
+
+<h3>Back to the Factory Method</h3>
+
+<p>With <code>Object.create</code> and <code>fromPrototype</code> in hand we&#8217;re ready to tackle our first Factory Method.</p>
+
+<p>Let&#8217;s start by creating a PizzaStore:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Define the Pizza product</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Pizza</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">description</span><span class="o">:</span> <span class="s1">&#39;Plain Generic Pizza&#39;</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// And the basic PizzaStore</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">PizzaStore</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">createPizza</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">type</span> <span class="o">==</span> <span class="s1">&#39;cheese&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nx">fromPrototype</span><span class="p">(</span><span class="nx">Pizza</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">description</span><span class="o">:</span> <span class="s1">&#39;Cheesy, Generic Pizza&#39;</span>
+</span><span class='line'>            <span class="p">});</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">type</span> <span class="o">==</span> <span class="s1">&#39;veggie&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nx">fromPrototype</span><span class="p">(</span><span class="nx">Pizza</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">description</span><span class="o">:</span> <span class="s1">&#39;Veggie, Generic Pizza&#39;</span>
+</span><span class='line'>            <span class="p">});</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Easy enough. Ok now let&#8217;s extend the PizzaStore so we have two variations: ChicagoPizzaStore and CaliforniaPizzaStore.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">ChicagoPizzaStore</span> <span class="o">=</span> <span class="nx">fromPrototype</span><span class="p">(</span><span class="nx">PizzaStore</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">createPizza</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">type</span> <span class="o">==</span> <span class="s1">&#39;cheese&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nx">fromPrototype</span><span class="p">(</span><span class="nx">Pizza</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">description</span><span class="o">:</span> <span class="s1">&#39;Cheesy, Deep-dish Chicago Pizza&#39;</span>
+</span><span class='line'>            <span class="p">});</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">type</span> <span class="o">==</span> <span class="s1">&#39;veggie&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nx">fromPrototype</span><span class="p">(</span><span class="nx">Pizza</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">description</span><span class="o">:</span> <span class="s1">&#39;Veggie, Deep-dish Chicago Pizza&#39;</span>
+</span><span class='line'>            <span class="p">});</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">CaliforniaPizzaStore</span> <span class="o">=</span> <span class="nx">fromPrototype</span><span class="p">(</span><span class="nx">PizzaStore</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">createPizza</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">type</span> <span class="o">==</span> <span class="s1">&#39;cheese&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nx">fromPrototype</span><span class="p">(</span><span class="nx">Pizza</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">description</span><span class="o">:</span> <span class="s1">&#39;Cheesy, Tasty California Pizza&#39;</span>
+</span><span class='line'>            <span class="p">});</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">type</span> <span class="o">==</span> <span class="s1">&#39;veggie&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="nx">fromPrototype</span><span class="p">(</span><span class="nx">Pizza</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">description</span><span class="o">:</span> <span class="s1">&#39;Veggie, Tasty California Pizza&#39;</span>
+</span><span class='line'>            <span class="p">});</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// Elsewhere in our app...</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">chicagoStore</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">create</span><span class="p">(</span><span class="nx">ChicagoPizzaStore</span><span class="p">);</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">pizza</span> <span class="o">=</span> <span class="nx">chicagoStore</span><span class="p">.</span><span class="nx">createPizza</span><span class="p">(</span><span class="s1">&#39;veggie&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">pizza</span><span class="p">.</span><span class="nx">description</span><span class="p">);</span> <span class="c1">// returns &#39;Veggie, Deep-dish Chicago Pizza&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>The Abstract Factory in JavaScript</h2>
+
+<p>Since we have a variety of pizza styles we might also have a variety of ingredients. Let&#8217;s see if we can accomodate all the different kinds.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">Ingredients</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">createDough</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s1">&#39;generic dough&#39;</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">createSauce</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s1">&#39;generic sauce&#39;</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="nx">createCrust</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="s1">&#39;generic crust&#39;</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Ingredients</span><span class="p">.</span><span class="nx">createChicagoStyle</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">fromPrototype</span><span class="p">(</span><span class="nx">Ingredients</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">createDough</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="s1">&#39;thick, heavy dough&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="nx">createSauce</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="s1">&#39;rich marinara&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="nx">createCrust</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="s1">&#39;deep-dish&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">Ingredients</span><span class="p">.</span><span class="nx">createCaliforniaStyle</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">fromPrototype</span><span class="p">(</span><span class="nx">Ingredients</span><span class="p">,</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">createDough</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="s1">&#39;light, fluffy dough&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="nx">createSauce</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="s1">&#39;tangy red sauce&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">},</span>
+</span><span class='line'>        <span class="nx">createCrust</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="s1">&#39;thin and crispy&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In the above example <code>Ingredients</code> is our Abstract Factory. We know that for every
+different kind of pizza we&#8217;ll need different ingredients and therefore a new Factory Method. We also know that we have different styles of pizza so we&#8217;ll need Chicago style ingredients and California style ingredients. When a client wishes to grab some ingredients for a particular kind of pizza they just say:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">californiaIngredients</span> <span class="o">=</span> <span class="nx">Ingredients</span><span class="p">.</span><span class="nx">createCaliforniaStyle</span><span class="p">();</span>
+</span><span class='line'><span class="nx">californiaIngredients</span><span class="p">.</span><span class="nx">createCrust</span><span class="p">();</span> <span class="c1">// returns &#39;thin and crispy&#39;;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The object that is returned by the call <code>createCaliforniaStyle</code> is the concrete implementation of our Abstract Ingredients object. In other words, if <code>Ingredients</code> is the Abstract Factory, then the object returned by <code>createCaliforniaStyle</code> could also be thought of as a <code>CaliforniaIngredients</code> object. It is a <em>subclass</em> of <code>Ingredients</code> if you want to think of it that way. The returned object extends <code>Ingredients</code> and overrides its Factory Methods with its own methods. In so doing we provide a lot of additional flexibility to our app. If we want to add a Hawaiian style ingredients we just add a <code>createHawaiianStyle</code> method.</p>
+
+<p>If you recall from <a href="http://robdodson.me/blog/2012/08/27/javascript-design-patterns-decorator/">the previous article on Decorators</a> we talked about the <strong>Open-Closed Principle</strong> which states that &#8220;classes should be open for extension but closed for modification.&#8221; You&#8217;ll notice that adding a <code>createHawaiianStyle</code> method would actually violate this principle so it should be noted that when using an Abstract Factory approach you&#8217;ll probably have to reopen the class/object a few times to modify it. Not ideal but depending on your use case this might not be such  big deal and you might prefer the flexibility and organization that the factory offers.</p>
+
+<h2><a href="https://github.com/robdodson/JavaScript-Design-Patterns/tree/master/factory/">Grab the Example Source</a></h2>
+
+<h2>Related Patterns</h2>
+
+<ul>
+<li>Template Methods: Factory Methods are usually called within Template Methods.</li>
+<li><a href="http://robdodson.me/blog/2012/08/08/javascript-design-patterns-singleton/">Singleton</a>: A concrete factory is often a singleton.</li>
+</ul>
+
+
+<p><small><cite style="color:#AAA;">Gamma, Erich; Helm, Richard; Johnson, Ralph; Vlissides, John (1994-10-31). Design Patterns: Elements of Reusable Object-Oriented Software. Pearson Education (USA).</cite></small></p>
+
+<hr>
+
+
+<br>
+
+
+<h4><a href="http://robdodson.me/blog/2012/08/03/javascript-design-patterns/">Table of Contents</a></h4>
+
+<br>
+
+
+<p>Thanks for reading! If you have questions or feedback please leave a comment below. - Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[JavaScript Design Patterns: Decorator Update]]></title>
@@ -4316,149 +4722,6 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 <li>Mood: Awake, Antsy</li>
 <li>Sleep: 6</li>
 <li>Hunger: 2</li>
-<li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Writing a Command Line Tool in Ruby]]></title>
-    <link href="http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby/"/>
-    <updated>2012-06-13T07:29:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/13/writing-a-command-line-tool-in-ruby</id>
-    <content type="html"><![CDATA[<p>Yesterday I tried to do a post on creating your first Ruby Gem as a command line tool. <a href="http://robdodson.me/blog/2012/06/12/messing-around-with-gems/">It didn&#8217;t go very well.</a> In an effort to better understand what goes on with command line tools I&#8217;m going to start from the most basic, a ruby script that is in our <code>PATH</code>.</p>
-
-<!--more-->
-
-
-<p>I&#8217;ve previously added the folder <code>~/bin</code> to my PATH so I know that if I drop an executable script in there I should be able to run it by just typing its name. Let&#8217;s give that a shot. First we&#8217;ll make a new file just called <code>sherp</code> without any file extension. Make sure to <code>chmod 755 sherpa</code> so that it&#8217;s executable. Then we&#8217;ll add the following:</p>
-
-<figure class='code'><figcaption><span>~/bin/sherpa</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">puts</span> <span class="s1">&#39;I am the sherpa!!!&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If I now type <code>sherpa</code> into the command line, it should fire back <code>I am the sherpa!!!</code></p>
-
-<p>Ok cool so we&#8217;ve got that part working. Now let&#8217;s see if we can get some arguments in there. We&#8217;ll iterate the <code>ARGV</code> object to see what comes in.</p>
-
-<figure class='code'><figcaption><span>~/bin/sherpa</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
-</span><span class='line'>
-</span><span class='line'><span class="no">ARGV</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">arg</span><span class="o">|</span>
-</span><span class='line'>    <span class="nb">puts</span> <span class="n">arg</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>With that little bit of code we should be able to pass just about anything to our command and have it echoed back.</p>
-
-<figure class='code'><figcaption><span>~/bin/sherpa</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">sherpa</span> <span class="n">foo</span> <span class="n">bar</span> <span class="n">baz</span>
-</span><span class='line'>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="n">foo</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="n">bar</span>
-</span><span class='line'> <span class="o">=&gt;</span> <span class="n">baz</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Ok cool. Now let&#8217;s step this up a notch or two. Let&#8217;s say we want to send in commands and options. For that we&#8217;ll use the built-in <a href="http://ruby-doc.org/stdlib-1.9.3/libdoc/optparse/rdoc/OptionParser.html">OptionParser</a>. Here&#8217;s <a href="http://rubylearning.com/blog/2011/01/03/how-do-i-make-a-command-line-tool-in-ruby/">a link to the article I&#8217;ve been following which details how to use the OptionParser.</a> In my case, I&#8217;m going to tell <code>sherpa</code> to either <code>say_hello</code> or <code>say_goodbye</code>. When I pass in the <code>-n</code> flag it should accept a name, otherwise it will use the name &#8216;Master&#8217;. So the line <code>sherpa say_hello -n Rob</code> should produce <code>Hello Rob</code> and likewise if I left off the option and just used <code>sherpa say_hello</code> it should produce <code>Hello Master</code>.</p>
-
-<p>Here&#8217;s the code to accomplish this:</p>
-
-<figure class='code'><figcaption><span>~/bin</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1">#!/usr/bin/env ruby</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;optparse&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">opt_parser</span> <span class="o">=</span> <span class="no">OptionParser</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">opt</span><span class="o">|</span>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">banner</span> <span class="o">=</span> <span class="s2">&quot;Usage: opt_parser COMMAND [OPTIONS]&quot;</span>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;&quot;</span>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;Commands&quot;</span>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;     name: the name the sherpa should use when addressing you&quot;</span>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;&quot;</span>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">separator</span>  <span class="s2">&quot;Options&quot;</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">&quot;-n&quot;</span><span class="p">,</span><span class="s2">&quot;--name NAME&quot;</span><span class="p">,</span><span class="s2">&quot;tell the sherpa what to call you&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="nb">name</span><span class="o">|</span>
-</span><span class='line'>    <span class="n">options</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span> <span class="o">=</span> <span class="nb">name</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="n">opt</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="s2">&quot;-h&quot;</span><span class="p">,</span><span class="s2">&quot;--help&quot;</span><span class="p">,</span><span class="s2">&quot;help&quot;</span><span class="p">)</span> <span class="k">do</span>
-</span><span class='line'>    <span class="nb">puts</span> <span class="n">opt_parser</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">opt_parser</span><span class="o">.</span><span class="n">parse!</span>
-</span><span class='line'><span class="nb">name</span> <span class="o">=</span> <span class="n">options</span><span class="o">[</span><span class="ss">:name</span><span class="o">]</span> <span class="o">||</span> <span class="s1">&#39;Master&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">case</span> <span class="no">ARGV</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span>
-</span><span class='line'><span class="k">when</span> <span class="s2">&quot;say_hello&quot;</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;Hello </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="k">when</span> <span class="s2">&quot;say_goodbye&quot;</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="s2">&quot;Goodbye </span><span class="si">#{</span><span class="nb">name</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span class='line'><span class="k">else</span>
-</span><span class='line'>  <span class="nb">puts</span> <span class="n">opt_parser</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And there we go, our first command line Ruby tool. I&#8217;ll pick it up tomorrow to try to improve upon it. We&#8217;re starting small but at least we have something that works!</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul>
-<li>Time: 7:31 am</li>
-<li>Mood: Tired, Patient</li>
-<li>Sleep: 6</li>
-<li>Hunger: 1</li>
 <li>Coffee: 0</li>
 </ul>
 
