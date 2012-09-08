@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Heroku | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/heroku/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-09-05T13:54:16-07:00</updated>
+  <updated>2012-09-08T07:37:51-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -321,12 +321,11 @@ $ heroku ps:scale web=0
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 10:02 pm</li>
-<li>Mood: Tired, Antsy</li>
-<li>Sleep: 5</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
+<ul class="personal-stats">
+    <li>Mood: Tired, Antsy</li>
+    <li>Sleep: 5</li>
+    <li>Hunger: 0</li>
+    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>

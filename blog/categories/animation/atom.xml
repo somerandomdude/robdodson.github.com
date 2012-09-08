@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Animation | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/animation/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-09-05T13:54:16-07:00</updated>
+  <updated>2012-09-08T07:37:51-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -50,12 +50,11 @@ easing: Ease.easeInExpo
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 12:09 am</li>
-<li>Mood: Tired, Tipsy</li>
-<li>Sleep: 7</li>
-<li>Hunger: 0</li>
-<li>Coffee: 0</li>
+<ul class="personal-stats">
+    <li>Mood: Tired, Tipsy</li>
+    <li>Sleep: 7</li>
+    <li>Hunger: 0</li>
+    <li>Coffee: 0</li>
 </ul>
 
 ]]></content>
@@ -174,12 +173,11 @@ $("#widget")</p>
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 8:07 am</li>
-<li>Mood: Sedated, Upset-Stomach, Laggy</li>
-<li>Sleep: 5.5</li>
-<li>Hunger: 0</li>
-<li>Coffee: 0</li>
+<ul class="personal-stats">
+    <li>Mood: Sedated, Upset-Stomach, Laggy</li>
+    <li>Sleep: 5.5</li>
+    <li>Hunger: 0</li>
+    <li>Coffee: 0</li>
 </ul>
 
 ]]></content>

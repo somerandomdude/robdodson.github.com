@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-09-05T13:54:16-07:00</updated>
+  <updated>2012-09-08T07:37:51-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -285,12 +285,11 @@ I'm pretty certain I could have done this with Node in a fraction of the time if
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 1:08 am</li>
-<li>Mood: Tired, Pissed</li>
-<li>Sleep: 6</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
+<ul class="personal-stats">
+    <li>Mood: Tired, Pissed</li>
+    <li>Sleep: 6</li>
+    <li>Hunger: 0</li>
+    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>
@@ -541,12 +540,11 @@ We can use that JSON to start graphing which I'll hopefully have time to get int
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 12:31 am</li>
-<li>Mood: Tired</li>
-<li>Sleep: 6</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
+<ul class="personal-stats">
+    <li>Mood: Tired</li>
+    <li>Sleep: 6</li>
+    <li>Hunger: 0</li>
+    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>
@@ -589,12 +587,11 @@ Having a horrible time getting anything to run tonight. The code from above is a
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 1:28 am</li>
-<li>Mood: Tired, Annoyed</li>
-<li>Sleep: 6</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
+<ul class="personal-stats">
+    <li>Mood: Tired, Annoyed</li>
+    <li>Sleep: 6</li>
+    <li>Hunger: 0</li>
+    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>
@@ -641,12 +638,11 @@ p doc
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 12:10 am</li>
-<li>Mood: Tired, Introspective</li>
-<li>Sleep: 4.5</li>
-<li>Hunger: 2</li>
-<li>Coffee: 1</li>
+<ul class="personal-stats">
+    <li>Mood: Tired, Introspective</li>
+    <li>Sleep: 4.5</li>
+    <li>Hunger: 2</li>
+    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>
@@ -772,12 +768,11 @@ end
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 8:20 am</li>
-<li>Mood: Awake</li>
-<li>Sleep: 6</li>
-<li>Hunger: 4</li>
-<li>Coffee: 0</li>
+<ul class="personal-stats">
+    <li>Mood: Awake</li>
+    <li>Sleep: 6</li>
+    <li>Hunger: 4</li>
+    <li>Coffee: 0</li>
 </ul>
 
 ]]></content>

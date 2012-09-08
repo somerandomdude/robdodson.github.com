@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-09-05T13:54:16-07:00</updated>
+  <updated>2012-09-08T07:37:51-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -2611,12 +2611,11 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 10:58 pm</li>
-<li>Mood: Tired, Relaxed</li>
-<li>Sleep: 6</li>
-<li>Hunger: 8</li>
-<li>Coffee: 1</li>
+<ul class="personal-stats">
+    <li>Mood: Tired, Relaxed</li>
+    <li>Sleep: 6</li>
+    <li>Hunger: 8</li>
+    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>
@@ -2737,12 +2736,11 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 10:48 pm</li>
-<li>Mood: Tired, Lazy</li>
-<li>Sleep: 5</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
+<ul class="personal-stats">
+    <li>Mood: Tired, Lazy</li>
+    <li>Sleep: 5</li>
+    <li>Hunger: 0</li>
+    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>
@@ -2924,12 +2922,11 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 10:34 pm</li>
-<li>Mood: Tired, Lazy</li>
-<li>Sleep: 5</li>
-<li>Hunger: 5</li>
-<li>Coffee: 1</li>
+<ul class="personal-stats">
+    <li>Mood: Tired, Lazy</li>
+    <li>Sleep: 5</li>
+    <li>Hunger: 5</li>
+    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>
@@ -3432,12 +3429,11 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 1:08 am</li>
-<li>Mood: Tired, Pissed</li>
-<li>Sleep: 6</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
+<ul class="personal-stats">
+    <li>Mood: Tired, Pissed</li>
+    <li>Sleep: 6</li>
+    <li>Hunger: 0</li>
+    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>
@@ -3879,12 +3875,11 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 12:31 am</li>
-<li>Mood: Tired</li>
-<li>Sleep: 6</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
+<ul class="personal-stats">
+    <li>Mood: Tired</li>
+    <li>Sleep: 6</li>
+    <li>Hunger: 0</li>
+    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>
@@ -3946,12 +3941,11 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 1:28 am</li>
-<li>Mood: Tired, Annoyed</li>
-<li>Sleep: 6</li>
-<li>Hunger: 0</li>
-<li>Coffee: 1</li>
+<ul class="personal-stats">
+    <li>Mood: Tired, Annoyed</li>
+    <li>Sleep: 6</li>
+    <li>Hunger: 0</li>
+    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>
@@ -4008,12 +4002,11 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 12:10 am</li>
-<li>Mood: Tired, Introspective</li>
-<li>Sleep: 4.5</li>
-<li>Hunger: 2</li>
-<li>Coffee: 1</li>
+<ul class="personal-stats">
+    <li>Mood: Tired, Introspective</li>
+    <li>Sleep: 4.5</li>
+    <li>Hunger: 2</li>
+    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>
@@ -4192,12 +4185,11 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 8:20 am</li>
-<li>Mood: Awake</li>
-<li>Sleep: 6</li>
-<li>Hunger: 4</li>
-<li>Coffee: 0</li>
+<ul class="personal-stats">
+    <li>Mood: Awake</li>
+    <li>Sleep: 6</li>
+    <li>Hunger: 4</li>
+    <li>Coffee: 0</li>
 </ul>
 
 ]]></content>
@@ -4375,12 +4367,11 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 10:44 pm</li>
-<li>Mood: Drunk, Sleepy</li>
-<li>Sleep: 3</li>
-<li>Hunger: 4</li>
-<li>Coffee: 1</li>
+<ul class="personal-stats">
+    <li>Mood: Drunk, Sleepy</li>
+    <li>Sleep: 3</li>
+    <li>Hunger: 4</li>
+    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>
@@ -4452,12 +4443,11 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 11:06 pm</li>
-<li>Mood: Hyper</li>
-<li>Sleep: 5</li>
-<li>Hunger: 1</li>
-<li>Coffee: 1</li>
+<ul class="personal-stats">
+    <li>Mood: Hyper</li>
+    <li>Sleep: 5</li>
+    <li>Hunger: 1</li>
+    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>
@@ -4528,12 +4518,11 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 8:18 am</li>
-<li>Mood: Awake, Antsy</li>
-<li>Sleep: 6</li>
-<li>Hunger: 2</li>
-<li>Coffee: 0</li>
+<ul class="personal-stats">
+    <li>Mood: Awake, Antsy</li>
+    <li>Sleep: 6</li>
+    <li>Hunger: 2</li>
+    <li>Coffee: 0</li>
 </ul>
 
 ]]></content>
@@ -4717,12 +4706,11 @@ Again, this is all about learning and experimenting. In my opinion a good unders
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 8:18 am</li>
-<li>Mood: Awake, Antsy</li>
-<li>Sleep: 6</li>
-<li>Hunger: 2</li>
-<li>Coffee: 0</li>
+<ul class="personal-stats">
+    <li>Mood: Awake, Antsy</li>
+    <li>Sleep: 6</li>
+    <li>Hunger: 2</li>
+    <li>Coffee: 0</li>
 </ul>
 
 ]]></content>

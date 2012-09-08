@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Ruby Gems | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/ruby-gems/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-09-05T13:54:16-07:00</updated>
+  <updated>2012-09-08T07:37:51-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -36,12 +36,11 @@ rvm use 1.9.3@r2
 
 <p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
 
-<ul>
-<li>Time: 10:28 pm</li>
-<li>Mood: Tired, Cranky</li>
-<li>Sleep: 6</li>
-<li>Hunger: 8</li>
-<li>Coffee: 0</li>
+<ul class="personal-stats">
+    <li>Mood: Tired, Cranky</li>
+    <li>Sleep: 6</li>
+    <li>Hunger: 8</li>
+    <li>Coffee: 0</li>
 </ul>
 
 ]]></content>
