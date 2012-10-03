@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Virtual Host | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/virtual-host/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-10-02T23:43:01-07:00</updated>
+  <updated>2012-10-02T23:47:57-07:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -146,7 +146,14 @@ sudo apachectl restart
 http://mysite.dev
 </code></p>
 
-<p>With any luck you should see your site! Good Luck!</p>
+<p>With any luck you should see your site! If everything worked go back to terminal and paste in this line:</p>
+
+<p><code>
+sudo launchctl load -w /System/Library/LaunchDaemons/org.apache.httpd.plist
+</code>
+That will tell apache to start whenever the system starts. A word of warning: Whenever you change anything in httpd.conf, httpd-vhosts.conf or your hosts file you'll have to restart apache with <code>sudo apachectl restart</code> otherwise your changes won't show up in the browser.</p>
+
+<p>Good Luck!</p>
 ]]></content>
   </entry>
   
