@@ -10,7 +10,7 @@
 
   <!--  -->
   
-  <meta name="description" content="Today I want to figure out what kind of events to use when one of my views is added to the DOM. This can have a lot of ramifications for positioning &hellip;">
+  <meta name="description" content="I want to figure out how to communicate on a framework level within Backbone. Coming from Flash and RobotLegs I&#8217;m used to a few MVC conventions &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -94,6 +94,66 @@
   </section>
 </div>
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/25/backbone-events-framework-communication/">Backbone Events: Framework Communication</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-25T08:01:00-07:00" pubdate data-updated="true">May 25<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I want to figure out how to communicate on a framework level within Backbone. Coming from Flash and <a href="http://www.robotlegs.org/">RobotLegs</a> I&#8217;m used to a few MVC conventions that work very well as far as event dispatching goes. In RobotLegs you typically have a framework wide eventDispatcher that anyone can tune into. In a nutshell your View will trigger an event, for instance a user clicking a button, and that will get dispatched to interested framework actors. These can be other Views or, more likely, they can be Commands. The Commands are like single use actions tied directly to events. Think of it like binding every public method of your controller to an event. The Commands will typically effect models, changing them in some way, and the Models will dispatch an event that the Views listen for to update themselves.</p>
+
+<p>Backbone works differently in that Views are often tied directly to their models like so:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">Documents</span><span class="p">.</span><span class="nx">first</span><span class="p">();</span> <span class="c1">// &lt;-- Model object</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">new</span> <span class="nx">DocumentRow</span><span class="p">({</span> <span class="c1">// &lt;-- View object with model reference</span>
+</span><span class='line'>  <span class="nx">model</span><span class="o">:</span> <span class="nx">doc</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">id</span><span class="o">:</span> <span class="s2">&quot;document-row-&quot;</span> <span class="o">+</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">id</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>When you use this approach it&#8217;s trivial to tell the view to listen to the model&#8217;s change event and then call <code>view.render()</code>. Essentially you are munging some of a Controller&#8217;s responsibilities into the View. That&#8217;s all well and good but let&#8217;s say we want to dispatch an event from one view which will affect other views and actors. This event has nothing to do with a model, maybe it&#8217;s just an animation of some kind that others need to know about. So how do we go about this?</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/05/25/backbone-events-framework-communication/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -516,47 +576,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7/">Object Oriented Scraper Backed With Tests Pt. 7</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-15T21:33:00-07:00" pubdate data-updated="true">May 15<span>th</span>, 2012</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>During my last post I realized that including my metadata in the blog post as only a ul meant that all the words were being scraped as part of the keyword frequency search. After thinking about it for a while I think I&#8217;m going to give the keyword search method an optional value which it can use to ignore or delete certain nodes.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; Older</a>
@@ -574,6 +593,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/10/02/virtual-host-in-mountain-lion-with-apache/">Virtual Host in Mountain Lion with Apache</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/09/03/javascript-design-patterns-factory/">JavaScript Design Patterns: Factory</a>
       </li>
     
@@ -587,10 +610,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/16/javascript-design-patterns-observer/">JavaScript Design Patterns: Observer</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/10/javascript-design-patterns-iterator/">JavaScript Design Patterns: Iterator</a>
       </li>
     
   </ul>
