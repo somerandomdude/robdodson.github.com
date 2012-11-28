@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-10-02T23:47:57-07:00</updated>
+  <updated>2012-11-27T20:54:10-08:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,303 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Require.js multi-page shimmed site: How-To]]></title>
+    <link href="http://robdodson.me/blog/2012/11/18/a-require-dot-js-multipage-shimmed-site-how-to/"/>
+    <updated>2012-11-18T13:05:00-08:00</updated>
+    <id>http://robdodson.me/blog/2012/11/18/a-require-dot-js-multipage-shimmed-site-how-to</id>
+    <content type="html"><![CDATA[<p>I&#8217;ve been working with require.js a lot lately and found it really improves the way I manage my code. I had previous experience with require in the context of some of my Backbone posts but I&#8217;d never used it on a more traditional multi-page site before. The workflow to setup require on a multi-page site can be a little confusing at first so I&#8217;ll try to walk you through the specifics.</p>
+
+<!--more-->
+
+
+<h2>Overview</h2>
+
+<p><em>Note: This tutorial assumes you&#8217;re already familiar with require.js and its configuration options. If not I recommend you <a href="http://requirejs.org/">checkout the docs</a> before proceeding &#8211; Rob</em></p>
+
+<h2><a href="https://github.com/robdodson/requirejs-multipage-shim-tutorial">Grab the Example Source</a></h2>
+
+<p>Typically when you work with require.js you&#8217;re building a single-page app. You usually have one main file which kicks off the app and pulls in dependencies as needed. When you&#8217;re developing you leave these dependencies in separate files but when you move to production you need to combine them. In a production setting you want to cut down the number of http requests to the bare minimum. To assist you, require.js provides a build tool called r.js which minifies and concatenates all of your dependencies into one file.</p>
+
+<p>When working with a multi-page site compiling everything into one file is probably not a good idea because you have no guarantee that the user will visit every page. Thus the ideal scenario is one in which each page has its own <code>main</code> file that contains page-specific instructions and then a separate (hopefully cached) file which contains all of the commonly used js libs. For example if you have a page called <strong>About</strong> and a page called <strong>Contact</strong> you would have <code>main-about.js</code> and <code>main-contact.js</code>. Let&#8217;s say <code>main-about.js</code> and <code>main-contact.js</code> both require <code>'jquery'</code> and <code>'underscore'</code>. We wouldn&#8217;t want to compile <code>jquery</code> and <code>underscore</code> into each <code>main</code> file because then we&#8217;re creating unnecessary bloat. Instead we should create a <code>common.js</code> file which contains <code>jquery</code> and <code>underscore</code> and we&#8217;ll make sure that this file loads before any of our <code>main</code> files. Take a look at this diagram to help it sink in:</p>
+
+<p><strong>BEFORE OPTIMIZATION</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>About
+</span><span class='line'>----------------
+</span><span class='line'>js/vendor/jquery.js
+</span><span class='line'>js/vendor/underscore.js
+</span><span class='line'>js/app/main-about.js
+</span><span class='line'>
+</span><span class='line'>Contact
+</span><span class='line'>----------------
+</span><span class='line'>js/vendor/jquery.js
+</span><span class='line'>js/vendor/underscore.js
+</span><span class='line'>js/app/main-contact.js</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>AFTER OPTIMIZATION</strong></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>common.js
+</span><span class='line'>----------------
+</span><span class='line'>js/vendor/jquery.js
+</span><span class='line'>js/vendor/underscore.js
+</span><span class='line'>
+</span><span class='line'>About
+</span><span class='line'>----------------
+</span><span class='line'>js/common.js
+</span><span class='line'>js/app/main-about.js
+</span><span class='line'>
+</span><span class='line'>Contact
+</span><span class='line'>----------------
+</span><span class='line'>js/common.js
+</span><span class='line'>js/app/main-contact.js</span></code></pre></td></tr></table></div></figure>
+
+
+<p>By compiling all of those libaries into <code>common.js</code> we&#8217;re reducing the number of http requests per page. Also, after the first page has loaded, <code>common.js</code> should be cached available from the browser&#8217;s cache. Now that you get the general concept let&#8217;s take a look at an example.</p>
+
+<h2>Examples!</h2>
+
+<p><a href="https://twitter.com/jrburke">James Burke</a>, author of require.js, has done a great job putting together some example projects which show how to effectively structure your project so it can be run through the r.js optimization tool when you&#8217;re ready to deploy. The one I typically refer to is the <a href="https://github.com/requirejs/example-multipage-shim">example-multipage-shim.</a> There&#8217;s also an <a href="https://github.com/requirejs/example-multipage">example-multipage</a> but I tend to use the shim version because it seems like there&#8217;s always a few non-AMD scripts that end up in a project.</p>
+
+<p>I&#8217;ve put together my own boilerplate which you guys are free to grab <a href="https://github.com/robdodson/requirejs-multipage-shim-tutorial">here.</a> The rest of this post will walk through this boilerplate.</p>
+
+<h2>Learn you a boilerplate!</h2>
+
+<p>If you&#8217;ve worked with require.js on a single page site you&#8217;re probably used to defining a script tag that looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="c">&lt;!--This sets the baseUrl to the &quot;scripts&quot; directory, and</span>
+</span><span class='line'><span class="c">    loads a script that will have a module ID of &#39;main&#39;--&gt;</span>
+</span><span class='line'><span class="nt">&lt;script </span><span class="na">data-main=</span><span class="s">&quot;scripts/main.js&quot;</span> <span class="na">src=</span><span class="s">&quot;scripts/require.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>data-main</code> attribute is a convenience feature of require.js which sets require&#8217;s <a href="http://requirejs.org/docs/api.html#config-baseUrl">baseUrl property.</a> You usually put some configuration options in the <code>main</code> file as well, for instance, if you&#8217;re loading a 3rd party library you might create a <a href="http://requirejs.org/docs/api.html#config-paths">path</a> so you can easily reference it. Since our boilerplate has different <code>main</code> files for each page we&#8217;re going to put that configuration data into our <code>common.js</code> file instead.</p>
+
+<p><em>Hold on, I thought you said common.js was where we were going to compile all of our libraries?</em></p>
+
+<p>Indeed you are correct astute reader. But since <code>common.js</code> is going to be loaded before any other required modules, why not put our configuration options in it as well? Here&#8217;s what the <code>common.js</code> file from our boilerplate looks like:</p>
+
+<figure class='code'><figcaption><span>common.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">//The build will inline common dependencies into this file.</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">requirejs</span><span class="p">.</span><span class="nx">config</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">baseUrl</span><span class="o">:</span> <span class="s1">&#39;./js&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">paths</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s1">&#39;jquery&#39;</span><span class="o">:</span> <span class="s1">&#39;vendor/require-jquery&#39;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s1">&#39;bootstrap&#39;</span><span class="o">:</span> <span class="s1">&#39;vendor/bootstrap&#39;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span><span class='line'>  <span class="nx">shim</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s1">&#39;bootstrap&#39;</span><span class="o">:</span> <span class="p">[</span> <span class="s1">&#39;jquery&#39;</span> <span class="p">]</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To smooth over possible weird module shimming situations I tend to use the combined jQuery-require.js bundle available <a href="http://requirejs.org/docs/jquery.html">here.</a> Then in my paths option I map <code>jquery</code> to this file. The file will already be loaded on the page so it doesn&#8217;t actually request anything new, it just makes sure that <code>$</code> is available in my modules.</p>
+
+<p>You&#8217;ll also note that we&#8217;re using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap</a> which is not AMD compliant out of the box so we have to shim it. In this case it depends on <code>jquery</code> so we list that as its only dependency and we&#8217;re good.</p>
+
+<p>Aside from <code>common.js</code> you should probably take a look in the <code>app/models</code> directory. I&#8217;ve created two models which extend a base model in order to illustrate that the <code>common.js</code> file isn&#8217;t only for 3rd party code, it&#8217;s really for any code that&#8217;s going to be used over and over on your site. We&#8217;ll toss the basicModel into common.js during the build process.</p>
+
+<h2>Just hit build already&#8230;</h2>
+
+<p>OK ok. I can tell you&#8217;re ready to see some fireworks. Before we hit build I want to point out the <code>options.js</code> file. This is where we tell r.js which modules to compile and what each module should include or exclude.</p>
+
+<figure class='code'><figcaption><span>options.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">appDir</span><span class="o">:</span> <span class="s1">&#39;www&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">baseUrl</span><span class="o">:</span> <span class="s1">&#39;js/&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">mainConfigFile</span><span class="o">:</span> <span class="s1">&#39;www/js/common.js&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">dir</span><span class="o">:</span> <span class="s1">&#39;www-release&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">modules</span><span class="o">:</span> <span class="p">[</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;common&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">include</span><span class="o">:</span> <span class="p">[</span>
+</span><span class='line'>        <span class="s1">&#39;app/models/basicModel&#39;</span><span class="p">,</span>
+</span><span class='line'>        <span class="s1">&#39;bootstrap&#39;</span>
+</span><span class='line'>      <span class="p">],</span>
+</span><span class='line'>      <span class="nx">exclude</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;jquery&#39;</span><span class="p">]</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;app/main-about&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">exclude</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;common&#39;</span><span class="p">,</span> <span class="s1">&#39;jquery&#39;</span><span class="p">]</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>      <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;app/main-contact&#39;</span><span class="p">,</span>
+</span><span class='line'>      <span class="nx">exclude</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;common&#39;</span><span class="p">,</span> <span class="s1">&#39;jquery&#39;</span><span class="p">]</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>  <span class="p">]</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You&#8217;ll note that first we put together our common module, then we tell the subsequent modules to exclude it. When you tell r.js to exclude a module it will find all of the nested dependencies in that module and exclude those as well. This is why we don&#8217;t need to tell about and contact to exclude bootstrap. It sees that bootstrap is already in common so it knows to exclude it.</p>
+
+<p>If you haven&#8217;t already now is a good time to do an <code>npm install</code>. That should pull down all of the grunt dependencies. Speaking of grunt, you&#8217;ll need to install that as well if you&#8217;ve never used it <code>npm install -g grunt</code>.</p>
+
+<p>OK. Ready to rock. Just type <code>grunt</code> to build! When you&#8217;re finished you should have a new folder called <code>www-release</code>. Take a look at the <code>build.txt</code> file to see where everything ended up.</p>
+
+<figure class='code'><figcaption><span>options.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">css</span><span class="o">/</span><span class="nx">bootstrap</span><span class="o">-</span><span class="nx">responsive</span><span class="p">.</span><span class="nx">css</span>
+</span><span class='line'><span class="o">----------------</span>
+</span><span class='line'><span class="nx">css</span><span class="o">/</span><span class="nx">bootstrap</span><span class="o">-</span><span class="nx">responsive</span><span class="p">.</span><span class="nx">css</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">css</span><span class="o">/</span><span class="nx">bootstrap</span><span class="p">.</span><span class="nx">css</span>
+</span><span class='line'><span class="o">----------------</span>
+</span><span class='line'><span class="nx">css</span><span class="o">/</span><span class="nx">bootstrap</span><span class="p">.</span><span class="nx">css</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">css</span><span class="o">/</span><span class="nx">style</span><span class="p">.</span><span class="nx">css</span>
+</span><span class='line'><span class="o">----------------</span>
+</span><span class='line'><span class="nx">css</span><span class="o">/</span><span class="nx">style</span><span class="p">.</span><span class="nx">css</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">js</span><span class="o">/</span><span class="nx">common</span><span class="p">.</span><span class="nx">js</span>
+</span><span class='line'><span class="o">----------------</span>
+</span><span class='line'><span class="nx">js</span><span class="o">/</span><span class="nx">common</span><span class="p">.</span><span class="nx">js</span>
+</span><span class='line'><span class="nx">js</span><span class="o">/</span><span class="nx">app</span><span class="o">/</span><span class="nx">models</span><span class="o">/</span><span class="nx">basicModel</span><span class="p">.</span><span class="nx">js</span>
+</span><span class='line'><span class="nx">js</span><span class="o">/</span><span class="nx">vendor</span><span class="o">/</span><span class="nx">bootstrap</span><span class="p">.</span><span class="nx">js</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">js</span><span class="o">/</span><span class="nx">app</span><span class="o">/</span><span class="nx">main</span><span class="o">-</span><span class="nx">about</span><span class="p">.</span><span class="nx">js</span>
+</span><span class='line'><span class="o">----------------</span>
+</span><span class='line'><span class="nx">js</span><span class="o">/</span><span class="nx">app</span><span class="o">/</span><span class="nx">models</span><span class="o">/</span><span class="nx">aboutModel</span><span class="p">.</span><span class="nx">js</span>
+</span><span class='line'><span class="nx">js</span><span class="o">/</span><span class="nx">app</span><span class="o">/</span><span class="nx">main</span><span class="o">-</span><span class="nx">about</span><span class="p">.</span><span class="nx">js</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">js</span><span class="o">/</span><span class="nx">app</span><span class="o">/</span><span class="nx">main</span><span class="o">-</span><span class="nx">contact</span><span class="p">.</span><span class="nx">js</span>
+</span><span class='line'><span class="o">----------------</span>
+</span><span class='line'><span class="nx">js</span><span class="o">/</span><span class="nx">app</span><span class="o">/</span><span class="nx">models</span><span class="o">/</span><span class="nx">contactModel</span><span class="p">.</span><span class="nx">js</span>
+</span><span class='line'><span class="nx">js</span><span class="o">/</span><span class="nx">app</span><span class="o">/</span><span class="nx">main</span><span class="o">-</span><span class="nx">contact</span><span class="p">.</span><span class="nx">js</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you take a look at the <code>common.js</code> file in <code>www-release</code> it should look like a big blob of minified code. That&#8217;s what we want to see. In this case it contains our basicModel, twitter bootstrap and our original configuration code. If you refer to about.html you can see how we control the load order:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;./js/vendor/require-jquery.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span><span class='line'><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'><span class="c1">// Load common code that includes config,</span>
+</span><span class='line'><span class="c1">// then load the app logic for this page.</span>
+</span><span class='line'><span class="nx">require</span><span class="p">([</span><span class="s1">&#39;./js/common&#39;</span><span class="p">],</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">common</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// ./js/common.js sets the baseUrl to be ./js/</span>
+</span><span class='line'>  <span class="c1">// You can ask for &#39;app/main-about&#39; here instead</span>
+</span><span class='line'>  <span class="c1">// of &#39;./js/app/main-about&#39;</span>
+</span><span class='line'>  <span class="nx">require</span><span class="p">([</span><span class="s1">&#39;app/main-about&#39;</span><span class="p">]);</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>First we bring in our combined require.js/jquery script. Then we load <code>common.js</code> and only <em>after</em> <code>common.js</code> is loaded do we load the page specific code in <code>main-about</code>. If you stick to this structure you should be able to easily layer your code so it&#8217;s easy to manage throughout your site.</p>
+
+<h2><a href="https://github.com/robdodson/requirejs-multipage-shim-tutorial">Grab the Example Source</a></h2>
+
+<p>Hope you learned something new today. Feedback and suggestions always welcome in the comments below. Thanks!</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Virtual Host in Mountain Lion with Apache]]></title>
@@ -4608,81 +4905,6 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <li>Sleep: 5</li>
     <li>Hunger: 1</li>
     <li>Coffee: 1</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to Run a Node Script from the Command Line]]></title>
-    <link href="http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/"/>
-    <updated>2012-06-15T19:46:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line</id>
-    <content type="html"><![CDATA[<p>This post is going to be short and sweet because I have to help my lady pack for her big trip to Germany. Over the past few days I&#8217;ve been messing around with command line tools written in Ruby so today I decided to give it a shot in Node.</p>
-
-<!--more-->
-
-
-<p>We&#8217;re going to start small in this first post and just get a little script running. After that we&#8217;ll step it up so it can be distributed using NPM, <a href="http://robdodson.me/blog/2012/06/14/how-to-write-a-command-line-ruby-gem/">just like we did with our previous Ruby gem.</a></p>
-
-<h2>First write some codez</h2>
-
-<p>Make a new directory called <code>compliment</code> and create two files inside of it: <code>comliment.js</code> and <code>package.json</code>.</p>
-
-<p>In <code>compliment.js</code> we&#8217;re just going to print out some kind words.</p>
-
-<figure class='code'><figcaption><span>compliment/compliment.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="err">#</span><span class="o">!</span> <span class="err">/usr/bin/env node</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;you. are. AWESOME!&#39;</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Simple enough right? Just make sure you include that shebang up at the top which directs the system to use Node to execute our script.</p>
-
-<h2>Package it up</h2>
-
-<p>Ok now that we have our little script we&#8217;ll give its <code>package.json</code> some love.</p>
-
-<figure class='code'><figcaption><span>compliment/package.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;compliment&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;version&quot;</span><span class="o">:</span> <span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;description&quot;</span><span class="o">:</span> <span class="s2">&quot;Tell us how awesome we are.&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;preferGlobal&quot;</span><span class="o">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;bin&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;compliment&quot;</span><span class="o">:</span> <span class="s2">&quot;compliment.js&quot;</span> <span class="p">},</span>
-</span><span class='line'>    <span class="s2">&quot;author&quot;</span><span class="o">:</span> <span class="s2">&quot;Rob Dodson&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;engines&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;node&quot;</span><span class="o">:</span> <span class="s2">&quot;*&quot;</span> <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Most of that should be self explanatory. The key aspect is the <code>bin</code> section where you tell it to translate <code>compliment</code> into <code>compliment.js</code>. To install it all we have to do is run <code>npm link</code>. After you&#8217;ve done that you should be able to type <code>compliment</code> and hear how awesome you are!</p>
-
-<p>Keep in mind this isn&#8217;t distributable just yet, we&#8217;ll work on that tomorrow. Till then have fun playing with your new powers :D</p>
-
-<ul>
-<li>Rob</li>
-</ul>
-
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul class="personal-stats">
-    <li>Mood: Awake, Antsy</li>
-    <li>Sleep: 6</li>
-    <li>Hunger: 2</li>
-    <li>Coffee: 0</li>
 </ul>
 
 ]]></content>

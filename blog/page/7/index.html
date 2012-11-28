@@ -10,7 +10,7 @@
 
   <!--  -->
   
-  <meta name="description" content="Since I&#8217;ve been talking so much about D3.js lately I thought it might be fun to start a little project which combines D3 and Ruby. The idea is &hellip;">
+  <meta name="description" content="I just drank a ton of coffee and I&#8217;m blasting music in my headphones so this post my bit a bit more scatter-shot than most since I can&#8217;t &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -94,6 +94,51 @@
   </section>
 </div>
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/05/06/object-oriented-scraper-backed-with-tests/">Object Oriented Scraper Backed With Tests</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-06T18:09:00-07:00" pubdate data-updated="true">May 6<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><em>I just drank a ton of coffee and I&#8217;m blasting music in my headphones so this post my bit a bit more scatter-shot than most since I can&#8217;t really focus :]</em></p>
+
+<p>Yesterday I managed to build a pretty naive scraper using Nokogiri which would count how often each word was used in the first 10 posts of this blog. Basically scraping the home URL of the site and grabbing everything inside of the <code>div.entry-content</code> selector.</p>
+
+<p>Today I want to convert it into a more OO library so it&#8217;s a bit more modular and reusable. I also want to back everything with RSpec tests to get into the practice. While it won&#8217;t be true TDD I&#8217;ll try to write the tests for the library before putting the classes together.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2012/05/06/object-oriented-scraper-backed-with-tests/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -621,49 +666,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2011/09/23/how-to-use-rvm-for-rails3/">A Basic RVM Tutorial for Rails 3</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-09-23T07:33:00-07:00" pubdate data-updated="true">Sep 23<span>rd</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h3>What is RVM?</h3>
-
-<p><a href="https://rvm.io//">RVM</a> is a great Ruby and gem management tool that should probably be the first thing you install if you’re learning Rails (or Ruby for that matter). The main benefit of RVM is that it helps to keep your rubies and your gems organized into discrete folders which can easily be thrown away and recreated. If you’ve ever had a gem explode on you, then you know how great a feature like this is. I’ll cover the basics of using RVM in this post to quickly get you up and running. This tutorial is written for the OSX terminal, if you&#8217;re on Windows&#8230;um&#8230;kill yourself.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2011/09/23/how-to-use-rvm-for-rails3/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/8/">&larr; Older</a>
@@ -681,6 +683,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/11/18/a-require-dot-js-multipage-shimmed-site-how-to/">A Require.js multi-page shimmed site: How-To</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/10/02/virtual-host-in-mountain-lion-with-apache/">Virtual Host in Mountain Lion with Apache</a>
       </li>
     
@@ -694,10 +700,6 @@
     
       <li class="post">
         <a href="/blog/2012/08/27/javascript-design-patterns-decorator/">JavaScript Design Patterns: Decorator</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/08/16/javascript-design-patterns-observer/">JavaScript Design Patterns: Observer</a>
       </li>
     
   </ul>
