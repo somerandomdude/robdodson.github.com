@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Require.js | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/require-js/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-11-27T20:54:10-08:00</updated>
+  <updated>2012-11-27T20:56:35-08:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -218,7 +218,7 @@ require(['./js/common'], function (common) {
 
 <p>```</p>
 
-<p>First we bring in our combined require.js/jquery script. Then we load <code>common.js</code> and only <em>after</em> <code>common.js</code> is loaded do we load the page specific code in <code>main-about</code>. If you stick to this structure you should be able to easily layer your code so it's easy to manage throughout your site.</p>
+<p>First we bring in our combined require.js/jquery script. Then we load <code>common.js</code> and only <em>after</em> <code>common.js</code> is loaded do we load the page specific code in <code>main-about</code>. If you stick to this structure you should be able to layer your code so it's easy to manage throughout your site.</p>
 
 <h2><a href="https://github.com/robdodson/requirejs-multipage-shim-tutorial">Grab the Example Source</a></h2>
 
