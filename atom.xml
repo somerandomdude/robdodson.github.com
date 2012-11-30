@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-11-27T20:56:35-08:00</updated>
+  <updated>2012-11-30T08:28:50-08:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,107 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Asynchronous Grunt Tasks]]></title>
+    <link href="http://robdodson.me/blog/2012/11/29/asynchronous-grunt-tasks/"/>
+    <updated>2012-11-29T08:15:00-08:00</updated>
+    <id>http://robdodson.me/blog/2012/11/29/asynchronous-grunt-tasks</id>
+    <content type="html"><![CDATA[<p>After my last post <a href="https://twitter.com/stevensacks">@stevensacks</a> tweeted at me that he was having issues getting node FileSystem commands to work in grunt. After a bit of poking around I noticed that there was no call to grunt&#8217;s <code>async</code> method, which was probably preventing the process from finishing properly. So today&#8217;s post is a primer on async grunt processes, and how to make sure your node and grunt syntax is setup correctly.</p>
+
+<!--more-->
+
+
+<h2><a href="https://github.com/robdodson/async-grunt-tasks">Grab the Example Source</a></h2>
+
+<p>I&#8217;ve provided a simple grunt project at the link above. Take a look at the <code>tasks</code> folder and you should see two custom tasks, <code>grunt-read-write-local.js</code> and <code>grunt-read-write-web.js</code>. The former will read a local file and write its contents to a new file. The latter will request a webpage and write its contents to a static file.</p>
+
+<p>There are two asynchronous APIs at play here (Node&#8217;s and Grunt&#8217;s) and it&#8217;s important to understand both.</p>
+
+<p>In Node an async operation will usually provide a callback, such is the case for <a href="http://nodejs.org/api/fs.html#fs_fs_readfile_filename_encoding_callback">fs.readFile</a>, or it will use an event dispatch, for instance in an http request we listen for the <a href="http://nodejs.org/api/http.html#http_event_data">data event.</a></p>
+
+<p>Grunt, on the other hand, uses a token or a kind of promise. You grab a reference to grunt&#8217;s <code>done</code> function and you wait till your node process has finished before calling it. If you take a look at <code>grunt-read-write-local.js</code> you can see that we first call the async method to let grunt know it needs to wait:</p>
+
+<figure class='code'><figcaption><span>tasks/grunt-read-write-local.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="kd">var</span> <span class="nx">done</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">async</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and as we finish writing our file we tell grunt that everything completed succesfully and it&#8217;s ok to carry on:</p>
+
+<figure class='code'><figcaption><span>tasks/grunt-read-write-local.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Write the contents of the target file to the new location</span>
+</span><span class='line'><span class="nx">fs</span><span class="p">.</span><span class="nx">writeFile</span><span class="p">(</span><span class="nx">pathToWrite</span><span class="p">,</span> <span class="nx">data</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">throw</span> <span class="nx">err</span><span class="p">;</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">pathToWrite</span> <span class="o">+</span> <span class="s1">&#39; saved!&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="c1">// Tell grunt the async task is complete</span>
+</span><span class='line'>  <span class="nx">done</span><span class="p">();</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We do something similar in our <code>grunt-read-write-web</code> task but this time we work with <a href="http://nodejs.org/api/stream.html#stream_stream">Stream events.</a></p>
+
+<figure class='code'><figcaption><span>tasks/grunt-read-write-web.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="c1">// Tell grunt this task is asynchronous.</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">done</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">async</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">http</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">pathToRead</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="c1">// Pipe the data from the response stream to</span>
+</span><span class='line'>  <span class="c1">// a static file.</span>
+</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span><span class="nx">fs</span><span class="p">.</span><span class="nx">createWriteStream</span><span class="p">(</span><span class="nx">pathToWrite</span><span class="p">));</span>
+</span><span class='line'>  <span class="c1">// Tell grunt the async task is complete</span>
+</span><span class='line'>  <span class="nx">res</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;end&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">pathToWrite</span> <span class="o">+</span> <span class="s1">&#39; saved!&#39;</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">done</span><span class="p">();</span>
+</span><span class='line'>  <span class="p">});</span>
+</span><span class='line'><span class="p">}).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Got error: &quot;</span> <span class="o">+</span> <span class="nx">e</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
+</span><span class='line'>  <span class="c1">// Tell grunt the async task failed</span>
+</span><span class='line'>  <span class="nx">done</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The response returned by an http request implements the <a href="http://nodejs.org/api/stream.html#stream_readable_stream">ReadableStream</a> interface so it will emit <code>data</code> and <code>end</code> events. Node Streams have a great feature called <a href="http://nodejs.org/api/stream.html#stream_stream_pipe_destination_options">pipes</a> which handle the work of consuming data events and writing them to a destination. Sexy :) We still listen for the <code>end</code> event coming from our request so we can notify grunt that the process has finished and it can move on.</p>
+
+<h2><a href="https://github.com/robdodson/async-grunt-tasks">Grab the Example Source</a></h2>
+
+<p>If you want to test it all out make sure you run <code>npm install</code> first to pull down any dependencies. Then kick things off by running <code>grunt</code>. I&#8217;m thinking my next post might be all about <a href="http://nodejs.org/api/stream.html#stream_stream">Streams</a> in node since they&#8217;re such a cool concept. Thanks to <a href="https://twitter.com/maxogden">@maxogden</a> and <a href="https://twitter.com/dominictarr">@dominictarr</a> for their great posts on the subject of streams.</p>
+
+<ul>
+<li><a href="http://maxogden.com/node-streams.html">Node Streams: How do they work? &#8211; Max Ogden</a></li>
+<li><a href="https://gist.github.com/2401787">High Level Style in JavaScript &#8211; Dominic Tarr</a></li>
+</ul>
+
+
+<p>Any questions or comments hit me up in the discussion area below.</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Require.js multi-page shimmed site: How-To]]></title>
@@ -4828,82 +4929,6 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <li>Mood: Drunk, Sleepy</li>
     <li>Sleep: 3</li>
     <li>Hunger: 4</li>
-    <li>Coffee: 1</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Publish your Node Library to NPM]]></title>
-    <link href="http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm/"/>
-    <updated>2012-06-16T23:06:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/16/publish-your-node-library-to-npm</id>
-    <content type="html"><![CDATA[<p>Alright, <a href="http://robdodson.me/blog/2012/06/15/how-to-run-a-node-script-from-the-command-line/">contuing from yesterday</a> we want to take our little Node module and make it available to the world as a really awesome command line tool.</p>
-
-<!--more-->
-
-
-<p>The first thing we need to do is register an NPM account.</p>
-
-<p><code>npm adduser</code></p>
-
-<p>Fill in your credentials and it should be ready to go.</p>
-
-<p>If we have any dependencies they should be added to our <code>package.json</code> file. Our simple <code>compliment</code> program doesn&#8217;t need any extra libraries but we&#8217;ll add <code>xml2json</code> just to demonstrate how it&#8217;s done.</p>
-
-<figure class='code'><figcaption><span>package.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;compliment&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;version&quot;</span><span class="o">:</span> <span class="s2">&quot;0.0.1&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;description&quot;</span><span class="o">:</span> <span class="s2">&quot;Tell us how awesome we are.&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;preferGlobal&quot;</span><span class="o">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;bin&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;compliment&quot;</span><span class="o">:</span> <span class="s2">&quot;compliment.js&quot;</span> <span class="p">},</span>
-</span><span class='line'>    <span class="s2">&quot;author&quot;</span><span class="o">:</span> <span class="s2">&quot;Rob Dodson&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;dependencies&quot;</span><span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>        <span class="s2">&quot;xml2json&quot;</span><span class="o">:</span> <span class="s2">&quot;0.2.4&quot;</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="s2">&quot;engines&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;node&quot;</span><span class="o">:</span> <span class="s2">&quot;*&quot;</span> <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Since we&#8217;ve changed our <code>package.json</code> we need to run <code>npm link</code> again to install the dependency. After that you should have a <code>node_modules/</code> folder in your project root.</p>
-
-<p>Let&#8217;s put this baby under version control!</p>
-
-<figure class='code'><figcaption><span>package.json</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">git</span> <span class="nx">init</span>
-</span><span class='line'><span class="nx">echo</span> <span class="nx">node_modules</span><span class="o">/</span> <span class="o">&gt;&gt;</span> <span class="p">.</span><span class="nx">gitignore</span> <span class="err">#</span> <span class="nx">node_modules</span> <span class="nx">should</span> <span class="nx">be</span> <span class="nx">installed</span> <span class="nx">by</span> <span class="nx">npm</span>
-</span><span class='line'><span class="nx">git</span> <span class="nx">add</span> <span class="p">.</span>
-</span><span class='line'><span class="nx">git</span> <span class="nx">commit</span> <span class="o">-</span><span class="nx">am</span> <span class="s1">&#39;Initial commit&#39;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Final step: <code>npm publish</code></p>
-
-<h1>BOOMJAMS! We have us an npm module! - Rob</h1>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul class="personal-stats">
-    <li>Mood: Hyper</li>
-    <li>Sleep: 5</li>
-    <li>Hunger: 1</li>
     <li>Coffee: 1</li>
 </ul>
 
