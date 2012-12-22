@@ -174,7 +174,7 @@
 </span><span class='line'>js/app/main-contact.js</span></code></pre></td></tr></table></div></figure>
 
 
-<p>By compiling all of those libaries into <code>common.js</code> we&#8217;re reducing the number of http requests per page. Also, after the first page has loaded, <code>common.js</code> should be cached available from the browser&#8217;s cache. Now that you get the general concept let&#8217;s take a look at an example.</p>
+<p>By compiling all of those libaries into <code>common.js</code> we&#8217;re reducing the number of http requests per page. Also, after the first page has loaded, <code>common.js</code> should be available from the browser&#8217;s cache. Now that you get the general concept let&#8217;s take a look at an example.</p>
 
 <h2>Examples!</h2>
 
@@ -295,9 +295,9 @@
 
 <p>You&#8217;ll note that first we put together our common module, then we tell the subsequent modules to exclude it. When you tell r.js to exclude a module it will find all of the nested dependencies in that module and exclude those as well. This is why we don&#8217;t need to tell about and contact to exclude bootstrap. It sees that bootstrap is already in common so it knows to exclude it.</p>
 
-<p>If you haven&#8217;t already now is a good time to do an <code>npm install</code>. That should pull down all of the grunt dependencies. Speaking of grunt, you&#8217;ll need to install that as well if you&#8217;ve never used it <code>npm install -g grunt</code>.</p>
+<p>If you haven&#8217;t already now is a good time to do an <code>npm install</code>. That should pull down all of the grunt dependencies. Speaking of grunt, you&#8217;ll need to install that as well if you&#8217;ve never used it <code>npm install -g grunt</code>. You might noticed in our gruntfile, <code>grunt.js</code>, we are using a number of tasks from the <a href="https://github.com/gruntjs/grunt-contrib">grunt-contrib</a> library. Grunt-contrib is a great resource for and I encourage you to spend some time looking through all of the tasks that fall under its umbrella.</p>
 
-<p>OK. Ready to rock. Just type <code>grunt</code> to build! When you&#8217;re finished you should have a new folder called <code>www-release</code>. Take a look at the <code>build.txt</code> file to see where everything ended up.</p>
+<p>OK. Ready to rock. Just type <code>grunt</code> to build, or <code>grunt.cmd</code> if you&#8217;re on Windows (thanks <a href="http://twitter.com/stevensacks">@stevensacks</a>). When you&#8217;re finished you should have a new folder called <code>www-release</code>. Take a look at the <code>build.txt</code> file to see where everything ended up.</p>
 
 <figure class='code'><figcaption><span>options.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
