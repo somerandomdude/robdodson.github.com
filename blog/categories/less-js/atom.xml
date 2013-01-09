@@ -4,7 +4,7 @@
   <title><![CDATA[Category: LESS.js | Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/blog/categories/less-js/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2013-01-09T08:14:10-08:00</updated>
+  <updated>2013-01-09T08:15:20-08:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -23,11 +23,11 @@
 <!--more-->
 
 
-<p>Just to whet your appetite I'll show you a teaser shot of what we're going to accomplish.</p>
+<p>Just to whet your appetite here's a teaser shot of what we're going to accomplish.</p>
 
 <p><img class="center" src="https://s3.amazonaws.com/robdodson/images/less-preview.png" title="'A preview of the Inspector showing LESS debugging'" ></p>
 
-<p>You'll notice over on the right instead of your typical "style.css: 7" it says "modules.less: 7". That's right, the developer tools are looking at the generated CSS and source mapping it back to the LESS files.</p>
+<p>You'll notice over on the right instead of your typical <code>style.css: 7</code> it says <code>modules.less: 7</code>. That's right, the developer tools are looking at the generated CSS and source mapping it back to the LESS files.</p>
 
 <p><img class="center" src="https://s3.amazonaws.com/robdodson/images/less-preview2.png" title="'The inspector revealing the actual LESS file'" ></p>
 
