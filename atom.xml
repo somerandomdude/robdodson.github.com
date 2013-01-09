@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2013-01-09T08:18:38-08:00</updated>
+  <updated>2013-01-09T08:20:26-08:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -72,7 +72,7 @@
 
 <h2>Processors</h2>
 
-<p>There are a quite a few ways to convert your LESS into properly source mapped CSS code. You can use the lessc command line tool, a GUI such as <a href="http://incident57.com/codekit/">CodeKit</a> or have the server do it with something like <a href="https://github.com/emberfeather/less.js-middleware">less-middleware</a> for <a href="http://www.senchalabs.org/connect/">connect</a>/<a href="http://expressjs.com/">express.</a> I&#8217;m sure there are others but these are the ones I&#8217;ll be covering today.</p>
+<p>There are a quite a few ways to convert your LESS into properly source mapped CSS code. You can use the lessc command line tool, a GUI such as <a href="http://incident57.com/codekit/">CodeKit</a> or have the server do it with something like <a href="https://github.com/emberfeather/less.js-middleware">less-middleware</a> for <a href="http://www.senchalabs.org/connect/">connect</a>/<a href="http://expressjs.com/">express.</a> As I mentioned previously, you can also compile less on the client-side using less.js but unfortunately our debugging technique does not seem to work with that approach so you&#8217;ll need to use an alternative.</p>
 
 <p>Depending on your processor and the version of LESS it uses you might have to locate the <code>tree.js</code> file inside its copy of LESS and change some of the debugging output. I know that the current version of CodeKit (1.4.1) still uses LESS 1.3.1 so we&#8217;ll detail how to patch it.</p>
 
