@@ -4,7 +4,7 @@
   <title><![CDATA[Rob Dodson talks internets]]></title>
   <link href="http://robdodson.me/atom.xml" rel="self"/>
   <link href="http://robdodson.me/"/>
-  <updated>2012-12-22T10:17:54-08:00</updated>
+  <updated>2013-01-09T08:11:21-08:00</updated>
   <id>http://robdodson.me/</id>
   <author>
     <name><![CDATA[Rob Dodson]]></name>
@@ -12,6 +12,179 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Debug LESS with Chrome Developer Tools]]></title>
+    <link href="http://robdodson.me/blog/2012/12/28/debug-less-with-chrome-developer-tools/"/>
+    <updated>2012-12-28T08:32:00-08:00</updated>
+    <id>http://robdodson.me/blog/2012/12/28/debug-less-with-chrome-developer-tools</id>
+    <content type="html"><![CDATA[<p>If you&#8217;ve spent much time with preprocessors like LESS, SASS/SCSS or Stylus you&#8217;ve probably discovered their one rather crippling flaw: debugging. With thousands of lines of LESS code suddenly turning into even more thousands of lines of CSS it can become nearly impossible to tell where a particular style comes from. Inspecting CSS used to be the domain of the Chrome Developer Tools and Firebug but now that our CSS is machine generated there&#8217;s no longer a link between the style at line 2137 and the LESS file that generated it. Thankfully the Chrome team is addressing this problem but their current focus is on SASS. So today I&#8217;ll teach you how to rework your LESS processor so it plays nice with Chrome and reunites you with your old friend, the CSS inspector.</p>
+
+<!--more-->
+
+
+<p>Just to whet your appetite I&#8217;ll show you a teaser shot of what we&#8217;re going to accomplish.</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/less-preview.png" title="'A preview of the Inspector showing LESS debugging'" ></p>
+
+<p>You&#8217;ll notice over on the right instead of your typical &#8220;style.css: 7&#8221; it says &#8220;modules.less: 7&#8221;. That&#8217;s right, the developer tools are looking at the generated CSS and source mapping it back to the LESS files.</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/less-preview2.png" title="'The inspector revealing the actual LESS file'" ></p>
+
+<p>Clicking on the line number will actual dive into the LESS file where we can see the nesting, variables and mixins.</p>
+
+<p>&#8220;Awesome!&#8221; you say, but how do we do it?</p>
+
+<p>Well SASS has a debugging feature which will output media-queries above each style. It looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="k">@media</span> <span class="nt">-sass-debug-info</span><span class="p">{</span><span class="nt">filename</span><span class="p">{</span><span class="k">font-family</span><span class="o">:</span><span class="n">file</span><span class="err">\</span><span class="o">:</span><span class="err">\</span><span class="o">/</span><span class="err">\</span><span class="o">/</span><span class="err">\</span><span class="o">/</span><span class="n">Users</span><span class="err">\</span><span class="o">/</span><span class="n">Rob</span><span class="err">\</span><span class="o">/</span><span class="n">Desktop</span><span class="err">\</span><span class="o">/</span><span class="n">less</span><span class="o">-</span><span class="n">debug</span><span class="err">\</span><span class="o">/</span><span class="n">less</span><span class="err">\</span><span class="o">/</span><span class="n">base</span><span class="err">\</span><span class="o">.</span><span class="n">less</span><span class="p">}</span><span class="nt">line</span><span class="p">{</span><span class="k">font-family</span><span class="o">:</span><span class="err">\</span><span class="m">000035</span><span class="p">}}</span>
+</span><span class='line'><span class="nt">h1</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">color</span><span class="o">:</span> <span class="m">#999999</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is known as a <strong>source map</strong> and it basically tells a debugging tool how to find it&#8217;s way from the generated output back to the correct source file. The latest version of Chrome Canary has specific support for SASS style source maps, so <a href="https://github.com/cloudhead/less.js/pull/1038">Felix Gnass cleverly reasoned that if LESS could work like SASS in this respect then the developer tools would pick up on that as well.</a> LESS already has a similar source map feature but the media-queries didn&#8217;t <em>quite</em> use the same syntax. In LESS 1.3.3 this should all be fixed so we can now debug our LESS files using the Chrome Dev Tools!</p>
+
+<p>Let&#8217;s go ahead and setup Chrome Canary which is required because these are still experimental features.</p>
+
+<p><em>Important: If you use less.js to compile your LESS in the browser the techniques we&#8217;ll be covering will not work for you. Unfortunately less.js generates all its output in a big style block at the top of the page and that seems to confuse the dev tools. I wanted to point that out before you spend too much time setting things up.</em></p>
+
+<h2>Chrome Canary</h2>
+
+<p>You can grab the latest version of <a href="https://www.google.com/intl/en/chrome/browser/canary.html">Chrome Canary here.</a> At the time of this writing (Jan. 09, 2013) the standard Chrome browser does not yet have this feature so Canary is a must.</p>
+
+<p>Once you&#8217;ve downloaded Canary type <code>chrome://flags/</code> into the address bar and hit enter. You should be transported to a magical place.</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/chrome-flags.png" title="'The Chrome Canary experiments section'" ></p>
+
+<p>Here we&#8217;ll search for &#8220;Enable Developer Tools experiments&#8221;. When you find it click &#8220;Enable&#8221;. Then <strong>restart Canary</strong>. Once it&#8217;s open again fire up the developer tools and click the gear in the bottom right.</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/chrome-options.png" title="'Chrome Developer tools options'" ></p>
+
+<p>In the left hand sidebar click General. Scroll down to where it says Sources and click &#8220;Enable source maps&#8221;. Again in the sidebar click Experiments, scroll down and enable &#8220;Support for Sass&#8221;.</p>
+
+<p>Now if you&#8217;re just working with SASS then all you have to do is make sure your SASS files generate the proper source maps and you&#8217;re done. <a href="http://bricss.net/post/33788072565/using-sass-source-maps-in-webkit-inspector">Here&#8217;s a great article to walk you through the last couple of steps.</a> But if you&#8217;re like me and your codebase is in LESS there is more work to be done. Onward!</p>
+
+<h2>Processors</h2>
+
+<p>There are a quite a few ways to convert your LESS into properly source mapped CSS code. You can use the lessc command line tool, a GUI such as <a href="http://incident57.com/codekit/">CodeKit</a> or have the server do it with something like <a href="https://github.com/emberfeather/less.js-middleware">less-middleware</a> for <a href="http://www.senchalabs.org/connect/">connect</a>/<a href="http://expressjs.com/">express.</a> I&#8217;m sure there are others but these are the ones I&#8217;ll be covering today.</p>
+
+<p>Depending on your processor and the version of LESS it uses you might have to locate the <code>tree.js</code> file inside its copy of LESS and change some of the debugging output. I know that the current version of CodeKit (1.4.1) still uses LESS 1.3.1 so we&#8217;ll detail how to patch it.</p>
+
+<p>Inside of <code>tree.js</code> we&#8217;re looking for a block of code like this:</p>
+
+<figure class='code'><figcaption><span>tree.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">tree</span><span class="p">.</span><span class="nx">debugInfo</span><span class="p">.</span><span class="nx">asMediaQuery</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s1">&#39;@media -sass-debug-info{filename{font-family:&quot;&#39;</span> <span class="o">+</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">debugInfo</span><span class="p">.</span><span class="nx">fileName</span> <span class="o">+</span> <span class="s1">&#39;&quot;;}line{font-family:&quot;&#39;</span> <span class="o">+</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">debugInfo</span><span class="p">.</span><span class="nx">lineNumber</span> <span class="o">+</span> <span class="s1">&#39;&quot;;}}\n&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>we&#8217;re just going to replace that function with this one:</p>
+
+<figure class='code'><figcaption><span>tree.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">tree</span><span class="p">.</span><span class="nx">debugInfo</span><span class="p">.</span><span class="nx">asMediaQuery</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s1">&#39;@media -sass-debug-info{filename{font-family:&#39;</span> <span class="o">+</span>
+</span><span class='line'>        <span class="p">(</span><span class="s1">&#39;file://&#39;</span> <span class="o">+</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">debugInfo</span><span class="p">.</span><span class="nx">fileName</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/[\/:.]/g</span><span class="p">,</span> <span class="s1">&#39;\\$&amp;&#39;</span><span class="p">)</span> <span class="o">+</span>
+</span><span class='line'>        <span class="s1">&#39;}line{font-family:\\00003&#39;</span> <span class="o">+</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">debugInfo</span><span class="p">.</span><span class="nx">lineNumber</span> <span class="o">+</span> <span class="s1">&#39;}}\n&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and that&#8217;s it really! I&#8217;ll point out where to find <code>tree.js</code> for various processors and any additional steps you might need to take.</p>
+
+<h3>lessc</h3>
+
+<p>If you&#8217;ve installed LESS using npm check that you&#8217;ve got the latest version.</p>
+
+<figure class='code'><figcaption><span>tree.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">$</span> <span class="nx">lessc</span> <span class="o">--</span><span class="nx">version</span>
+</span><span class='line'><span class="nx">lessc</span> <span class="mf">1.3</span><span class="p">.</span><span class="mi">3</span> <span class="p">(</span><span class="nx">LESS</span> <span class="nx">Compiler</span><span class="p">)</span> <span class="p">[</span><span class="nx">JavaScript</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If your version is not 1.3.3 or greater you should run <code>npm install -g less</code> to update to the latest version.</p>
+
+<p>To compile your less with baked in source maps pass the <code>--line-numbers</code> flag a value of <code>mediaquery</code>. For example:</p>
+
+<figure class='code'><figcaption><span>tree.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">lessc</span> <span class="o">--</span><span class="nx">line</span><span class="o">-</span><span class="nx">numbers</span><span class="o">=</span><span class="nx">mediaquery</span> <span class="nx">theme</span><span class="p">.</span><span class="nx">less</span> <span class="nx">theme</span><span class="p">.</span><span class="nx">css</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Your generated LESS should now be inspectable in Chrome Canary. Yay!</p>
+
+<h3>CodeKit</h3>
+
+<p>Navigate to your Applications folder and right-click on CodeKit.app. Choose &#8220;Show Package Contents.&#8221; Navigate to <code>Contents/Resources/engines/less/lib/less/</code> and paste the code from above into <code>tree.js</code>.</p>
+
+<p>Now when you go back to CodeKit use the &#8220;Debug Info in CSS&#8221; dropdown and set it to &#8220;Media Query at Top of CSS File&#8221;.</p>
+
+<p>After that you should be good to go :)</p>
+
+<h3>less-middleware</h3>
+
+<p>If you&#8217;re using the <a href="https://github.com/emberfeather/less.js-middleware">less-middleware</a> extension for Express you&#8217;ll want to check its <code>package.json</code> and make sure it&#8217;s on version 0.1.9. You should notice in its dependencies that it requires LESS 1.3.3.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="s2">&quot;dependencies&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;less&quot;</span><span class="o">:</span> <span class="s2">&quot;&gt;= 1.3.3&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;mkdirp&quot;</span><span class="o">:</span> <span class="s2">&quot;&gt;= 0.3.1&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You might need to update your version of the middleware and run <code>npm install</code> again to update everything to the very latest.</p>
+
+<p>In your app you&#8217;ll need to add the <code>dumpLineNumbers</code> options to the middleware&#8217;s config.</p>
+
+<figure class='code'><figcaption><span>app.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">lessMiddleware</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">src</span><span class="o">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;path/to/src&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">dest</span><span class="o">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;path/to/dest&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">dumpLineNumbers</span><span class="o">:</span> <span class="s1">&#39;mediaquery&#39;</span>
+</span><span class='line'><span class="p">}));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After that you should be all set.</p>
+
+<h2>Warnings</h2>
+
+<p>Be careful about hacking your own <code>tree.js</code> file if you can&#8217;t update LESS for whatever reason. For instance if you&#8217;re using CodeKit a future update might wipe out your patch but not necessarily bring LESS to the current version so you may have to re-apply it.</p>
+
+<p>One more thing, make sure before you send your code into production that you remember to <strong>turn off debugging</strong> otherwise you&#8217;ll be needlessly bloating your CSS files by quite a lot.</p>
+
+<h2>Conclusion</h2>
+
+<p>Personally I&#8217;ve found this trick <em>extremely</em> useful when working with large LESS codebases. I&#8217;ve seen some chatter that Stylus might also support this trick so if you have first-hand experience debugging Stylus with Chrome please drop me a comment. Otherwise I might do a follow up showing how to achieve similar results in that language.</p>
+
+<p>Any questions or comments hit me up in the discussion area below.</p>
+
+<p>&#8211; Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Asynchronous Grunt Tasks]]></title>
@@ -4748,188 +4921,6 @@ Again, this is all about learning and experimenting. In my opinion a good unders
     <li>Sleep: 6</li>
     <li>Hunger: 4</li>
     <li>Coffee: 0</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Object Oriented Scraper Backed With Tests Pt...9?]]></title>
-    <link href="http://robdodson.me/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9/"/>
-    <updated>2012-06-17T22:43:00-07:00</updated>
-    <id>http://robdodson.me/blog/2012/06/17/object-oriented-scraper-backed-with-tests-pt-dot-dot-dot-9</id>
-    <content type="html"><![CDATA[<p>I just spent a few hours talking to my friend <a href="http://derekbradley.com/">Derek</a>(<a href="https://twitter.com/#!/derekebradley">@derekebradley</a>) about Ruby and it occured to me that I never finished this scraper project. We got awfully far with it but then it kind of died on the vine. <a href="http://robdodson.me/blog/2012/05/06/object-oriented-scraper-backed-with-tests/">Thankfully,</a> <a href="http://robdodson.me/blog/2012/05/07/object-oriented-scraper-backed-with-tests-pt-2/">I</a> <a href="http://robdodson.me/blog/2012/05/08/object-oriented-scraper-backed-with-tests-pt-3/">wrote</a> <a href="http://robdodson.me/blog/2012/05/11/object-oriented-scraper-backed-with-tests-pt-4/">it</a> <a href="http://robdodson.me/blog/2012/05/12/object-oriented-scraper-backed-with-tests-pt-5/">all</a> <a href="http://robdodson.me/blog/2012/05/13/object-oriented-scraper-backed-with-tests-pt-6/">down.</a> <a href="http://robdodson.me/blog/2012/05/15/object-oriented-scraper-backed-with-tests-pt-7/">down.</a> <a href="http://robdodson.me/blog/2012/05/16/object-oriented-scraper-backed-with-tests-pt-8/">down.</a></p>
-
-<p>The fact of the matter is I didn&#8217;t know where to take the data. I didn&#8217;t have a design or a layout that I could put it all into. I want to change all that. I want to turn this into something useful. But first I have to make sense of all the code that was written so many weeks ago.</p>
-
-<!--more-->
-
-
-<h2>Tests as documentation&#8230;bullshit.</h2>
-
-<p>Ok ok. I should say it&#8217;s <em>total</em> bullshit to call your tests the documentation because they are helpful. But the fact of the matter is you can get so crafty with RSpec that it makes the tests difficult to read in a useful way. I&#8217;m not saying they&#8217;re illegible, it&#8217;s just that they leverage features which adds to their thought deficit. Before you go off saying that I wrote them wrong and tests should be all the documentation you need&#8230;shutup. They&#8217;re helpful but I would love it if I had written a bit of Markdown Readme to go with all this&#8230;</p>
-
-<h2>Explain yourself</h2>
-
-<p>Let&#8217;s see if I can regurgitate what this thing currently does in plain English.</p>
-
-<ul>
-<li><p>There&#8217;s a config.yml file. It says what page to scrape, what the CSS selector for a post looks like and what the CSS selector for metadata looks like. The metadata is the list at the bottom of every page listing the time, amount of sleep, coffee, etc.</p></li>
-<li><p>There&#8217;s a command line object, <code>tentacles</code>. It initiates <code>runner.rb</code>. <code>Runner</code> creates an instance of <code>Options</code>. <code>Options</code> loads the config.yml file and parses it, turning its properties into members of the options object.</p></li>
-<li><p>It actually doesn&#8217;t do anything else beyond that. <code>runner.rb</code> stops right there but we have Rspec tests which fake data and check to see if our other classes work. Those other classes are&#8230;</p></li>
-<li><p><code>crawler.rb</code> should be the real meat of our program. Funny, seeing as how I wrote all this, that I totally can&#8217;t remember who does what&#8230;</p></li>
-<li><p><code>crawler.rb</code> has two primary methods: <code>words_by_selector</code> and <code>metadata_by_selector</code>.</p></li>
-<li><p><code>words_by_selector</code> returns an array of words and the number of times they&#8217;ve occurred. This array should be in order from most used to least used.</p></li>
-<li><p><code>metadata_by_selector</code> returns the content of one of our metadata lists&#8230;. I think.</p></li>
-</ul>
-
-
-<h2>Make it work</h2>
-
-<p>With Tim Gunn&#8217;s mantra we&#8217;re gonna make this thing work. The tests verify that everything should be at least somewhat functioning. Since I&#8217;m a little drunk I can&#8217;t do a <em>super</em> deep dive but let&#8217;s see if we can get our runner to write out the contents of <code>words_by_selector</code> to a text file.</p>
-
-<figure class='code'><figcaption><span>runner.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;yaml&#39;</span>
-</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;options&#39;</span>
-</span><span class='line'><span class="n">require_relative</span> <span class="s1">&#39;crawler&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">module</span> <span class="nn">Tentacles</span>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Runner</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-</span><span class='line'>      <span class="vi">@options</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Options</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">run</span>
-</span><span class='line'>      <span class="vi">@crawler</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Crawler</span><span class="o">.</span><span class="n">from_uri</span><span class="p">(</span><span class="vi">@options</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
-</span><span class='line'>      <span class="n">output</span> <span class="o">=</span> <span class="vi">@crawler</span><span class="o">.</span><span class="n">words_by_selector</span><span class="p">(</span><span class="vi">@options</span><span class="o">.</span><span class="n">post_selector</span><span class="p">,</span> <span class="s1">&#39;ul:last-child&#39;</span><span class="p">)</span>
-</span><span class='line'>      <span class="no">File</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;output.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">file</span><span class="o">|</span>
-</span><span class='line'>        <span class="n">output</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">line</span><span class="o">|</span>
-</span><span class='line'>          <span class="n">file</span><span class="o">.</span><span class="n">puts</span> <span class="n">line</span>
-</span><span class='line'>        <span class="k">end</span>
-</span><span class='line'>      <span class="k">end</span>
-</span><span class='line'>    <span class="k">end</span>
-</span><span class='line'>  <span class="k">end</span>
-</span><span class='line'><span class="k">end</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>To get this working I <code>cd</code> into the lib/ folder where all the code lives and do an <code>irb -I .</code> so I can require the local files.</p>
-
-<figure class='code'><figcaption><span>runner.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;runner&#39;</span>
-</span><span class='line'><span class="n">runner</span> <span class="o">=</span> <span class="no">Tentacles</span><span class="o">::</span><span class="no">Runner</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s1">&#39;config.yml&#39;</span><span class="p">)</span>
-</span><span class='line'><span class="n">runner</span><span class="o">.</span><span class="n">run</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>After doing that we <em>do</em> get a text file, with copy that looks somewhat correct&#8230;</p>
-
-<figure class='code'><figcaption><span>runner.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">we</span><span class="p">:</span> <span class="mi">8</span>
-</span><span class='line'><span class="n">to</span><span class="p">:</span> <span class="mi">8</span>
-</span><span class='line'><span class="n">npm</span><span class="p">:</span> <span class="mi">6</span>
-</span><span class='line'><span class="n">should</span><span class="p">:</span> <span class="mi">5</span>
-</span><span class='line'><span class="n">package</span><span class="p">:</span> <span class="mi">4</span>
-</span><span class='line'><span class="n">our</span><span class="p">:</span> <span class="mi">4</span>
-</span><span class='line'><span class="n">compliment</span><span class="p">:</span> <span class="mi">4</span>
-</span><span class='line'><span class="n">git</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="mi">0</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="mi">4</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">need</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="mi">2</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">it</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">node_modules</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">the</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">have</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">be</span><span class="p">:</span> <span class="mi">3</span>
-</span><span class='line'><span class="n">json</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">your</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">any</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">dependencies</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">module</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="ow">and</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">node</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">add</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">xml2json</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">how</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">s</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="k">in</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">you</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">json1</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">an</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="mi">3</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">awesome</span><span class="p">:</span> <span class="mi">2</span>
-</span><span class='line'><span class="n">version</span><span class="p">:</span> <span class="mi">2</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>It looks like the copy from my most recent blog post, plus or minus a few words. Horrible regex aside it <em>kinda</em> works and that&#8217;s what we&#8217;re after. Maybe tomorrow we can turn it into some JSON :D Till then. - Rob</p>
-
-<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
-
-<ul class="personal-stats">
-    <li>Mood: Drunk, Sleepy</li>
-    <li>Sleep: 3</li>
-    <li>Hunger: 4</li>
-    <li>Coffee: 1</li>
 </ul>
 
 ]]></content>

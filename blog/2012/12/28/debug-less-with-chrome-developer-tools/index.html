@@ -1,0 +1,507 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Debug LESS with Chrome Developer Tools - Rob Dodson talks internets</title>
+  <meta name="author" content="Rob Dodson">
+
+  <!--  -->
+  
+  <meta name="description" content="If you&#8217;ve spent much time with preprocessors like LESS, SASS/SCSS or Stylus you&#8217;ve probably discovered their one rather crippling flaw: &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://robdodson.me/blog/2012/12/28/debug-less-with-chrome-developer-tools">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Rob Dodson talks internets" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-25869920-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Rob Dodson talks internets</a></h1>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:robdodson.me" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Debug LESS With Chrome Developer Tools</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-28T08:32:00-08:00" pubdate data-updated="true">Dec 28<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>If you&#8217;ve spent much time with preprocessors like LESS, SASS/SCSS or Stylus you&#8217;ve probably discovered their one rather crippling flaw: debugging. With thousands of lines of LESS code suddenly turning into even more thousands of lines of CSS it can become nearly impossible to tell where a particular style comes from. Inspecting CSS used to be the domain of the Chrome Developer Tools and Firebug but now that our CSS is machine generated there&#8217;s no longer a link between the style at line 2137 and the LESS file that generated it. Thankfully the Chrome team is addressing this problem but their current focus is on SASS. So today I&#8217;ll teach you how to rework your LESS processor so it plays nice with Chrome and reunites you with your old friend, the CSS inspector.</p>
+
+<!--more-->
+
+
+<p>Just to whet your appetite I&#8217;ll show you a teaser shot of what we&#8217;re going to accomplish.</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/less-preview.png" title="'A preview of the Inspector showing LESS debugging'" ></p>
+
+<p>You&#8217;ll notice over on the right instead of your typical &#8220;style.css: 7&#8221; it says &#8220;modules.less: 7&#8221;. That&#8217;s right, the developer tools are looking at the generated CSS and source mapping it back to the LESS files.</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/less-preview2.png" title="'The inspector revealing the actual LESS file'" ></p>
+
+<p>Clicking on the line number will actual dive into the LESS file where we can see the nesting, variables and mixins.</p>
+
+<p>&#8220;Awesome!&#8221; you say, but how do we do it?</p>
+
+<p>Well SASS has a debugging feature which will output media-queries above each style. It looks like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="k">@media</span> <span class="nt">-sass-debug-info</span><span class="p">{</span><span class="nt">filename</span><span class="p">{</span><span class="k">font-family</span><span class="o">:</span><span class="n">file</span><span class="err">\</span><span class="o">:</span><span class="err">\</span><span class="o">/</span><span class="err">\</span><span class="o">/</span><span class="err">\</span><span class="o">/</span><span class="n">Users</span><span class="err">\</span><span class="o">/</span><span class="n">Rob</span><span class="err">\</span><span class="o">/</span><span class="n">Desktop</span><span class="err">\</span><span class="o">/</span><span class="n">less</span><span class="o">-</span><span class="n">debug</span><span class="err">\</span><span class="o">/</span><span class="n">less</span><span class="err">\</span><span class="o">/</span><span class="n">base</span><span class="err">\</span><span class="o">.</span><span class="n">less</span><span class="p">}</span><span class="nt">line</span><span class="p">{</span><span class="k">font-family</span><span class="o">:</span><span class="err">\</span><span class="m">000035</span><span class="p">}}</span>
+</span><span class='line'><span class="nt">h1</span> <span class="p">{</span>
+</span><span class='line'>  <span class="k">color</span><span class="o">:</span> <span class="m">#999999</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is known as a <strong>source map</strong> and it basically tells a debugging tool how to find it&#8217;s way from the generated output back to the correct source file. The latest version of Chrome Canary has specific support for SASS style source maps, so <a href="https://github.com/cloudhead/less.js/pull/1038">Felix Gnass cleverly reasoned that if LESS could work like SASS in this respect then the developer tools would pick up on that as well.</a> LESS already has a similar source map feature but the media-queries didn&#8217;t <em>quite</em> use the same syntax. In LESS 1.3.3 this should all be fixed so we can now debug our LESS files using the Chrome Dev Tools!</p>
+
+<p>Let&#8217;s go ahead and setup Chrome Canary which is required because these are still experimental features.</p>
+
+<p><em>Important: If you use less.js to compile your LESS in the browser the techniques we&#8217;ll be covering will not work for you. Unfortunately less.js generates all its output in a big style block at the top of the page and that seems to confuse the dev tools. I wanted to point that out before you spend too much time setting things up.</em></p>
+
+<h2>Chrome Canary</h2>
+
+<p>You can grab the latest version of <a href="https://www.google.com/intl/en/chrome/browser/canary.html">Chrome Canary here.</a> At the time of this writing (Jan. 09, 2013) the standard Chrome browser does not yet have this feature so Canary is a must.</p>
+
+<p>Once you&#8217;ve downloaded Canary type <code>chrome://flags/</code> into the address bar and hit enter. You should be transported to a magical place.</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/chrome-flags.png" title="'The Chrome Canary experiments section'" ></p>
+
+<p>Here we&#8217;ll search for &#8220;Enable Developer Tools experiments&#8221;. When you find it click &#8220;Enable&#8221;. Then <strong>restart Canary</strong>. Once it&#8217;s open again fire up the developer tools and click the gear in the bottom right.</p>
+
+<p><img class="center" src="https://s3.amazonaws.com/robdodson/images/chrome-options.png" title="'Chrome Developer tools options'" ></p>
+
+<p>In the left hand sidebar click General. Scroll down to where it says Sources and click &#8220;Enable source maps&#8221;. Again in the sidebar click Experiments, scroll down and enable &#8220;Support for Sass&#8221;.</p>
+
+<p>Now if you&#8217;re just working with SASS then all you have to do is make sure your SASS files generate the proper source maps and you&#8217;re done. <a href="http://bricss.net/post/33788072565/using-sass-source-maps-in-webkit-inspector">Here&#8217;s a great article to walk you through the last couple of steps.</a> But if you&#8217;re like me and your codebase is in LESS there is more work to be done. Onward!</p>
+
+<h2>Processors</h2>
+
+<p>There are a quite a few ways to convert your LESS into properly source mapped CSS code. You can use the lessc command line tool, a GUI such as <a href="http://incident57.com/codekit/">CodeKit</a> or have the server do it with something like <a href="https://github.com/emberfeather/less.js-middleware">less-middleware</a> for <a href="http://www.senchalabs.org/connect/">connect</a>/<a href="http://expressjs.com/">express.</a> I&#8217;m sure there are others but these are the ones I&#8217;ll be covering today.</p>
+
+<p>Depending on your processor and the version of LESS it uses you might have to locate the <code>tree.js</code> file inside its copy of LESS and change some of the debugging output. I know that the current version of CodeKit (1.4.1) still uses LESS 1.3.1 so we&#8217;ll detail how to patch it.</p>
+
+<p>Inside of <code>tree.js</code> we&#8217;re looking for a block of code like this:</p>
+
+<figure class='code'><figcaption><span>tree.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">tree</span><span class="p">.</span><span class="nx">debugInfo</span><span class="p">.</span><span class="nx">asMediaQuery</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s1">&#39;@media -sass-debug-info{filename{font-family:&quot;&#39;</span> <span class="o">+</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">debugInfo</span><span class="p">.</span><span class="nx">fileName</span> <span class="o">+</span> <span class="s1">&#39;&quot;;}line{font-family:&quot;&#39;</span> <span class="o">+</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">debugInfo</span><span class="p">.</span><span class="nx">lineNumber</span> <span class="o">+</span> <span class="s1">&#39;&quot;;}}\n&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>we&#8217;re just going to replace that function with this one:</p>
+
+<figure class='code'><figcaption><span>tree.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">tree</span><span class="p">.</span><span class="nx">debugInfo</span><span class="p">.</span><span class="nx">asMediaQuery</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ctx</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s1">&#39;@media -sass-debug-info{filename{font-family:&#39;</span> <span class="o">+</span>
+</span><span class='line'>        <span class="p">(</span><span class="s1">&#39;file://&#39;</span> <span class="o">+</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">debugInfo</span><span class="p">.</span><span class="nx">fileName</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/[\/:.]/g</span><span class="p">,</span> <span class="s1">&#39;\\$&amp;&#39;</span><span class="p">)</span> <span class="o">+</span>
+</span><span class='line'>        <span class="s1">&#39;}line{font-family:\\00003&#39;</span> <span class="o">+</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">debugInfo</span><span class="p">.</span><span class="nx">lineNumber</span> <span class="o">+</span> <span class="s1">&#39;}}\n&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and that&#8217;s it really! I&#8217;ll point out where to find <code>tree.js</code> for various processors and any additional steps you might need to take.</p>
+
+<h3>lessc</h3>
+
+<p>If you&#8217;ve installed LESS using npm check that you&#8217;ve got the latest version.</p>
+
+<figure class='code'><figcaption><span>tree.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">$</span> <span class="nx">lessc</span> <span class="o">--</span><span class="nx">version</span>
+</span><span class='line'><span class="nx">lessc</span> <span class="mf">1.3</span><span class="p">.</span><span class="mi">3</span> <span class="p">(</span><span class="nx">LESS</span> <span class="nx">Compiler</span><span class="p">)</span> <span class="p">[</span><span class="nx">JavaScript</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If your version is not 1.3.3 or greater you should run <code>npm install -g less</code> to update to the latest version.</p>
+
+<p>To compile your less with baked in source maps pass the <code>--line-numbers</code> flag a value of <code>mediaquery</code>. For example:</p>
+
+<figure class='code'><figcaption><span>tree.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">lessc</span> <span class="o">--</span><span class="nx">line</span><span class="o">-</span><span class="nx">numbers</span><span class="o">=</span><span class="nx">mediaquery</span> <span class="nx">theme</span><span class="p">.</span><span class="nx">less</span> <span class="nx">theme</span><span class="p">.</span><span class="nx">css</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Your generated LESS should now be inspectable in Chrome Canary. Yay!</p>
+
+<h3>CodeKit</h3>
+
+<p>Navigate to your Applications folder and right-click on CodeKit.app. Choose &#8220;Show Package Contents.&#8221; Navigate to <code>Contents/Resources/engines/less/lib/less/</code> and paste the code from above into <code>tree.js</code>.</p>
+
+<p>Now when you go back to CodeKit use the &#8220;Debug Info in CSS&#8221; dropdown and set it to &#8220;Media Query at Top of CSS File&#8221;.</p>
+
+<p>After that you should be good to go :)</p>
+
+<h3>less-middleware</h3>
+
+<p>If you&#8217;re using the <a href="https://github.com/emberfeather/less.js-middleware">less-middleware</a> extension for Express you&#8217;ll want to check its <code>package.json</code> and make sure it&#8217;s on version 0.1.9. You should notice in its dependencies that it requires LESS 1.3.3.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="s2">&quot;dependencies&quot;</span><span class="o">:</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s2">&quot;less&quot;</span><span class="o">:</span> <span class="s2">&quot;&gt;= 1.3.3&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;mkdirp&quot;</span><span class="o">:</span> <span class="s2">&quot;&gt;= 0.3.1&quot;</span>
+</span><span class='line'>  <span class="p">},</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You might need to update your version of the middleware and run <code>npm install</code> again to update everything to the very latest.</p>
+
+<p>In your app you&#8217;ll need to add the <code>dumpLineNumbers</code> options to the middleware&#8217;s config.</p>
+
+<figure class='code'><figcaption><span>app.js</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">lessMiddleware</span><span class="p">({</span>
+</span><span class='line'>  <span class="nx">src</span><span class="o">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;path/to/src&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">dest</span><span class="o">:</span> <span class="nx">__dirname</span> <span class="o">+</span> <span class="s1">&#39;path/to/dest&#39;</span><span class="p">,</span>
+</span><span class='line'>  <span class="nx">dumpLineNumbers</span><span class="o">:</span> <span class="s1">&#39;mediaquery&#39;</span>
+</span><span class='line'><span class="p">}));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After that you should be all set.</p>
+
+<h2>Warnings</h2>
+
+<p>Be careful about hacking your own <code>tree.js</code> file if you can&#8217;t update LESS for whatever reason. For instance if you&#8217;re using CodeKit a future update might wipe out your patch but not necessarily bring LESS to the current version so you may have to re-apply it.</p>
+
+<p>One more thing, make sure before you send your code into production that you remember to <strong>turn off debugging</strong> otherwise you&#8217;ll be needlessly bloating your CSS files by quite a lot.</p>
+
+<h2>Conclusion</h2>
+
+<p>Personally I&#8217;ve found this trick <em>extremely</em> useful when working with large LESS codebases. I&#8217;ve seen some chatter that Stylus might also support this trick so if you have first-hand experience debugging Stylus with Chrome please drop me a comment. Otherwise I might do a follow up showing how to achieve similar results in that language.</p>
+
+<p>Any questions or comments hit me up in the discussion area below.</p>
+
+<p>&#8211; Rob</p>
+
+<p>You should follow me on Twitter <a href="http://twitter.com/rob_dodson">here.</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rob Dodson</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-28T08:32:00-08:00" pubdate data-updated="true">Dec 28<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/chrome/'>Chrome</a>, <a class='category' href='/blog/categories/codekit/'>CodeKit</a>, <a class='category' href='/blog/categories/less/'>LESS</a>, <a class='category' href='/blog/categories/less-js/'>LESS.js</a>, <a class='category' href='/blog/categories/less-middleware/'>Less-Middleware</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://robdodson.me/blog/2012/12/28/debug-less-with-chrome-developer-tools/" data-via="rob_dodson" data-counturl="http://robdodson.me/blog/2012/12/28/debug-less-with-chrome-developer-tools/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/11/29/asynchronous-grunt-tasks/" title="Previous Post: Asynchronous Grunt Tasks">&laquo; Asynchronous Grunt Tasks</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2012/12/28/debug-less-with-chrome-developer-tools/">Debug LESS with Chrome Developer Tools</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/29/asynchronous-grunt-tasks/">Asynchronous Grunt Tasks</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/18/a-require-dot-js-multipage-shimmed-site-how-to/">A Require.js multi-page shimmed site: How-To</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/10/02/virtual-host-in-mountain-lion-with-apache/">Virtual Host in Mountain Lion with Apache</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/03/javascript-design-patterns-factory/">JavaScript Design Patterns: Factory</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/robdodson">@robdodson</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'robdodson',
+            count: 4,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("rob_dodson", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/rob_dodson" class="twitter-follow-button" data-show-count="false">Follow @rob_dodson</a>
+  
+</section>
+
+
+<section>
+  <h1>My Pinboard</h1>
+  <ul id="pinboard_linkroll">Fetching linkroll...</ul>
+  <p><a href="http://pinboard.in/u:robdodson">My Pinboard Bookmarks &raquo;</a></p>
+</section>
+<script type="text/javascript">
+  var linkroll = 'pinboard_linkroll'; //id target for pinboard list
+  var pinboard_user = "robdodson"; //id target for pinboard list
+  var pinboard_count = 3; //id target for pinboard list
+  (function(){
+    var pinboardInit = document.createElement('script');
+    pinboardInit.type = 'text/javascript';
+    pinboardInit.async = true;
+    pinboardInit.src = '/javascripts/pinboard.js';
+    document.getElementsByTagName('head')[0].appendChild(pinboardInit);
+  })();
+</script>
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/118271135596408598424?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Rob Dodson -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'robdodsontalksinternets';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://robdodson.me/blog/2012/12/28/debug-less-with-chrome-developer-tools/';
+        var disqus_url = 'http://robdodson.me/blog/2012/12/28/debug-less-with-chrome-developer-tools/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
